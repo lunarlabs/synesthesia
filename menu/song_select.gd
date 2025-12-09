@@ -58,8 +58,6 @@ const HI_SPEED_MULTS_VAL: Array[float] = [
 	1.5,
 	1.75,
 	2.0,
-	2.5,
-	3.0
 ]
 
 const HI_SPEED_MULTS_STR: Dictionary = {
@@ -70,8 +68,6 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 	1.5: "1.5x",
 	1.75: "1.75x",
 	2.0: "2.0x",
-	2.5: "2.5x",
-	3.0: "3.0x"
 }
 
 @onready var anim = $AnimationPlayer
@@ -112,7 +108,21 @@ func _ready():
 	
 	_populate_song_list()
 	_connect_signals()
-	_select_song(0)
+	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
+	energy_modifier_index = SessionManager.previous_select_options.get("energy_modifier_index", 0)
+	checkpoint_modifier_index = SessionManager.previous_select_options.get("checkpoint_modifier_index", 0)
+	timing_modifier_index = SessionManager.previous_select_options.get("timing_modifier_index", 0)
+	reset_modifier_index = SessionManager.previous_select_options.get("reset_modifier_index", 0)
+	hi_speed_index = SessionManager.previous_select_options.get("hi_speed_index", 2)
+	%EnergyOption.text = tr(ENERGY_MODIFIER_NAMES[energy_modifier_index])
+	%CheckpointOption.text = tr(CHECKPOINT_MODIFIER_NAMES[checkpoint_modifier_index])
+	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])
+	%ResetOption.text = tr(RESET_MODIFIER_NAMES[reset_modifier_index])
+	if HI_SPEED_MULTS_VAL[hi_speed_index] == 1.0:
+		%HiSpeedOption.text = tr("MOD_HISPEED")
+	else:
+		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
+	_select_song(SessionManager.previous_select_options.get("song_index", 0))
 
 func _load_async():
 	print("Loading song catalog (async)...")
@@ -214,6 +224,19 @@ func _on_play_pressed():
 	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
 	manager.autoblast = %AutoblastButton.button_pressed
 	
+	#save current session options
+	SessionManager.previous_select_options = {
+		"song_index": selected_song_index,
+		"difficulty": selected_difficulty,
+		"energy_modifier_index": energy_modifier_index,
+		"checkpoint_modifier_index": checkpoint_modifier_index,
+		"timing_modifier_index": timing_modifier_index,
+		"reset_modifier_index": reset_modifier_index,
+		"hi_speed_index": hi_speed_index,
+		"hide_streak_hints": %NoStreakHintButton.button_pressed,
+		"autoblast": %AutoblastButton.button_pressed
+	}
+
 	# Load the song
 	get_tree().root.add_child(manager)
 	get_tree().current_scene = manager
