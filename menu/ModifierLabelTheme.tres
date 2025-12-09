@@ -1,0 +1,59 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://c7c1rqmsxlumn"]
+
+[ext_resource type="StyleBox" uid="uid://bowjolfrqf7nv" path="res://menu/ModifierBoxOff.tres" id="1_nckg7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a3tho"]
+bg_color = Color(1, 0, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ihbn7"]
+bg_color = Color(0, 0.77828115, 0.9975229, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nckg7"]
+bg_color = Color(0, 0.85882354, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c7i0r"]
+bg_color = Color(0.69803923, 0, 0.96862745, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lql3q"]
+bg_color = Color(0.9049415, 0.6627196, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[resource]
+AutoblastModifier/base_type = &"Modifier"
+AutoblastModifier/colors/font_color = Color(0, 0, 0, 1)
+AutoblastModifier/styles/normal = SubResource("StyleBoxFlat_a3tho")
+CheckpointModifier/base_type = &"Modifier"
+CheckpointModifier/colors/font_color = Color(0, 0, 0, 1)
+CheckpointModifier/styles/normal = SubResource("StyleBoxFlat_ihbn7")
+EnergyModifier/base_type = &"Modifier"
+EnergyModifier/colors/font_color = Color(0, 0, 0, 1)
+EnergyModifier/styles/normal = SubResource("StyleBoxFlat_nckg7")
+HintModifier/base_type = &"Modifier"
+HintModifier/colors/font_color = Color(0, 0, 0, 1)
+HintModifier/styles/normal = SubResource("StyleBoxFlat_c7i0r")
+Modifier/base_type = &"Label"
+Modifier/colors/font_color = Color(0.15487596, 0.154876, 0.15487596, 1)
+Modifier/font_sizes/font_size = 16
+Modifier/styles/normal = ExtResource("1_nckg7")
+TimingModifier/base_type = &"Label"
+TimingModifier/colors/font_color = Color(0, 0, 0, 1)
+TimingModifier/styles/normal = SubResource("StyleBoxFlat_lql3q")

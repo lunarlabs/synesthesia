@@ -1,0 +1,253 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtyo4m00l076s"]
+
+[ext_resource type="Script" uid="uid://bn83sjvxymuup" path="res://addons/moggsong_to_synroad/testdock.gd" id="1_xsd26"]
+
+[node name="Dock" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xsd26")
+
+[node name="SongFolderEdit" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Song Folder"
+emoji_menu_enabled = false
+
+[node name="ButtonBar" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 2
+
+[node name="StatusLine" type="Label" parent="ButtonBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FolderSelectButton" type="Button" parent="ButtonBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select Folder"
+
+[node name="ImportButton" type="Button" parent="ButtonBar"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Import"
+
+[node name="SaveButton" type="Button" parent="ButtonBar"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Save"
+
+[node name="WarningLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 0.6, 0.2, 1)
+layout_mode = 2
+
+[node name="Main" type="HSplitContainer" parent="."]
+layout_mode = 2
+split_offset = 3
+
+[node name="VBoxContainer" type="GridContainer" parent="Main"]
+layout_mode = 2
+columns = 2
+
+[node name="SongTitleTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Title"
+
+[node name="SongTitleEntry" type="LineEdit" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+editable = false
+
+[node name="LongTitleTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Title (long)"
+
+[node name="LongTitleEntry" type="LineEdit" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="ArtistTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Artist"
+
+[node name="ArtistEntry" type="LineEdit" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="GenreTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Genre"
+
+[node name="GenreEntry" type="LineEdit" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="DescTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Description"
+
+[node name="DescEntry" type="TextEdit" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+editable = false
+wrap_mode = 1
+
+[node name="FixedBPMTitle" type="CheckBox" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Fixed BPM"
+
+[node name="FixedBPMEntry" type="SpinBox" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 60.0
+max_value = 400.0
+value = 120.0
+editable = false
+
+[node name="IntroMeasuresTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Intro Measures"
+
+[node name="IntroMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+value = 4.0
+editable = false
+
+[node name="PlayableMeasuresTitle" type="Label" parent="Main/VBoxContainer"]
+layout_mode = 2
+text = "Playable Measures"
+
+[node name="PlayableMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 300.0
+value = 100.0
+editable = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+
+[node name="InstrumentEditor" type="VBoxContainer" parent="Main/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InstrumentHeader" type="HBoxContainer" parent="Main/HBoxContainer/InstrumentEditor"]
+layout_mode = 2
+
+[node name="InstrumentTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+layout_mode = 2
+text = "Tracks"
+
+[node name="AddTrackButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Add track"
+disabled = true
+text = "+"
+
+[node name="ClickTrackTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+layout_mode = 2
+text = "Click Track:"
+
+[node name="ClickTrackEntry" type="LineEdit" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="ClickTrackBrowseButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Browse..."
+
+[node name="TrackScroll" type="ScrollContainer" parent="Main/HBoxContainer/InstrumentEditor"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TrackList" type="VBoxContainer" parent="Main/HBoxContainer/InstrumentEditor/TrackScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CheckpointEditor" type="VBoxContainer" parent="Main/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="CheckpointHeader" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor"]
+layout_mode = 2
+
+[node name="CheckpointTitle" type="Label" parent="Main/HBoxContainer/CheckpointEditor/CheckpointHeader"]
+layout_mode = 2
+text = "Checkpoints"
+
+[node name="CheckpointAddBox" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor"]
+layout_mode = 2
+
+[node name="CheckpointSpin" type="SpinBox" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 500.0
+value = 4.0
+editable = false
+
+[node name="AddCheckpointButton" type="Button" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Add"
+
+[node name="CheckpointList" type="ItemList" parent="Main/HBoxContainer/CheckpointEditor"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SongDirDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Select Song Directory"
+initial_position = 2
+size = Vector2i(1000, 500)
+file_mode = 2
+display_mode = 1
+root_subfolder = "song"
+
+[node name="AudioFileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Open a File"
+initial_position = 2
+size = Vector2i(1000, 500)
+file_mode = 0
+display_mode = 1
+root_subfolder = "song"
+filters = PackedStringArray("*.wav; Audio Stems")
+
+[connection signal="pressed" from="ButtonBar/FolderSelectButton" to="." method="_on_folder_select_button_pressed"]
+[connection signal="pressed" from="ButtonBar/ImportButton" to="." method="_on_import_button_pressed"]
+[connection signal="pressed" from="ButtonBar/SaveButton" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="Main/HBoxContainer/InstrumentEditor/InstrumentHeader/AddTrackButton" to="." method="_on_add_track_button_pressed"]
+[connection signal="pressed" from="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox/AddCheckpointButton" to="." method="_on_add_checkpoint_button_pressed"]

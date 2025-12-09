@@ -1,0 +1,110 @@
+[gd_scene load_steps=11 format=3 uid="uid://dst7ex0lc5nue"]
+
+[ext_resource type="Script" uid="uid://che0tg4hwisbv" path="res://entities/checkpoint.gd" id="1_hjeaj"]
+[ext_resource type="Texture2D" uid="uid://b8xemuakjro0l" path="res://addons/kenney_particle_pack/flame_02.png" id="1_wpuaw"]
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_l3rob"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_0bd8t"]
+left_to_right = 1.0
+size = Vector3(3, 10, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_6wqo1"]
+base_font = ExtResource("2_l3rob")
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="Gradient" id="Gradient_wpuaw"]
+interpolation_color_space = 1
+offsets = PackedFloat32Array(0, 0.10628019, 0.5845411, 1)
+colors = PackedColorArray(0, 0.39999986, 1, 0, 0, 0.39999986, 1, 1, 0, 0.93, 0.15499985, 1, 0.49019608, 0.9254902, 0.56078434, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_hjeaj"]
+gradient = SubResource("Gradient_wpuaw")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hjeaj"]
+lifetime_randomness = 0.15
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(7.5, 0.2, 0.02)
+angle_min = -179.99998
+angle_max = 180.00002
+inherit_velocity_ratio = 1.0
+direction = Vector3(0, 1, 0)
+spread = 5.0
+initial_velocity_min = 2.31
+initial_velocity_max = 4.31
+angular_velocity_min = -150.00002
+angular_velocity_max = 149.99998
+gravity = Vector3(0, 0, 0)
+scale_min = 0.19999999
+color_ramp = SubResource("GradientTexture1D_hjeaj")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6wqo1"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+specular_mode = 2
+disable_ambient_light = true
+disable_fog = true
+disable_specular_occlusion = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_color = Color(1.0789914, 1.0789914, 1.0789914, 1)
+albedo_texture = ExtResource("1_wpuaw")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_hjeaj"]
+material = SubResource("StandardMaterial3D_6wqo1")
+size = Vector2(4, 4)
+
+[node name="Checkpoint" type="Node3D"]
+script = ExtResource("1_hjeaj")
+
+[node name="LeftPillar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2, 0)
+visibility_range_end = 96.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+mesh = SubResource("PrismMesh_0bd8t")
+
+[node name="RightPillar" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 15.5, 2, 0)
+visibility_range_end = 96.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+mesh = SubResource("PrismMesh_0bd8t")
+
+[node name="Text" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 2.979, 0.839)
+visibility_range_end = 96.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+pixel_size = 0.004
+double_sided = false
+alpha_antialiasing_mode = 1
+modulate = Color(0.98039216, 0.69411767, 0, 1)
+text = "00% Completed"
+font = SubResource("FontVariation_6wqo1")
+font_size = 320
+outline_size = 70
+vertical_alignment = 2
+autowrap_mode = 1
+width = 4000.0
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, -0.2, 0)
+visibility_range_end = 96.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+amount = 500
+preprocess = 1.0
+visibility_aabb = AABB(-12.9835205, -3.1711996, -3, 25.97467, 17.557516, 6)
+local_coords = true
+trail_lifetime = 0.66
+process_material = SubResource("ParticleProcessMaterial_hjeaj")
+draw_pass_1 = SubResource("QuadMesh_hjeaj")

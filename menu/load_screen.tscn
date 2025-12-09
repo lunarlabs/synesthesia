@@ -1,0 +1,584 @@
+[gd_scene load_steps=14 format=3 uid="uid://bshtgri8guqec"]
+
+[ext_resource type="Theme" uid="uid://c7c1rqmsxlumn" path="res://menu/ModifierLabelTheme.tres" id="1_o0fmc"]
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_mbwvg"]
+[ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="3_yfifq"]
+
+[sub_resource type="FontVariation" id="FontVariation_fjgtc"]
+base_font = ExtResource("2_mbwvg")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 200,
+2003265652: 400
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_4pkhu"]
+font = SubResource("FontVariation_fjgtc")
+font_size = 36
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_4pkhu"]
+resource_name = "LoadIn"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.23333333, 1.9666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0, 0.07877567, 0.23894912, 1), Color(0, 0.07877567, 0.23894912, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SongInfo:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(4.5, 4.5), Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SongInfo/ArtistLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.23333335, 0.40000004),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SongInfo/GenreLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.36666667, 0.53333336),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("SongInfo/TitleLabel:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.1, 0.33333334),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("StageData:theme_override_constants/margin_top")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.3, 1),
+"update": 0,
+"values": [-50, 32]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("StageData:theme_override_constants/margin_bottom")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.3, 1),
+"update": 0,
+"values": [-75, 32]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/EnergyModLabel:modulate")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0.5, 0.90000004),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/CheckpointModLabel:modulate")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.7, 1.0999999),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/HintsModLabel:modulate")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.9, 1.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TimingModLabel:modulate")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(1.1, 1.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/AutoblastModLabel:modulate")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(1.5, 1.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TrackResetModLabel:modulate")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(1.3000001, 1.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_hvuvw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0.07877567, 0.23894912, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SongInfo:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SongInfo/ArtistLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SongInfo/GenreLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("SongInfo/TitleLabel:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("StageData:theme_override_constants/margin_top")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [32]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("StageData:theme_override_constants/margin_bottom")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [32]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/EnergyModLabel:modulate")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/CheckpointModLabel:modulate")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/HintsModLabel:modulate")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TimingModLabel:modulate")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/AutoblastModLabel:modulate")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("StageData:modulate")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TrackResetModLabel:modulate")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_tr38k"]
+resource_name = "vanish"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("StageData:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.20000002),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0.07877567, 0.23894912, 1), Color(0, 0.078431375, 0.23921569, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SongInfo:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.20000002, 0.3),
+"transitions": PackedFloat32Array(1, 2),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(3, 1e-05)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e0d3t"]
+_data = {
+&"LoadIn": SubResource("Animation_4pkhu"),
+&"RESET": SubResource("Animation_hvuvw"),
+&"vanish": SubResource("Animation_tr38k")
+}
+
+[sub_resource type="FontVariation" id="FontVariation_i0f0l"]
+base_font = ExtResource("2_mbwvg")
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 85,
+2003265652: 400
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_yfifq"]
+font = SubResource("FontVariation_i0f0l")
+font_size = 28
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_yfifq"]
+base_font = ExtResource("2_mbwvg")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 120,
+2003265652: 450
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_hj2m3"]
+font = SubResource("FontVariation_yfifq")
+font_size = 24
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="LoadScreen" type="ColorRect"]
+z_index = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.07877567, 0.23894912, 1)
+
+[node name="StageData" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(576, 324)
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StageData"]
+layout_mode = 2
+
+[node name="TopArea" type="HBoxContainer" parent="StageData/VBoxContainer"]
+layout_mode = 2
+
+[node name="DifficultyLabel" type="Label" parent="StageData/VBoxContainer/TopArea"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 1
+text = "Difficulty"
+label_settings = SubResource("LabelSettings_4pkhu")
+
+[node name="BottomArea" type="PanelContainer" parent="StageData/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+
+[node name="BottomContainer" type="VBoxContainer" parent="StageData/VBoxContainer/BottomArea"]
+layout_mode = 2
+
+[node name="ModifiersTitle" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer"]
+layout_mode = 2
+text = "Modifiers"
+horizontal_alignment = 1
+
+[node name="ModifiersGrid" type="HBoxContainer" parent="StageData/VBoxContainer/BottomArea/BottomContainer"]
+layout_direction = 1
+layout_mode = 2
+
+[node name="EnergyModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Energy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckpointModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Checkpoint"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HintsModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Streak Hints Off"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimingModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Timing"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TrackResetModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Fast Reset"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AutoblastModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme = ExtResource("1_o0fmc")
+theme_type_variation = &"Modifier"
+text = "Autoblaster"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_e0d3t")
+}
+
+[node name="SongInfo" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(1088, 475)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -544.0
+offset_top = -237.5
+offset_right = 544.0
+offset_bottom = 237.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(544, 237.5)
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="SongInfo"]
+layout_mode = 2
+text = "Two Lines"
+label_settings = ExtResource("3_yfifq")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ArtistLabel" type="Label" parent="SongInfo"]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 2
+text = "Artist Name"
+label_settings = SubResource("LabelSettings_yfifq")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="GenreLabel" type="Label" parent="SongInfo"]
+layout_mode = 2
+text = "Genre"
+label_settings = SubResource("LabelSettings_hj2m3")
+horizontal_alignment = 1

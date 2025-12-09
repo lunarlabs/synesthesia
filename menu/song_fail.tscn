@@ -1,0 +1,371 @@
+[gd_scene load_steps=16 format=3 uid="uid://xt6k04euw0of"]
+
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_iwvo3"]
+[ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="2_4aqx1"]
+
+[sub_resource type="FontVariation" id="FontVariation_4aqx1"]
+base_font = ExtResource("1_iwvo3")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 120,
+2003265652: 500
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_q22q5"]
+font = SubResource("FontVariation_4aqx1")
+font_size = 72
+font_color = Color(1, 0, 0, 1)
+outline_size = 25
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.79607844)
+shadow_offset = Vector2(5, 5)
+
+[sub_resource type="Gradient" id="Gradient_qysm3"]
+offsets = PackedFloat32Array(0.2739726, 0.7041096)
+colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0.7058824)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_x8yts"]
+gradient = SubResource("Gradient_qysm3")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Animation" id="Animation_x6j7c"]
+resource_name = "Display"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FailResult:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(3.6333334, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Background:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3.0000002),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_qpvtr"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FailResult:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Background:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_j8q48"]
+_data = {
+&"Display": SubResource("Animation_x6j7c"),
+&"RESET": SubResource("Animation_qpvtr")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_h12c4"]
+font = ExtResource("2_4aqx1")
+font_size = 72
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_bsqdo"]
+base_font = ExtResource("1_iwvo3")
+variation_opentype = {
+1129599571: 25,
+1936486004: 0,
+2003072104: 85,
+2003265652: 600
+}
+opentype_features = {
+1953396077: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_dn0fs"]
+font = SubResource("FontVariation_bsqdo")
+font_size = 72
+font_color = Color(1, 0, 0, 1)
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_qysm3"]
+font_size = 36
+
+[sub_resource type="LabelSettings" id="LabelSettings_dr1j0"]
+font_size = 36
+
+[node name="SongFail" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07594267, 0.060513116, 0.0605148, 1)
+
+[node name="Label" type="Label" parent="."]
+clip_children = 2
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -547.0
+offset_right = 547.0
+offset_bottom = 178.00089
+grow_horizontal = 2
+text = "SONG FAILED"
+label_settings = SubResource("LabelSettings_q22q5")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Label"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_x8yts")
+expand_mode = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_j8q48")
+}
+
+[node name="FailResult" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.3
+anchor_right = 0.5
+anchor_bottom = 0.3
+offset_left = -429.0
+offset_top = -43.0
+offset_right = 429.0
+offset_bottom = 394.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="FailResult"]
+layout_mode = 2
+
+[node name="LeftSide" type="VBoxContainer" parent="FailResult/PanelContainer"]
+layout_mode = 2
+
+[node name="SongTitleLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Song Title (long)"
+label_settings = SubResource("LabelSettings_xsivx")
+horizontal_alignment = 2
+
+[node name="ArtistLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Artist"
+horizontal_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="FailResult/PanelContainer/LeftSide"]
+layout_mode = 2
+
+[node name="DifficultyLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Intermediate"
+horizontal_alignment = 2
+
+[node name="HSeparator2" type="HSeparator" parent="FailResult/PanelContainer/LeftSide"]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="FailResult/PanelContainer/LeftSide"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ExitButton" type="Button" parent="FailResult/PanelContainer/LeftSide"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Exit to Song Select"
+
+[node name="RestartButton" type="Button" parent="FailResult/PanelContainer/LeftSide"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Restart"
+
+[node name="RightSide" type="VBoxContainer" parent="FailResult"]
+layout_mode = 2
+alignment = 1
+
+[node name="TipContainer" type="PanelContainer" parent="FailResult/RightSide"]
+layout_mode = 2
+
+[node name="TipLabel" type="Label" parent="FailResult/RightSide/TipContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+text = "If you want to practice a song, use the \"NO FAIL\" energy modifier."
+autowrap_mode = 2
+
+[node name="RightTop" type="HBoxContainer" parent="FailResult/RightSide"]
+layout_mode = 2
+
+[node name="ScorePanel" type="PanelContainer" parent="FailResult/RightSide/RightTop"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="ScoreTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer"]
+layout_mode = 2
+text = "Score"
+uppercase = true
+
+[node name="ScoreLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_h12c4")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ScorePanel2" type="PanelContainer" parent="FailResult/RightSide/RightTop"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel2"]
+layout_mode = 2
+alignment = 1
+
+[node name="RankTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer"]
+layout_mode = 2
+text = "RATING"
+uppercase = true
+
+[node name="RankLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "F"
+label_settings = SubResource("LabelSettings_dn0fs")
+horizontal_alignment = 1
+
+[node name="PrevScore" type="PanelContainer" parent="FailResult/RightSide"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore"]
+layout_mode = 2
+columns = 2
+
+[node name="PercentCompletedTitle" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Song completion"
+uppercase = true
+
+[node name="PercentCompletedLabel" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "0.00%"
+label_settings = SubResource("LabelSettings_qysm3")
+horizontal_alignment = 2
+uppercase = true
+
+[node name="PrevScore2" type="PanelContainer" parent="FailResult/RightSide"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore2"]
+layout_mode = 2
+columns = 2
+
+[node name="StreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Longest streak:"
+uppercase = true
+
+[node name="StreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "00"
+label_settings = SubResource("LabelSettings_dr1j0")
+horizontal_alignment = 2
+uppercase = true
+
+[node name="StreakBreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Streak breaks:"
+uppercase = true
+
+[node name="StreakBreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+horizontal_alignment = 2
+uppercase = true
+
+[node name="AccuracyTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Phrase accuracy:"
+uppercase = true
+
+[node name="AccuracyLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0%"
+label_settings = SubResource("LabelSettings_dr1j0")
+horizontal_alignment = 2
+uppercase = true

@@ -1,0 +1,14 @@
+[remap]
+
+importer="com.nlaha.godotmidi"
+type="MidiResource"
+uid="uid://d3yecdjqy4c7j"
+path="res://.godot/imported/drumnbass.mid-a2fe4fd73ed655b9028184bf5c25e21e.res"
+
+[deps]
+
+source_file="res://drumnbass.mid"
+dest_files=["res://.godot/imported/drumnbass.mid-a2fe4fd73ed655b9028184bf5c25e21e.res"]
+
+[params]
+

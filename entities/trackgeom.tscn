@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5rou2au557hc"]
+
+[ext_resource type="PackedScene" uid="uid://b3f3ytkxxv0lr" path="res://assets/trackgeom.blend" id="1_oblog"]
+[ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/trackshader.res" id="2_plo11"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y256c"]
+render_priority = 0
+shader = ExtResource("2_plo11")
+
+[node name="trackgeom" instance=ExtResource("1_oblog")]
+
+[node name="Cube" parent="." index="0"]
+visibility_range_end = 200.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+surface_material_override/0 = SubResource("ShaderMaterial_y256c")

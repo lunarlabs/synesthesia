@@ -1,0 +1,16 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://cm4v2e2f0im5p"]
+
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_xtqma"]
+
+[sub_resource type="FontVariation" id="FontVariation_b4i3g"]
+base_font = ExtResource("1_xtqma")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 85,
+2003265652: 350
+}
+
+[resource]
+default_font = SubResource("FontVariation_b4i3g")
+default_font_size = 18

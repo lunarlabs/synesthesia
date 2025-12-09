@@ -1,0 +1,580 @@
+[gd_scene load_steps=21 format=3 uid="uid://cj5qbqo5phlu1"]
+
+[ext_resource type="Theme" uid="uid://cm4v2e2f0im5p" path="res://menu/theme/MenuTheme.tres" id="1_0tx4y"]
+[ext_resource type="Script" uid="uid://bwqk5wogs7fgg" path="res://menu/song_select.gd" id="1_etro7"]
+[ext_resource type="PackedScene" uid="uid://br0ofs7o2a64t" path="res://menu/difficultyPanel.tscn" id="1_w051a"]
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="3_mbci5"]
+[ext_resource type="Shader" uid="uid://b4tbx2xcdsxcy" path="res://menu/theme/SongSelectBG.gdshader" id="3_vojec"]
+[ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
+[ext_resource type="AudioStream" uid="uid://cahskgr3vv5if" path="res://assets/SongSelect.mp3" id="6_mbci5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
+shader = ExtResource("3_vojec")
+shader_parameter/speed = 4.00000018674012
+shader_parameter/spacing = 4.0
+shader_parameter/torus_size = Vector2(1.5, 0.2)
+shader_parameter/object_color = Color(0.1, 0.6, 0.9, 1)
+shader_parameter/fog_color = Color(0.05, 0.05, 0.1, 1)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mbci5"]
+size = Vector2(512, 512)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mbci5"]
+blend_mode = 3
+
+[sub_resource type="Gradient" id="Gradient_vojec"]
+colors = PackedColorArray(0, 0.52156866, 0.7607843, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hjgwb"]
+gradient = SubResource("Gradient_vojec")
+fill_from = Vector2(1, 0.8119658)
+fill_to = Vector2(1, 0.2863248)
+
+[sub_resource type="FontVariation" id="FontVariation_i0f0l"]
+base_font = ExtResource("3_mbci5")
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 85,
+2003265652: 400
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_hjgwb"]
+font = SubResource("FontVariation_i0f0l")
+font_size = 28
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_yfifq"]
+base_font = ExtResource("3_mbci5")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 120,
+2003265652: 450
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_pjj6u"]
+font = SubResource("FontVariation_yfifq")
+font_size = 24
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_0tx4y"]
+font = SubResource("FontVariation_yfifq")
+font_size = 20
+font_color = Color(0.078431375, 1, 0.3647059, 1)
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_vojec"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:anchor_right")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%TitleLabel:text_overrun_behavior")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%BeginnerDifficulty:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%IntermediateDifficulty:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%AdvancedDifficulty:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("%ExpertDifficulty:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_mbci5"]
+resource_name = "SongSelected"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:anchor_right")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.725]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%TitleLabel:text_overrun_behavior")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%BeginnerDifficulty:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.05),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%IntermediateDifficulty:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.06666667, 0.116666675),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%AdvancedDifficulty:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.13333334, 0.18333334),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("%ExpertDifficulty:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.2, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hjgwb"]
+_data = {
+&"RESET": SubResource("Animation_vojec"),
+&"SongSelected": SubResource("Animation_mbci5")
+}
+
+[node name="SongSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_0tx4y")
+script = ExtResource("1_etro7")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_hjgwb")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RightSide" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="SongList" type="ItemList" parent="RightSide"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlayButton" type="Button" parent="RightSide"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "PLAY"
+
+[node name="LeftSide" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 0.725
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_bottom = -40.0
+
+[node name="PanelContainer" type="PanelContainer" parent="LeftSide"]
+layout_mode = 2
+
+[node name="Difficulties" type="HBoxContainer" parent="LeftSide/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="BeginnerDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+base_color = Color(0.125, 0.2, 0.1, 1)
+selected_color = Color(0.4, 1, 0.2, 1)
+difficulty_name = "DIFF_96"
+difficulty_value = 0
+
+[node name="IntermediateDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+base_color = Color(0.029599994, 0.18845335, 0.37, 1)
+selected_color = Color(0.07999998, 0.5093334, 1, 1)
+difficulty_name = "DIFF_102"
+difficulty_value = 0
+
+[node name="AdvancedDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+base_color = Color(0.4, 0.25626668, 0.007999993, 1)
+selected_color = Color(1, 0.64066666, 0.01999998, 1)
+difficulty_name = "DIFF_108"
+difficulty_value = 0
+
+[node name="ExpertDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+base_color = Color(0.31, 0.062000014, 0, 1)
+selected_color = Color(0.81, 0.16200005, 0, 1)
+difficulty_name = "DIFF_114"
+difficulty_value = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide"]
+layout_mode = 2
+size_flags_vertical = 10
+alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="LeftSide/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="PreviousBestsTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "MENU_PREV_BESTS"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="PrevScoreTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(175, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+text = "MENU_SCORETITLE"
+uppercase = true
+
+[node name="PrevScoreLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="PrevRankTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+text = "MENU_RANKTITLE"
+uppercase = true
+
+[node name="PrevRankLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "--"
+horizontal_alignment = 2
+uppercase = true
+
+[node name="PrevStreakTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+text = "MENU_LONGESTSTREAKTITLE"
+uppercase = true
+
+[node name="PrevStreakLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="PrevAccTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+text = "MENU_PHRASEACCURACYTITLE"
+uppercase = true
+
+[node name="PrevAccLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ModifiersGrid" type="GridContainer" parent="LeftSide/HBoxContainer/Modifiers"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 8
+columns = 2
+
+[node name="EnergyOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MOD_ENERGY_NORMAL"
+
+[node name="CheckpointOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MOD_CHECKPOINTS_NORMAL"
+
+[node name="NoStreakHintButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "MOD_NO_STREAK_MARKER"
+
+[node name="TimingOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MOD_TIMING_NORMAL"
+
+[node name="ResetOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MOD_RESET_NORMAL"
+
+[node name="AutoblastButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "MOD_AUTOBLAST"
+
+[node name="HiSpeedOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MOD_HISPEED"
+
+[node name="LoadingContainer" type="CenterContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.72800004
+anchor_bottom = 0.47000003
+offset_left = 50.0
+
+[node name="LoadingPanel" type="PanelContainer" parent="LoadingContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LoadingContainer/LoadingPanel"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+text = "MENU_SONG_CATALOG_LOADING"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TopBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.425
+anchor_bottom = 0.425
+offset_left = 50.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 30
+
+[node name="TextureRect" type="TextureRect" parent="TopBox"]
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_mbci5")
+expand_mode = 3
+
+[node name="SongInfo" type="VBoxContainer" parent="TopBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 1
+alignment = 2
+
+[node name="Control" type="Control" parent="TopBox/SongInfo"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="TopBox/SongInfo/Control"]
+unique_name_in_owner = true
+clip_children = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 2
+text = "Song Name"
+label_settings = ExtResource("5_mbci5")
+vertical_alignment = 2
+clip_text = true
+text_overrun_behavior = 3
+max_lines_visible = 1
+visible_characters_behavior = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="TopBox/SongInfo/Control/TitleLabel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopBox/SongInfo/Control/TitleLabel/MarginContainer"]
+material = SubResource("CanvasItemMaterial_mbci5")
+layout_mode = 2
+texture = SubResource("GradientTexture2D_hjgwb")
+
+[node name="ArtistLabel" type="Label" parent="TopBox/SongInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Artist Name"
+label_settings = SubResource("LabelSettings_hjgwb")
+text_overrun_behavior = 3
+
+[node name="HSeparator" type="HSeparator" parent="TopBox/SongInfo"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBox/SongInfo"]
+layout_mode = 2
+
+[node name="GenreLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Song Genre"
+label_settings = SubResource("LabelSettings_pjj6u")
+
+[node name="VSeparator" type="VSeparator" parent="TopBox/SongInfo/HBoxContainer"]
+layout_mode = 2
+
+[node name="TempoLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 2
+text = "??? BPM"
+label_settings = SubResource("LabelSettings_0tx4y")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_mbci5")
+volume_db = -3.0
+autoplay = true
+parameters/looping = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../TopBox/SongInfo")
+libraries = {
+&"": SubResource("AnimationLibrary_hjgwb")
+}
+
+[connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/EnergyOption" to="." method="_on_energy_option_pressed"]
+[connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/CheckpointOption" to="." method="_on_checkpoint_option_pressed"]
+[connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/TimingOption" to="." method="_on_timing_option_pressed"]
+[connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/ResetOption" to="." method="_on_reset_option_pressed"]
+[connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/HiSpeedOption" to="." method="_on_hi_speed_option_pressed"]

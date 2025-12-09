@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://s7yd7btpw102"]
+
+[ext_resource type="Script" uid="uid://bddukwl2l5slh" path="res://entities/rails.gd" id="1_d6jyr"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_aeq1i"]
+size = Vector3(0.1, 0.7, 16)
+subdivide_depth = 16
+
+[node name="rails" type="Node3D"]
+script = ExtResource("1_d6jyr")
+
+[node name="left_rail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.17, -0.25, -8)
+visibility_range_end = 200.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+mesh = SubResource("BoxMesh_aeq1i")
+skeleton = NodePath("../..")
+
+[node name="right_rail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.17, -0.25, -8)
+visibility_range_end = 200.0
+visibility_range_end_margin = 16.0
+visibility_range_fade_mode = 1
+mesh = SubResource("BoxMesh_aeq1i")
+skeleton = NodePath("../..")

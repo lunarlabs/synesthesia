@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://w401c706l7dq"]
+
+[resource]
+albedo_color = Color(0.8000002, 0, 1, 1)
+roughness = 0.34
+emission_enabled = true
+emission = Color(0.8000002, 0, 1, 1)
+emission_energy_multiplier = 2.0
+stencil_flags = 2
+stencil_outline_thickness = 0.1

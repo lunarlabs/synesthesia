@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfrco8fhq8eem"]
+
+[ext_resource type="Texture2D" uid="uid://bmo4seinvux87" path="res://assets/textures/miss.png" id="1_pccmu"]
+[ext_resource type="Script" uid="uid://dycgr3cyrq3dp" path="res://entities/misblast.gd" id="2_ntt5b"]
+
+[node name="Misblast" type="Decal"]
+size = Vector3(0.7, 0.7, 0.7)
+texture_albedo = ExtResource("1_pccmu")
+cull_mask = 1048573
+script = ExtResource("2_ntt5b")

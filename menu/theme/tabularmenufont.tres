@@ -1,0 +1,15 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://cxlh2wreioa5o"]
+
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_2s262"]
+
+[resource]
+base_font = ExtResource("1_2s262")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 85,
+2003265652: 350
+}
+opentype_features = {
+1953396077: 1
+}

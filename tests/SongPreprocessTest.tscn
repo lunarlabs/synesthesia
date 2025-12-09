@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmhc8b8el18yv"]
+
+[ext_resource type="Script" uid="uid://dee22d17jehvb" path="res://tests/song_preprocess_test.gd" id="1"]
+
+[node name="SongPreprocessTest" type="Node"]
+script = ExtResource("1")

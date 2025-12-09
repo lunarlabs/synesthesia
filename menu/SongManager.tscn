@@ -1,0 +1,57 @@
+[gd_scene load_steps=5 format=3 uid="uid://rehe4hobdmbl"]
+
+[ext_resource type="Script" uid="uid://dnco7owat03n4" path="res://menu/song_manager.gd" id="1_o7bha"]
+[ext_resource type="PackedScene" uid="uid://bshtgri8guqec" path="res://menu/load_screen.tscn" id="2_tr38k"]
+[ext_resource type="PackedScene" uid="uid://xt6k04euw0of" path="res://menu/song_fail.tscn" id="3_4pkhu"]
+[ext_resource type="PackedScene" uid="uid://dm4hcmhaewyp6" path="res://menu/song_result.tscn" id="4_hvuvw"]
+
+[node name="SongManager" type="Node"]
+script = ExtResource("1_o7bha")
+song_file = "uid://cmv7jola8rpbe"
+difficulty = 114
+autoblast = true
+
+[node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
+process_mode = 3
+mouse_filter = 2
+
+[node name="PausePanel" type="PanelContainer" parent="."]
+process_mode = 3
+visible = false
+z_index = 100
+z_as_relative = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel"]
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="PausePanel/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Continue"
+
+[node name="RestartButton" type="Button" parent="PausePanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Restart"
+
+[node name="QuitButton" type="Button" parent="PausePanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Exit to Song Select"
+
+[node name="SongFail" parent="." instance=ExtResource("3_4pkhu")]
+visible = false
+
+[node name="SongResult" parent="." instance=ExtResource("4_hvuvw")]
+visible = false

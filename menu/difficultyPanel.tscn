@@ -1,0 +1,115 @@
+[gd_scene load_steps=12 format=3 uid="uid://br0ofs7o2a64t"]
+
+[ext_resource type="Texture2D" uid="uid://bowkaba7c5ewv" path="res://assets/textures/DifficultyButton.svg" id="1_e44yp"]
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_xcwxj"]
+[ext_resource type="Script" uid="uid://d022odvwob3dw" path="res://menu/difficulty_panel.gd" id="2_gmsny"]
+[ext_resource type="Texture2D" uid="uid://c2efbhkxp0k18" path="res://assets/textures/DifficultyButtonSelected.svg" id="3_3wmxv"]
+
+[sub_resource type="FontVariation" id="FontVariation_e44yp"]
+base_font = ExtResource("1_xcwxj")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 125,
+2003265652: 550
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_gmsny"]
+font = SubResource("FontVariation_e44yp")
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_xcwxj"]
+base_font = ExtResource("1_xcwxj")
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 200,
+2003265652: 600
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_b8mxn"]
+font = SubResource("FontVariation_xcwxj")
+font_size = 45
+font_color = Color(0, 0, 0, 1)
+outline_size = 6
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_xcwxj"]
+blend_mode = 3
+
+[sub_resource type="Gradient" id="Gradient_e44yp"]
+colors = PackedColorArray(0.24, 0.24, 0.24, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_gmsny"]
+gradient = SubResource("Gradient_e44yp")
+fill_from = Vector2(0, 0.83760685)
+fill_to = Vector2(0, 0.115384616)
+
+[node name="Difficulty" type="Control"]
+self_modulate = Color(1, 1, 1, 0.6)
+custom_minimum_size = Vector2(190, 85)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 190.0
+offset_bottom = 85.0
+script = ExtResource("2_gmsny")
+
+[node name="ButtonTexture" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 190.0
+offset_bottom = 85.0
+texture = ExtResource("1_e44yp")
+
+[node name="SelectedTexture" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 190.0
+offset_bottom = 85.0
+texture = ExtResource("3_3wmxv")
+
+[node name="DifficultyNameLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 4.0
+offset_bottom = 29.0
+grow_horizontal = 2
+text = "Difficulty"
+label_settings = SubResource("LabelSettings_gmsny")
+horizontal_alignment = 1
+
+[node name="DifficultyValueLabel" type="Label" parent="."]
+clip_children = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "10"
+label_settings = SubResource("LabelSettings_b8mxn")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="MarginContainer" parent="DifficultyValueLabel"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="DifficultyValueLabel/CenterContainer"]
+material = SubResource("CanvasItemMaterial_xcwxj")
+layout_mode = 2
+texture = SubResource("GradientTexture2D_gmsny")
+expand_mode = 1

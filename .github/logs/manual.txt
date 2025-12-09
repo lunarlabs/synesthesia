@@ -1,0 +1,393 @@
+Godot Engine v4.5.1.stable.steam.f62fdbde1 - https://godotengine.org
+Vulkan 1.4.312 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce GTX 1660 SUPER
+
+Loading song: Exterminator
+  Track T1 Catch:D:Drums1 _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 5 with 8 notes
+    Phrase beats: [16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0]
+    Phrase beats: [23.0, 22.0, 21.0, 20.0, 19.0, 18.0, 17.0, 16.0]
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 5 with 6 notes
+    Phrase beats: [16.0, 17.0, 18.0, 20.0, 21.0, 22.0]
+    Phrase beats: [22.0, 21.0, 20.0, 18.0, 17.0, 16.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 5 with 7 notes
+    Phrase beats: [16.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0]
+    Phrase beats: [23.0, 22.0, 21.0, 20.0, 19.0, 18.0, 16.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 5 with 3 notes
+    Phrase beats: [16.0, 18.0, 20.0]
+    Phrase beats: [20.0, 18.0, 16.0]
+  Track T5 Catch:S:synth _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 13 with 8 notes
+    Phrase beats: [48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0]
+    Phrase beats: [55.0, 54.0, 53.0, 52.0, 51.0, 50.0, 49.0, 48.0]
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 12 with 5 notes
+    Phrase beats: [45.0, 46.0, 47.0, 48.0, 49.0]
+    Phrase beats: [49.0, 48.0, 47.0, 46.0, 45.0]
+Precompiling shaders...
+Starting song: Exterminator [Intermediate]
+Playhead starting at x=6.25
+Current track starting at x=-6.25
+Camera starting at x=-6.25
+  Track T1 Catch:D:Drums1 _find_next_phrase: current_measure=1, target_measure=2
+    Found phrase at measure 5 with 8 notes
+    Phrase beats: [16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0]
+    Phrase beats: [23.0, 22.0, 21.0, 20.0, 19.0, 18.0, 17.0, 16.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 16.00 (offset -0.064)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 6 notes
+    Phrase beats: [20.0, 21.0, 22.0, 24.0, 25.0, 26.0]
+    Phrase beats: [26.0, 25.0, 24.0, 22.0, 21.0, 20.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 8 notes
+    Phrase beats: [20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0]
+    Phrase beats: [27.0, 26.0, 25.0, 24.0, 23.0, 22.0, 21.0, 20.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 5 notes
+    Phrase beats: [20.0, 24.0, 25.0, 26.0, 27.0]
+    Phrase beats: [27.0, 26.0, 25.0, 24.0, 20.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 17.00 (offset -0.018)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 6 notes
+    Phrase beats: [20.0, 21.0, 22.0, 24.0, 25.0, 26.0]
+    Phrase beats: [26.0, 25.0, 24.0, 22.0, 21.0, 20.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 18.00 (offset -0.028)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 6 notes
+    Phrase beats: [20.0, 21.0, 22.0, 24.0, 25.0, 26.0]
+    Phrase beats: [26.0, 25.0, 24.0, 22.0, 21.0, 20.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 8 notes
+    Phrase beats: [20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0]
+    Phrase beats: [27.0, 26.0, 25.0, 24.0, 23.0, 22.0, 21.0, 20.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 5 notes
+    Phrase beats: [20.0, 24.0, 25.0, 26.0, 27.0]
+    Phrase beats: [27.0, 26.0, 25.0, 24.0, 20.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 19.00 (offset -0.010)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=5, target_measure=6
+    Found phrase at measure 6 with 8 notes
+    Phrase beats: [20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0]
+    Phrase beats: [27.0, 26.0, 25.0, 24.0, 23.0, 22.0, 21.0, 20.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 20.00 (offset 0.018)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 6 notes
+    Phrase beats: [24.0, 25.0, 26.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 26.0, 25.0, 24.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 7 notes
+    Phrase beats: [24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 27.0, 26.0, 25.0, 24.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 8 notes
+    Phrase beats: [24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0]
+    Phrase beats: [31.0, 30.0, 29.0, 28.0, 27.0, 26.0, 25.0, 24.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 21.00 (offset 0.009)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 6 notes
+    Phrase beats: [24.0, 25.0, 26.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 26.0, 25.0, 24.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 7 notes
+    Phrase beats: [24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 27.0, 26.0, 25.0, 24.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 22.00 (offset -0.005)
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 6 notes
+    Phrase beats: [24.0, 25.0, 26.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 26.0, 25.0, 24.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 7 notes
+    Phrase beats: [24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 27.0, 26.0, 25.0, 24.0]
+  Track T1 Catch:D:Drums1: Blasted note at beat 23.00 (offset 0.011)
+  Track T1 Catch:D:Drums1 _find_next_phrase: reset_countdown=12, target_measure=18
+    Found phrase at measure 18 with 8 notes
+    Phrase beats: [68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0]
+    Phrase beats: [75.0, 74.0, 73.0, 72.0, 71.0, 70.0, 69.0, 68.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 7 notes
+    Phrase beats: [24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 27.0, 26.0, 25.0, 24.0]
+Switching active track from 0 to 1 at beat 23.37
+  Track T2 Catch:B:bass _find_next_phrase: current_measure=6, target_measure=7
+    Found phrase at measure 7 with 6 notes
+    Phrase beats: [24.0, 25.0, 26.0, 28.0, 29.0, 30.0]
+    Phrase beats: [30.0, 29.0, 28.0, 26.0, 25.0, 24.0]
+  Track T2 Catch:B:bass: Blasted note at beat 24.00 (offset 0.002)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 7 notes
+    Phrase beats: [28.0, 29.0, 30.0, 32.0, 33.0, 34.0, 35.0]
+    Phrase beats: [35.0, 34.0, 33.0, 32.0, 30.0, 29.0, 28.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 6 notes
+    Phrase beats: [28.0, 29.0, 30.0, 31.0, 32.0, 34.0]
+    Phrase beats: [34.0, 32.0, 31.0, 30.0, 29.0, 28.0]
+  Track T2 Catch:B:bass: Blasted note at beat 25.00 (offset -0.002)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 7 notes
+    Phrase beats: [28.0, 29.0, 30.0, 32.0, 33.0, 34.0, 35.0]
+    Phrase beats: [35.0, 34.0, 33.0, 32.0, 30.0, 29.0, 28.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 6 notes
+    Phrase beats: [28.0, 29.0, 30.0, 31.0, 32.0, 34.0]
+    Phrase beats: [34.0, 32.0, 31.0, 30.0, 29.0, 28.0]
+  Track T2 Catch:B:bass: Blasted note at beat 26.00 (offset -0.031)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 7 notes
+    Phrase beats: [28.0, 29.0, 30.0, 32.0, 33.0, 34.0, 35.0]
+    Phrase beats: [35.0, 34.0, 33.0, 32.0, 30.0, 29.0, 28.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 6 notes
+    Phrase beats: [28.0, 29.0, 30.0, 31.0, 32.0, 34.0]
+    Phrase beats: [34.0, 32.0, 31.0, 30.0, 29.0, 28.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 7 notes
+    Phrase beats: [28.0, 29.0, 30.0, 32.0, 33.0, 34.0, 35.0]
+    Phrase beats: [35.0, 34.0, 33.0, 32.0, 30.0, 29.0, 28.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=7, target_measure=8
+    Found phrase at measure 8 with 6 notes
+    Phrase beats: [28.0, 29.0, 30.0, 31.0, 32.0, 34.0]
+    Phrase beats: [34.0, 32.0, 31.0, 30.0, 29.0, 28.0]
+  Track T2 Catch:B:bass: Blasted note at beat 28.00 (offset 0.009)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 8 notes
+    Phrase beats: [32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0]
+    Phrase beats: [39.0, 38.0, 37.0, 36.0, 35.0, 34.0, 33.0, 32.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 3 notes
+    Phrase beats: [32.0, 34.0, 36.0]
+    Phrase beats: [36.0, 34.0, 32.0]
+  Track T2 Catch:B:bass: Blasted note at beat 29.00 (offset -0.001)
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 8 notes
+    Phrase beats: [32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0]
+    Phrase beats: [39.0, 38.0, 37.0, 36.0, 35.0, 34.0, 33.0, 32.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 3 notes
+    Phrase beats: [32.0, 34.0, 36.0]
+    Phrase beats: [36.0, 34.0, 32.0]
+  Track T2 Catch:B:bass: Blasted note at beat 30.00 (offset -0.029)
+  Track T2 Catch:B:bass _find_next_phrase: reset_countdown=12, target_measure=20
+    Found phrase at measure 20 with 6 notes
+    Phrase beats: [76.0, 77.0, 78.0, 80.0, 81.0, 82.0]
+    Phrase beats: [82.0, 81.0, 80.0, 78.0, 77.0, 76.0]
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 8 notes
+    Phrase beats: [32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0]
+    Phrase beats: [39.0, 38.0, 37.0, 36.0, 35.0, 34.0, 33.0, 32.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 3 notes
+    Phrase beats: [32.0, 34.0, 36.0]
+    Phrase beats: [36.0, 34.0, 32.0]
+Switching active track from 1 to 2 at beat 30.31
+  Track T3 Catch:D:drums _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 8 notes
+    Phrase beats: [32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0]
+    Phrase beats: [39.0, 38.0, 37.0, 36.0, 35.0, 34.0, 33.0, 32.0]
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=8, target_measure=9
+    Found phrase at measure 9 with 3 notes
+    Phrase beats: [32.0, 34.0, 36.0]
+    Phrase beats: [36.0, 34.0, 32.0]
+  Track T3 Catch:D:drums: Blasted note at beat 32.00 (offset 0.004)
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=9, target_measure=10
+    Found phrase at measure 10 with 5 notes
+    Phrase beats: [36.0, 40.0, 41.0, 42.0, 43.0]
+    Phrase beats: [43.0, 42.0, 41.0, 40.0, 36.0]
+  Track T3 Catch:D:drums: Blasted note at beat 33.00 (offset -0.023)
+  Track T3 Catch:D:drums: Blasted note at beat 34.00 (offset -0.016)
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=9, target_measure=10
+    Found phrase at measure 10 with 5 notes
+    Phrase beats: [36.0, 40.0, 41.0, 42.0, 43.0]
+    Phrase beats: [43.0, 42.0, 41.0, 40.0, 36.0]
+  Track T3 Catch:D:drums: Blasted note at beat 35.00 (offset -0.006)
+  Track T3 Catch:D:drums: Blasted note at beat 36.00 (offset 0.000)
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=10, target_measure=11
+    Found phrase at measure 11 with 8 notes
+    Phrase beats: [40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0]
+    Phrase beats: [47.0, 46.0, 45.0, 44.0, 43.0, 42.0, 41.0, 40.0]
+  Track T3 Catch:D:drums: Blasted note at beat 37.00 (offset -0.004)
+  Track T3 Catch:D:drums: Blasted note at beat 38.00 (offset -0.014)
+  Track T3 Catch:D:drums: Blasted note at beat 39.00 (offset -0.021)
+  Track T3 Catch:D:drums _find_next_phrase: reset_countdown=12, target_measure=22
+    Found phrase at measure 22 with 8 notes
+    Phrase beats: [84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0]
+    Phrase beats: [91.0, 90.0, 89.0, 88.0, 87.0, 86.0, 85.0, 84.0]
+Switching active track from 2 to 3 at beat 39.38
+  Track T4 Catch:S:synthfx1 _find_next_phrase: current_measure=10, target_measure=11
+    Found phrase at measure 11 with 8 notes
+    Phrase beats: [40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0]
+    Phrase beats: [47.0, 46.0, 45.0, 44.0, 43.0, 42.0, 41.0, 40.0]
+  Track T4 Catch:S:synthfx1: Blasted note at beat 40.00 (offset -0.009)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 41.00 (offset -0.035)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 42.00 (offset -0.037)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 43.00 (offset -0.005)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 44.00 (offset -0.036)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 45.00 (offset -0.023)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=12, target_measure=13
+    Found phrase at measure 13 with 5 notes
+    Phrase beats: [48.0, 49.0, 52.0, 53.0, 54.0]
+    Phrase beats: [54.0, 53.0, 52.0, 49.0, 48.0]
+  Track T4 Catch:S:synthfx1: Blasted note at beat 46.00 (offset -0.033)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=12, target_measure=13
+    Found phrase at measure 13 with 5 notes
+    Phrase beats: [48.0, 49.0, 52.0, 53.0, 54.0]
+    Phrase beats: [54.0, 53.0, 52.0, 49.0, 48.0]
+  Track T4 Catch:S:synthfx1: Blasted note at beat 47.00 (offset -0.002)
+  Track T4 Catch:S:synthfx1 _find_next_phrase: reset_countdown=12, target_measure=24
+    Found phrase at measure 24 with 6 notes
+    Phrase beats: [92.0, 93.0, 94.0, 95.0, 96.0, 98.0]
+    Phrase beats: [98.0, 96.0, 95.0, 94.0, 93.0, 92.0]
+Switching active track from 3 to 4 at beat 47.25
+  Track T5 Catch:S:synth _find_next_phrase: current_measure=12, target_measure=13
+    Found phrase at measure 13 with 8 notes
+    Phrase beats: [48.0, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0]
+    Phrase beats: [55.0, 54.0, 53.0, 52.0, 51.0, 50.0, 49.0, 48.0]
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=12, target_measure=13
+    Found phrase at measure 13 with 5 notes
+    Phrase beats: [48.0, 49.0, 52.0, 53.0, 54.0]
+    Phrase beats: [54.0, 53.0, 52.0, 49.0, 48.0]
+  Track T5 Catch:S:synth: Blasted note at beat 48.00 (offset -0.030)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=13, target_measure=14
+    Found phrase at measure 14 with 7 notes
+    Phrase beats: [52.0, 53.0, 54.0, 56.0, 57.0, 58.0, 59.0]
+    Phrase beats: [59.0, 58.0, 57.0, 56.0, 54.0, 53.0, 52.0]
+  Track T5 Catch:S:synth: Blasted note at beat 49.00 (offset 0.012)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=13, target_measure=14
+    Found phrase at measure 14 with 7 notes
+    Phrase beats: [52.0, 53.0, 54.0, 56.0, 57.0, 58.0, 59.0]
+    Phrase beats: [59.0, 58.0, 57.0, 56.0, 54.0, 53.0, 52.0]
+  Track T5 Catch:S:synth: Blasted note at beat 50.00 (offset -0.003)
+  Track T5 Catch:S:synth: Blasted note at beat 51.00 (offset -0.009)
+  Track T5 Catch:S:synth: Blasted note at beat 52.00 (offset -0.019)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=14, target_measure=15
+    Found phrase at measure 15 with 8 notes
+    Phrase beats: [56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0]
+    Phrase beats: [63.0, 62.0, 61.0, 60.0, 59.0, 58.0, 57.0, 56.0]
+  Track T5 Catch:S:synth: Blasted note at beat 53.00 (offset -0.010)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=14, target_measure=15
+    Found phrase at measure 15 with 8 notes
+    Phrase beats: [56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0]
+    Phrase beats: [63.0, 62.0, 61.0, 60.0, 59.0, 58.0, 57.0, 56.0]
+  Track T5 Catch:S:synth: Blasted note at beat 54.00 (offset 0.003)
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=14, target_measure=15
+    Found phrase at measure 15 with 8 notes
+    Phrase beats: [56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0]
+    Phrase beats: [63.0, 62.0, 61.0, 60.0, 59.0, 58.0, 57.0, 56.0]
+  Track T5 Catch:S:synth: Blasted note at beat 55.00 (offset -0.042)
+  Track T5 Catch:S:synth _find_next_phrase: reset_countdown=12, target_measure=26
+    Found phrase at measure 26 with 6 notes
+    Phrase beats: [100.0, 101.0, 104.0, 105.0, 106.0, 107.0]
+    Phrase beats: [107.0, 106.0, 105.0, 104.0, 101.0, 100.0]
+Switching active track from 4 to 5 at beat 55.34
+  Track T6 Catch:V:vocals _find_next_phrase: current_measure=14, target_measure=15
+    Found phrase at measure 15 with 8 notes
+    Phrase beats: [56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0]
+    Phrase beats: [63.0, 62.0, 61.0, 60.0, 59.0, 58.0, 57.0, 56.0]
+  Track T6 Catch:V:vocals: Blasted note at beat 56.00 (offset -0.036)
+  Track T6 Catch:V:vocals: Blasted note at beat 57.00 (offset -0.021)
+  Track T6 Catch:V:vocals: Blasted note at beat 58.00 (offset 0.007)
+  Track T6 Catch:V:vocals: Blasted note at beat 59.00 (offset -0.003)
+  Track T6 Catch:V:vocals: Blasted note at beat 60.00 (offset -0.009)
+  Track T6 Catch:V:vocals: Blasted note at beat 61.00 (offset -0.035)
+  Track T6 Catch:V:vocals: Blasted note at beat 62.00 (offset -0.044)
+  Track T6 Catch:V:vocals: Blasted note at beat 63.00 (offset -0.024)
+  Track T6 Catch:V:vocals _find_next_phrase: reset_countdown=12, target_measure=28
+    Found phrase at measure 28 with 7 notes
+    Phrase beats: [108.0, 109.0, 110.0, 112.0, 113.0, 114.0, 115.0]
+    Phrase beats: [115.0, 114.0, 113.0, 112.0, 110.0, 109.0, 108.0]
+Switching active track from 5 to 4 at beat 64.00
+Switching active track from 4 to 3 at beat 64.29
+Switching active track from 3 to 2 at beat 64.59
+Switching active track from 2 to 1 at beat 65.22
+Switching active track from 1 to 0 at beat 65.79
+  Track T1 Catch:D:Drums1: Blasted note at beat 68.00 (offset -0.046)
+  Track T1 Catch:D:Drums1: Blasted note at beat 69.00 (offset -0.024)
+  Track T1 Catch:D:Drums1: Blasted note at beat 70.00 (offset -0.030)
+  Track T1 Catch:D:Drums1: Blasted note at beat 71.00 (offset 0.000)
+  Track T1 Catch:D:Drums1: Blasted note at beat 72.00 (offset -0.008)
+  Track T1 Catch:D:Drums1: Blasted note at beat 73.00 (offset -0.010)
+  Track T1 Catch:D:Drums1: Blasted note at beat 74.00 (offset -0.000)
+  Track T1 Catch:D:Drums1: Blasted note at beat 75.00 (offset -0.025)
+  Track T1 Catch:D:Drums1 _find_next_phrase: reset_countdown=12, target_measure=31
+    Found phrase at measure 31 with 8 notes
+    Phrase beats: [120.0, 121.0, 122.0, 123.0, 124.0, 125.0, 126.0, 127.0]
+    Phrase beats: [127.0, 126.0, 125.0, 124.0, 123.0, 122.0, 121.0, 120.0]
+Switching active track from 0 to 1 at beat 75.28
+  Track T2 Catch:B:bass: Blasted note at beat 76.00 (offset -0.016)
+  Track T2 Catch:B:bass: Blasted note at beat 77.00 (offset 0.011)
+  Track T2 Catch:B:bass: Blasted note at beat 78.00 (offset -0.031)
+  Track T2 Catch:B:bass: Blasted note at beat 80.00 (offset -0.031)
+  Track T2 Catch:B:bass: Blasted note at beat 81.00 (offset -0.003)
+  Track T2 Catch:B:bass: Blasted note at beat 82.00 (offset -0.010)
+  Track T2 Catch:B:bass _find_next_phrase: reset_countdown=12, target_measure=33
+    Found phrase at measure 33 with 6 notes
+    Phrase beats: [128.0, 129.0, 130.0, 132.0, 133.0, 134.0]
+    Phrase beats: [134.0, 133.0, 132.0, 130.0, 129.0, 128.0]
+Switching active track from 1 to 2 at beat 82.40
+  Track T3 Catch:D:drums: Blasted note at beat 84.00 (offset -0.026)
+  Track T3 Catch:D:drums: Blasted note at beat 85.00 (offset 0.003)
+  Track T3 Catch:D:drums: Blasted note at beat 86.00 (offset -0.015)
+  Track T3 Catch:D:drums: Blasted note at beat 87.00 (offset 0.012)
+  Track T3 Catch:D:drums: Blasted note at beat 88.00 (offset 0.005)
+  Track T3 Catch:D:drums: Blasted note at beat 89.00 (offset 0.010)
+  Track T3 Catch:D:drums: Blasted note at beat 90.00 (offset 0.007)
+  Track T3 Catch:D:drums: Blasted note at beat 91.00 (offset 0.017)
+  Track T3 Catch:D:drums _find_next_phrase: reset_countdown=12, target_measure=35
+    Found phrase at measure 35 with 8 notes
+    Phrase beats: [136.0, 137.0, 138.0, 139.0, 140.0, 141.0, 142.0, 143.0]
+    Phrase beats: [143.0, 142.0, 141.0, 140.0, 139.0, 138.0, 137.0, 136.0]
+Switching active track from 2 to 3 at beat 91.27
+  Track T4 Catch:S:synthfx1: Blasted note at beat 92.00 (offset -0.036)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 93.00 (offset 0.006)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 94.00 (offset -0.018)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 95.00 (offset -0.035)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 96.00 (offset -0.033)
+  Track T4 Catch:S:synthfx1: Blasted note at beat 98.00 (offset -0.067)
+  Track T4 Catch:S:synthfx1 _find_next_phrase: reset_countdown=12, target_measure=37
+    Found phrase at measure 37 with 4 notes
+    Phrase beats: [144.0, 146.0, 148.0, 150.0]
+    Phrase beats: [150.0, 148.0, 146.0, 144.0]
+Switching active track from 3 to 4 at beat 98.58
+  Track T5 Catch:S:synth: Blasted note at beat 100.00 (offset -0.013)
+  Track T5 Catch:S:synth: Blasted note at beat 101.00 (offset -0.038)
+  Track T5 Catch:S:synth: Blasted note at beat 104.00 (offset -0.009)
+  Track T5 Catch:S:synth: Blasted note at beat 105.00 (offset 0.009)
+  Track T5 Catch:S:synth: Blasted note at beat 106.00 (offset -0.020)
+  Track T5 Catch:S:synth: Blasted note at beat 107.00 (offset -0.044)
+  Track T5 Catch:S:synth _find_next_phrase: reset_countdown=12, target_measure=39
+    Found phrase at measure 39 with 3 notes
+    Phrase beats: [152.0, 154.0, 155.0]
+    Phrase beats: [155.0, 154.0, 152.0]
+Switching active track from 4 to 5 at beat 107.35
+  Track T6 Catch:V:vocals: Blasted note at beat 108.00 (offset -0.014)
+  Track T6 Catch:V:vocals: Blasted note at beat 109.00 (offset 0.014)
+  Track T6 Catch:V:vocals: Blasted note at beat 110.00 (offset 0.005)
+  Track T6 Catch:V:vocals: Blasted note at beat 112.00 (offset 0.003)
+  Track T6 Catch:V:vocals: Blasted note at beat 113.00 (offset 0.024)
+  Track T6 Catch:V:vocals: Blasted note at beat 114.00 (offset -0.001)
+  Track T6 Catch:V:vocals: Blasted note at beat 115.00 (offset -0.010)
+  Track T6 Catch:V:vocals _find_next_phrase: reset_countdown=12, target_measure=41
+    Found phrase at measure 41 with 7 notes
+    Phrase beats: [161.0, 162.0, 163.0, 164.0, 165.0, 166.0, 167.0]
+    Phrase beats: [167.0, 166.0, 165.0, 164.0, 163.0, 162.0, 161.0]
+Switching active track from 5 to 4 at beat 116.30
+Switching active track from 4 to 3 at beat 116.56
+Switching active track from 3 to 2 at beat 116.81
+Switching active track from 2 to 1 at beat 117.04
+Switching active track from 1 to 0 at beat 117.28
+  Track T1 Catch:D:Drums1: Blasted note at beat 120.00 (offset -0.049)
+  Track T1 Catch:D:Drums1: Blasted note at beat 121.00 (offset -0.023)
+  Track T1 Catch:D:Drums1: Blasted note at beat 122.00 (offset -0.033)
+  Track T1 Catch:D:Drums1: Blasted note at beat 123.00 (offset -0.019)
+  Track T1 Catch:D:Drums1: Blasted note at beat 124.00 (offset -0.040)
+  Track T1 Catch:D:Drums1: Blasted note at beat 125.00 (offset -0.019)
+  Track T1 Catch:D:Drums1: Blasted note at beat 126.00 (offset -0.025)
+  Track T1 Catch:D:Drums1: Blasted note at beat 127.00 (offset -0.010)
+  Track T1 Catch:D:Drums1 _find_next_phrase: reset_countdown=12, target_measure=44
+    Found phrase at measure 44 with 8 notes
+    Phrase beats: [172.0, 173.0, 174.0, 175.0, 176.0, 177.0, 178.0, 179.0]
+    Phrase beats: [179.0, 178.0, 177.0, 176.0, 175.0, 174.0, 173.0, 172.0]
+--- Debugging process stopped ---
