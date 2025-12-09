@@ -634,6 +634,10 @@ func _on_note_hit(offset: float):
 	_min_hit_offset = min(_min_hit_offset, offset)
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
 	_notes_hit_count += 1
+	%NotesHitLabel.text = str(_notes_hit_count)
+	%EarlyHitLabel.text = "%d ms" % (_min_hit_offset * 1000)
+	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * 1000)
+	%LateHitLabel.text = "%d ms" % (_max_hit_offset * 1000)
 	if abs(offset) > 0.01:
 		lbl_fast_slow.show()
 		if offset > 0:

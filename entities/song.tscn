@@ -752,7 +752,6 @@ theme_override_fonts/font = SubResource("FontVariation_0yoam")
 text = "STREAK"
 
 [node name="TimingStats" type="PanelContainer" parent="HUD/ScoreBar"]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.745
@@ -766,6 +765,7 @@ layout_mode = 2
 columns = 2
 
 [node name="HiSpeedTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Hi-Speed"
@@ -773,6 +773,7 @@ uppercase = true
 
 [node name="HiSpeedLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 text = "0.00"

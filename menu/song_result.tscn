@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dm4hcmhaewyp6"]
+[gd_scene load_steps=13 format=3 uid="uid://dm4hcmhaewyp6"]
 
 [ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="1_h12c4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_eskt4"]
@@ -6,6 +6,9 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
 font_size = 24
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_eskt4"]
+size = Vector2(512, 512)
 
 [sub_resource type="LabelSettings" id="LabelSettings_h12c4"]
 font = ExtResource("1_h12c4")
@@ -551,9 +554,13 @@ visible_characters_behavior = 1
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/LeftSide"]
 layout_mode = 2
 
-[node name="Control" type="Control" parent="PanelContainer/LeftSide"]
+[node name="AlbumCover" type="TextureRect" parent="PanelContainer/LeftSide"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+texture = SubResource("PlaceholderTexture2D_eskt4")
+expand_mode = 3
+stretch_mode = 5
 
 [node name="ExitButton" type="Button" parent="PanelContainer/LeftSide"]
 unique_name_in_owner = true
