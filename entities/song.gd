@@ -41,8 +41,8 @@ var _autoblast_next_track: int
 var _autoblast_track_distance: int
 var _track_transition_tween:Tween
 var _intro_tween:Tween
-var _max_hit_offset: float = 0.0
-var _min_hit_offset: float = 0.0
+var _max_hit_offset: float = NAN
+var _min_hit_offset: float = NAN
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack  # Cache active track reference
@@ -630,8 +630,8 @@ func energy_change(amount:int) -> void:
 	%EnergyBar.value = energy
 
 func _on_note_hit(offset: float):
-	_max_hit_offset = max(_max_hit_offset, offset)
-	_min_hit_offset = min(_min_hit_offset, offset)
+	_max_hit_offset = max(_max_hit_offset, offset) if not is_nan(_max_hit_offset) else offset
+	_min_hit_offset = min(_min_hit_offset, offset) if not is_nan(_min_hit_offset) else offset
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
 	_notes_hit_count += 1
 	%NotesHitLabel.text = str(_notes_hit_count)
