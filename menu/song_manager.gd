@@ -125,6 +125,11 @@ func _ready() -> void:
 	fail_exit_btn.pressed.connect(_on_quit_pressed)
 	fail_restart_btn.pressed.connect(_on_restart_pressed)
 	
+	if not SessionManager.song_records.has(song_data.title):
+		SessionManager.song_records[song_data.title] = {}
+	SessionManager.song_records[song_data.title][difficulty] = {
+		"clear_state": "not_played",
+	}
 	song_instance = SONG_SCENE.instantiate() as SynRoadSong
 	song_instance.length_multiplier = (hi_speed) / song_data.scale_fudge_factor
 	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [song_instance.length_multiplier, hi_speed, song_data.scale_fudge_factor])
@@ -221,6 +226,30 @@ func _on_song_failed(stats) -> void:
 	# "Song Failed" slams down as soon as the slowdown begins and covers the whole duration
 	# of the slowdown effect.
 	fail_screen.show()
+	if not autoblast:
+		# Update session record if it's not already clear or better
+		match SessionManager.song_records.get(song_data.title, {}).get(difficulty, {}).get("clear_state", "not_played"):
+			"not_played":
+				SessionManager.song_records[song_data.title][difficulty] = {
+					"clear_state": "failed",
+					"rank": "F",
+					"score": stats.score,
+					"max_streak": stats.max_streak,
+					"accuracy": accuracy,
+					"streak_breaks": stats.streak_breaks,
+					"percent_completed": percent_completed
+			}
+			"failed":
+				if SessionManager.song_records[song_data.title][difficulty].get("score", 0) < stats.score:
+					SessionManager.song_records[song_data.title][difficulty] = {
+						"clear_state": "failed",
+						"rank": "F",
+						"score": stats.score,
+						"max_streak": stats.max_streak,
+						"accuracy": accuracy,
+						"streak_breaks": stats.streak_breaks,
+						"percent_completed": percent_completed
+						}
 	fail_anim.play("Display")
 	# Enable buttons when animation finishes
 	var exit_btn = fail_screen.get_node("%ExitButton") as Button
@@ -240,23 +269,64 @@ func _on_song_finished(stats) -> void:
 	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
 	result_screen.get_node("%AccuracyLabel").text = "%.2f%%" % accuracy
 	result_screen.get_node("%StreakBreakLabel").text = str(stats.streak_breaks)
+	if SessionManager.song_records.get(song_data.title, {}).get(difficulty, {}).get("clear_state", "not_played") != "not_played":
+		result_screen.get_node("%PreviousBestsContainer").show()
+		result_screen.get_node("%PrevScoreLabel").text = str(SessionManager.song_records[song_data.title][difficulty]["score"])
+		result_screen.get_node("%PrevStreakLabel").text = str(SessionManager.song_records[song_data.title][difficulty]["max_streak"])
+		result_screen.get_node("%PrevAccLabel").text = "%.2f%%" % SessionManager.song_records[song_data.title][difficulty]["accuracy"]
+		result_screen.get_node("%PrevRankLabel").text = SessionManager.song_records[song_data.title][difficulty]["rank"]
+		result_screen.get_node("%ScoreDiffLabel").show()
+		result_screen.get_node("%ScoreDiffLabel").text = "%+d" % (stats.score - SessionManager.song_records[song_data.title][difficulty]["score"])
+		result_screen.get_node("%StreakDiffLabel").show()
+		result_screen.get_node("%StreakDiffLabel").text = "%+d" % (stats.max_streak - SessionManager.song_records[song_data.title][difficulty]["max_streak"])
+		result_screen.get_node("%AccuracyDiffLabel").show()
+		result_screen.get_node("%AccuracyDiffLabel").text = "%+.2f%%" % (accuracy - SessionManager.song_records[song_data.title][difficulty]["accuracy"])
 	# TODO: set color for rank label based on rank, currently white for all
+	var rank: String
 	if autoblast:
-		result_screen.get_node("%RankLabel").text = "auto"
+		rank = "auto"
 	elif stats.streak_breaks == 0:
-		result_screen.get_node("%RankLabel").text = "AAA"
+		rank = "AAA"
 	elif accuracy >= 95.0:
-		result_screen.get_node("%RankLabel").text = "AA"
+		rank = "AA"
 	elif accuracy >= 90.0:
-		result_screen.get_node("%RankLabel").text = "A"
+		rank = "A"
 	elif accuracy >= 80.0:
-		result_screen.get_node("%RankLabel").text = "B"
+		rank = "B"
 	elif accuracy >= 70.0:
-		result_screen.get_node("%RankLabel").text = "C"
+		rank = "C"
 	else:
-		result_screen.get_node("%RankLabel").text = "D"
+		rank = "D"
+	result_screen.get_node("%RankLabel").text = rank
 
-	# TODO: We also don't have "previous bests" yet, so those will show as N/A for now.
+	if not autoblast:
+		if stats["miss_count"] == 0:
+			if energy_modifier == ENERGY_MODIFIER_NAMES.find("No Fail") or timing_modifier == TIMING_MODIFIER_NAMES.find("Loose"):
+				SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "assist perfect run"
+				SessionManager.song_records[song_data.title][difficulty]["rank"] = rank + "*"
+			else:
+				SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "perfect run"
+				SessionManager.song_records[song_data.title][difficulty]["rank"] = rank
+		elif energy_modifier == ENERGY_MODIFIER_NAMES.find("No Fail") or timing_modifier == TIMING_MODIFIER_NAMES.find("Loose"):
+			SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "assist clear"
+			SessionManager.song_records[song_data.title][difficulty]["rank"] = rank + "*"
+		else:
+			SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "clear"
+			SessionManager.song_records[song_data.title][difficulty]["rank"] = rank
+
+		SessionManager.song_records[song_data.title][difficulty]["percent_completed"] = 100.0
+
+		if SessionManager.song_records[song_data.title][difficulty].get("score", 0) < stats.score:
+			SessionManager.song_records[song_data.title][difficulty]["score"] = stats.score
+		
+		if SessionManager.song_records[song_data.title][difficulty].get("max_streak", 0) < stats.max_streak:
+			SessionManager.song_records[song_data.title][difficulty]["max_streak"] = stats.max_streak
+		
+		if SessionManager.song_records[song_data.title][difficulty].get("accuracy", 0) < accuracy:
+			SessionManager.song_records[song_data.title][difficulty]["accuracy"] = accuracy
+
+		if SessionManager.song_records[song_data.title][difficulty].get("streak_breaks", 9999) > stats.streak_breaks:
+			SessionManager.song_records[song_data.title][difficulty]["streak_breaks"] = stats.streak_breaks
 
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
@@ -303,4 +373,5 @@ func _on_restart_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
+	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")

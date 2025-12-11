@@ -106,6 +106,9 @@ func _ready():
 			%PlayButton.disabled = true
 			return
 	
+	if SessionManager.song_records.is_empty():
+		# temporary until we have a splash screen proper
+		SessionManager.load_session()
 	_populate_song_list()
 	_connect_signals()
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
@@ -192,6 +195,8 @@ func _update_difficulty_panels(entry: SynRoadSongCatalog.SongEntry):
 		panel.difficulty_value = int(rating)
 		panel.selected = (diff == selected_difficulty)
 		panel.update()
+	
+	_update_previous_bests()
 		
 func _on_song_selected(index: int):
 	_select_song(index)
@@ -280,3 +285,25 @@ func _on_checkpoint_option_pressed() -> void:
 func _on_timing_option_pressed() -> void:
 	timing_modifier_index = (timing_modifier_index + 1) % TIMING_MODIFIER_NAMES.size()
 	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])
+
+func _update_previous_bests():
+	var entry = SongCatalog.catalog[selected_song_index]
+	if SessionManager.song_records.get(entry.title, {}).get(selected_difficulty, {}).get("clear_state", "not_played") == "not_played":
+		%PreviousBestsTitle.text = "MENU_NOTPLAYED"
+		%PrevScoreLabel.text = ""
+		%PrevRankLabel.text = ""
+		%PrevStreakLabel.text = ""
+		%PrevAccTitle.text = "MENU_SONGCOMPLETION"
+		%PrevAccLabel.text = "0.00%"
+	else:
+		var record = SessionManager.song_records[entry.title][selected_difficulty]
+		%PreviousBestsTitle.text = "MENU_PREV_BESTS"
+		%PrevScoreLabel.text = str(record["score"])
+		%PrevRankLabel.text = record.get("rank", "")
+		%PrevStreakLabel.text = str(record["max_streak"])
+		if record["clear_state"] == "failed":
+			%PrevAccTitle.text = "MENU_SONGCOMPLETION"
+			%PrevAccLabel.text = "%.2f%%" % (record["percent_completed"])
+		else:
+			%PrevAccTitle.text = "MENU_PHRASEACCURACYTITLE"
+			%PrevAccLabel.text = "%.2f%%" % (record["accuracy"])

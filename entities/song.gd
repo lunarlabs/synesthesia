@@ -266,6 +266,7 @@ func _process(delta: float):
 					"phrases_completed": _phrases_completed,
 					"phrases_missed": _phrases_missed,
 					"streak_breaks": _streak_breaks,
+					"miss_count": _miss_count,
 				}
 				emit_signal("song_finished", stats)
 				print(final_score_text)
@@ -283,7 +284,7 @@ func _process(delta: float):
 					count_in.text = str(lead_in_measures)
 					lead_in_measures -= 1
 				elif lead_in_measures == 0:
-					get_tree().call_group("TrackAudio", "set_volume_db", SynRoadTrack.MUTED_VOLUME)
+#					get_tree().call_group("TrackAudio", "set_volume_db", SynRoadTrack.MUTED_VOLUME)
 					lead_in_measures = -1
 						
 		if lead_in_measures < 1:
@@ -635,9 +636,9 @@ func _on_note_hit(offset: float):
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
 	_notes_hit_count += 1
 	%NotesHitLabel.text = str(_notes_hit_count)
-	%EarlyHitLabel.text = "%d ms" % (_min_hit_offset * 1000)
-	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * 1000)
-	%LateHitLabel.text = "%d ms" % (_max_hit_offset * 1000)
+	%EarlyHitLabel.text = "%d ms" % (_max_hit_offset * -1000)
+	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * -1000)
+	%LateHitLabel.text = "%d ms" % (_min_hit_offset * -1000)
 	if abs(offset) > 0.01:
 		lbl_fast_slow.show()
 		if offset > 0:

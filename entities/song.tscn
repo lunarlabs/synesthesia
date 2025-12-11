@@ -809,13 +809,13 @@ text = "0"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="EarlyHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="LateHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
-text = "Early"
+text = "Late"
 uppercase = true
 
-[node name="EarlyHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="LateHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -837,13 +837,13 @@ text = "0 ms"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="LateHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="EarlyHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
-text = "Late"
+text = "Early"
 uppercase = true
 
-[node name="LateHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="EarlyHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
