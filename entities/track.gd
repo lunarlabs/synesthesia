@@ -232,7 +232,6 @@ func _process(delta: float):
 			_find_next_phrase()
 	if !song_node._manager_node.autoblast:
 		# We are not in autoblast mode, just check for missed notes
-		var miss_threshold = current_time + MISS_BEAT_WINDOW
 		for lane_index in range(3):
 			var lane_beats = lane_note_beats[lane_index]
 			var note_index = next_note_idx_per_lane[lane_index]
@@ -240,7 +239,7 @@ func _process(delta: float):
 				continue
 			var target_beat = lane_beats[note_index]
 			var target_time = target_beat * song_node.seconds_per_beat
-			if target_time < miss_threshold:
+			if current_time > target_time + MISS_BEAT_WINDOW:
 				# Check if note was already blasted before marking as missed
 				var note_node = note_nodes.get(target_beat) as SynRoadNote
 				if note_node and note_node.blasted:
@@ -253,13 +252,13 @@ func _process(delta: float):
 					if is_active:
 						active_phrase_missed.emit()
 						print("Track %s breaking streak for missing note at beat %.2f (measure %d)" % 
-							[midi_name, target_beat, current_measure])
+							[midi_name, target_beat, song_node.current_measure()])
 						streak_broken.emit()
 						blasting_phrase = false
 						if asp.volume_db != MUTED_VOLUME:
 							asp.volume_db = MUTED_VOLUME
 						if reset_countdown == 0:
-							var next_measure = current_measure + 1
+							var next_measure = song_node.current_measure() + 1
 							_process_phrase_at_measure(next_measure)
 							_move_marker(get_first_available_measure(next_measure))
 							marker.visible = !song_node._manager_node.hide_streak_hints

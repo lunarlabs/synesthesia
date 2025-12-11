@@ -590,6 +590,9 @@ func energy_change(amount:int) -> void:
 #	print("Energy changed by %d, new value: %d" % [amount, energy])
 	%EnergyBar.value = energy
 
+func _hide_fast_slow_label():
+	lbl_fast_slow.hide()
+
 func _on_note_hit(offset: float):
 	_max_hit_offset = max(_max_hit_offset, offset) if not is_nan(_max_hit_offset) else offset
 	_min_hit_offset = min(_min_hit_offset, offset) if not is_nan(_min_hit_offset) else offset
@@ -614,9 +617,6 @@ func _on_note_hit(offset: float):
 			_fast_slow_hide_timer.timeout.connect(_hide_fast_slow_label)
 	else:
 		lbl_fast_slow.hide()
-
-func _hide_fast_slow_label():
-	lbl_fast_slow.hide()
 
 func fail_song():
 	if _in_fail_state:
