@@ -29,6 +29,7 @@ var midi_name: String
 var audio_file: String
 var instrument: int
 var instrument_note_material: StandardMaterial3D
+var instrument_ghost_material: StandardMaterial3D
 var length_multiplier: float = 1.0
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var note_map: Dictionary[float, int]
@@ -41,7 +42,9 @@ var phrase_start_measure:int = 0
 var marker_measure:int = 0
 var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
+var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
 var phrase_beats: Array[float]
+var phrase_beat_index: int = 0  # Track which beat we're processing next in autoblast
 var phrase_score_value:int = 0
 var phrase_first_beat: float = 0.0
 var beats_in_measure: Dictionary  # Cache beats per measure: int -> Array[float]
@@ -84,7 +87,10 @@ func _enter_tree():
 
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
-	var rail_mat = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
+	# Cache materials once at track level instead of loading in each chunk
+	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
+	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
+	var rail_mat = instrument_ghost_material
 	for i in range(song_node.total_measures):
 		var new_rail = RAIL_SCENE.instantiate() as Node3D
 		new_rail.position.z = -(BEATS_PER_MEASURE * length_per_beat) * i
@@ -154,8 +160,9 @@ func try_blast(lane_index:int):
 				blasting_phrase = true
 				marker.hide()
 			phrase_notes.erase(note_node)
+			phrase_notes_count -= 1  # Keep in sync with phrase_notes array
 			phrase_notes_dict.erase(note_node)
-			if phrase_notes.size() == 0:
+			if phrase_notes_count == 0:
 				activate(floori(target_note / BEATS_PER_MEASURE) + 1)
 				blasting_phrase = false
 		asp.volume_db = BLASTING_VOLUME
@@ -227,10 +234,11 @@ func _process(delta: float):
 	if !song_node._manager_node.autoblast:
 		# We are not in autoblast mode, just check for missed notes
 		for lane_index in range(3):
+			var lane_beats = lane_note_beats[lane_index]
 			var note_index = next_note_idx_per_lane[lane_index]
-			if note_index >= lane_note_beats[lane_index].size():
+			if note_index >= lane_beats.size():
 				continue
-			var target_beat = lane_note_beats[lane_index][note_index]
+			var target_beat = lane_beats[note_index]
 			var target_time = target_beat * song_node.seconds_per_beat
 			if current_time > target_time + MISS_BEAT_WINDOW:
 				# Check if note was already blasted before marking as missed
@@ -251,40 +259,39 @@ func _process(delta: float):
 						if asp.volume_db != MUTED_VOLUME:
 							asp.volume_db = MUTED_VOLUME
 						if reset_countdown == 0:
-							_process_phrase_at_measure(song_node.current_measure() + 1)
-							_move_marker(get_first_available_measure(song_node.current_measure() + 1))
+							var next_measure = song_node.current_measure() + 1
+							_process_phrase_at_measure(next_measure)
+							_move_marker(get_first_available_measure(next_measure))
 							marker.visible = !song_node._manager_node.hide_streak_hints
 				
 				next_note_idx_per_lane[lane_index] += 1
 	else:
 		if is_active:
 			# TIME TO FAKE IT BABY!
-			# Process beats in reverse order (earliest last) to avoid issues with array modification
-			var beats_to_remove: Array[float] = []
-			for beat in phrase_beats:
-				if beat <= current_beat:
-					asp.volume_db = BLASTING_VOLUME
-					if !note_nodes[beat].blasted:
-						note_nodes[beat].blast(true)
-						# Emit note_hit signal with perfect timing (0.0 offset)
-						note_hit.emit(0.0)
-					# Check if this is the first note of the phrase
-					if !blasting_phrase:
-						var phrase_measure_count = 2
-						started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-						#print("  Track %s: Starting autoblast phrase at beat %.2f" % [midi_name, beat])
-						blasting_phrase = true
-						marker.hide()
-						#print("    Blasted beat %.2f" % beat)
-						#print("    Remaining phrase beats: %s" % str(phrase_beats))
-					beats_to_remove.append(beat)
-			
-			# Remove blasted beats after iteration
-			for beat in beats_to_remove:
-				phrase_beats.erase(beat)
+			# Optimized: only process beats from current index until we find one that hasn't been reached
+			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
+			var notes_blasted = 0
+			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= current_beat:
+				var beat = phrase_beats[phrase_beat_index]
+				asp.volume_db = BLASTING_VOLUME
+				if !note_nodes[beat].blasted:
+					note_nodes[beat].blast(true)
+					# Emit note_hit signal with perfect timing (0.0 offset)
+					note_hit.emit(0.0)
+				# Check if this is the first note of the phrase
+				if !blasting_phrase:
+					var phrase_measure_count = 2
+					started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
+					#print("  Track %s: Starting autoblast phrase at beat %.2f" % [midi_name, beat])
+					blasting_phrase = true
+					marker.hide()
+					#print("    Blasted beat %.2f" % beat)
+					#print("    Remaining phrase beats: %s" % str(phrase_beats))
+				phrase_beat_index += 1
+				notes_blasted += 1
 			
 			# Check if phrase is complete
-			if phrase_beats.is_empty() and beats_to_remove.size() > 0:
+			if phrase_beat_index >= phrase_beats.size() and notes_blasted > 0:
 				#print("  Track %s: Phrase complete, activating" % midi_name)
 				activate(song_node.current_measure())
 				blasting_phrase = false
@@ -321,7 +328,9 @@ func _clear_phrase():
 		note.set_phrase_note(false)
 	phrase_notes.clear()
 	phrase_notes_dict.clear()
+	phrase_notes_count = 0
 	phrase_beats.clear()
+	phrase_beat_index = 0
 	phrase_score_value = 0
 	phrase_start_measure = 0
 	blasting_phrase = false
@@ -359,7 +368,7 @@ func _process_phrase_at_index(idx:int):
 	phrase_start_measure = phrase_data.start_measure
 	phrase_score_value = phrase_data.score_value
 	phrase_beats = phrase_data.beats.duplicate()
-	phrase_first_beat = phrase_beats.min()
+	phrase_first_beat = phrase_data.first_beat  # Use precomputed value instead of .min()
 
 	for i in range(phrase_data.measure_count):
 		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
@@ -369,6 +378,7 @@ func _process_phrase_at_index(idx:int):
 			measure_nodes[phrase_start_measure + i].get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", true)
 		phrase_notes.append_array(get_notes_in_measure(phrase_start_measure + i))
 	phrase_notes_dict.clear()
+	phrase_notes_count = phrase_notes.size()
 	for note in phrase_notes:
 		phrase_notes_dict[note] = true
 		if _active_track:
@@ -523,8 +533,9 @@ class MeasureChunk:
 	func load_if_needed():
 		if note_nodes.is_empty():
 			var suppressed_measures = track.song_node._manager_node.suppressed_measures
-			var instrument_note_material = load(INSTRUMENTS[track.instrument][2])
-			var ghost_material = load(INSTRUMENTS[track.instrument][3])
+			# Use cached materials from track instead of loading repeatedly
+			var instrument_note_material = track.instrument_note_material
+			var ghost_material = track.instrument_ghost_material
 			for i in range(start_measure, end_measure):	
 				var new_measure = MEASURE_SCENE.instantiate() as Node3D
 				new_measure.position.z = -(BEATS_PER_MEASURE * track.length_per_beat) * (i - 1)
@@ -559,6 +570,7 @@ class MeasureChunk:
 				if track.phrase_notes_dict.has(note):
 					track.phrase_notes.erase(note)
 					track.phrase_notes_dict.erase(note)
+					track.phrase_notes_count -= 1
 			
 			# Remove notes from track dictionary using stored beat positions
 			for i in range(note_beat_positions.size()):

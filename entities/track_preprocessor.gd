@@ -101,11 +101,13 @@ func _process_job(job:Dictionary):
 		if phrase_beats.is_empty():
 			continue
 		var first_note_lane: int = note_map[phrase_beats[0]]
+		var first_beat: float = phrase_beats[0]
 		phrases.append({
 			"start_measure": m,
 			"measure_count": phrase_measure_count,
 			"beats": phrase_beats,
 			"first_note_lane": first_note_lane,
+			"first_beat": first_beat,
 			"score_value": phrase_beats.size(),
 		})
 	result["phrases"] = phrases
