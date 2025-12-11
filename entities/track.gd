@@ -367,7 +367,7 @@ func _process_phrase_at_index(idx:int):
 	phrase_start_measure = phrase_data.start_measure
 	phrase_score_value = phrase_data.score_value
 	phrase_beats = phrase_data.beats.duplicate()
-	phrase_first_beat = phrase_beats.min()
+	phrase_first_beat = phrase_data.first_beat  # Use precomputed value instead of .min()
 
 	for i in range(phrase_data.measure_count):
 		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
