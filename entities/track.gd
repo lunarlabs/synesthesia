@@ -42,7 +42,7 @@ var phrase_start_measure:int = 0
 var marker_measure:int = 0
 var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
-var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls
+var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
 var phrase_beats: Array[float]
 var phrase_beat_index: int = 0  # Track which beat we're processing next in autoblast
 var phrase_score_value:int = 0
@@ -160,8 +160,8 @@ func try_blast(lane_index:int):
 				blasting_phrase = true
 				marker.hide()
 			phrase_notes.erase(note_node)
+			phrase_notes_count -= 1  # Keep in sync with phrase_notes array
 			phrase_notes_dict.erase(note_node)
-			phrase_notes_count -= 1
 			if phrase_notes_count == 0:
 				activate(floori(target_note / BEATS_PER_MEASURE) + 1)
 				blasting_phrase = false
