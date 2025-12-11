@@ -484,97 +484,63 @@ func _has_phrase_next_measure(exclude_track:int) -> bool:
 
 func _find_best_track_for_autoblast() -> int:
 	# Find closest unactivated measure using track marker_measure
-	var candidates: Array = []
+	# Optimized single-pass comparison instead of multiple filter passes
+	var best_track = active_track
+	var best_measure_dist = 9999
+	var best_note_count = -1
+	var best_track_dist = 9999
+	var curr_measure = current_measure()
 	
-#	print("  Finding best track: active=%d" % active_track)
-	
-	# Build list of candidates: [track_idx, measure_distance, note_count, track_distance_from_active, reset_countdown]
 	for i in tracks.size():
-		var track = tracks[i] as SynRoadTrack
-		# Always skip the current active track - we want to switch to a different track
 		if i == active_track:
-#			print("    Track %d: skipped (current track)" % i)
 			continue
 		
-		# Use marker_measure to get the first measure with notes
+		var track = tracks[i] as SynRoadTrack
 		var first_measure = track.marker_measure
 		
 		# Skip tracks with no future notes or whose phrase starts in the current measure or earlier
-		if first_measure <= 0 or first_measure <= current_measure():
-#			print("    Track %d: skipped (first_measure=%d not after current=%d)" % [i, first_measure, current_measure()])
+		if first_measure <= 0 or first_measure <= curr_measure:
 			continue
 		
-		# Count notes in the first two measures of this phrase
-		var note_count = 0
-		var start_beat = float(first_measure - 1) * BEATS_PER_MEASURE
-		var end_beat = float(first_measure + 1) * BEATS_PER_MEASURE
-		for beat in track.note_map.keys():
-			if beat >= start_beat and beat < end_beat:
-				note_count += 1
+		var measure_distance = first_measure - curr_measure
 		
-		var measure_distance = first_measure - current_measure()
+		# Early exit if this track is farther than our current best
+		if measure_distance > best_measure_dist:
+			continue
+		
+		# Count notes in the first two measures (only if needed for comparison)
+		var note_count = 0
+		if measure_distance <= best_measure_dist:
+			var start_beat = float(first_measure - 1) * BEATS_PER_MEASURE
+			var end_beat = float(first_measure + 1) * BEATS_PER_MEASURE
+			for beat in track.note_map.keys():
+				if beat >= start_beat and beat < end_beat:
+					note_count += 1
+		
 		var track_distance = abs(i - active_track)
 		
-		# Add all tracks to candidates - we'll prioritize by measure_distance first
-		candidates.append([i, measure_distance, note_count, track_distance, track.reset_countdown])
-#		print("    Track %d: candidate (first_measure=%d, measure_dist=%d, notes=%d, track_dist=%d, countdown=%d)" % [i, first_measure, measure_distance, note_count, track_distance, track.reset_countdown])
+		# Compare using priority: measure_distance > note_count > track_distance > track_idx
+		var is_better = false
+		if measure_distance < best_measure_dist:
+			is_better = true
+		elif measure_distance == best_measure_dist:
+			if note_count > best_note_count:
+				is_better = true
+			elif note_count == best_note_count:
+				if track_distance < best_track_dist:
+					is_better = true
+				elif track_distance == best_track_dist:
+					# If equidistant, prefer right (higher index)
+					if i > best_track:
+						is_better = true
+		
+		if is_better:
+			best_track = i
+			best_measure_dist = measure_distance
+			best_note_count = note_count
+			best_track_dist = track_distance
 	
-	if candidates.is_empty():
-#		print("  No candidates found, staying on track %d" % active_track)
-		return active_track
-	
-	# Find minimum measure distance
-	var min_measure_distance = 9999
-	for candidate in candidates:
-		if candidate[1] < min_measure_distance:
-			min_measure_distance = candidate[1]
-	
-	# Filter to only candidates with minimum measure distance
-	var closest_candidates: Array = []
-	for candidate in candidates:
-		if candidate[1] == min_measure_distance:
-			closest_candidates.append(candidate)
-	
-	if closest_candidates.size() == 1:
-		return closest_candidates[0][0]
-	
-	# If tied, find maximum note count among the closest
-	var max_note_count = -1
-	for candidate in closest_candidates:
-		if candidate[2] > max_note_count:
-			max_note_count = candidate[2]
-	
-	# Filter to only candidates with max note count
-	var best_note_candidates: Array = []
-	for candidate in closest_candidates:
-		if candidate[2] == max_note_count:
-			best_note_candidates.append(candidate)
-	
-	if best_note_candidates.size() == 1:
-		return best_note_candidates[0][0]
-	
-	# If still tied, find minimum track distance (prefer closer tracks)
-	var min_track_distance = 9999
-	for candidate in best_note_candidates:
-		if candidate[3] < min_track_distance:
-			min_track_distance = candidate[3]
-	
-	# Filter to only candidates with minimum track distance
-	var final_candidates: Array = []
-	for candidate in best_note_candidates:
-		if candidate[3] == min_track_distance:
-			final_candidates.append(candidate)
-	
-	if final_candidates.size() == 1:
-		return final_candidates[0][0]
-	
-	# If equidistant, prefer right (higher index)
-	var best_idx = final_candidates[0][0]
-	for candidate in final_candidates:
-		if candidate[0] > best_idx:
-			best_idx = candidate[0]
-	
-	return best_idx
+	return best_track
 
 func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
 	var min_value = 9999
@@ -646,12 +612,17 @@ func _on_note_hit(offset: float):
 		else:
 			lbl_fast_slow.text = "SLOW"
 		
-		# Reuse timer instead of creating new ones
+		# Reuse timer instead of creating new ones - only reconnect if timer is new
 		if not _fast_slow_hide_timer or _fast_slow_hide_timer.time_left <= 0:
+			if _fast_slow_hide_timer and _fast_slow_hide_timer.timeout.is_connected(_hide_fast_slow_label):
+				_fast_slow_hide_timer.timeout.disconnect(_hide_fast_slow_label)
 			_fast_slow_hide_timer = get_tree().create_timer(0.5)
-			_fast_slow_hide_timer.timeout.connect(func(): lbl_fast_slow.hide())
+			_fast_slow_hide_timer.timeout.connect(_hide_fast_slow_label)
 	else:
 		lbl_fast_slow.hide()
+
+func _hide_fast_slow_label():
+	lbl_fast_slow.hide()
 
 func fail_song():
 	if _in_fail_state:
