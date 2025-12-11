@@ -29,6 +29,7 @@ var midi_name: String
 var audio_file: String
 var instrument: int
 var instrument_note_material: StandardMaterial3D
+var instrument_ghost_material: StandardMaterial3D
 var length_multiplier: float = 1.0
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var note_map: Dictionary[float, int]
@@ -85,7 +86,10 @@ func _enter_tree():
 
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
-	var rail_mat = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
+	# Cache materials once at track level instead of loading in each chunk
+	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
+	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
+	var rail_mat = instrument_ghost_material
 	for i in range(song_node.total_measures):
 		var new_rail = RAIL_SCENE.instantiate() as Node3D
 		new_rail.position.z = -(BEATS_PER_MEASURE * length_per_beat) * i
@@ -528,8 +532,9 @@ class MeasureChunk:
 	func load_if_needed():
 		if note_nodes.is_empty():
 			var suppressed_measures = track.song_node._manager_node.suppressed_measures
-			var instrument_note_material = load(INSTRUMENTS[track.instrument][2])
-			var ghost_material = load(INSTRUMENTS[track.instrument][3])
+			# Use cached materials from track instead of loading repeatedly
+			var instrument_note_material = track.instrument_note_material
+			var ghost_material = track.instrument_ghost_material
 			for i in range(start_measure, end_measure):	
 				var new_measure = MEASURE_SCENE.instantiate() as Node3D
 				new_measure.position.z = -(BEATS_PER_MEASURE * track.length_per_beat) * (i - 1)

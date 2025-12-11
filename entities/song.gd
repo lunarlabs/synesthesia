@@ -508,14 +508,8 @@ func _find_best_track_for_autoblast() -> int:
 		if measure_distance > best_measure_dist:
 			continue
 		
-		# Count notes in the first two measures (only if needed for comparison)
-		var note_count = 0
-		if measure_distance <= best_measure_dist:
-			var start_beat = float(first_measure - 1) * BEATS_PER_MEASURE
-			var end_beat = float(first_measure + 1) * BEATS_PER_MEASURE
-			for beat in track.note_map.keys():
-				if beat >= start_beat and beat < end_beat:
-					note_count += 1
+		# Use precomputed phrase score value as note count (already available)
+		var note_count = track.phrase_score_value
 		
 		var track_distance = abs(i - active_track)
 		
