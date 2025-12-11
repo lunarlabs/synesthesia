@@ -609,10 +609,9 @@ func _on_note_hit(offset: float):
 		else:
 			lbl_fast_slow.text = "SLOW"
 		
-		# Reuse timer instead of creating new ones - only reconnect if timer is new
+		# Reuse timer instead of creating new ones
+		# SceneTreeTimer auto-disconnects on completion, so no manual disconnect needed
 		if not _fast_slow_hide_timer or _fast_slow_hide_timer.time_left <= 0:
-			if _fast_slow_hide_timer and _fast_slow_hide_timer.timeout.is_connected(_hide_fast_slow_label):
-				_fast_slow_hide_timer.timeout.disconnect(_hide_fast_slow_label)
 			_fast_slow_hide_timer = get_tree().create_timer(0.5)
 			_fast_slow_hide_timer.timeout.connect(_hide_fast_slow_label)
 	else:

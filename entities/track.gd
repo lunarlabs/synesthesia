@@ -44,6 +44,7 @@ var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
 var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls
 var phrase_beats: Array[float]
+var phrase_beat_index: int = 0  # Track which beat we're processing next in autoblast
 var phrase_score_value:int = 0
 var phrase_first_beat: float = 0.0
 var beats_in_measure: Dictionary  # Cache beats per measure: int -> Array[float]
@@ -267,11 +268,11 @@ func _process(delta: float):
 	else:
 		if is_active:
 			# TIME TO FAKE IT BABY!
-			# Optimized: only process beats from start until we find one that hasn't been reached
-			# Since phrase_beats is sorted, we can stop early
+			# Optimized: only process beats from current index until we find one that hasn't been reached
+			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
 			var notes_blasted = 0
-			while phrase_beats.size() > 0 and phrase_beats[0] <= current_beat:
-				var beat = phrase_beats[0]
+			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= current_beat:
+				var beat = phrase_beats[phrase_beat_index]
 				asp.volume_db = BLASTING_VOLUME
 				if !note_nodes[beat].blasted:
 					note_nodes[beat].blast(true)
@@ -286,11 +287,11 @@ func _process(delta: float):
 					marker.hide()
 					#print("    Blasted beat %.2f" % beat)
 					#print("    Remaining phrase beats: %s" % str(phrase_beats))
-				phrase_beats.remove_at(0)  # More efficient than erase() for first element
+				phrase_beat_index += 1
 				notes_blasted += 1
 			
 			# Check if phrase is complete
-			if phrase_beats.is_empty() and notes_blasted > 0:
+			if phrase_beat_index >= phrase_beats.size() and notes_blasted > 0:
 				#print("  Track %s: Phrase complete, activating" % midi_name)
 				activate(song_node.current_measure())
 				blasting_phrase = false
@@ -329,6 +330,7 @@ func _clear_phrase():
 	phrase_notes_dict.clear()
 	phrase_notes_count = 0
 	phrase_beats.clear()
+	phrase_beat_index = 0
 	phrase_score_value = 0
 	phrase_start_measure = 0
 	blasting_phrase = false
