@@ -512,6 +512,10 @@ func _spawn_misblast_effect(beat_position: float, lane_index: int):
 	misblast.position.x = (lane_index - 1) * 0.6
 	add_child(misblast)
 
+func current_measure_is_unactivated() -> bool:
+	var current_measure = song_node.current_measure()
+	return reset_countdown == 0 and beats_in_measure.has(current_measure)
+
 class MeasureChunk:
 	var start_measure:int
 	var end_measure:int

@@ -271,13 +271,23 @@ func _process(delta: float):
 				emit_signal("song_finished", stats)
 				print(final_score_text)
 			else:
-				if _manager_node.energy_modifier == 1:
-					# TODO: If any track is not activated or empty, subtract 1 energy
-					# but don't fail the song unless there's a streak break with 0 energy
-					pass
 				previous_measure = current_measure()
 				%SongProgress.value = previous_measure
 #				print("measure %d/%d" % [previous_measure, total_measures])
+				if _manager_node.energy_modifier == 1 and _manager_node.suppressed_measures.has(previous_measure) == false:
+					# TODO: If any track is not activated or empty, subtract 1 energy
+					# but don't fail the song unless there's a streak break with 0 energy
+					var any_unactivated = false
+					for track in tracks:
+						if (track as SynRoadTrack).current_measure_is_unactivated():
+							any_unactivated = true
+							break
+					if any_unactivated:
+						if energy == 0 and tracks[active_track].blasting_phrase == false:
+							fail_song()
+							return
+						else:
+							energy_change(-1)
 				new_measure.emit(previous_measure)
 				if lead_in_measures > 0:
 					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * previous_measure
@@ -380,6 +390,10 @@ func _on_streak_broken():
 	match _manager_node.energy_modifier:
 		0, 2:
 			energy_change(-1)
+			if energy <= 0:
+				fail_song()
+				return
+		1:
 			if energy <= 0:
 				fail_song()
 				return

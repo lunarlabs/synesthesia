@@ -297,7 +297,7 @@ func _update_previous_bests():
 		%PrevAccLabel.text = "0.00%"
 	else:
 		var record = SessionManager.song_records[entry.title][selected_difficulty]
-		%PreviousBestsTitle.text = "MENU_PREV_BESTS"
+		%PreviousBestsTitle.text = "MENU_PREV_BESTS" if record["clear_state"] != "failed" else "MENU_FAILED"
 		%PrevScoreLabel.text = str(record["score"])
 		%PrevRankLabel.text = record.get("rank", "")
 		%PrevStreakLabel.text = str(record["max_streak"])
