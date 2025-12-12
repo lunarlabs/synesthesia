@@ -12,6 +12,9 @@ var difficulty: int = 96
 @export_enum("Normal:12", "Fast Reset 1:10", "Fast Reset 2:8") var fast_track_reset: int = 12
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
+@export_group("Benchmark")
+@export var enable_benchmark: bool = false
+@export var benchmark_per_track_detail: bool = false
 
 const SONG_SCENE:PackedScene = preload("res://entities/Song.tscn")
 const DIFFICULTY_NAMES = {
@@ -66,14 +69,26 @@ const FAST_RESET_NAMES = {
 @onready var btn_quit: Button = $PausePanel/VBoxContainer/QuitButton
 @onready var fail_screen: Control = $SongFail
 @onready var result_screen: Control = $SongResult
+@onready var benchmark_overlay = $BenchmarkOverlay  # BenchmarkOverlay type
 
 var song_data:SongData
 var song_instance:SynRoadSong
 var preprocessor:SynRoadTrackPreprocessor
 var track_data:Dictionary
 var suppressed_measures:Array[int] = []
+var benchmark_manager: BenchmarkManager
 
 func _ready() -> void:
+	# Initialize benchmark manager if enabled
+	if enable_benchmark:
+		benchmark_manager = BenchmarkManager.new()
+		add_child(benchmark_manager)
+		benchmark_manager.show_per_track_detail = benchmark_per_track_detail
+		benchmark_manager.autoblast_default = autoblast
+		benchmark_overlay.show()
+	else:
+		benchmark_overlay.hide()
+	
 	song_data = load(song_file) as SongData
 	await get_tree().process_frame
 	if not song_data:
@@ -144,6 +159,17 @@ func _ready() -> void:
 		await get_tree().process_frame
 
 	print("Starting song: %s [%s]" % [song_data.long_title, DIFFICULTY_NAMES[difficulty]])
+	
+	# Start benchmark if enabled
+	if benchmark_manager:
+		var modifiers = {
+			"autoblast": autoblast,
+			"hi_speed": hi_speed,
+			"timing_modifier": timing_modifier,
+			"energy_modifier": energy_modifier
+		}
+		benchmark_manager.start_run(song_data, difficulty, modifiers)
+	
 	song_instance.start_song()
 	var tween = get_tree().create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(load_screen, "color", Color(0,0,0,0),\
@@ -210,6 +236,10 @@ func _input(event: InputEvent) -> void:
 		_toggle_pause()
 
 func _on_song_failed(stats) -> void:
+	# Finalize benchmark if enabled
+	if benchmark_manager and benchmark_manager.is_enabled:
+		benchmark_manager.finalize_run(song_instance)
+	
 	var fail_anim = fail_screen.get_node("AnimationPlayer") as AnimationPlayer
 	# TODO: the rest of the fail screen labels and then populate them with stats
 	# TODO: we have %TipLabel but no tips yet so you'll just see the "no fail" tip all the time
@@ -259,6 +289,10 @@ func _on_song_failed(stats) -> void:
 	restart_btn.disabled = false
 
 func _on_song_finished(stats) -> void:
+	# Finalize benchmark if enabled
+	if benchmark_manager and benchmark_manager.is_enabled:
+		benchmark_manager.finalize_run(song_instance)
+	
 	var finish_anim = result_screen.get_node("AnimationPlayer") as AnimationPlayer
 	# TODO: the rest of the result screen labels and then populate them with stats
 	result_screen.get_node("%SongTitleLabel").text = song_data.long_title
@@ -370,6 +404,39 @@ func _on_restart_pressed() -> void:
 	await get_tree().process_frame
 	song_instance.start_song()
 	load_screen.hide()
+
+func _process(delta: float) -> void:
+	if benchmark_manager and benchmark_manager.is_enabled and song_instance:
+		var fps = Engine.get_frames_per_second()
+		benchmark_manager.sample_frame(delta, fps)
+		
+		# Update overlay with current metrics
+		if benchmark_overlay:
+			var current_metrics = {
+				"fps": fps,
+				"frame_time_ms": delta * 1000.0,
+				"drift_ms": song_instance.max_drift * 1000.0,
+				"frame_drops": song_instance.frame_drops,
+				"active_notes": 0,
+				"active_measures": 0,
+				"chunk_loads": 0,
+				"chunk_unloads": 0,
+				"notes_spawned": 0,
+				"hit_offset_ms": song_instance._avg_hit_offset * 1000.0 if not is_nan(song_instance._avg_hit_offset) else 0.0,
+				"notes_hit": song_instance._notes_hit_count,
+				"elapsed": song_instance.time_elapsed
+			}
+			
+			# Aggregate streaming metrics from all tracks
+			for track in song_instance.tracks:
+				if track is SynRoadTrack:
+					current_metrics["active_notes"] += track.note_nodes.size()
+					current_metrics["active_measures"] += track.measure_nodes.size()
+					current_metrics["chunk_loads"] += track.benchmark_chunk_loads
+					current_metrics["chunk_unloads"] += track.benchmark_chunk_unloads
+					current_metrics["notes_spawned"] += track.benchmark_notes_spawned
+			
+			benchmark_overlay.update_metrics(current_metrics)
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false

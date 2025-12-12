@@ -108,6 +108,12 @@ func _ready():
 		newTrack.active_phrase_missed.connect(_on_active_phrase_missed)
 		newTrack.note_hit.connect(_on_note_hit)
 		add_child(newTrack)
+	
+	# Connect to benchmark manager if available
+	var song_manager = _manager_node as SynRoadSongManager
+	if song_manager and "benchmark_manager" in song_manager and song_manager.benchmark_manager:
+		new_measure.connect(song_manager.benchmark_manager.sample_measure)
+	
 	click_track_asp.stream = load(ResourceUID.path_to_uid(_manager_node.song_data.click_track))
 	for audioFileName in _manager_node.song_data.intro_audio:
 		var introAsp = AudioStreamPlayer.new()

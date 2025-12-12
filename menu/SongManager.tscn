@@ -1,15 +1,17 @@
-[gd_scene load_steps=5 format=3 uid="uid://rehe4hobdmbl"]
+[gd_scene load_steps=6 format=3 uid="uid://rehe4hobdmbl"]
 
 [ext_resource type="Script" uid="uid://dnco7owat03n4" path="res://menu/song_manager.gd" id="1_o7bha"]
 [ext_resource type="PackedScene" uid="uid://bshtgri8guqec" path="res://menu/load_screen.tscn" id="2_tr38k"]
 [ext_resource type="PackedScene" uid="uid://xt6k04euw0of" path="res://menu/song_fail.tscn" id="3_4pkhu"]
 [ext_resource type="PackedScene" uid="uid://dm4hcmhaewyp6" path="res://menu/song_result.tscn" id="4_hvuvw"]
+[ext_resource type="PackedScene" uid="uid://bh83ynfydw2b" path="res://menu/benchmark_overlay.tscn" id="5_ab8xy"]
 
 [node name="SongManager" type="Node"]
 script = ExtResource("1_o7bha")
-song_file = "uid://cmv7jola8rpbe"
-difficulty = 114
-autoblast = true
+song_file = "uid://b4tsfv2pbakm6"
+checkpoint_modifier = 1
+enable_benchmark = true
+benchmark_per_track_detail = true
 
 [node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
 process_mode = 3
@@ -55,3 +57,5 @@ visible = false
 
 [node name="SongResult" parent="." instance=ExtResource("4_hvuvw")]
 visible = false
+
+[node name="BenchmarkOverlay" parent="." instance=ExtResource("5_ab8xy")]

@@ -48,6 +48,11 @@ var phrase_beat_index: int = 0  # Track which beat we're processing next in auto
 var phrase_score_value:int = 0
 var phrase_first_beat: float = 0.0
 var beats_in_measure: Dictionary  # Cache beats per measure: int -> Array[float]
+
+# Benchmark tracking
+var benchmark_chunk_loads: int = 0
+var benchmark_chunk_unloads: int = 0
+var benchmark_notes_spawned: int = 0
 var blasting_phrase: bool = false
 var lane_note_beats = [[],[],[],]
 var next_note_idx_per_lane: Array[int] = [0,0,0,]
@@ -539,6 +544,7 @@ class MeasureChunk:
 
 	func load_if_needed():
 		if note_nodes.is_empty():
+			track.benchmark_chunk_loads += 1
 			var suppressed_measures = track.song_node._manager_node.suppressed_measures
 			# Use cached materials from track instead of loading repeatedly
 			var instrument_note_material = track.instrument_note_material
@@ -574,6 +580,7 @@ class MeasureChunk:
 			for beat_position in track.note_map:
 				var measure = floori(beat_position / BEATS_PER_MEASURE) + 1
 				if measure >= start_measure and measure < end_measure:
+					track.benchmark_notes_spawned += 1
 					var lane_index = track.note_map[beat_position]
 					var new_note = NOTE_SCENE.instantiate() as SynRoadNote
 					if suppressed_measures.has(measure):
@@ -591,6 +598,7 @@ class MeasureChunk:
 	
 	func unload():
 		if not note_nodes.is_empty():
+			track.benchmark_chunk_unloads += 1
 			# Remove freed notes from phrase_notes to prevent accessing freed instances
 			for note in note_nodes:
 				if track.phrase_notes_dict.has(note):
