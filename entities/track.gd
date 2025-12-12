@@ -78,6 +78,8 @@ signal note_hit(timing:float)
 @onready var rails = $RailMaster
 
 func _enter_tree():
+	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
+	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	song_node = get_parent() as SynRoadSong
 	length_per_beat = song_node.length_per_beat
 #	_populateNotes()  # No longer needed here, preprocessor handled it
@@ -88,8 +90,6 @@ func _enter_tree():
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
 	# Cache materials once at track level instead of loading in each chunk
-	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
-	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	var rail_mat = instrument_ghost_material
 	for i in range(song_node.total_measures):
 		var new_rail = RAIL_SCENE.instantiate() as Node3D
@@ -154,8 +154,8 @@ func try_blast(lane_index:int):
 		#print("  Track %s: Blasted note at beat %.2f (offset %.3f)" % [midi_name, target_note, time_offset])
 		if phrase_notes_dict.has(note_node):
 			if !blasting_phrase:
-				# Calculate phrase measure count (always 2 for now)
-				var phrase_measure_count = 2
+				# preprocessed phrase measure count
+				var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
 				started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
 				blasting_phrase = true
 				marker.hide()
@@ -280,9 +280,9 @@ func _process(delta: float):
 					note_hit.emit(0.0)
 				# Check if this is the first note of the phrase
 				if !blasting_phrase:
-					var phrase_measure_count = 2
+					var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
 					started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-					#print("  Track %s: Starting autoblast phrase at beat %.2f" % [midi_name, beat])
+					print("  Track %s: Starting autoblast phrase at measure %d" % [midi_name, phrase_start_measure])
 					blasting_phrase = true
 					marker.hide()
 					#print("    Blasted beat %.2f" % beat)
@@ -321,7 +321,13 @@ func _on_song_new_measure(_measure_num: int):
 			_move_marker(get_first_available_measure(_measure_num + 1))
 
 func _clear_phrase():
-	for i in range(2):
+	# Clear exactly the measures in this phrase, not always 2
+	var count := 0
+	if current_phrase_index >= 0 and current_phrase_index < preprocessed_phrases.size():
+		count = preprocessed_phrases[current_phrase_index].measure_count
+	else:
+		count = 1  # safe default
+	for i in range(count):
 		if measure_nodes.has(phrase_start_measure + i):
 			measure_nodes[phrase_start_measure + i].get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", false)
 	for note in phrase_notes:
@@ -334,7 +340,7 @@ func _clear_phrase():
 	phrase_score_value = 0
 	phrase_start_measure = 0
 	blasting_phrase = false
-
+	
 func _find_next_phrase():
 	# first clear effects from previous phrase
 	if reset_countdown > 0:
@@ -368,8 +374,8 @@ func _process_phrase_at_index(idx:int):
 	phrase_start_measure = phrase_data.start_measure
 	phrase_score_value = phrase_data.score_value
 	phrase_beats = phrase_data.beats.duplicate()
-	phrase_first_beat = phrase_data.first_beat  # Use precomputed value instead of .min()
-
+	phrase_first_beat = phrase_data.first_beat
+	# Use phrase_data.measure_count consistently
 	for i in range(phrase_data.measure_count):
 		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
 		if chunk_idx >= 0 and chunk_idx < chunks.size():
@@ -420,16 +426,17 @@ func activate(start_measure:int):
 			print("%s: activation spans checkpoint gap at measure %d, extending by 2" % [midi_name, suppressed])
 			spans_checkpoint = true
 			break  # Only need to handle one checkpoint span per activation
-	print("  Track %s activate: start_measure=%d, activation_length=%d, target_measure=%d" % [midi_name, start_measure, activation_length_measures, target_measure])
+#	print("  Track %s activate: start_measure=%d, activation_length=%d, target_measure=%d" % [midi_name, start_measure, reset_countdown, target_measure])
 	_move_marker(get_first_available_measure(target_measure))
 	asp.volume_db = UNFOCUSED_VOLUME
 	# Save the completed phrase value before finding the next phrase
 	var completed_phrase_value = phrase_score_value
 	for i in range(reset_countdown):
+#		print("Hide measure %d" % (start_measure + i))
+		hidden_measures.append(start_measure + i)
 		if measure_nodes.has(start_measure + i):
 			measure_nodes[start_measure + i].get_node("track_geometry").hide()
 			measure_nodes[start_measure + i].get_node("activation_particles").emitting = true
-			hidden_measures.append(start_measure + i)
 			for note in get_notes_in_measure(start_measure + i):
 				note.blast()
 	blasting_phrase = false
@@ -540,11 +547,27 @@ class MeasureChunk:
 				var new_measure = MEASURE_SCENE.instantiate() as Node3D
 				new_measure.position.z = -(BEATS_PER_MEASURE * track.length_per_beat) * (i - 1)
 				new_measure.scale.z = track.length_per_beat / STANDARD_LENGTH_PER_BEAT
-				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("measure_tint", INSTRUMENTS[track.instrument][1])
+				var cube = new_measure.get_node("track_geometry").get_node("Cube")
+				cube.set_instance_shader_parameter("measure_tint", INSTRUMENTS[track.instrument][1])
+				# Ensure newly loaded measures inherit current active visual state
+				cube.set_instance_shader_parameter("active", track._active_track)
+				# Preserve phrase highlighting for measures within the current phrase
+				var phrase_len:int = 0
+				if track.current_phrase_index >= 0 and track.current_phrase_index < track.preprocessed_phrases.size():
+					phrase_len = track.preprocessed_phrases[track.current_phrase_index].measure_count
+				var in_phrase := (phrase_len > 0 and i >= track.phrase_start_measure and i < track.phrase_start_measure + phrase_len)
+				if in_phrase:
+					cube.set_instance_shader_parameter("phrase", true)
+				var track_geom = new_measure.get_node("track_geometry")
 				var pfx = new_measure.get_node("activation_particles").process_material as ParticleProcessMaterial
 				pfx.color = INSTRUMENTS[track.instrument][1]
-				if non_empty_measures.has(i) and not suppressed_measures.has(i) and not track.hidden_measures.has(i):
-					new_measure.get_node("track_geometry").show()
+				var is_hidden := track.hidden_measures.has(i)
+				if non_empty_measures.has(i) and not suppressed_measures.has(i) and not is_hidden:
+					track_geom.show()
+				else:
+					track_geom.hide()
+					# Keep checkpoint-straddled activation visuals hidden when chunks reload
+					new_measure.get_node("activation_particles").emitting = is_hidden
 				measure_nodes.append(new_measure)
 				track.measure_nodes[i] = new_measure
 				track.add_child(new_measure)
@@ -559,9 +582,12 @@ class MeasureChunk:
 					new_note.ghost_material = ghost_material
 					new_note.position.z = - (beat_position * track.length_per_beat)
 					new_note.position.x = (lane_index - 1) * 0.6
+					# If this measure was already activated, keep notes visually cleared on reload
 					note_nodes.append(new_note)
 					track.note_nodes[beat_position] = new_note
 					track.add_child(new_note)
+					if track.hidden_measures.has(measure):
+						new_note.blast()
 	
 	func unload():
 		if not note_nodes.is_empty():

@@ -28,7 +28,8 @@ func blast(emit:bool = false):
 	if _blasted:
 		return
 	_blasted = true
-	particles.emitting = emit
+	if emit:
+		particles.emitting = true
 	capsule.hide()
 	ghost.show()
 
