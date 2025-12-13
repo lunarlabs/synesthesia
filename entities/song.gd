@@ -273,6 +273,7 @@ func _process(delta: float):
 			else:
 				previous_measure = current_measure()
 				%SongProgress.value = previous_measure
+				new_measure.emit(previous_measure)
 #				print("measure %d/%d" % [previous_measure, total_measures])
 				if _manager_node.energy_modifier == 1 and _manager_node.suppressed_measures.has(previous_measure) == false:
 					# TODO: If any track is not activated or empty, subtract 1 energy
@@ -288,7 +289,6 @@ func _process(delta: float):
 							return
 						else:
 							energy_change(-1)
-				new_measure.emit(previous_measure)
 				if lead_in_measures > 0:
 					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * previous_measure
 					count_in.text = str(lead_in_measures)
