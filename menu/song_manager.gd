@@ -13,7 +13,7 @@ var difficulty: int = 96
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
 
-const SONG_SCENE:PackedScene = preload("res://entities/Song.tscn")
+const SONG_SCENE:PackedScene = preload("res://entities/song.tscn")
 const DIFFICULTY_NAMES = {
 	96: "Beginner",
 	102: "Intermediate",
