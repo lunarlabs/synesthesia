@@ -51,13 +51,13 @@ const RESET_MODIFIER_NAMES: Array[String] = [
 ]
 
 const HI_SPEED_MULTS_VAL: Array[float] = [
-	0.5,
-	0.75,
 	1.0,
 	1.25,
 	1.5,
 	1.75,
 	2.0,
+	0.5,
+	0.75,
 ]
 
 const HI_SPEED_MULTS_STR: Dictionary = {
@@ -79,7 +79,7 @@ var energy_modifier_index: int = 0
 var checkpoint_modifier_index: int = 0
 var timing_modifier_index: int = 0
 var reset_modifier_index: int = 0
-var hi_speed_index: int = 2  # Default to 1.0x
+var hi_speed_index: int = 0  # Default to 1.0x
 
 # UI References
 
