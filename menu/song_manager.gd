@@ -375,3 +375,8 @@ func _on_quit_pressed() -> void:
 	get_tree().paused = false
 	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
+
+class SongGameplayData:
+	# For this refactor, we'll use time instead of beats for everything
+	# Also measures will be zero-indexed
+	var measure_times: PackedFloat32Array

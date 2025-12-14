@@ -1,7 +1,8 @@
-[gd_scene load_steps=31 format=3 uid="uid://dih2tkchgg7x0"]
+[gd_scene load_steps=32 format=3 uid="uid://dih2tkchgg7x0"]
 
 [ext_resource type="Script" uid="uid://cgr576c4m6vpp" path="res://entities/song.gd" id="1_jv32a"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_0bd8t"]
+[ext_resource type="PackedScene" uid="uid://c3ixmuikuxhov" path="res://entities/target.tscn" id="2_gkj2n"]
 [ext_resource type="Shader" uid="uid://557g0yaormii" path="res://entities/target.tres" id="2_o2o53"]
 [ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="2_scy1h"]
 [ext_resource type="Texture2D" uid="uid://cb3t3wrdorm6v" path="res://addons/kenney_particle_pack/circle_01.png" id="3_0mt4k"]
@@ -565,10 +566,8 @@ theme_override_font_sizes/font_size = 11
 
 [node name="CurrentTrack" type="Marker3D" parent="Playhead"]
 
-[node name="TargetLeft" type="MeshInstance3D" parent="Playhead/CurrentTrack"]
+[node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
-layers = 2
-mesh = SubResource("PlaneMesh_jv32a")
 
 [node name="TargetCenter" type="MeshInstance3D" parent="Playhead/CurrentTrack"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
