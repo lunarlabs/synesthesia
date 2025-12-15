@@ -6,8 +6,13 @@ var pending_jobs: Array = []
 var completed: Array = []
 var running := false
 
-func queue_job(song_track_index: int, midi_track_index:int, midi_data:MidiData,\
-  ticks_per_beat:int, difficulty_offset:int, supressed_measures:Array[int] = []):
+func queue_job(
+	song_track_index: int,
+	midi_track_index:int,
+	midi_data:MidiData,
+	ticks_per_beat:int,
+	difficulty_offset:int,
+	supressed_measures:Array[int] = []):
 	mutex.lock()
 	pending_jobs.append({
 		"song_track_index": song_track_index,

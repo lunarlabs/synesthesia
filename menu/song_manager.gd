@@ -71,6 +71,9 @@ var song_data:SongData
 var song_instance:SynRoadSong
 var preprocessor:SynRoadTrackPreprocessor
 var track_data:Dictionary
+var length_multiplier: float
+var seconds_per_beat: float
+var measure_times: Array[float] = []
 var suppressed_measures:Array[int] = []
 
 func _ready() -> void:
@@ -92,12 +95,14 @@ func _ready() -> void:
 		1:
 			# Disabled -- leave the checkpoint gates as is but they won't do anything
 			pass
+		# TODO: Barrier logic.
 		2:
 			pass
 		3:
 			pass
 		4:
 			pass
+
 
 	_fetch_track_data()
 	preprocessor.wait_for_all()
