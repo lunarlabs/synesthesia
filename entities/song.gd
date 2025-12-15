@@ -204,6 +204,7 @@ func _process(delta: float):
 		time_elapsed = audio_time
 		
 		%actualplayhead.position.z = current_beat() * -length_per_beat
+		RenderingServer.global_shader_parameter_set("beat", fmod(current_beat(), 1))
 
 		# Calculate target position from audio time
 		# Tuned to minimize player hit offset - aim for ~0ms average

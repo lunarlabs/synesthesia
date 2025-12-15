@@ -5,12 +5,12 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0yoam"]
 render_priority = 0
 shader = ExtResource("1_5laoc")
-shader_parameter/TgtBrite = 1.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jv32a"]
 material = SubResource("ShaderMaterial_0yoam")
 size = Vector2(0.5, 0.5)
 
-[node name="TargetLeft" type="MeshInstance3D"]
+[node name="Target" type="MeshInstance3D"]
 layers = 2
+instance_shader_parameters/hit = false
 mesh = SubResource("PlaneMesh_jv32a")
