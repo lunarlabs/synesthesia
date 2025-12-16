@@ -46,6 +46,9 @@ const FAST_RESET_NAMES = {
 	8: "Fast Reset 2"
 }
 
+const STANDARD_LENGTH_PER_BEAT = 4.0
+const BEATS_PER_MEASURE = 4.0
+
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
 @onready var lbl_difficulty: Label = $LoadScreen/StageData/VBoxContainer/TopArea/DifficultyLabel
@@ -75,10 +78,13 @@ var preprocessor:SynRoadTrackPreprocessor
 var track_data:Dictionary
 var length_multiplier: float
 var seconds_per_beat: float
+var length_per_beat
 ## A zero-based array of measure start times (in seconds.)
 var measure_times: PackedFloat32Array = []
 ## the Z-position of measures on the track
 var measure_positions: PackedFloat32Array = []
+var checkpoint_positions: PackedFloat32Array = []
+var checkpoint_measures: PackedInt32Array = []
 var suppressed_measures: PackedInt32Array = [] # Possibly overkill? There is always the possibility of songs with over 256 measures though.
 
 func _ready() -> void:
@@ -90,23 +96,33 @@ func _ready() -> void:
 	_populate_load_screen()
 	anim.play("LoadIn")
 
-	match checkpoint_modifier:
-		0:
-			for measure in song_data.checkpoints:
-				var actual_measure = measure + song_data.lead_in_measures
+	seconds_per_beat = song_data.seconds_per_beat
+	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
+	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
+	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
+
+	for i in range(song_data.lead_in_measures + song_data.playable_measures):
+		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
+		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
+
+	for measure in song_data.checkpoints:
+		var actual_measure = measure + song_data.lead_in_measures
+		checkpoint_measures.append(actual_measure)
+		checkpoint_positions.append(actual_measure * length_per_beat * BEATS_PER_MEASURE)
+		match checkpoint_modifier:
+			0:
 				suppressed_measures.append(actual_measure)
 				suppressed_measures.append(actual_measure + 1)
-
-		1:
-			# Disabled -- leave the checkpoint gates as is but they won't do anything
-			pass
-		# TODO: Barrier logic.
-		2:
-			pass
-		3:
-			pass
-		4:
-			pass
+			1:
+				# Disabled -- leave the checkpoint gates as is but they won't do anything
+				pass
+			# TODO: Barrier logic.
+			2:
+				pass
+			3:
+				pass
+			4:
+				pass
 
 
 	_fetch_track_data()
@@ -141,8 +157,7 @@ func _ready() -> void:
 		"clear_state": "not_played",
 	}
 	song_instance = SONG_SCENE.instantiate() as SynRoadSong
-	song_instance.length_multiplier = (hi_speed) / song_data.scale_fudge_factor
-	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [song_instance.length_multiplier, hi_speed, song_data.scale_fudge_factor])
+
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
 	await anim.animation_finished
@@ -199,7 +214,7 @@ func _fetch_track_data() -> void:
 		if midi_track_idx == -1:
 			push_error("Track name %s not found in MIDI data." % track_info.midi_track_name)
 			continue
-		preprocessor.queue_job(i, midi_track_idx, midi_data, ticks_per_beat, difficulty, suppressed_measures)
+		preprocessor.queue_job(self, i, midi_data.tracks[midi_track_idx].events, ticks_per_beat)
 
 func _apply_preprocessor_results(results: Array) -> void:
 	for result in results:

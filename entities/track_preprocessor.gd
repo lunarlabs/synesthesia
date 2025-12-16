@@ -7,20 +7,18 @@ var completed: Array = []
 var running := false
 
 func queue_job(
+	manager: SynRoadSongManager,
 	song_track_index: int,
-	midi_track_index:int,
-	midi_data:MidiData,
-	ticks_per_beat:int,
-	difficulty_offset:int,
-	supressed_measures:Array[int] = []):
+	events: Array,
+	ticks_per_beat:int,):
 	mutex.lock()
 	pending_jobs.append({
 		"song_track_index": song_track_index,
-		"midi_track_index": midi_track_index,
-		"midi_data": midi_data,
+		"events": events,
 		"ticks_per_beat": ticks_per_beat,
-		"difficulty_offset": difficulty_offset,
-		"supressed_measures": supressed_measures,
+		"difficulty_offset": manager.difficulty,
+		"supressed_measures": manager.supressed_measures,
+		"track_reset": manager.fast_track_reset,
 	})
 	mutex.unlock()
 	_start_if_needed()
@@ -59,9 +57,8 @@ func _process_job(job:Dictionary):
 	var valid_note_positions: Array[int] = [job.difficulty_offset, job.difficulty_offset + 2, job.difficulty_offset + 4]
 	var tick := 0
 
-	var track_events = job.midi_data.tracks[job.midi_track_index].events
-	for i in range(track_events.size()):
-		var event = track_events[i]
+	for i in range(job.events.size()):
+		var event = job.events[i]
 		tick += event.delta_time
 		if event is MidiData.NoteOn and event.velocity > 0 and valid_note_positions.has(event.note):
 			var beat_position: float = float(tick) / float(job.ticks_per_beat)
