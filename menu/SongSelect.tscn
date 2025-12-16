@@ -6,7 +6,7 @@
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="3_mbci5"]
 [ext_resource type="Shader" uid="uid://b4tbx2xcdsxcy" path="res://menu/theme/SongSelectBG.gdshader" id="3_vojec"]
 [ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
-[ext_resource type="AudioStream" uid="uid://cahskgr3vv5if" path="res://assets/SongSelect.mp3" id="6_mbci5"]
+[ext_resource type="AudioStream" uid="uid://rpnnp1hrsh8d" path="res://assets/songsel2.mp3" id="7_vojec"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
 shader = ExtResource("3_vojec")
@@ -565,9 +565,10 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("6_mbci5")
+stream = ExtResource("7_vojec")
 volume_db = -3.0
 autoplay = true
+bus = &"Song"
 parameters/looping = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

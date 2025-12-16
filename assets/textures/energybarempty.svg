@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="95.249992mm"
+   height="14.816667mm"
+   viewBox="0 0 95.249992 14.816667"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="energybarempty.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.0179639"
+     inkscape:cx="139.00296"
+     inkscape:cy="-5.8941185"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g18" />
+  <defs
+     id="defs1">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient14"
+       id="linearGradient15"
+       x1="1500"
+       y1="44"
+       x2="1500"
+       y2="88"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient14"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="0"
+         id="stop15" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop16" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient14"
+       id="linearGradient18"
+       x1="1488"
+       y1="40"
+       x2="1488"
+       y2="96"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter14"
+       x="-0.042726092"
+       y="-0.03368788"
+       width="1.0854522"
+       height="1.0673758">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.3132374"
+         id="feGaussianBlur14" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-57.414575,-141.02291)">
+    <g
+       id="g18"
+       transform="matrix(0.26458333,0,0,0.26458333,-333.11042,130.43958)">
+      <rect
+         style="fill:#000000;stroke:none;stroke-width:2;-inkscape-stroke:none;paint-order:fill markers stroke;fill-opacity:0.63693273"
+         id="rect13"
+         width="45"
+         height="56"
+         x="1476"
+         y="40" />
+      <rect
+         style="fill:url(#linearGradient15);fill-opacity:1;stroke:url(#linearGradient18);stroke-width:2;stroke-dasharray:none;paint-order:fill markers stroke;filter:url(#filter14);opacity:0.27827381"
+         id="rect14"
+         width="41"
+         height="52"
+         x="1478"
+         y="42" />
+    </g>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use18"
+       transform="translate(11.906242)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use19"
+       transform="translate(23.812492)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use20"
+       transform="translate(35.718742)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use21"
+       transform="translate(47.624992)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use22"
+       transform="translate(59.531242)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use23"
+       transform="translate(71.437492)" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g18"
+       id="use24"
+       transform="translate(83.343741)" />
+  </g>
+</svg>

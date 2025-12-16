@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://c3ixmuikuxhov"]
+[gd_scene load_steps=5 format=3 uid="uid://c3ixmuikuxhov"]
 
 [ext_resource type="Shader" uid="uid://557g0yaormii" path="res://entities/target.tres" id="1_5laoc"]
+[ext_resource type="Script" uid="uid://dq5h127wm57ve" path="res://entities/target.gd" id="2_vwvyh"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0yoam"]
 render_priority = 0
@@ -14,3 +15,10 @@ size = Vector2(0.5, 0.5)
 layers = 2
 instance_shader_parameters/hit = false
 mesh = SubResource("PlaneMesh_jv32a")
+script = ExtResource("2_vwvyh")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -116,7 +116,7 @@ func _ready():
 	checkpoint_modifier_index = SessionManager.previous_select_options.get("checkpoint_modifier_index", 0)
 	timing_modifier_index = SessionManager.previous_select_options.get("timing_modifier_index", 0)
 	reset_modifier_index = SessionManager.previous_select_options.get("reset_modifier_index", 0)
-	hi_speed_index = SessionManager.previous_select_options.get("hi_speed_index", 2)
+	hi_speed_index = SessionManager.previous_select_options.get("hi_speed_index", 0)
 	%EnergyOption.text = tr(ENERGY_MODIFIER_NAMES[energy_modifier_index])
 	%CheckpointOption.text = tr(CHECKPOINT_MODIFIER_NAMES[checkpoint_modifier_index])
 	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])

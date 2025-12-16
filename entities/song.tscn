@@ -3,20 +3,13 @@
 [ext_resource type="Script" uid="uid://cgr576c4m6vpp" path="res://entities/song.gd" id="1_jv32a"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_0bd8t"]
 [ext_resource type="PackedScene" uid="uid://c3ixmuikuxhov" path="res://entities/target.tscn" id="2_gkj2n"]
-[ext_resource type="Shader" uid="uid://557g0yaormii" path="res://entities/target.tres" id="2_o2o53"]
 [ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="2_scy1h"]
 [ext_resource type="Texture2D" uid="uid://cb3t3wrdorm6v" path="res://addons/kenney_particle_pack/circle_01.png" id="3_0mt4k"]
 [ext_resource type="Texture2D" uid="uid://dil27tl3d85hr" path="res://assets/textures/scorearea.svg" id="5_q2dmg"]
 [ext_resource type="FontVariation" uid="uid://cxlh2wreioa5o" path="res://menu/theme/tabularmenufont.tres" id="7_0yoam"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0yoam"]
-render_priority = 0
-shader = ExtResource("2_o2o53")
-shader_parameter/TgtBrite = 1.0
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_jv32a"]
-material = SubResource("ShaderMaterial_0yoam")
-size = Vector2(0.5, 0.5)
+[ext_resource type="Texture2D" uid="uid://owpby88d13pj" path="res://assets/textures/energyarea.svg" id="8_otm2r"]
+[ext_resource type="Texture2D" uid="uid://5q8cu3on2cso" path="res://assets/textures/energybarempty.svg" id="9_jycet"]
+[ext_resource type="Texture2D" uid="uid://rc6bir30grrf" path="res://assets/textures/energybar.svg" id="10_nbke4"]
 
 [sub_resource type="FontVariation" id="FontVariation_q2dmg"]
 base_font = ExtResource("2_0bd8t")
@@ -567,17 +560,16 @@ theme_override_font_sizes/font_size = 11
 [node name="CurrentTrack" type="Marker3D" parent="Playhead"]
 
 [node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
 
-[node name="TargetCenter" type="MeshInstance3D" parent="Playhead/CurrentTrack"]
+[node name="TargetCenter" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
-layers = 2
-mesh = SubResource("PlaneMesh_jv32a")
 
-[node name="TargetRight" type="MeshInstance3D" parent="Playhead/CurrentTrack"]
+[node name="TargetRight" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
-layers = 2
-mesh = SubResource("PlaneMesh_jv32a")
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
 transform = Transform3D(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.16338265, 0.83456635)
@@ -687,7 +679,7 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.92
 anchor_right = 0.92
-offset_left = -422.40002
+offset_left = -422.0
 offset_right = 133.59998
 offset_bottom = 108.0
 grow_horizontal = 0
@@ -921,26 +913,15 @@ text = "FAST"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EnergyBar" type="ProgressBar" parent="HUD"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 360.0
-offset_bottom = 64.0
-max_value = 8.0
-step = 1.0
-value = 3.0
-show_percentage = false
-
 [node name="SongProgress" type="ProgressBar" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.02
-anchor_top = 0.15
-anchor_right = 0.05
-anchor_bottom = 0.9
+anchor_top = 0.2
+anchor_right = 0.02
+anchor_bottom = 0.95
+offset_right = 30.0
 fill_mode = 3
 show_percentage = false
 
@@ -949,6 +930,37 @@ unique_name_in_owner = true
 libraries = {
 &"": SubResource("AnimationLibrary_82rk8")
 }
+
+[node name="EnergyArea" type="TextureRect" parent="HUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_right = 0.08
+offset_left = -134.0
+offset_right = 40.0
+offset_bottom = 40.0
+pivot_offset = Vector2(240, 0)
+texture = ExtResource("8_otm2r")
+
+[node name="EnergyBar" type="TextureProgressBar" parent="HUD/EnergyArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -166.0
+offset_top = -17.0
+offset_right = 194.0
+offset_bottom = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+max_value = 8.0
+value = 3.0
+texture_under = ExtResource("9_jycet")
+texture_progress = ExtResource("10_nbke4")
+tint_progress = Color(0, 0.63394016, 0.03212304, 1)
 
 [node name="actualplayhead" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true

@@ -48,6 +48,7 @@ var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack  # Cache active track reference
 var _fast_slow_hide_timer: SceneTreeTimer  # Reusable timer for fast/slow label
 var _last_inactive_penalty_measure: int = -1  # Ensures only one energy/streak penalty per measure for inactive phrase misses
+var _targets: Array
 @onready var click_track_asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -87,6 +88,7 @@ func _ready():
 	bpm = _manager_node.song_data.bpm
 	seconds_per_beat = _manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
+	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	for i in _manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
@@ -137,6 +139,9 @@ func _ready():
 		checkpoint.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (measure + lead_in_measures - 1)
 		add_child(checkpoint)
 	match _manager_node.energy_modifier:
+		1:
+			energy = 5
+			%EnergyBar.value = energy
 		3, 4:
 			#energy system disabled
 			%EnergyBar.hide()
@@ -316,10 +321,13 @@ func _process(delta: float):
 #					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
 			if not _manager_node.autoblast and input_enabled:
 				if Input.is_action_just_pressed("note_left"):
+					_targets[0].flash()
 					_cached_active_track_node.try_blast(0)
 				elif Input.is_action_just_pressed("note_center"):
+					_targets[1].flash()
 					_cached_active_track_node.try_blast(1)
 				elif Input.is_action_just_pressed("note_right"):
+					_targets[2].flash()
 					_cached_active_track_node.try_blast(2)
 	
 	#lblDebugInfo.text = debug_info()
@@ -603,6 +611,10 @@ func _find_adjacent_unactivated_track() -> int:
 func energy_change(amount:int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
 #	print("Energy changed by %d, new value: %d" % [amount, energy])
+	if energy < 3:
+		RenderingServer.global_shader_parameter_set("danger", true)
+	elif energy >= 3:
+		RenderingServer.global_shader_parameter_set("danger", false )
 	%EnergyBar.value = energy
 
 func _hide_fast_slow_label():
