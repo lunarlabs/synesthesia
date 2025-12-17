@@ -6,6 +6,8 @@ var pending_jobs: Array = []
 var completed: Array = []
 var running := false
 
+const LANE_GAP := 0.6
+
 func queue_job(
 	manager: SynRoadSongManager,
 	song_track_index: int,
@@ -17,8 +19,10 @@ func queue_job(
 		"events": events,
 		"ticks_per_beat": ticks_per_beat,
 		"difficulty_offset": manager.difficulty,
-		"supressed_measures": manager.supressed_measures,
+		"supressed_measures": manager.suppressed_measures,
 		"track_reset": manager.fast_track_reset,
+		"seconds_per_beat": manager.seconds_per_beat,
+		"length_per_beat": manager.length_per_beat,
 	})
 	mutex.unlock()
 	_start_if_needed()
@@ -53,6 +57,7 @@ func _worker(_userdata = null):
 
 func _process_job(job:Dictionary):
 	var result: Dictionary = {}
+	## map of beat (float) to lane (int)
 	var note_map: Dictionary[float,int] = {}
 	var valid_note_positions: Array[int] = [job.difficulty_offset, job.difficulty_offset + 2, job.difficulty_offset + 4]
 	var tick := 0
@@ -64,41 +69,53 @@ func _process_job(job:Dictionary):
 			var beat_position: float = float(tick) / float(job.ticks_per_beat)
 			note_map[beat_position] = valid_note_positions.find(event.note)
 
-	var sorted_beats: Array = note_map.keys()
+	note_map.sort()
+	var sorted_beats: Array[float] = note_map.keys()
 	sorted_beats.sort()
 	result["note_map"] = note_map
 
-	var lane_note_beats: Array = [[],[],[]]
-	var beats_in_measure: Dictionary = {}
+	var note_times: PackedFloat32Array = []
+	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
+	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
+	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
 
-	for beat_position in sorted_beats:
-		var measure_num: int = int(floor(beat_position / 4.0)) + 1
+	for i in range(sorted_beats.size()):
+		var beat: float = sorted_beats[i]
+		# WARN: measure_num is 0-indexed here
+		var measure_num: int = int(floor(beat / 4.0))
+		var lane: int = note_map[beat]
+		var x_pos: float = (lane - 1) * LANE_GAP
+		var z_pos: float = (beat * job.length_per_beat)
+		note_positions.append(Vector2(x_pos, z_pos))
 		if not job.supressed_measures.has(measure_num):
-			var lane: int = note_map[beat_position]
-			lane_note_beats[lane].append(beat_position)
-		if not beats_in_measure.has(measure_num):
-			beats_in_measure[measure_num] = []
-		(beats_in_measure[measure_num] as Array).append(beat_position)
+			lane_notes[lane].append(i)
+		note_times.append(beat * job.seconds_per_beat)
+		if not notes_in_measure.has(measure_num):
+			notes_in_measure[measure_num] = []
+		(notes_in_measure[measure_num] as Array).append(i)
 
-	for i in range(lane_note_beats.size()):
-		(lane_note_beats[i] as Array).sort()
+	assert(note_times.size() == note_positions.size(), "Note times and positions size mismatch!")
+	result["note_times"] = note_times
+	result["note_positions"] = note_positions
 
-	result["lane_note_beats"] = lane_note_beats
-	result["beats_in_measure"] = beats_in_measure
+	for i in range(lane_notes.size()):
+		(lane_notes[i] as PackedInt32Array).sort()
+
+	result["lane_notes"] = lane_notes
 
 	var phrases: Array[Dictionary] = []
-	var measures: Array = beats_in_measure.keys()
+	var measures: Array = notes_in_measure.keys()
 	measures.sort()
 	for m in measures:
 		if m in job.supressed_measures:
 			continue
 		var phrase_measure_count: int = 1
 		var phrase_beats: Array[float] = []
-		phrase_beats.append_array(beats_in_measure[m])
-		if beats_in_measure.has(m + 1) and !beats_in_measure[m + 1].is_empty() and \
+		phrase_beats.append_array(notes_in_measure[m])
+		if notes_in_measure.has(m + 1) and !notes_in_measure[m + 1].is_empty() and \
 		  !(job.supressed_measures.has(m + 1)):
 			phrase_measure_count += 1
-			phrase_beats.append_array(beats_in_measure[m + 1])
+			phrase_beats.append_array(notes_in_measure[m + 1])
 		phrase_beats.sort()
 		if phrase_beats.is_empty():
 			continue

@@ -46,7 +46,7 @@ const FAST_RESET_NAMES = {
 	8: "Fast Reset 2"
 }
 
-const STANDARD_LENGTH_PER_BEAT = 4.0
+const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 
 @onready var load_screen: Control = $LoadScreen
@@ -78,7 +78,8 @@ var preprocessor:SynRoadTrackPreprocessor
 var track_data:Dictionary
 var length_multiplier: float
 var seconds_per_beat: float
-var length_per_beat
+var length_per_beat: float
+var finish_time: float
 ## A zero-based array of measure start times (in seconds.)
 var measure_times: PackedFloat32Array = []
 ## the Z-position of measures on the track
@@ -101,7 +102,9 @@ func _ready() -> void:
 	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 
-	for i in range(song_data.lead_in_measures + song_data.playable_measures):
+	var total_measures = song_data.lead_in_measures + song_data.playable_measures
+	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
+	for i in range(total_measures):
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
 
