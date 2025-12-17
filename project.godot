@@ -101,3 +101,7 @@ danger={
 "type": "bool",
 "value": false
 }
+current_track={
+"type": "int",
+"value": 0
+}

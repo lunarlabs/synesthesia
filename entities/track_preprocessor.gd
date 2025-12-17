@@ -103,33 +103,67 @@ func _process_job(job:Dictionary):
 
 	result["lane_notes"] = lane_notes
 
-	var phrases: Array[Dictionary] = []
-	var measures: Array = notes_in_measure.keys()
-	measures.sort()
-	for m in measures:
-		if m in job.supressed_measures:
+	# can't use a packed array for this since measures may be missing
+	var measures: Dictionary = {}
+	for m in notes_in_measure.keys():
+		assert(!notes_in_measure[m].is_empty(), "Empty measure found in notes_in_measure!")
+		var entry = {}
+		entry["note_indices"] = notes_in_measure[m]
+		entry["note_count"] = notes_in_measure[m].size()
+		entry["suppressed"] = job.supressed_measures.has(m)
+		measures[m] = entry
+	
+	var phrases: Dictionary = {}
+	for m in measures.keys():
+		if measures[m]["suppressed"]:
 			continue
+		var entry = {}
+		entry["start_measure"] = m
 		var phrase_measure_count: int = 1
-		var phrase_beats: Array[float] = []
-		phrase_beats.append_array(notes_in_measure[m])
-		if notes_in_measure.has(m + 1) and !notes_in_measure[m + 1].is_empty() and \
-		  !(job.supressed_measures.has(m + 1)):
+		var phrase_note_indices: Array = measures[m]["note_indices"].duplicate()
+		if measures.has(m + 1) and not measures[m + 1]["suppressed"]:
+			entry["end_measure"] = m + 1
 			phrase_measure_count += 1
-			phrase_beats.append_array(notes_in_measure[m + 1])
-		phrase_beats.sort()
-		if phrase_beats.is_empty():
-			continue
-		var first_note_lane: int = note_map[phrase_beats[0]]
-		var first_beat: float = phrase_beats[0]
-		phrases.append({
-			"start_measure": m,
-			"measure_count": phrase_measure_count,
-			"beats": phrase_beats,
-			"first_note_lane": first_note_lane,
-			"first_beat": first_beat,
-			"score_value": phrase_beats.size(),
-		})
+			phrase_note_indices.append_array(measures[m + 1]["note_indices"])
+		else:
+			entry["end_measure"] = m
+		entry["measure_count"] = phrase_measure_count
+		entry["note_count"] = phrase_note_indices.size()
+		phrase_note_indices.sort()
+		# TODO: marker position, activation length, next phrase...
+		phrases[m] = entry
+	
+	result["measures"] = measures
 	result["phrases"] = phrases
+
+
+	# var phrases: Array[Dictionary] = []
+	# var measures: Array = notes_in_measure.keys()
+	# measures.sort()
+	# for m in measures:
+	# 	if m in job.supressed_measures:
+	# 		continue
+	# 	var phrase_measure_count: int = 1
+	# 	var phrase_beats: Array[float] = []
+	# 	phrase_beats.append_array(notes_in_measure[m])
+	# 	if notes_in_measure.has(m + 1) and !notes_in_measure[m + 1].is_empty() and \
+	# 	  !(job.supressed_measures.has(m + 1)):
+	# 		phrase_measure_count += 1
+	# 		phrase_beats.append_array(notes_in_measure[m + 1])
+	# 	phrase_beats.sort()
+	# 	if phrase_beats.is_empty():
+	# 		continue
+	# 	var first_note_lane: int = note_map[phrase_beats[0]]
+	# 	var first_beat: float = phrase_beats[0]
+	# 	phrases.append({
+	# 		"start_measure": m,
+	# 		"measure_count": phrase_measure_count,
+	# 		"beats": phrase_beats,
+	# 		"first_note_lane": first_note_lane,
+	# 		"first_beat": first_beat,
+	# 		"score_value": phrase_beats.size(),
+	# 	})
+	# result["phrases"] = phrases
 	return result
 		
 func take_completed():
