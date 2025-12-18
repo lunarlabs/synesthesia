@@ -48,7 +48,7 @@ const FAST_RESET_NAMES = {
 
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
-const CHUNK_LENGTH_IN_MEASURES = 16
+const CHUNK_LENGTH_IN_MEASURES = 8
 
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
@@ -76,7 +76,8 @@ const CHUNK_LENGTH_IN_MEASURES = 16
 var song_data:SongData
 var song_instance:SynRoadSong
 var preprocessor:SynRoadTrackPreprocessor
-var track_data:Dictionary
+var track_data:Array[Dictionary]
+var total_measures: int
 var length_multiplier: float
 var seconds_per_beat: float
 var length_per_beat: float
@@ -107,7 +108,7 @@ func _ready() -> void:
 	ideal_playhead_speed = length_per_beat / seconds_per_beat
 	print("Ideal playhead speed: %.3f units/sec" % ideal_playhead_speed)
 
-	var total_measures = song_data.lead_in_measures + song_data.playable_measures
+	total_measures = song_data.lead_in_measures + song_data.playable_measures
 	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
 	for i in range(total_measures):
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
@@ -218,6 +219,7 @@ func _fetch_track_data() -> void:
 		push_error("Failed to load MIDI data from %s" % song_data.midi_file)
 		return
 	var ticks_per_beat = midi_data.header.ticks_per_beat
+	track_data.resize(song_data.tracks.size())
 	for i in song_data.tracks.size():
 		var track_info = song_data.tracks[i] as SongTrackData
 		var midi_track_idx = song_data.song_track_locations.get(track_info.midi_track_name, -1)
@@ -229,16 +231,9 @@ func _fetch_track_data() -> void:
 func _apply_preprocessor_results(results: Array) -> void:
 	for result in results:
 		var track_info = song_data.tracks[result.track_index] as SongTrackData
-		var track_entry = {
-			"audio_file": track_info.audio_file,
-			"instrument": track_info.instrument,
-			"note_map": result.result.note_map,
-			"lane_note_beats": result.result.lane_note_beats,
-			"beats_in_measure": result.result.beats_in_measure,
-			"phrases": result.result.phrases,
-		}
-		if track_entry.note_map.size() > 0:
-			track_data[track_info.midi_track_name] = track_entry
+		if result.result.note_map.size() > 0:
+			track_data[result.track_index] = result.result
+			track_data[result.track_index]["track_info"] = track_info
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):

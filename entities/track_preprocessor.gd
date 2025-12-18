@@ -93,7 +93,7 @@ func _process_job(job:Dictionary):
 		note_times.append(beat * job.seconds_per_beat)
 		if not notes_in_measure.has(measure_num):
 			notes_in_measure[measure_num] = PackedInt32Array()
-		(notes_in_measure[measure_num] as PackedInt32Array).append(i)
+		notes_in_measure[measure_num].append(i)
 
 	assert(note_times.size() == note_positions.size(), "Note times and positions size mismatch!")
 	result["note_times"] = note_times
@@ -124,7 +124,7 @@ func _process_job(job:Dictionary):
 		var chunk_idx: int = m / SynRoadSongManager.CHUNK_LENGTH_IN_MEASURES
 		if not measures_in_chunks.has(chunk_idx):
 			measures_in_chunks[chunk_idx] = PackedInt32Array()
-		(measures_in_chunks[chunk_idx] as PackedInt32Array).append(m)
+		measures_in_chunks[chunk_idx].append(m)
 	result["measure_note_counts"] = measure_note_counts
 	result["suppressed_measures"] = suppressed_measures
 	result["measures_in_chunks"] = measures_in_chunks
@@ -153,9 +153,10 @@ func _process_job(job:Dictionary):
 			if target_measure == suppressed:
 				target_measure += 1
 				activation_length += 1
-			elif m < suppressed and suppressed< target_measure:
+			elif m < suppressed and suppressed < target_measure:
 				target_measure += 2
 				activation_length += 2
+				break
 		phrase_activation_lengths[m] = activation_length
 		if target_measure >= job.total_measures:
 			phrase_next_measures[m] = -1

@@ -92,7 +92,7 @@ func _ready():
 	for i in _manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
-		newTrack.midi_name = _manager_node.track_data.keys()[i]
+#		newTrack.midi_name = _manager_node.track_data.keys()[i]
 		newTrack.audio_file = ResourceUID.path_to_uid(_manager_node.track_data[newTrack.midi_name].audio_file)
 		newTrack.measure_count = total_measures
 		newTrack.note_map = _manager_node.track_data[newTrack.midi_name].note_map
