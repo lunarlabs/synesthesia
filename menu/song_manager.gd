@@ -132,7 +132,7 @@ func _ready() -> void:
 				pass
 			4:
 				pass
-
+	suppressed_measures.sort()
 
 
 	_fetch_track_data()

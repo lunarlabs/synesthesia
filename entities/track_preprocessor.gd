@@ -19,10 +19,11 @@ func queue_job(
 		"events": events,
 		"ticks_per_beat": ticks_per_beat,
 		"difficulty_offset": manager.difficulty,
-		"supressed_measures": manager.suppressed_measures,
+		"suppressed_measures": manager.suppressed_measures,
 		"track_reset": manager.fast_track_reset,
 		"seconds_per_beat": manager.seconds_per_beat,
 		"length_per_beat": manager.length_per_beat,
+		"total_measures": manager.total_measures,
 	})
 	mutex.unlock()
 	_start_if_needed()
@@ -87,83 +88,97 @@ func _process_job(job:Dictionary):
 		var x_pos: float = (lane - 1) * LANE_GAP
 		var z_pos: float = (beat * job.length_per_beat)
 		note_positions.append(Vector2(x_pos, z_pos))
-		if not job.supressed_measures.has(measure_num):
+		if not job.suppressed_measures.has(measure_num):
 			lane_notes[lane].append(i)
 		note_times.append(beat * job.seconds_per_beat)
 		if not notes_in_measure.has(measure_num):
-			notes_in_measure[measure_num] = []
-		(notes_in_measure[measure_num] as Array).append(i)
+			notes_in_measure[measure_num] = PackedInt32Array()
+		(notes_in_measure[measure_num] as PackedInt32Array).append(i)
 
 	assert(note_times.size() == note_positions.size(), "Note times and positions size mismatch!")
 	result["note_times"] = note_times
 	result["note_positions"] = note_positions
+	result["notes_in_measure"] = notes_in_measure
 
 	for i in range(lane_notes.size()):
 		(lane_notes[i] as PackedInt32Array).sort()
 
 	result["lane_notes"] = lane_notes
 
-	# can't use a packed array for this since measures may be missing
-	var measures: Dictionary = {}
+	var measure_note_counts: Dictionary[int,int] = {}
+	var suppressed_measures: Dictionary[int,bool] = {}
+	var measures_in_chunks: Dictionary[int,PackedInt32Array] = {}
+	# For phrases, keys will be the starting measure number
+	var phrase_lengths: Dictionary[int,int] = {}
+	var phrase_note_indices: Dictionary[int,PackedInt32Array] = {}
+	var phrase_note_counts: Dictionary[int,int] = {}
+	var phrase_marker_positions: Dictionary[int,Vector2] = {}
+	var phrase_activation_lengths: Dictionary[int,int] = {}
+	var phrase_next_measures: Dictionary[int,int] = {}
+
+	# First pass: gather measure note counts and chunk info
 	for m in notes_in_measure.keys():
 		assert(!notes_in_measure[m].is_empty(), "Empty measure found in notes_in_measure!")
-		var entry = {}
-		entry["note_indices"] = notes_in_measure[m]
-		entry["note_count"] = notes_in_measure[m].size()
-		entry["suppressed"] = job.supressed_measures.has(m)
-		measures[m] = entry
+		measure_note_counts[m] = notes_in_measure[m].size()
+		suppressed_measures[m] = job.suppressed_measures.has(m)
+		var chunk_idx: int = m / SynRoadSongManager.CHUNK_LENGTH_IN_MEASURES
+		if not measures_in_chunks.has(chunk_idx):
+			measures_in_chunks[chunk_idx] = PackedInt32Array()
+		(measures_in_chunks[chunk_idx] as PackedInt32Array).append(m)
+	result["measure_note_counts"] = measure_note_counts
+	result["suppressed_measures"] = suppressed_measures
+	result["measures_in_chunks"] = measures_in_chunks
 	
-	var phrases: Dictionary = {}
-	for m in measures.keys():
-		if measures[m]["suppressed"]:
+	# Second pass: build phrases
+	for m in notes_in_measure.keys():
+		if suppressed_measures[m]:
 			continue
-		var entry = {}
-		entry["start_measure"] = m
-		var phrase_measure_count: int = 1
-		var phrase_note_indices: Array = measures[m]["note_indices"].duplicate()
-		if measures.has(m + 1) and not measures[m + 1]["suppressed"]:
-			entry["end_measure"] = m + 1
-			phrase_measure_count += 1
-			phrase_note_indices.append_array(measures[m + 1]["note_indices"])
+		phrase_note_indices[m] = PackedInt32Array()
+		var first_note = notes_in_measure[m][0]
+		var lane: int = note_map[sorted_beats[first_note]]
+		var x_pos: float = (lane - 1) * LANE_GAP
+		var z_pos: float = (sorted_beats[first_note] * job.length_per_beat)
+		phrase_marker_positions[m] = Vector2(x_pos, z_pos)
+		phrase_note_indices[m].append_array(notes_in_measure[m])
+		if notes_in_measure.has(m + 1) and not suppressed_measures[m + 1]:
+			phrase_lengths[m] = 2
+			phrase_note_indices[m].append_array(notes_in_measure[m + 1])
 		else:
-			entry["end_measure"] = m
-		entry["measure_count"] = phrase_measure_count
-		entry["note_count"] = phrase_note_indices.size()
+			phrase_lengths[m] = 1
+		phrase_note_counts[m] = phrase_note_indices[m].size()
 		phrase_note_indices.sort()
-		# TODO: marker position, activation length, next phrase...
-		phrases[m] = entry
-	
-	result["measures"] = measures
-	result["phrases"] = phrases
+		var activation_length = min(job.track_reset, (job.total_measures - (m + phrase_lengths[m])))
+		var target_measure = m + (phrase_lengths[m] - 1) + activation_length
+		for suppressed in job.suppressed_measures:
+			if target_measure == suppressed:
+				target_measure += 1
+				activation_length += 1
+			elif m < suppressed and suppressed< target_measure:
+				target_measure += 2
+				activation_length += 2
+		phrase_activation_lengths[m] = activation_length
+		if target_measure >= job.total_measures:
+			phrase_next_measures[m] = -1
+		elif measure_note_counts.keys().has(target_measure):
+			phrase_next_measures[m] = target_measure
+		else:
+			# Find the next available measure with notes after target_measure
+			var next_measure = target_measure + 1
+			while next_measure < job.total_measures:
+				if measure_note_counts.keys().has(next_measure):
+					phrase_next_measures[m] = next_measure
+					break
+				next_measure += 1
+			if next_measure >= job.total_measures:
+				phrase_next_measures[m] = -1
+		
+	result["phrase_lengths"] = phrase_lengths
+	result["phrase_note_indices"] = phrase_note_indices
+	result["phrase_note_counts"] = phrase_note_counts
+	result["phrase_marker_positions"] = phrase_marker_positions
+	result["phrase_activation_lengths"] = phrase_activation_lengths
+	result["phrase_next_measures"] = phrase_next_measures
 
-
-	# var phrases: Array[Dictionary] = []
-	# var measures: Array = notes_in_measure.keys()
-	# measures.sort()
-	# for m in measures:
-	# 	if m in job.supressed_measures:
-	# 		continue
-	# 	var phrase_measure_count: int = 1
-	# 	var phrase_beats: Array[float] = []
-	# 	phrase_beats.append_array(notes_in_measure[m])
-	# 	if notes_in_measure.has(m + 1) and !notes_in_measure[m + 1].is_empty() and \
-	# 	  !(job.supressed_measures.has(m + 1)):
-	# 		phrase_measure_count += 1
-	# 		phrase_beats.append_array(notes_in_measure[m + 1])
-	# 	phrase_beats.sort()
-	# 	if phrase_beats.is_empty():
-	# 		continue
-	# 	var first_note_lane: int = note_map[phrase_beats[0]]
-	# 	var first_beat: float = phrase_beats[0]
-	# 	phrases.append({
-	# 		"start_measure": m,
-	# 		"measure_count": phrase_measure_count,
-	# 		"beats": phrase_beats,
-	# 		"first_note_lane": first_note_lane,
-	# 		"first_beat": first_beat,
-	# 		"score_value": phrase_beats.size(),
-	# 	})
-	# result["phrases"] = phrases
 	return result
 		
 func take_completed():
