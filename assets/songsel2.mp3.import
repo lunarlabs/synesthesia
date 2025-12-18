@@ -12,8 +12,8 @@ dest_files=["res://.godot/imported/songsel2.mp3-b4c8a44d303f6987ec99ec3fc5bcba07
 
 [params]
 
-loop=false
-loop_offset=0
-bpm=0
+loop=true
+loop_offset=0.0
+bpm=120.0
 beat_count=0
 bar_beats=4

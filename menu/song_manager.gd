@@ -48,6 +48,7 @@ const FAST_RESET_NAMES = {
 
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
+const CHUNK_LENGTH_IN_MEASURES = 16
 
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
@@ -79,11 +80,13 @@ var track_data:Dictionary
 var length_multiplier: float
 var seconds_per_beat: float
 var length_per_beat: float
+var ideal_playhead_speed: float
 var finish_time: float
 ## A zero-based array of measure start times (in seconds.)
 var measure_times: PackedFloat32Array = []
 ## the Z-position of measures on the track
 var measure_positions: PackedFloat32Array = []
+var measure_in_chunks: PackedInt32Array = []
 var checkpoint_positions: PackedFloat32Array = []
 var checkpoint_measures: PackedInt32Array = []
 var suppressed_measures: PackedInt32Array = [] # Possibly overkill? There is always the possibility of songs with over 256 measures though.
@@ -101,12 +104,15 @@ func _ready() -> void:
 	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
 	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
+	ideal_playhead_speed = length_per_beat / seconds_per_beat
+	print("Ideal playhead speed: %.3f units/sec" % ideal_playhead_speed)
 
 	var total_measures = song_data.lead_in_measures + song_data.playable_measures
 	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
 	for i in range(total_measures):
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
+		measure_in_chunks.append(i / CHUNK_LENGTH_IN_MEASURES)
 
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
@@ -126,6 +132,7 @@ func _ready() -> void:
 				pass
 			4:
 				pass
+
 
 
 	_fetch_track_data()
