@@ -88,6 +88,7 @@ var measure_times: PackedFloat32Array = []
 ## the Z-position of measures on the track
 var measure_positions: PackedFloat32Array = []
 var measure_in_chunks: PackedInt32Array = []
+var chunk_count := 0
 var checkpoint_positions: PackedFloat32Array = []
 var checkpoint_measures: PackedInt32Array = []
 var suppressed_measures: PackedInt32Array = [] # Possibly overkill? There is always the possibility of songs with over 256 measures though.
@@ -113,7 +114,10 @@ func _ready() -> void:
 	for i in range(total_measures):
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
-		measure_in_chunks.append(i / CHUNK_LENGTH_IN_MEASURES)
+		@warning_ignore("integer_division")
+		var chunk = i / CHUNK_LENGTH_IN_MEASURES
+		measure_in_chunks.append(chunk)
+		chunk_count = max(chunk_count, chunk + 1)
 
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures

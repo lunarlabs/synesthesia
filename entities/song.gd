@@ -11,7 +11,7 @@ const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
 var energy: int = MAX_ENERGY
-var _manager_node:SynRoadSongManager
+var manager_node:SynRoadSongManager
 var bpm:float = 120.0
 var seconds_per_beat:float = 0.5
 var ticks_per_beat:int = -1
@@ -76,31 +76,24 @@ var playhead_target_z: float = 0.0
 var playhead_velocity: float = 0.0
 
 func _enter_tree() -> void:
-	_manager_node = get_parent() as SynRoadSongManager
+	manager_node = get_parent() as SynRoadSongManager
 
 func _ready():
-	if not _manager_node.song_data:
+	if not manager_node.song_data:
 		print("No SongData assigned, aborting")
 		return
-	print("Loading song: %s" % _manager_node.song_data.title)
-	lead_in_measures = _manager_node.song_data.lead_in_measures
-	total_measures = _manager_node.song_data.playable_measures + lead_in_measures
-	bpm = _manager_node.song_data.bpm
-	seconds_per_beat = _manager_node.song_data.seconds_per_beat
+	print("Loading song: %s" % manager_node.song_data.title)
+	lead_in_measures = manager_node.song_data.lead_in_measures
+	total_measures = manager_node.song_data.playable_measures + lead_in_measures
+	bpm = manager_node.song_data.bpm
+	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
-	for i in _manager_node.track_data.size():
+	for i in manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
-#		newTrack.midi_name = _manager_node.track_data.keys()[i]
-		newTrack.audio_file = ResourceUID.path_to_uid(_manager_node.track_data[newTrack.midi_name].audio_file)
-		newTrack.measure_count = total_measures
-		newTrack.note_map = _manager_node.track_data[newTrack.midi_name].note_map
-		newTrack.instrument = _manager_node.track_data[newTrack.midi_name].instrument
-		newTrack.beats_in_measure = _manager_node.track_data[newTrack.midi_name].beats_in_measure
-		newTrack.lane_note_beats = _manager_node.track_data[newTrack.midi_name].lane_note_beats
-		newTrack.preprocessed_phrases = _manager_node.track_data[newTrack.midi_name].phrases
-		newTrack.activation_length_measures = _manager_node.fast_track_reset
+		newTrack.audio_file = ResourceUID.path_to_uid(manager_node.track_data[i].track_info.audio_file)
+		newTrack.track_data = manager_node.track_data[i]
 		tracks.append(newTrack)
 		new_measure.connect(newTrack._on_song_new_measure)
 		newTrack.track_activated.connect(_on_track_activated)
@@ -110,8 +103,8 @@ func _ready():
 		newTrack.active_phrase_missed.connect(_on_active_phrase_missed)
 		newTrack.note_hit.connect(_on_note_hit)
 		add_child(newTrack)
-	click_track_asp.stream = load(ResourceUID.path_to_uid(_manager_node.song_data.click_track))
-	for audioFileName in _manager_node.song_data.intro_audio:
+	click_track_asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
+	for audioFileName in manager_node.song_data.intro_audio:
 		var introAsp = AudioStreamPlayer.new()
 		introAsp.stream = load(ResourceUID.path_to_uid(audioFileName))
 		introAsp.volume_db = -7.0
@@ -130,7 +123,7 @@ func _ready():
 	end_gate.gate_location = total_measures
 	end_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
 	add_child(end_gate)
-	for measure in _manager_node.song_data.checkpoints:
+	for measure in manager_node.song_data.checkpoints:
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
 		new_measure.connect(checkpoint._on_song_new_measure)
 		var percentage = float(measure * 100) / total_measures
@@ -138,7 +131,7 @@ func _ready():
 		checkpoint.gate_location = (measure + lead_in_measures - 1)
 		checkpoint.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (measure + lead_in_measures - 1)
 		add_child(checkpoint)
-	match _manager_node.energy_modifier:
+	match manager_node.energy_modifier:
 		1:
 			energy = 5
 			%EnergyBar.value = energy
@@ -160,7 +153,7 @@ func start_song():
 	print("Camera starting at x=%.2f" % camera.position.x)
 	%SongProgress.max_value = total_measures
 	%SongProgress.min_value = lead_in_measures + 1
-	if _manager_node.autoblast:
+	if manager_node.autoblast:
 		lbl_auto_blast.show()
 		_autoblast_next_track = _find_best_track_for_autoblast()
 		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track]
@@ -195,7 +188,7 @@ func _process(delta: float):
 					[drift * 1000, audio_time / (seconds_per_beat),current_measure(), current_measure() % 8, delta, audio_time, expected_time])
 				frame_drops += 1
 
-				if _manager_node.autoblast:
+				if manager_node.autoblast:
 					var _active_track_node = tracks[active_track] as SynRoadTrack
 					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
 		#			_active_track_node._find_next_phrase()
@@ -227,7 +220,7 @@ func _process(delta: float):
 		playhead_velocity += (spring_force + damping_force) * delta
 		playhead.position.z += playhead_velocity * delta
 		var new_active_track = active_track
-		if !_manager_node.autoblast and input_enabled:
+		if !manager_node.autoblast and input_enabled:
 			if Input.is_action_just_pressed("track_next"):
 				new_active_track = (active_track + 1) % tracks.size()
 				_switch_active_track(new_active_track)
@@ -237,7 +230,7 @@ func _process(delta: float):
 		if previous_measure != current_measure():
 			if previous_measure > total_measures - 1:
 				finished = true
-				if not _manager_node.autoblast:
+				if not manager_node.autoblast:
 					if _miss_count == 0:
 						%HUDAnimations.play("PerfectRun")
 					else:
@@ -253,7 +246,7 @@ func _process(delta: float):
 				var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 				print("Song finished!")
 				var final_score_text = "Final Score: %d\nMax Streak: %d" % [score, max_streak]
-				if _manager_node.autoblast:
+				if manager_node.autoblast:
 					print("Autoblast was enabled.")
 				else:
 					print("Total frame drops: %d" % frame_drops)
@@ -281,7 +274,7 @@ func _process(delta: float):
 				%SongProgress.value = previous_measure
 				new_measure.emit(previous_measure)
 #				print("measure %d/%d" % [previous_measure, total_measures])
-				if _manager_node.energy_modifier == 1 and _manager_node.suppressed_measures.has(previous_measure) == false:
+				if manager_node.energy_modifier == 1 and manager_node.suppressed_measures.has(previous_measure) == false:
 					# TODO: If any track is not activated or empty, subtract 1 energy
 					# but don't fail the song unless there's a streak break with 0 energy
 					var any_unactivated = false
@@ -308,7 +301,7 @@ func _process(delta: float):
 			_cached_active_track_node = tracks[active_track] as SynRoadTrack
 			
 			# Check for autoblast track switching every frame, not just on measure boundaries
-			if _manager_node.autoblast and _autoblast_next_track != active_track:
+			if manager_node.autoblast and _autoblast_next_track != active_track:
 				if !_cached_active_track_node.blasting_phrase:
 					var next_track_node = tracks[_autoblast_next_track] as SynRoadTrack
 					var switch_measure = next_track_node.phrase_start_measure
@@ -319,7 +312,7 @@ func _process(delta: float):
 						# Update cached reference after switch
 						_cached_active_track_node = tracks[active_track] as SynRoadTrack
 #					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
-			if not _manager_node.autoblast and input_enabled:
+			if not manager_node.autoblast and input_enabled:
 				if Input.is_action_just_pressed("note_left"):
 					_targets[0].flash()
 					_cached_active_track_node.try_blast(0)
@@ -379,14 +372,14 @@ func _on_track_activated(note_count:int, start_measure:int):
 	lbl_phrase_value.hide()
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak,4)
-	match _manager_node.energy_modifier:
+	match manager_node.energy_modifier:
 		0:
 			# Gain 1 energy per successful phrase
 			energy_change(1)
 		1:
 			# Gain 3 energy per successful phrase
 			energy_change(3)
-	if _manager_node.autoblast and current_measure() < total_measures:
+	if manager_node.autoblast and current_measure() < total_measures:
 		# Queue up the next track to switch to on the next measure boundary
 		_autoblast_next_track = _find_best_track_for_autoblast()
 		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track] if _autoblast_next_track != active_track else 999
@@ -396,7 +389,7 @@ func _on_track_activated(note_count:int, start_measure:int):
 func _on_streak_broken():
 	var had_streak = streak > 0
 	_miss_count += 1
-	match _manager_node.energy_modifier:
+	match manager_node.energy_modifier:
 		0, 2:
 			energy_change(-1)
 			if energy <= 0:

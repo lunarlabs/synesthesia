@@ -22,9 +22,12 @@ const MISS_BEAT_WINDOW = 0.1
 const AUTOBLAST_TIMING_MULTIPLIER = 0.67
 const CHUNK_SIZE_MEASURES = 8
 const CHUNK_LOAD_RANGE_FORWARD = 3
+const CHUNK_UNLOAD_RANGE_BEHIND = 2
 const NOTE_VISIBILITY_RANGE_BEATS = 64.0
 const STANDARD_LENGTH_PER_BEAT = 4.0
 const BEATS_PER_MEASURE = 4.0
+var track_data: Dictionary
+var lane_tint: Color
 var midi_name: String
 var audio_file: String
 var instrument: int
@@ -37,7 +40,7 @@ var note_nodes: Dictionary[float, SynRoadNote]
 var measure_nodes: Dictionary[int, Node3D]
 var hidden_measures: Array[int]
 var measure_count: int = 0
-var chunks: Array[MeasureChunk]
+var chunks: Array[Node3D] = []
 var phrase_start_measure:int = 0
 var marker_measure:int = 0
 var phrase_notes: Array[SynRoadNote]
@@ -78,14 +81,16 @@ signal note_hit(timing:float)
 @onready var rails = $RailMaster
 
 func _enter_tree():
+	lane_tint = INSTRUMENTS[instrument][1] as Color
 	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	song_node = get_parent() as SynRoadSong
 	length_per_beat = song_node.length_per_beat
+	chunks.resize(song_node.manager_node.chunk_count)
 #	_populateNotes()  # No longer needed here, preprocessor handled it
-	_populateChunks()
-	for i in range(CHUNK_LOAD_RANGE_FORWARD):
-		chunks[i].load_if_needed()
+#	_populateChunks()
+#	for i in range(CHUNK_LOAD_RANGE_FORWARD):
+#		chunks[i].load_if_needed()
 
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
@@ -103,13 +108,13 @@ func _ready():
 	_find_next_phrase()
 	_move_marker(phrase_start_measure)
 #	marker.material_override = load(INSTRUMENTS[instrument][3])
-	marker.visible = song_node._manager_node.hide_streak_hints == false
+	marker.visible = song_node.manager_node.hide_streak_hints == false
 
-func _populateChunks():
-	var chunk_count = ceili(float(beats_in_measure.keys().max() + 1) / CHUNK_SIZE_MEASURES)
-	for i in chunk_count:
+#func _populateChunks():
+#	var chunk_count = ceili(float(beats_in_measure.keys().max() + 1) / CHUNK_SIZE_MEASURES)
+#	for i in chunk_count:
 #		#print("populating chunk %d" % i)
-		chunks.append(MeasureChunk.new(i * CHUNK_SIZE_MEASURES, self))
+#		chunks.append(MeasureChunk.new(i * CHUNK_SIZE_MEASURES, self))
 
 func get_beats_in_measure(measure_num:int) -> Array:
 	if beats_in_measure.has(measure_num):
@@ -377,9 +382,9 @@ func _process_phrase_at_index(idx:int):
 	phrase_first_beat = phrase_data.first_beat
 	# Use phrase_data.measure_count consistently
 	for i in range(phrase_data.measure_count):
-		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
-		if chunk_idx >= 0 and chunk_idx < chunks.size():
-			chunks[chunk_idx].load_if_needed()
+#		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
+#		if chunk_idx >= 0 and chunk_idx < chunks.size():
+#			chunks[chunk_idx].load_if_needed()
 		if measure_nodes.has(phrase_start_measure + i):
 			measure_nodes[phrase_start_measure + i].get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", true)
 		phrase_notes.append_array(get_notes_in_measure(phrase_start_measure + i))
@@ -476,14 +481,14 @@ func _update_note_streaming(measure:int):
 	var chunk_idx = measure / CHUNK_SIZE_MEASURES
 
 	# Bounds checking for unload
-	if chunk_idx - 3 >= 0 and chunk_idx - 3 < chunks.size():
-		chunks[chunk_idx - 3].unload()
+#	if chunk_idx - 3 >= 0 and chunk_idx - 3 < chunks.size():
+#		chunks[chunk_idx - 3].unload()
 	
 	# Bounds checking for load
 	for offset in range(-1, CHUNK_LOAD_RANGE_FORWARD):
 		var target_idx = chunk_idx + offset
-		if target_idx >= 0 and target_idx < chunks.size():
-			chunks[target_idx].load_if_needed()
+#		if target_idx >= 0 and target_idx < chunks.size():
+#			chunks[target_idx].load_if_needed()
 	
 func get_first_available_measure(start_measure:int) -> int:
 	for m in range(start_measure, song_node.total_measures + 1):
@@ -515,104 +520,3 @@ func _spawn_misblast_effect(beat_position: float, lane_index: int):
 func current_measure_is_unactivated() -> bool:
 	var current_measure = song_node.current_measure()
 	return reset_countdown == 0 and beats_in_measure.has(current_measure)
-
-class MeasureChunk:
-	var start_measure:int
-	var end_measure:int
-	var track: SynRoadTrack
-	var note_nodes:Array[SynRoadNote]
-	var measure_nodes:Array[Node3D]
-	var non_empty_measures:Array[int]
-	var note_beat_positions: Array[float]  # Add this to track beat positions
-
-	func _init(_start: int, _track: SynRoadTrack):
-		start_measure = _start
-		track = _track
-		end_measure = mini(_start + CHUNK_SIZE_MEASURES, track.measure_count + 1)
-		note_nodes = []
-		measure_nodes = []
-		note_beat_positions = []  # Initialize
-		for beat_position in track.note_map:
-			var measure = floori(beat_position / BEATS_PER_MEASURE) + 1
-			if measure >= start_measure and measure < end_measure:
-#				#print("add beat position %.2f" % beat_position)
-				note_beat_positions.append(beat_position)  # Track the beat position
-				if not non_empty_measures.has(measure):
-					non_empty_measures.append(measure)
-		non_empty_measures.sort()
-
-	func load_if_needed():
-		if note_nodes.is_empty():
-			var suppressed_measures = track.song_node._manager_node.suppressed_measures
-			# Use cached materials from track instead of loading repeatedly
-			var instrument_note_material = track.instrument_note_material
-			var ghost_material = track.instrument_ghost_material
-			for i in range(start_measure, end_measure):	
-				var new_measure = MEASURE_SCENE.instantiate() as Node3D
-				new_measure.position.z = -(BEATS_PER_MEASURE * track.length_per_beat) * (i - 1)
-				new_measure.scale.z = track.length_per_beat / STANDARD_LENGTH_PER_BEAT
-				var cube = new_measure.get_node("track_geometry").get_node("Cube")
-				cube.set_instance_shader_parameter("measure_tint", INSTRUMENTS[track.instrument][1])
-				# Ensure newly loaded measures inherit current active visual state
-				cube.set_instance_shader_parameter("active", track._active_track)
-				# Preserve phrase highlighting for measures within the current phrase
-				var phrase_len:int = 0
-				if track.current_phrase_index >= 0 and track.current_phrase_index < track.preprocessed_phrases.size():
-					phrase_len = track.preprocessed_phrases[track.current_phrase_index].measure_count
-				var in_phrase := (phrase_len > 0 and i >= track.phrase_start_measure and i < track.phrase_start_measure + phrase_len)
-				if in_phrase:
-					cube.set_instance_shader_parameter("phrase", true)
-				var track_geom = new_measure.get_node("track_geometry")
-				var pfx = new_measure.get_node("activation_particles").process_material as ParticleProcessMaterial
-				pfx.color = INSTRUMENTS[track.instrument][1]
-				var is_hidden := track.hidden_measures.has(i)
-				if non_empty_measures.has(i) and not suppressed_measures.has(i) and not is_hidden:
-					track_geom.show()
-				else:
-					track_geom.hide()
-					# Keep checkpoint-straddled activation visuals hidden when chunks reload
-					new_measure.get_node("activation_particles").emitting = is_hidden
-				measure_nodes.append(new_measure)
-				track.measure_nodes[i] = new_measure
-				track.add_child(new_measure)
-			for beat_position in track.note_map:
-				var measure = floori(beat_position / BEATS_PER_MEASURE) + 1
-				if measure >= start_measure and measure < end_measure:
-					var lane_index = track.note_map[beat_position]
-					var new_note = NOTE_SCENE.instantiate() as SynRoadNote
-					if suppressed_measures.has(measure):
-						new_note.suppressed = true
-					new_note.capsule_material = instrument_note_material
-					new_note.ghost_material = ghost_material
-					new_note.position.z = - (beat_position * track.length_per_beat)
-					new_note.position.x = (lane_index - 1) * 0.6
-					# If this measure was already activated, keep notes visually cleared on reload
-					note_nodes.append(new_note)
-					track.note_nodes[beat_position] = new_note
-					track.add_child(new_note)
-					if track.hidden_measures.has(measure):
-						new_note.blast()
-	
-	func unload():
-		if not note_nodes.is_empty():
-			# Remove freed notes from phrase_notes to prevent accessing freed instances
-			for note in note_nodes:
-				if track.phrase_notes_dict.has(note):
-					track.phrase_notes.erase(note)
-					track.phrase_notes_dict.erase(note)
-					track.phrase_notes_count -= 1
-			
-			# Remove notes from track dictionary using stored beat positions
-			for i in range(note_beat_positions.size()):
-				track.note_nodes.erase(note_beat_positions[i])
-				note_nodes[i].queue_free()
-			
-			# Remove measures from track dictionary
-			for i in range(start_measure, end_measure):
-				track.measure_nodes.erase(i)
-			for measure in measure_nodes:
-				measure.queue_free()
-			
-			note_nodes.clear()
-			measure_nodes.clear()
-			note_beat_positions.clear()
