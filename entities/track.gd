@@ -2,7 +2,7 @@ class_name SynRoadTrack
 extends Node3D
 
 #TODO: fix the color assignments, don't make them fullbright (keep ps4/CroCru or use ps2 theme??)
-const INSTRUMENTS = [
+static var INSTRUMENTS = [
 	["Drums", Color(0.8,0,1), "uid://bx04vawou1p2o", "uid://w401c706l7dq"],
 	["Bass", Color(0.129,0.25,1), "uid://dmfgawpqalfv3", "uid://b7mxrnn681i7t"],
 	["Guitar", Color(1,0,0), "uid://bihm6tbkft235", "uid://5qhhjlqiksto"],
