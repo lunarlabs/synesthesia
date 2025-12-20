@@ -49,6 +49,7 @@ const FAST_RESET_NAMES = {
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
+const TIMING_WINDOWS = [0.6, 0.8, 0.4,]
 
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
@@ -236,7 +237,7 @@ func _apply_preprocessor_results(results: Array) -> void:
 	for result in results:
 		var track_info = song_data.tracks[result.track_index] as SongTrackData
 		if result.result.note_map.size() > 0:
-			track_data[result.track_index] = result.result
+			track_data[result.track_index]["track_data"] = result.result
 			track_data[result.track_index]["track_info"] = track_info
 
 func _input(event: InputEvent) -> void:

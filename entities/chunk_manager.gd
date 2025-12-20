@@ -48,14 +48,25 @@ static func _worker(_userdata = null):
 		var chunk_idx = current_job.y
 
 		var track_node = manager_node.song_instance.tracks[current_job.x] as SynRoadTrack
+		var track_data = track_node.track_data
 		if track_node.chunks[chunk_idx] != null:
 			# The chunk is already loaded
 			continue
 		var z_scale = manager_node.length_multiplier
 		var chunk := Node3D.new()
 
-		for i in track_node.track_data.measures_in_chunks[chunk_idx]:
-			var new_measure = _measure_scene.instantiate()
+		for i in track_data.measures_in_chunks[chunk_idx]:
+			if not track_data.suppressed_measures[i]:
+				var new_measure = _measure_scene.instantiate() as Node3D
+				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("this_track", current_job.x)
+				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("measure_tint", track_node.lane_tint)
+				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", false)
+				new_measure.position.z = -(16 * z_scale) * (i - 1)
+				new_measure.scale.z = z_scale
+				track_node.measure_nodes[i] = new_measure
+				chunk.add_child(new_measure)
+			for j in track_data.notes_in_measure[i]:
+				var new_note = _note_scene.instantiate() as SynRoadNote
 
 	_running = false
 	return

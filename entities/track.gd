@@ -26,7 +26,7 @@ const CHUNK_UNLOAD_RANGE_BEHIND = 2
 const NOTE_VISIBILITY_RANGE_BEATS = 64.0
 const STANDARD_LENGTH_PER_BEAT = 4.0
 const BEATS_PER_MEASURE = 4.0
-var track_data: Dictionary
+var track_data: GameplayTrackData
 var lane_tint: Color
 var midi_name: String
 var audio_file: String
@@ -36,11 +36,11 @@ var instrument_ghost_material: StandardMaterial3D
 var length_multiplier: float = 1.0
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var note_map: Dictionary[float, int]
-var note_nodes: Dictionary[float, SynRoadNote]
-var measure_nodes: Dictionary[int, Node3D]
-var hidden_measures: Array[int]
+var note_nodes: Array[SynRoadNote] = []
+var measure_nodes: Array[Node3D]
 var measure_count: int = 0
 var chunks: Array[Node3D] = []
+var reset_measure: int = 0
 var phrase_start_measure:int = 0
 var marker_measure:int = 0
 var phrase_notes: Array[SynRoadNote]
@@ -87,27 +87,23 @@ func _enter_tree():
 	song_node = get_parent() as SynRoadSong
 	length_per_beat = song_node.length_per_beat
 	chunks.resize(song_node.manager_node.chunk_count)
-#	_populateNotes()  # No longer needed here, preprocessor handled it
-#	_populateChunks()
-#	for i in range(CHUNK_LOAD_RANGE_FORWARD):
-#		chunks[i].load_if_needed()
-
-func _ready():
-	asp.stream = load(audio_file) as AudioStream
-	# Cache materials once at track level instead of loading in each chunk
-	var rail_mat = instrument_ghost_material
+	measure_nodes.resize(song_node.total_measures)
+	note_nodes.resize(track_data.note_map.keys().size())
 	for i in range(song_node.total_measures):
 		var new_rail = RAIL_SCENE.instantiate() as Node3D
 		new_rail.position.z = -(BEATS_PER_MEASURE * length_per_beat) * i
 		new_rail.scale.z = length_per_beat / STANDARD_LENGTH_PER_BEAT
-		new_rail.mat = rail_mat
+		new_rail.mat = instrument_ghost_material
 		rails.add_child(new_rail)
+
+func _ready():
+	asp.stream = load(audio_file) as AudioStream
+	# Cache materials once at track level instead of loading in each chunk
 	asp.volume_db = UNFOCUSED_VOLUME
 	asp.add_to_group("AudioPlayers")
 	asp.add_to_group("TrackAudio")
-	_find_next_phrase()
-	_move_marker(phrase_start_measure)
-#	marker.material_override = load(INSTRUMENTS[instrument][3])
+	reset_measure = track_data.notes_in_measure.keys()[0]
+	phrase_start_measure = reset_measure
 	marker.visible = song_node.manager_node.hide_streak_hints == false
 
 #func _populateChunks():
@@ -115,19 +111,6 @@ func _ready():
 #	for i in chunk_count:
 #		#print("populating chunk %d" % i)
 #		chunks.append(MeasureChunk.new(i * CHUNK_SIZE_MEASURES, self))
-
-func get_beats_in_measure(measure_num:int) -> Array:
-	if beats_in_measure.has(measure_num):
-		return beats_in_measure[measure_num]
-	return []
-
-func get_notes_in_measure(measure_num: int) -> Array[SynRoadNote]:
-	var beats = get_beats_in_measure(measure_num)
-	var notes: Array[SynRoadNote] = []
-	for beat in beats:
-		if note_nodes.has(beat):
-			notes.append(note_nodes[beat])
-	return notes
 
 func try_blast(lane_index:int):
 	var current_beat = song_node.current_beat()
@@ -188,9 +171,6 @@ func try_blast(lane_index:int):
 func set_active(active: bool):
 	_active_track = active
 	rails.visible = active
-	for measure in measure_nodes.values():
-		if measure != null:
-			measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("active", active)
 	for note in phrase_notes:
 		note.set_phrase_note(active)
 	if !active and blasting_phrase:
@@ -235,7 +215,7 @@ func _process(delta: float):
 				asp.volume_db = MUTED_VOLUME
 			
 			# Advance to next phrase
-			_find_next_phrase()
+
 	if !song_node._manager_node.autoblast:
 		# We are not in autoblast mode, just check for missed notes
 		for lane_index in range(3):
@@ -312,89 +292,21 @@ func _process(delta: float):
 						asp.volume_db = MUTED_VOLUME
 
 func _on_song_new_measure(_measure_num: int):
-	if just_activated:
-		just_activated = false
-	# Stagger chunk updates across tracks to spread frame load
-	if (_measure_num + get_index()) % song_node.tracks.size() == 0:
-		_update_note_streaming(_measure_num)
-	if reset_countdown > 0:
-		reset_countdown -= 1
-		if reset_countdown == 0:
-			hidden_measures.clear()
-	if reset_countdown == 0:
-		if marker_measure < _measure_num + 1 and !is_active:
-			_move_marker(get_first_available_measure(_measure_num + 1))
-
-func _clear_phrase():
-	# Clear exactly the measures in this phrase, not always 2
-	var count := 0
-	if current_phrase_index >= 0 and current_phrase_index < preprocessed_phrases.size():
-		count = preprocessed_phrases[current_phrase_index].measure_count
-	else:
-		count = 1  # safe default
-	for i in range(count):
-		if measure_nodes.has(phrase_start_measure + i):
-			measure_nodes[phrase_start_measure + i].get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", false)
-	for note in phrase_notes:
-		note.set_phrase_note(false)
-	phrase_notes.clear()
-	phrase_notes_dict.clear()
-	phrase_notes_count = 0
-	phrase_beats.clear()
-	phrase_beat_index = 0
-	phrase_score_value = 0
-	phrase_start_measure = 0
-	blasting_phrase = false
+	pass
 	
-func _find_next_phrase():
-	# first clear effects from previous phrase
-	if reset_countdown > 0:
-		print("  Track %s: In reset countdown, skipping _find_next_phrase" % midi_name)
-		return
-	current_phrase_index += 1
-	if current_phrase_index >= preprocessed_phrases.size():
-		# No more phrases
-		phrase_start_measure = song_node.total_measures + 1
-		marker_measure = song_node.total_measures + 1
-#		print("    No more phrases found in preprocessed data")
-		return
-	else:
-		_process_phrase_at_index(current_phrase_index)
 
 func _process_phrase_at_measure(measure:int):
 	# Get the index of the phrase that starts at or after the given measure
 	for i in range(preprocessed_phrases.size()):
 		if preprocessed_phrases[i].start_measure >= measure:
 			current_phrase_index = i
-			_process_phrase_at_index(i)
+#			_process_phrase_at_index(i)
 			return
 	# No phrase found at or after the given measure
 	phrase_start_measure = song_node.total_measures + 1
 	marker_measure = song_node.total_measures + 1
 #	print("    No phrase found at or after measure %d" % measure)
 
-func _process_phrase_at_index(idx:int):	
-	_clear_phrase()
-	var phrase_data = preprocessed_phrases[idx]
-	phrase_start_measure = phrase_data.start_measure
-	phrase_score_value = phrase_data.score_value
-	phrase_beats = phrase_data.beats.duplicate()
-	phrase_first_beat = phrase_data.first_beat
-	# Use phrase_data.measure_count consistently
-	for i in range(phrase_data.measure_count):
-#		var chunk_idx = (phrase_start_measure + i) / CHUNK_SIZE_MEASURES
-#		if chunk_idx >= 0 and chunk_idx < chunks.size():
-#			chunks[chunk_idx].load_if_needed()
-		if measure_nodes.has(phrase_start_measure + i):
-			measure_nodes[phrase_start_measure + i].get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", true)
-		phrase_notes.append_array(get_notes_in_measure(phrase_start_measure + i))
-	phrase_notes_dict.clear()
-	phrase_notes_count = phrase_notes.size()
-	for note in phrase_notes:
-		phrase_notes_dict[note] = true
-		if _active_track:
-			note.set_phrase_note(true)
-	blasting_phrase = false
 
 func update_marker_for_inactive(after_measure:int):
 	# Called by song when another track starts blasting a phrase
@@ -436,14 +348,6 @@ func activate(start_measure:int):
 	asp.volume_db = UNFOCUSED_VOLUME
 	# Save the completed phrase value before finding the next phrase
 	var completed_phrase_value = phrase_score_value
-	for i in range(reset_countdown):
-#		print("Hide measure %d" % (start_measure + i))
-		hidden_measures.append(start_measure + i)
-		if measure_nodes.has(start_measure + i):
-			measure_nodes[start_measure + i].get_node("track_geometry").hide()
-			measure_nodes[start_measure + i].get_node("activation_particles").emitting = true
-			for note in get_notes_in_measure(start_measure + i):
-				note.blast()
 	blasting_phrase = false
 	just_activated = true
 	_process_phrase_at_measure(target_measure)
@@ -520,3 +424,20 @@ func _spawn_misblast_effect(beat_position: float, lane_index: int):
 func current_measure_is_unactivated() -> bool:
 	var current_measure = song_node.current_measure()
 	return reset_countdown == 0 and beats_in_measure.has(current_measure)
+
+class GameplayTrackData:
+	var note_map: Dictionary[float,int] = {}
+	var note_times: PackedFloat32Array = []
+	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
+	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
+	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
+	var measure_note_counts: Dictionary[int,int] = {}
+	var suppressed_measures: Dictionary[int,bool] = {}
+	var measures_in_chunks: Dictionary[int,PackedInt32Array] = {}
+	# For phrases, keys will be the starting measure number
+	var phrase_lengths: Dictionary[int,int] = {}
+	var phrase_note_indices: Dictionary[int,PackedInt32Array] = {}
+	var phrase_note_counts: Dictionary[int,int] = {}
+	var phrase_marker_positions: Dictionary[int,Vector2] = {}
+	var phrase_activation_lengths: Dictionary[int,int] = {}
+	var phrase_next_measures: Dictionary[int,int] = {}

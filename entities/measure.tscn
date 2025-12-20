@@ -70,4 +70,3 @@ draw_pass_1 = SubResource("QuadMesh_gkcph")
 
 [node name="track_geometry" parent="." instance=ExtResource("3_aeq1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00073444843, 0, -9.346008e-05)
-visible = false

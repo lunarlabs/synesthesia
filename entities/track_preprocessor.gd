@@ -57,7 +57,7 @@ func _worker(_userdata = null):
 	return
 
 func _process_job(job:Dictionary):
-	var result: Dictionary = {}
+	var result: SynRoadTrack.GameplayTrackData = SynRoadTrack.GameplayTrackData.new()
 	## map of beat (float) to lane (int)
 	var note_map: Dictionary[float,int] = {}
 	var valid_note_positions: Array[int] = [job.difficulty_offset, job.difficulty_offset + 2, job.difficulty_offset + 4]
@@ -73,7 +73,7 @@ func _process_job(job:Dictionary):
 	note_map.sort()
 	var sorted_beats: Array[float] = note_map.keys()
 	sorted_beats.sort()
-	result["note_map"] = note_map
+	result.note_map = note_map
 
 	var note_times: PackedFloat32Array = []
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
@@ -96,9 +96,9 @@ func _process_job(job:Dictionary):
 		notes_in_measure[measure_num].append(i)
 
 	assert(note_times.size() == note_positions.size(), "Note times and positions size mismatch!")
-	result["note_times"] = note_times
-	result["note_positions"] = note_positions
-	result["notes_in_measure"] = notes_in_measure
+	result.note_times = note_times
+	result.note_positions = note_positions
+	result.notes_in_measure = notes_in_measure
 
 	for i in range(lane_notes.size()):
 		(lane_notes[i] as PackedInt32Array).sort()
@@ -125,9 +125,9 @@ func _process_job(job:Dictionary):
 		if not measures_in_chunks.has(chunk_idx):
 			measures_in_chunks[chunk_idx] = PackedInt32Array()
 		measures_in_chunks[chunk_idx].append(m)
-	result["measure_note_counts"] = measure_note_counts
-	result["suppressed_measures"] = suppressed_measures
-	result["measures_in_chunks"] = measures_in_chunks
+	result.measure_note_counts = measure_note_counts
+	result.suppressed_measures = suppressed_measures
+	result.measures_in_chunks = measures_in_chunks
 	
 	# Second pass: build phrases
 	for m in notes_in_measure.keys():
@@ -173,12 +173,12 @@ func _process_job(job:Dictionary):
 			if next_measure >= job.total_measures:
 				phrase_next_measures[m] = -1
 		
-	result["phrase_lengths"] = phrase_lengths
-	result["phrase_note_indices"] = phrase_note_indices
-	result["phrase_note_counts"] = phrase_note_counts
-	result["phrase_marker_positions"] = phrase_marker_positions
-	result["phrase_activation_lengths"] = phrase_activation_lengths
-	result["phrase_next_measures"] = phrase_next_measures
+	result.phrase_lengths = phrase_lengths
+	result.phrase_note_indices = phrase_note_indices
+	result.phrase_note_counts = phrase_note_counts
+	result.phrase_marker_positions = phrase_marker_positions
+	result.phrase_activation_lengths = phrase_activation_lengths
+	result.phrase_next_measures = phrase_next_measures
 
 	return result
 		
