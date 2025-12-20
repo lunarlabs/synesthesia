@@ -23,7 +23,8 @@ var time_elapsed := 0.0
 var active_track := 0
 var lead_in_measures := 999_999
 var total_measures := 0
-var previous_measure := 0
+var current_measure := 0
+var next_checkpoint := 0
 var phrase_start_measure := 0
 var finished := false
 var input_enabled := true
@@ -38,7 +39,6 @@ var _phrases_completed: int = 0
 var _phrases_missed: int = 0
 var _streak_breaks: int = 0
 var _autoblast_next_track: int
-var _autoblast_track_distance: int
 var _track_transition_tween:Tween
 var _intro_tween:Tween
 var _max_hit_offset: float = NAN
@@ -91,9 +91,11 @@ func _ready():
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	for i in manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
+		newTrack.track_index = i
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
+		newTrack.instrument = manager_node.track_data[i].track_info.instrument
 		newTrack.audio_file = ResourceUID.path_to_uid(manager_node.track_data[i].track_info.audio_file)
-		newTrack.track_data = manager_node.track_data[i]
+		newTrack.track_data = manager_node.track_data[i].track_data
 		tracks.append(newTrack)
 		new_measure.connect(newTrack._on_song_new_measure)
 		newTrack.track_activated.connect(_on_track_activated)
@@ -123,13 +125,13 @@ func _ready():
 	end_gate.gate_location = total_measures
 	end_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
 	add_child(end_gate)
-	for measure in manager_node.song_data.checkpoints:
+	for i in range(manager_node.checkpoint_measures.size()):
+		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
-		new_measure.connect(checkpoint._on_song_new_measure)
 		var percentage = float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure + lead_in_measures - 1)
-		checkpoint.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (measure + lead_in_measures - 1)
+		checkpoint.position.z = manager_node.checkpoint_positions[i]
 		add_child(checkpoint)
 	match manager_node.energy_modifier:
 		1:
@@ -141,8 +143,10 @@ func _ready():
 		_:
 			%EnergyBar.show()
 			%EnergyBar.value = energy
+	print("Precompiling shaders...")
+	for i in range(3):
+		await get_tree().process_frame
 
-func start_song():
 	print("Starting song playback.")
 	_intro_tween = get_tree().create_tween()		
 	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH)/2
@@ -152,11 +156,10 @@ func start_song():
 	camera.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Camera starting at x=%.2f" % camera.position.x)
 	%SongProgress.max_value = total_measures
-	%SongProgress.min_value = lead_in_measures + 1
+	%SongProgress.min_value = lead_in_measures
 	if manager_node.autoblast:
 		lbl_auto_blast.show()
 		_autoblast_next_track = _find_best_track_for_autoblast()
-		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track]
 		if _autoblast_next_track != active_track:
 			_switch_active_track(_autoblast_next_track, false)
 	else:
@@ -164,9 +167,6 @@ func start_song():
 	_set_instrument_label()
 	tracks[active_track].set_active(true)
 	get_tree().call_group("AudioPlayers", "play")
-	_intro_tween.tween_interval((lead_in_measures - 1) * BEATS_PER_MEASURE * seconds_per_beat)
-	_intro_tween.tween_property(hud, "modulate:a", 1.0, 0.1)
-	_intro_tween.parallel().tween_property(instrument_label, "scale", Vector3.ONE, 0.1)
 
 func _process(delta: float):
 	if !finished:
@@ -185,7 +185,7 @@ func _process(delta: float):
 			
 			if abs(drift) > 0.050:  # >50ms drift
 				print("FRAME DROP: %.1fms @ beat %.2f (measure %d, mod8=%d, delta: %.3f, actual: %.3f, expected: %.3f)" % 
-					[drift * 1000, audio_time / (seconds_per_beat),current_measure(), current_measure() % 8, delta, audio_time, expected_time])
+					[drift * 1000, audio_time / (seconds_per_beat),current_measure, current_measure % 8, delta, audio_time, expected_time])
 				frame_drops += 1
 
 				if manager_node.autoblast:
@@ -219,6 +219,7 @@ func _process(delta: float):
 		
 		playhead_velocity += (spring_force + damping_force) * delta
 		playhead.position.z += playhead_velocity * delta
+
 		var new_active_track = active_track
 		if !manager_node.autoblast and input_enabled:
 			if Input.is_action_just_pressed("track_next"):
@@ -227,8 +228,10 @@ func _process(delta: float):
 			elif Input.is_action_just_pressed("track_prev"):
 				new_active_track = (active_track - 1 + tracks.size()) % tracks.size()
 				_switch_active_track(new_active_track)
-		if previous_measure != current_measure():
-			if previous_measure > total_measures - 1:
+		if time_elapsed > manager_node.measure_times[current_measure + 1]:
+			current_measure += 1
+			%SongProgress.value = current_measure
+			if current_measure >= total_measures:
 				finished = true
 				if not manager_node.autoblast:
 					if _miss_count == 0:
@@ -270,11 +273,9 @@ func _process(delta: float):
 				emit_signal("song_finished", stats)
 				print(final_score_text)
 			else:
-				previous_measure = current_measure()
-				%SongProgress.value = previous_measure
-				new_measure.emit(previous_measure)
-#				print("measure %d/%d" % [previous_measure, total_measures])
-				if manager_node.energy_modifier == 1 and manager_node.suppressed_measures.has(previous_measure) == false:
+				new_measure.emit(current_measure)
+				print("measure %d/%d" % [current_measure, total_measures])
+				if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[current_measure] == false):
 					# TODO: If any track is not activated or empty, subtract 1 energy
 					# but don't fail the song unless there's a streak break with 0 energy
 					var any_unactivated = false
@@ -289,7 +290,7 @@ func _process(delta: float):
 						else:
 							energy_change(-1)
 				if lead_in_measures > 0:
-					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * previous_measure
+					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * current_measure
 					count_in.text = str(lead_in_measures)
 					lead_in_measures -= 1
 				elif lead_in_measures == 0:
@@ -312,16 +313,16 @@ func _process(delta: float):
 						# Update cached reference after switch
 						_cached_active_track_node = tracks[active_track] as SynRoadTrack
 #					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
-			if not manager_node.autoblast and input_enabled:
-				if Input.is_action_just_pressed("note_left"):
-					_targets[0].flash()
-					_cached_active_track_node.try_blast(0)
-				elif Input.is_action_just_pressed("note_center"):
-					_targets[1].flash()
-					_cached_active_track_node.try_blast(1)
-				elif Input.is_action_just_pressed("note_right"):
-					_targets[2].flash()
-					_cached_active_track_node.try_blast(2)
+			# if not manager_node.autoblast and input_enabled:
+			# 	if Input.is_action_just_pressed("note_left"):
+			# 		_targets[0].flash()
+			# 		_cached_active_track_node.try_blast(0)
+			# 	elif Input.is_action_just_pressed("note_center"):
+			# 		_targets[1].flash()
+			# 		_cached_active_track_node.try_blast(1)
+			# 	elif Input.is_action_just_pressed("note_right"):
+			# 		_targets[2].flash()
+			# 		_cached_active_track_node.try_blast(2)
 	
 	#lblDebugInfo.text = debug_info()
 
@@ -333,9 +334,6 @@ func _set_instrument_label():
 
 func current_beat() -> float:
 	return time_elapsed * (bpm/60)
-
-func current_measure() -> int:
-	return floor((time_elapsed * (bpm/60)) / BEATS_PER_MEASURE) + 1
 	
 func debug_info() -> String:
 	var lines: Array[String] = []
@@ -344,7 +342,7 @@ func debug_info() -> String:
 	else:
 		lines.append("Elapsed Audio Time: %.3f" % time_elapsed)
 		lines.append("Beat: %.4f" % current_beat())
-		lines.append("Measure: %d : %.1f" % [current_measure(), fmod(current_beat(), BEATS_PER_MEASURE)])
+		lines.append("Measure: %d : %.1f" % [current_measure, fmod(current_beat(), BEATS_PER_MEASURE)])
 		lines.append("Phrase start position: %d\n" % phrase_start_measure)
 	lines.append("Tracks:")
 	for i in tracks.size():
@@ -379,10 +377,10 @@ func _on_track_activated(note_count:int, start_measure:int):
 		1:
 			# Gain 3 energy per successful phrase
 			energy_change(3)
-	if manager_node.autoblast and current_measure() < total_measures:
+#	if manager_node.autoblast and current_measure < total_measures:
 		# Queue up the next track to switch to on the next measure boundary
-		_autoblast_next_track = _find_best_track_for_autoblast()
-		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track] if _autoblast_next_track != active_track else 999
+#		_autoblast_next_track = _find_best_track_for_autoblast()
+#		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track] if _autoblast_next_track != active_track else 999
 #		print("Autoblast: Current track %d, queued next track %d (distance=%d)" % [active_track, _autoblast_next_track, _autoblast_track_distance])
 
 
@@ -403,7 +401,7 @@ func _on_streak_broken():
 			fail_song()
 			return
 	lbl_phrase_value.hide()
-	print("Streak break, was %d at measure %d" % [streak, current_measure()])
+	print("Streak break, was %d at measure %d" % [streak, current_measure])
 	streak = 0
 	if had_streak:
 		print("Stat updated for proper streak break.")
@@ -414,9 +412,9 @@ func _on_active_phrase_missed():
 	_phrases_missed += 1
 
 func _on_inactive_phrase_missed(trk_name:String):
-	if _inactive_safeguard_measure >= current_measure(): # this measure already had a phrase activation, do not penalize
+	if _inactive_safeguard_measure >= current_measure: # this measure already had a phrase activation, do not penalize
 		return
-	var measure = current_measure()
+	var measure = current_measure
 
 	# Enforce only one penalty per measure for inactive phrase misses
 	if measure == _last_inactive_penalty_measure:
@@ -472,31 +470,6 @@ func _switch_active_track(new_active_track:int, use_tween: bool = true):
 		current_track.position.x = new_x_pos
 		camera.position.x = new_x_pos
 
-func _get_phrase_distances() -> Array[int]:
-	var result:Array[int]
-	for track in tracks:
-		var phrase_distance = (track as SynRoadTrack).phrase_start_measure - current_measure()
-		result.append(phrase_distance)
-	return result
-
-func _get_next_phrase_values() -> Array[int]:
-	var result:Array[int]
-	for track in tracks:
-		var phrase_value = (track as SynRoadTrack).phrase_score_value
-		result.append(phrase_value)
-	return result
-
-func _has_phrase_next_measure(exclude_track:int) -> bool:
-	for i in tracks.size():
-		if i == exclude_track:
-			continue
-		var track = tracks[i] as SynRoadTrack
-		if track.reset_countdown > 0:
-			continue
-		var phrase_distance = track.phrase_start_measure - current_measure()
-		if phrase_distance == 1:
-			return true
-	return false
 
 func _find_best_track_for_autoblast() -> int:
 	# Find closest unactivated measure using track marker_measure
@@ -505,7 +478,7 @@ func _find_best_track_for_autoblast() -> int:
 	var best_measure_dist = 9999
 	var best_note_count = -1
 	var best_track_dist = 9999
-	var curr_measure = current_measure()
+	var curr_measure = current_measure
 	
 	for i in tracks.size():
 		if i == active_track:
@@ -559,48 +532,6 @@ func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
 			min_value = value
 	return min_value
 
-func _find_adjacent_unactivated_track() -> int:
-	# Check left and right adjacent tracks for unactivated ones
-	var candidates: Array[int] = []
-	
-	# Check left neighbor
-	if active_track > 0:
-		var left_track = tracks[active_track - 1] as SynRoadTrack
-		if left_track.reset_countdown == 0:
-			candidates.append(active_track - 1)
-	
-	# Check right neighbor
-	if active_track < tracks.size() - 1:
-		var right_track = tracks[active_track + 1] as SynRoadTrack
-		if right_track.reset_countdown == 0:
-			candidates.append(active_track + 1)
-	
-	if candidates.is_empty():
-		return -1
-	
-	# Filter candidates to only those with phrases starting in the next measure
-	# This prevents switching to a track that would cause a streak break
-	var phrase_distances = _get_phrase_distances()
-	var valid_candidates: Array[int] = []
-	for candidate in candidates:
-		var distance = phrase_distances[candidate]
-		# Only consider if phrase starts exactly next measure
-		if distance == 1:
-			valid_candidates.append(candidate)
-	
-	if valid_candidates.is_empty():
-		return -1
-	
-	# If both adjacent tracks have phrases next measure, pick the one with higher value
-	if valid_candidates.size() == 2:
-		var phrase_values = _get_next_phrase_values()
-		if phrase_values[valid_candidates[0]] >= phrase_values[valid_candidates[1]]:
-			return valid_candidates[0]
-		else:
-			return valid_candidates[1]
-	
-	return valid_candidates[0]
-
 func energy_change(amount:int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
 #	print("Energy changed by %d, new value: %d" % [amount, energy])
@@ -646,7 +577,7 @@ func fail_song():
 	hud.hide()
 	var stats = {
 		"score": score,
-		"measure": current_measure(),
+		"measure": current_measure,
 		"max_streak": max_streak,
 		"phrases_completed": _phrases_completed,
 		"phrases_missed": _phrases_missed,

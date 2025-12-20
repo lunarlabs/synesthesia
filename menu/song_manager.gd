@@ -50,6 +50,7 @@ const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
 const TIMING_WINDOWS = [0.6, 0.8, 0.4,]
+const MISS_WINDOW_OFFSET = 0.05
 
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
@@ -92,7 +93,9 @@ var measure_in_chunks: PackedInt32Array = []
 var chunk_count := 0
 var checkpoint_positions: PackedFloat32Array = []
 var checkpoint_measures: PackedInt32Array = []
-var suppressed_measures: PackedInt32Array = [] # Possibly overkill? There is always the possibility of songs with over 256 measures though.
+var suppressed_measures: Array[bool] = []
+var hit_window: float
+var miss_window: float
 
 func _ready() -> void:
 	song_data = load(song_file) as SongData
@@ -100,9 +103,11 @@ func _ready() -> void:
 	if not song_data:
 		push_error("Failed to load song data from %s" % song_file)
 		return
-	_populate_load_screen()
-	anim.play("LoadIn")
 
+	ChunkManager.manager_node = self
+	ChunkManager.start_if_needed()
+	hit_window = TIMING_WINDOWS[timing_modifier]
+	miss_window = hit_window + MISS_WINDOW_OFFSET
 	seconds_per_beat = song_data.seconds_per_beat
 	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
 	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
@@ -112,7 +117,7 @@ func _ready() -> void:
 
 	total_measures = song_data.lead_in_measures + song_data.playable_measures
 	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
-	for i in range(total_measures):
+	for i in range(total_measures + 2):
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
 		@warning_ignore("integer_division")
@@ -122,12 +127,13 @@ func _ready() -> void:
 
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
+		suppressed_measures.resize(total_measures)
 		checkpoint_measures.append(actual_measure)
 		checkpoint_positions.append(actual_measure * length_per_beat * BEATS_PER_MEASURE)
 		match checkpoint_modifier:
 			0:
-				suppressed_measures.append(actual_measure)
-				suppressed_measures.append(actual_measure + 1)
+				suppressed_measures[actual_measure] =  true
+				suppressed_measures[actual_measure + 1] = true
 			1:
 				# Disabled -- leave the checkpoint gates as is but they won't do anything
 				pass
@@ -176,24 +182,7 @@ func _ready() -> void:
 
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
-	await anim.animation_finished
 	add_child.call_deferred(song_instance)
-	await song_instance.ready
-
-	print("Precompiling shaders...")
-	for i in range(3):
-		await get_tree().process_frame
-
-	print("Starting song: %s [%s]" % [song_data.long_title, DIFFICULTY_NAMES[difficulty]])
-	song_instance.start_song()
-	var tween = get_tree().create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(load_screen, "color", Color(0,0,0,0),\
-	 (song_instance.seconds_per_beat) * 4)
-	tween.parallel().tween_property(stage_data, "modulate", Color(0.1,0.2,1,0),\
-	 (song_instance.seconds_per_beat) * 4)
-	tween.tween_interval((song_instance.seconds_per_beat) * 4)
-	tween.tween_property(song_info, "scale", Vector2(3,0), 0.2)
-	tween.tween_callback(load_screen.hide)
 
 func _populate_load_screen() -> void:
 	lbl_difficulty.text = DIFFICULTY_NAMES[difficulty]
@@ -403,7 +392,7 @@ func _on_restart_pressed() -> void:
 	song_instance.song_finished.connect(_on_song_finished)
 	add_child(song_instance)
 	await get_tree().process_frame
-	song_instance.start_song()
+#	song_instance.start_song()
 	load_screen.hide()
 
 func _on_quit_pressed() -> void:

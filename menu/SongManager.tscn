@@ -9,10 +9,10 @@
 script = ExtResource("1_o7bha")
 song_file = "uid://cmv7jola8rpbe"
 difficulty = 114
-autoblast = true
 
 [node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
 process_mode = 3
+visible = false
 mouse_filter = 2
 
 [node name="PausePanel" type="PanelContainer" parent="."]
