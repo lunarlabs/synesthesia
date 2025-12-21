@@ -85,16 +85,17 @@ func _process_job(job:Dictionary):
 		var beat: float = sorted_beats[i]
 		# WARN: measure_num is 0-indexed here
 		var measure_num: int = int(floor(beat / 4.0))
-		var lane: int = note_map[beat]
-		var x_pos: float = (lane - 1) * LANE_GAP
-		var z_pos: float = (beat * job.length_per_beat)
-		note_positions.append(Vector2(x_pos, z_pos))
-		if not job.suppressed_measures[measure_num]:
-			lane_notes[lane].append(i)
-		note_times.append(beat * job.seconds_per_beat)
-		if not notes_in_measure.has(measure_num):
-			notes_in_measure[measure_num] = PackedInt32Array()
-		notes_in_measure[measure_num].append(i)
+		if measure_num < job.total_measures:
+			var lane: int = note_map[beat]
+			var x_pos: float = (lane - 1) * LANE_GAP
+			var z_pos: float = (beat * job.length_per_beat)
+			note_positions.append(Vector2(x_pos, z_pos))
+			if not job.suppressed_measures[measure_num]:
+				lane_notes[lane].append(i)
+			note_times.append(beat * job.seconds_per_beat)
+			if not notes_in_measure.has(measure_num):
+				notes_in_measure[measure_num] = PackedInt32Array()
+			notes_in_measure[measure_num].append(i)
 
 	assert(note_times.size() == note_positions.size(), "Note times and positions size mismatch!")
 	result.note_times = note_times

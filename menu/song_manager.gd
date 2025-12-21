@@ -124,12 +124,13 @@ func _ready() -> void:
 		var chunk = i / CHUNK_LENGTH_IN_MEASURES
 		measure_in_chunks.append(chunk)
 		chunk_count = max(chunk_count, chunk + 1)
+	chunk_count += 1
 
+	suppressed_measures.resize(total_measures)
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
-		suppressed_measures.resize(total_measures)
 		checkpoint_measures.append(actual_measure)
-		checkpoint_positions.append(actual_measure * length_per_beat * BEATS_PER_MEASURE)
+		checkpoint_positions.append(actual_measure * length_per_beat * BEATS_PER_MEASURE * length_multiplier)
 		match checkpoint_modifier:
 			0:
 				suppressed_measures[actual_measure] =  true
@@ -144,7 +145,6 @@ func _ready() -> void:
 				pass
 			4:
 				pass
-	suppressed_measures.sort()
 
 
 	_fetch_track_data()

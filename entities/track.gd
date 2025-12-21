@@ -92,7 +92,7 @@ func _enter_tree():
 		new_rail.scale.z = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		new_rail.mat = instrument_ghost_material
 		get_node("RailMaster").add_child(new_rail)
-	_request_chunks(CHUNK_LOAD_RANGE_FORWARD - 1)
+#	_request_chunks(CHUNK_LOAD_RANGE_FORWARD)
 
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
@@ -286,7 +286,16 @@ func _process(delta: float):
 #						asp.volume_db = MUTED_VOLUME
 
 func _on_song_new_measure(_measure_num: int):
-	pass
+	var current_chunk = song_node.manager_node.measure_in_chunks[_measure_num]
+	print ("We are on chunk %d" % current_chunk)
+	var target_ahead = song_node.manager_node.measure_in_chunks[_measure_num] + CHUNK_LOAD_RANGE_FORWARD
+	var target_behind = song_node.manager_node.measure_in_chunks[_measure_num] - CHUNK_UNLOAD_RANGE_BEHIND
+	if furthest_chunk_loaded < target_ahead and target_ahead < song_node.manager_node.chunk_count:
+		_request_chunks(target_ahead)
+	if target_behind >= 0 and chunks[target_behind]:
+		print("Track %d destroying chunk %d" % [track_index, target_behind])
+		chunks[target_behind].queue_free()
+		chunks[target_behind] = null
 
 func _request_chunks(furthest: int):
 	while furthest_chunk_loaded < furthest:
