@@ -56,10 +56,12 @@ static func _worker(_userdata = null):
 			continue
 		var z_scale = manager_node.length_multiplier
 		var chunk := Node3D.new()
+		chunk.name = "chunk_%d" % chunk_idx
 
 		for i in track_data.measures_in_chunks[chunk_idx]:
 			if not manager_node.suppressed_measures[i] or (i < track_node.reset_measure):
 				var new_measure = _measure_scene.instantiate() as Node3D
+				new_measure.name = "measure_%d" % i
 				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("this_track", track_idx)
 				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("measure_tint", track_node.lane_tint)
 				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", false)
@@ -70,6 +72,7 @@ static func _worker(_userdata = null):
 
 			for j in track_data.notes_in_measure[i]:
 				var new_note = _note_scene.instantiate() as SynRoadNote
+				new_note.name = "note_%d" % j
 				new_note.capsule_material = track_node.instrument_note_material
 				new_note.ghost_material = track_node.instrument_ghost_material
 				new_note.suppressed = manager_node.suppressed_measures[i]

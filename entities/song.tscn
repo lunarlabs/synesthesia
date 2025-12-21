@@ -572,7 +572,7 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
-transform = Transform3D(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.16338265, 0.83456635)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)
 pixel_size = 0.006
 billboard = 1
 double_sided = false
@@ -733,7 +733,7 @@ theme_override_fonts/font = SubResource("FontVariation_o2o53")
 text = "SCORE"
 horizontal_alignment = 2
 
-[node name="Label2" type="Label" parent="HUD/ScoreBar"]
+[node name="StreakTitle" type="Label" parent="HUD/ScoreBar"]
 layout_mode = 1
 offset_left = 68.56006
 offset_top = 10.0
@@ -951,9 +951,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -166.0
-offset_top = -17.0
+offset_top = -22.0
 offset_right = 194.0
-offset_bottom = 39.0
+offset_bottom = 34.0
 grow_horizontal = 2
 grow_vertical = 2
 max_value = 8.0
@@ -961,6 +961,15 @@ value = 3.0
 texture_under = ExtResource("9_jycet")
 texture_progress = ExtResource("10_nbke4")
 tint_progress = Color(0, 0.63394016, 0.03212304, 1)
+
+[node name="StreakTitle2" type="Label" parent="HUD/EnergyArea"]
+layout_mode = 1
+offset_left = 112.84003
+offset_top = 10.0
+offset_right = 184.84003
+offset_bottom = 37.0
+theme_override_fonts/font = SubResource("FontVariation_0yoam")
+text = "ENERGY"
 
 [node name="actualplayhead" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true

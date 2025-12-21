@@ -24,6 +24,7 @@ var active_track := 0
 var lead_in_measures := 999_999
 var total_measures := 0
 var current_measure := -1
+var current_beat := 0.0
 var next_checkpoint := 0
 var phrase_start_measure := 0
 var finished := false
@@ -95,6 +96,7 @@ func _ready():
 		newTrack.track_index = i
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
 		newTrack.instrument = manager_node.track_data[i].track_info.instrument
+		newTrack.name = "Track%d" % i
 		newTrack.audio_file = ResourceUID.path_to_uid(manager_node.track_data[i].track_info.audio_file)
 		newTrack.track_data = manager_node.track_data[i].track_data
 		tracks.append(newTrack)
@@ -117,18 +119,21 @@ func _ready():
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 #	new_measure.connect(start_gate._on_song_new_measure)
 	start_gate.get_node("Text").text = "Song Start"
+	start_gate.name = "SongStart"
 	start_gate.gate_location = lead_in_measures
 	start_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 #	new_measure.connect(end_gate._on_song_new_measure)
 	end_gate.get_node("Text").text = "Song End"
+	end_gate.name = "SongEnd"
 	end_gate.gate_location = total_measures
 	end_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
 	add_child(end_gate)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
+		checkpoint.name = "Checkpoint%d" % (i)
 		var percentage = float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure + lead_in_measures - 1)
@@ -149,7 +154,9 @@ func _ready():
 		await get_tree().process_frame
 
 	_print_new_measure_connections()
+	_song_start()
 
+func _song_start():
 	print("Starting song playback.")
 	_intro_tween = get_tree().create_tween()		
 	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH)/2
@@ -198,7 +205,7 @@ func _process(delta: float):
 
 				if mn.autoblast:
 					var _active_track_node = trs[active_track] as SynRoadTrack
-					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
+#					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
 			elif abs(drift) > 0.010:
 				drift_samples += 1
 				total_drift += abs(drift)
@@ -208,9 +215,9 @@ func _process(delta: float):
 		time_elapsed = audio_time
 		
 		# Compute beat once, reuse values
-		var curr_beat = time_elapsed * (bpm * 0.016666666666666666) # bpm/60
-		%actualplayhead.position.z = curr_beat * -length_per_beat
-		RenderingServer.global_shader_parameter_set("beat", fmod(curr_beat, 1.0))
+		current_beat = time_elapsed * (bpm * 0.016666666666666666) # bpm/60
+		%actualplayhead.position.z = current_beat * -length_per_beat
+		RenderingServer.global_shader_parameter_set("beat", fmod(current_beat, 1.0))
 
 		# Calculate target position from audio time (single predicted beat calc)
 		var predicted_beat = (audio_time + PLAYHEAD_LEAD_TIME) * (bpm * 0.016666666666666666)
@@ -316,7 +323,7 @@ func _process(delta: float):
 					var next_track_node = trs[_autoblast_next_track] as SynRoadTrack
 					var switch_measure = next_track_node.phrase_start_measure
 					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
-					if curr_beat >= switch_beat:
+					if current_beat >= switch_beat:
 						_switch_active_track(_autoblast_next_track)
 						_cached_active_track_node = trs[active_track] as SynRoadTrack
 #		lblDebugInfo.text = debug_info()
@@ -326,9 +333,6 @@ func _set_instrument_label():
 		var active_track_node = tracks[active_track] as SynRoadTrack
 		instrument_label.text = SynRoadTrack.INSTRUMENTS[active_track_node.instrument][0]
 		instrument_label.modulate = SynRoadTrack.INSTRUMENTS[active_track_node.instrument][1]
-
-func current_beat() -> float:
-	return time_elapsed * (bpm/60)
 	
 func debug_info() -> String:
 	var lines: Array[String] = []
@@ -336,8 +340,8 @@ func debug_info() -> String:
 		lines.append("Song finished")
 	else:
 		lines.append("Elapsed Audio Time: %.3f" % time_elapsed)
-		lines.append("Beat: %.4f" % current_beat())
-		lines.append("Measure: %d : %.1f" % [current_measure, fmod(current_beat(), BEATS_PER_MEASURE)])
+		lines.append("Beat: %.4f" % current_beat)
+		lines.append("Measure: %d : %.1f" % [current_measure, fmod(current_beat, BEATS_PER_MEASURE)])
 		lines.append("Phrase start position: %d\n" % phrase_start_measure)
 	lines.append("Tracks:")
 	for i in tracks.size():
@@ -440,7 +444,7 @@ func _on_inactive_phrase_missed(trk_name:String):
 func _switch_active_track(new_active_track:int, use_tween: bool = true):
 	if new_active_track == active_track:
 		return
-#	print("Switching active track from %d to %d at beat %.2f" % [active_track, new_active_track, current_beat()])
+#	print("Switching active track from %d to %d at beat %.2f" % [active_track, new_active_track, current_beat])
 #	print_stack()
 	if playhead.position.x <= 0:
 		print("Playhead x position is probably uninitialized (%.2f), not moving anything." % playhead.position.x)
@@ -459,7 +463,7 @@ func _switch_active_track(new_active_track:int, use_tween: bool = true):
 	if use_tween:
 #		print("Tweening camera.position.x to %f (active_track=%d, playhead.x=%f)" % [new_x_pos, active_track, playhead.position.x])
 		_track_transition_tween.tween_property(current_track, "position:x", new_x_pos, 0.1).set_trans(Tween.TRANS_QUAD)
-		_track_transition_tween.tween_property(camera, "position:x", new_x_pos, 0.25).set_trans(Tween.TRANS_SINE)
+		_track_transition_tween.tween_property(camera, "position:x", new_x_pos, 0.15).set_trans(Tween.TRANS_SINE)
 	else:
 #		print("Setting camera.position.x to %f (active_track=%d, playhead.x=%f)" % [new_x_pos, active_track, playhead.position.x])
 		current_track.position.x = new_x_pos

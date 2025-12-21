@@ -11,6 +11,6 @@ shader = ExtResource("2_plo11")
 
 [node name="Cube" parent="." index="0"]
 visibility_range_end = 200.0
-visibility_range_end_margin = 16.0
+visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 surface_material_override/0 = SubResource("ShaderMaterial_y256c")
