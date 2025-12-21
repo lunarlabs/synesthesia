@@ -589,7 +589,7 @@ width = 300.0
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2.25)
 
 [node name="CountIn" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -3.934025e-07, 1, 0, -9, -4.371139e-08, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -5.2453663e-07, 1, 0, -12, -4.371139e-08, 0, 0, 0)
 pixel_size = 0.01
 render_priority = -1
 outline_render_priority = -2

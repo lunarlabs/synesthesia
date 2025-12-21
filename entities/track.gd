@@ -287,9 +287,9 @@ func _process(delta: float):
 
 func _on_song_new_measure(_measure_num: int):
 	var current_chunk = song_node.manager_node.measure_in_chunks[_measure_num]
-	print ("We are on chunk %d" % current_chunk)
-	var target_ahead = song_node.manager_node.measure_in_chunks[_measure_num] + CHUNK_LOAD_RANGE_FORWARD
-	var target_behind = song_node.manager_node.measure_in_chunks[_measure_num] - CHUNK_UNLOAD_RANGE_BEHIND
+#	print ("We are on chunk %d" % current_chunk)
+	var target_ahead = current_chunk + CHUNK_LOAD_RANGE_FORWARD
+	var target_behind = current_chunk - CHUNK_UNLOAD_RANGE_BEHIND
 	if furthest_chunk_loaded < target_ahead and target_ahead < song_node.manager_node.chunk_count:
 		_request_chunks(target_ahead)
 	if target_behind >= 0 and chunks[target_behind]:

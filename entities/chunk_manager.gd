@@ -88,7 +88,7 @@ static func _worker(_userdata = null):
 
 static func request_chunk(track: int, chunk: int):
 	assert(manager_node, "No SongManager node was assigned to ChunkManager")
-	print("Track %d requests chunk %d" % [track, chunk])
+#	print("Track %d requests chunk %d" % [track, chunk])
 	_mutex.lock()
 	_pending_jobs.append(Vector2i(track,chunk))
 	_mutex.unlock()

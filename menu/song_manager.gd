@@ -130,7 +130,7 @@ func _ready() -> void:
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
 		checkpoint_measures.append(actual_measure)
-		checkpoint_positions.append(actual_measure * length_per_beat * BEATS_PER_MEASURE * length_multiplier)
+		checkpoint_positions.append(measure_positions[actual_measure])
 		match checkpoint_modifier:
 			0:
 				suppressed_measures[actual_measure] =  true

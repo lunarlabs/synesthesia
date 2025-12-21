@@ -159,7 +159,7 @@ func _ready():
 	camera.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Camera starting at x=%.2f" % camera.position.x)
 	%SongProgress.max_value = total_measures
-	%SongProgress.min_value = lead_in_measures - 1
+	%SongProgress.min_value = lead_in_measures
 	if manager_node.autoblast:
 		lbl_auto_blast.show()
 		_autoblast_next_track = _find_best_track_for_autoblast()
@@ -232,9 +232,11 @@ func _process(delta: float):
 			if Input.is_action_just_pressed("track_next"):
 				new_active_track = (active_track + 1) % trs.size()
 				_switch_active_track(new_active_track)
+				RenderingServer.global_shader_parameter_set("current_track", active_track)
 			elif Input.is_action_just_pressed("track_prev"):
 				new_active_track = (active_track - 1 + trs.size()) % trs.size()
 				_switch_active_track(new_active_track)
+				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
 		# Use cached measure_times reference for boundary check
 		var mts = mn.measure_times
@@ -284,7 +286,7 @@ func _process(delta: float):
 				print(final_score_text)
 			else:
 				new_measure.emit(current_measure)
-				print("measure %d/%d" % [current_measure + 1, total_measures])
+#				print("measure %d/%d" % [current_measure + 1, total_measures])
 				if mn.energy_modifier == 1 and (mn.suppressed_measures[current_measure] == false):
 					var any_unactivated = false
 					for track in trs:
@@ -298,7 +300,7 @@ func _process(delta: float):
 						else:
 							energy_change(-1)
 				if lead_in_measures > 0:
-					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * current_measure
+					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (current_measure + 1)
 					count_in.text = str(lead_in_measures)
 					lead_in_measures -= 1
 				elif lead_in_measures == 0:

@@ -7,7 +7,7 @@
 
 [node name="SongManager" type="Node"]
 script = ExtResource("1_o7bha")
-song_file = "uid://cmv7jola8rpbe"
+song_file = "uid://c5mriffc1gegh"
 difficulty = 114
 
 [node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
