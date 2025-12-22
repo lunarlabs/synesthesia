@@ -106,9 +106,9 @@ func _ready():
 			%PlayButton.disabled = true
 			return
 	
-	if SessionManager.song_records.is_empty():
+#	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
-		SessionManager.load_session()
+#		SessionManager.load_session()
 	_populate_song_list()
 	_connect_signals()
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
