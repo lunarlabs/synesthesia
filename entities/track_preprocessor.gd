@@ -175,6 +175,7 @@ func _process_job(job:Dictionary):
 	result.phrase_marker_positions = phrase_marker_positions
 	result.phrase_activation_lengths = phrase_activation_lengths
 	result.phrase_next_measures = phrase_next_measures
+	result.phrase_keys = PackedInt32Array(phrase_lengths.keys())
 
 	return result
 		

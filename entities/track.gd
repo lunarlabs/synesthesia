@@ -348,6 +348,7 @@ class GameplayTrackData:
 	var measure_note_counts: Dictionary[int,int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
 	# For phrases, keys will be the starting measure number
+	var phrase_keys: PackedInt32Array = []
 	var phrase_lengths: Dictionary[int,int] = {}
 	var phrase_note_indices: Dictionary[int,PackedInt32Array] = {}
 	var phrase_note_counts: Dictionary[int,int] = {}
