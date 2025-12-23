@@ -41,8 +41,9 @@ var measure_count: int = 0
 var chunks: Array[Node3D] = []
 var furthest_chunk_loaded := -1
 var reset_measure: int = 0
-var phrase_start_measure:int = 0
 var marker_measure:int = 0
+var current_phrase_index: int = 0
+var phrase_start_measure:int = 0
 var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
 var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
@@ -111,7 +112,28 @@ func _process(delta: float):
 	marker.position.y = lerp(1.2, 1.7, fmod(song_node.current_beat, 1))
 	if song_node.lead_in_measures >= 0 or song_node.finished:
 		return
-	
+#	if song_node.manager_node.autoblast:
+#		pass
+	else:
+		for lane_index in range(3):
+			var lane_notes = track_data.lane_notes[lane_index]
+			var next_lane_note_idx = next_note_idx_per_lane[lane_index]
+			if next_lane_note_idx >= lane_notes.size():
+				continue
+			var note_idx = lane_notes[next_lane_note_idx]
+			var note_time = _get_note_time(note_idx)
+			if ((song_node.current_measure < reset_measure) or !is_active) and current_time > note_time:
+				#don't care about the miss window if track isn't reset or we're not active
+				next_note_idx_per_lane[lane_index] += 1
+				# TODO: if not active track, see if the passed note was the first note in the phrase
+				# and signal inactive_phrase_missed if it was
+			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
+				# We're past the hit window, should be a miss but check if it was already blasted
+				var note_node = note_nodes[note_idx] as SynRoadNote
+				next_note_idx_per_lane[lane_index] += 1
+				if note_node and note_node.blasted:
+					# Blasted but the index didn't advance. We're done.
+					continue
 	# Phrase-level progression based on precomputed first beat
 	# Only auto-fail if we've WELL passed the window AND haven't started hitting this phrase
 #	if reset_countdown == 0 and phrase_first_beat > 0.0 and !blasting_phrase:
@@ -282,7 +304,7 @@ func set_active(active: bool):
 		asp.volume_db = UNFOCUSED_VOLUME
 	# When becoming active, update to the current phrase if not in reset countdown
 
-func _get_note_time(note_index: int):
+func _get_note_time(note_index: int) -> float:
 	return track_data.note_times[note_index]
 
 func _get_note_lane(note_index: int):
@@ -321,6 +343,7 @@ class GameplayTrackData:
 	var note_times: PackedFloat32Array = []
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
 	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
+	var measures_with_notes: PackedInt32Array = []
 	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
 	var measure_note_counts: Dictionary[int,int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
