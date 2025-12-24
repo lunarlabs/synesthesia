@@ -15,11 +15,11 @@ var capsule_material: BaseMaterial3D
 var ghost_material: BaseMaterial3D
 
 func _ready():
+	ghost.material_override = ghost_material
 	if suppressed:
 		capsule.hide()
 		return
 	capsule.material_override = capsule_material
-	ghost.material_override = ghost_material
 
 func change_material(mat: BaseMaterial3D):
 	capsule.material_override = mat

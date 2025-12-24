@@ -41,10 +41,9 @@ var measure_count: int = 0
 var chunks: Array[Node3D] = []
 var furthest_chunk_loaded := -1
 var reset_measure: int = 0
-var marker_measure_idx :int = 0
+var marker_measure_index: int = 0
 var current_phrase_index: int = 0
-var phrase_notes: Array[SynRoadNote]
-var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
+var phrase_notes_blasted: int = 0
 var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
 var phrase_beats: Array[float]
 var phrase_beat_index: int = 0  # Track which beat we're processing next in autoblast
@@ -101,6 +100,8 @@ func _ready():
 	asp.add_to_group("TrackAudio")
 	marker.position.x = track_data.phrase_marker_positions[0].x
 	marker.position.z = track_data.phrase_marker_positions[0].y
+	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[0])
+	reset_measure = track_data.phrase_starts[0]
 	marker.visible = song_node.manager_node.hide_streak_hints == false
 
 @warning_ignore("unused_parameter")
@@ -122,7 +123,7 @@ func _process(delta: float):
 			if song_node.current_measure < reset_measure and current_time > note_time:
 				# Track hasn't been reset yet, but we've passed the note. Just advance the index.
 				next_note_idx_per_lane[lane_index] += 1
-			if (!is_active) and current_time > note_time:
+			elif (!is_active) and current_time > note_time:
 				# Track is not active, but we've passed the note. Mark as missed and mute the track.
 				next_note_idx_per_lane[lane_index] += 1
 				if asp.volume_db != MUTED_VOLUME:
@@ -244,26 +245,30 @@ func _process(delta: float):
 #						asp.volume_db = MUTED_VOLUME
 
 func try_blast(lane_index:int):
-	pass
-	# var current_beat = song_node.current_beat()
-	# var note_index = next_note_idx_per_lane[lane_index]
-	# if note_index >= track_data.lane_notes[lane_index].size():
-	# 	# No notes in this lane or all notes passed - still show misblast
-	# 	miss_sound.play()
-	# 	_spawn_misblast_effect(current_beat, lane_index)
-	# 	# Break streak if blasting a phrase
-	# 	if blasting_phrase:
-	# 		asp.volume_db = MUTED_VOLUME
-	# 		blasting_phrase = false
-	# 		active_phrase_missed.emit()
-	# 		print("Track %s breaking streak for misblast (no notes in lane) at beat %.2f (measure %d)" % 
-	# 			[midi_name, current_beat, song_node.current_measure])
-	# 		streak_broken.emit()
-	# 		if reset_countdown == 0:
-	# 			_process_phrase_at_measure(song_node.current_measure + 1)
-	# 	return
-	# var target_note = track_data.lane_notes[lane_index][note_index]
-	# var time_offset = (target_note - current_beat) * song_node.seconds_per_beat
+	var current_time = song_node.time_elapsed
+	var lane_note_index = next_note_idx_per_lane[lane_index]
+	if lane_note_index >= track_data.lane_notes[lane_index].size():
+		_misblast(song_node.current_beat, lane_index)
+		return
+	var target_note_index = track_data.lane_notes[lane_index][lane_note_index]
+	var target_note_time = _get_note_time(target_note_index)
+	var time_offset = (target_note_time - current_time)
+	if abs(time_offset) <= song_node.manager_node.hit_window \
+	and song_node.current_measure >= reset_measure - 1:
+		var note_node = note_nodes[target_note_index] as SynRoadNote
+		if note_node.blasted:
+			return # Don't double-blast
+		next_note_idx_per_lane[lane_index] += 1
+		note_node.blast(true)
+		note_hit.emit(time_offset)
+		asp.volume_db = BLASTING_VOLUME
+		if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
+			phrase_notes_blasted += 1
+			if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
+				activate(current_phrase_index)
+				phrase_notes_blasted = 0
+		
+		
 	# # Allow a slight early hit on the first post-reset note (reset_countdown == 1) if within window and early (time_offset > 0)
 	# if abs(time_offset) <= song_node.manager_node.hit_window and (reset_countdown == 0 or (reset_countdown == 1 and time_offset > 0)):
 	# 	var note_node = note_nodes[target_note] as SynRoadNote
@@ -319,6 +324,7 @@ func _advance_phrase():
 	while (
 	current_phrase_index < track_data.phrase_starts.size()
 	and song_node.current_measure > track_data.phrase_starts[current_phrase_index]
+	or track_data.phrase_starts[current_phrase_index] < reset_measure
 	):
 		# if we're past the measure the phrase starts on, keep going forward
 		current_phrase_index += 1
@@ -333,9 +339,13 @@ func _advance_phrase():
 
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# Let's do the bounds check again!
+		marker.hide()
 		return
 
 	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
+	if marker_measure_index < current_phrase_index:
+		marker_measure_index = current_phrase_index
+		_move_marker(marker_measure_index)
 
 	for i in range(track_data.phrase_lengths[current_phrase_index]):
 		var measure = track_data.phrase_starts[current_phrase_index] + i
@@ -345,6 +355,13 @@ func _advance_phrase():
 		var note = note_nodes[i]
 		if is_active:
 			note.set_phrase_note(true)
+
+func _move_marker(measure_index: int):
+	marker.position.x = track_data.phrase_marker_positions[measure_index].x
+	marker.position.z = track_data.phrase_marker_positions[measure_index].y
+	marker_measure_index = measure_index
+	# tell the song node to update its marker cache with the actual measure number
+	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[current_phrase_index])
 
 func set_active(active: bool):
 	_active_track = active
@@ -384,11 +401,25 @@ func _request_chunks(furthest: int):
 		furthest_chunk_loaded += 1
 		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
 
-func activate(start_measure:int):
-	pass
+func activate(phrase_idx:int):
+	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+	reset_measure = track_data.phrase_next_measures[phrase_idx]
+	if reset_measure != -1:
+		var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
+		for i in range(phrase_end_measure, reset_measure):
+			if measure_nodes[i]:
+				var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
+				cube.hide()
+			if i in track_data.notes_in_measure.keys():
+				for j in track_data.notes_in_measure[i]:
+					if note_nodes[j]:
+						note_nodes[j].blast(false)
+		_advance_phrase()
 	
 
-func _spawn_misblast_effect(beat_position: float, lane_index: int):
+func _misblast(beat_position: float, lane_index: int):
+	miss_sound.play()
+	asp.volume_db = MUTED_VOLUME
 	var misblast = MISBLAST_SCENE.instantiate() as Node3D
 	misblast.position.z = - (beat_position * length_per_beat)
 	misblast.position.x = (lane_index - 1) * 0.6

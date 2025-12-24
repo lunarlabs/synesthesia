@@ -147,13 +147,13 @@ func _process_job(job:Dictionary):
 			phrase_lengths[m] = 1
 		phrase_note_counts[m] = phrase_note_indices[m].size()
 		phrase_note_indices.sort()
-		var activation_length = min(job.track_reset, (job.total_measures - (m + phrase_lengths[m])))
+		var activation_length = job.track_reset
 		var target_measure = m + (phrase_lengths[m] - 1) + activation_length
 		for i in range(target_measure, m, -1):
-			if job.suppressed_measures[i]:
+			if i < job.total_measures and job.suppressed_measures[i]:
 				target_measure += 1
 				activation_length += 1
-		phrase_activation_lengths[m] = activation_length
+		phrase_activation_lengths[m] = min(job.track_reset, (job.total_measures - (m + phrase_lengths[m])))
 		if target_measure >= job.total_measures:
 			phrase_next_measures[m] = -1
 		elif measure_note_counts.keys().has(target_measure):

@@ -1,7 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://d0ooj6aih13in"]
+[gd_scene load_steps=5 format=3 uid="uid://d0ooj6aih13in"]
 
 [ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/trackshader.res" id="1_lkcd8"]
-[ext_resource type="Texture2D" uid="uid://d01hegt57ocus" path="res://addons/kenney_particle_pack/star_06.png" id="2_ri2lq"]
 [ext_resource type="PackedScene" uid="uid://b5rou2au557hc" path="res://entities/trackgeom.tscn" id="3_aeq1i"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lkcd8"]
@@ -14,59 +13,12 @@ size = Vector2(2.5, 16)
 subdivide_width = 1
 subdivide_depth = 31
 
-[sub_resource type="Curve" id="Curve_lkcd8"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.05, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CurveTexture_ri2lq"]
-curve = SubResource("Curve_lkcd8")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_aeq1i"]
-resource_local_to_scene = true
-emission_shape_offset = Vector3(0, 0, -8)
-emission_shape = 3
-emission_box_extents = Vector3(1.1, 0.02, 8)
-direction = Vector3(0, 1, 0)
-spread = 20.0
-initial_velocity_min = 1.0
-initial_velocity_max = 2.0
-gravity = Vector3(0, 0, 0)
-attractor_interaction_enabled = false
-scale_curve = SubResource("CurveTexture_ri2lq")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lkcd8"]
-transparency = 1
-blend_mode = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("2_ri2lq")
-billboard_mode = 3
-billboard_keep_scale = true
-particles_anim_h_frames = 1
-particles_anim_v_frames = 1
-particles_anim_loop = false
-
-[sub_resource type="QuadMesh" id="QuadMesh_gkcph"]
-material = SubResource("StandardMaterial3D_lkcd8")
-
 [node name="measure" type="Node3D"]
 
 [node name="track_geometry_old" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
 visible = false
 mesh = SubResource("PlaneMesh_ri2lq")
-
-[node name="activation_particles" type="GPUParticles3D" parent="."]
-emitting = false
-amount = 400
-lifetime = 0.5
-one_shot = true
-explosiveness = 1.0
-fract_delta = false
-visibility_aabb = AABB(-1.9334358, -0.1, -25.20278, 3.650324, 2.6535964, 33.272514)
-trail_lifetime = 0.01
-process_material = SubResource("ParticleProcessMaterial_aeq1i")
-draw_pass_1 = SubResource("QuadMesh_gkcph")
 
 [node name="track_geometry" parent="." instance=ExtResource("3_aeq1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00073444843, 0, -9.346008e-05)

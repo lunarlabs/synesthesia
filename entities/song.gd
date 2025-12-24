@@ -49,6 +49,7 @@ var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack  # Cache active track reference
 var _fast_slow_hide_timer: SceneTreeTimer  # Reusable timer for fast/slow label
 var _last_inactive_penalty_measure: int = -1  # Ensures only one energy/streak penalty per measure for inactive phrase misses
+var _track_marker_measures: PackedInt32Array  # Cache of marker measures for each track, updated by track._move_marker()
 var _targets: Array
 @onready var click_track_asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
@@ -80,6 +81,8 @@ func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
 
 func _ready():
+	RenderingServer.global_shader_parameter_set("danger", false )
+	RenderingServer.global_shader_parameter_set("current_track", 0)
 	if not manager_node.song_data:
 		print("No SongData assigned, aborting")
 		return
@@ -91,6 +94,7 @@ func _ready():
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
+	_track_marker_measures.resize(6)  # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.track_index = i
@@ -325,8 +329,21 @@ func _process(delta: float):
 					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
 					if current_beat >= switch_beat:
 						_switch_active_track(_autoblast_next_track)
-						_cached_active_track_node = trs[active_track] as SynRoadTrack
-#		lblDebugInfo.text = debug_info()
+						# Update cached reference after switch
+						_cached_active_track_node = tracks[active_track] as SynRoadTrack
+#					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
+			if not manager_node.autoblast and input_enabled:
+				if Input.is_action_just_pressed("note_left"):
+					_targets[0].flash()
+					_cached_active_track_node.try_blast(0)
+				elif Input.is_action_just_pressed("note_center"):
+					_targets[1].flash()
+					_cached_active_track_node.try_blast(1)
+				elif Input.is_action_just_pressed("note_right"):
+					_targets[2].flash()
+					_cached_active_track_node.try_blast(2)
+	
+	#lblDebugInfo.text = debug_info()
 
 func _set_instrument_label():
 	if tracks.size() > 0:
@@ -483,8 +500,7 @@ func _find_best_track_for_autoblast() -> int:
 		if i == active_track:
 			continue
 		
-		var track = tracks[i] as SynRoadTrack
-		var first_measure = track.marker_measure
+		var first_measure = _track_marker_measures[i]
 		
 		# Skip tracks with no future notes or whose phrase starts in the current measure or earlier
 		if first_measure <= 0 or first_measure <= curr_measure:
@@ -497,7 +513,7 @@ func _find_best_track_for_autoblast() -> int:
 			continue
 		
 		# Use precomputed phrase score value as note count (already available)
-		var note_count = track.phrase_score_value
+		var note_count = tracks[i].phrase_score_value
 		
 		var track_distance = abs(i - active_track)
 		
@@ -530,6 +546,10 @@ func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
 		if value > 0 and value < min_value:
 			min_value = value
 	return min_value
+
+func _update_track_marker_cache(track_idx: int, marker_measure: int) -> void:
+	if track_idx >= 0 and track_idx < _track_marker_measures.size():
+		_track_marker_measures[track_idx] = marker_measure
 
 func energy_change(amount:int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)

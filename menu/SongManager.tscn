@@ -10,7 +10,6 @@ script = ExtResource("1_o7bha")
 song_file = "uid://dh1lpldjfaa2x"
 difficulty = 114
 checkpoint_modifier = 1
-autoblast = true
 
 [node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
 process_mode = 3
