@@ -49,8 +49,8 @@ const FAST_RESET_NAMES = {
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
-const TIMING_WINDOWS = [0.6, 0.8, 0.4,]
-const MISS_WINDOW_OFFSET = 0.05
+const TIMING_WINDOWS = [0.06, 0.08, 0.04,]
+const MISS_WINDOW_OFFSET = 0.01
 
 @onready var load_screen: Control = $LoadScreen
 @onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer

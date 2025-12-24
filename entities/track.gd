@@ -41,9 +41,8 @@ var measure_count: int = 0
 var chunks: Array[Node3D] = []
 var furthest_chunk_loaded := -1
 var reset_measure: int = 0
-var marker_measure:int = 0
-var current_phrase_index: int = 0
-var phrase_start_measure:int = 0
+var marker_measure_idx :int = 0
+var current_phrase_index: int = -1
 var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
 var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
@@ -100,14 +99,12 @@ func _ready():
 	asp.volume_db = UNFOCUSED_VOLUME
 	asp.add_to_group("AudioPlayers")
 	asp.add_to_group("TrackAudio")
-	phrase_start_measure = track_data.notes_in_measure.keys()[0]
-	marker.position.x = track_data.phrase_marker_positions[phrase_start_measure].x
-	marker.position.z = track_data.phrase_marker_positions[phrase_start_measure].y
+	marker.position.x = track_data.phrase_marker_positions[0].x
+	marker.position.z = track_data.phrase_marker_positions[0].y
 	marker.visible = song_node.manager_node.hide_streak_hints == false
 
 @warning_ignore("unused_parameter")
 func _process(delta: float):
-
 	var current_time = song_node.time_elapsed
 	marker.position.y = lerp(1.2, 1.7, fmod(song_node.current_beat, 1))
 	if song_node.lead_in_measures >= 0 or song_node.finished:
@@ -122,11 +119,17 @@ func _process(delta: float):
 				continue
 			var note_idx = lane_notes[next_lane_note_idx]
 			var note_time = _get_note_time(note_idx)
-			if ((song_node.current_measure < reset_measure) or !is_active) and current_time > note_time:
-				#don't care about the miss window if track isn't reset or we're not active
+			if song_node.current_measure < reset_measure and current_time > note_time:
+				# Track hasn't been reset yet, but we've passed the note. Just advance the index.
 				next_note_idx_per_lane[lane_index] += 1
-				# TODO: if not active track, see if the passed note was the first note in the phrase
+			if (!is_active) and current_time > note_time:
+				# Track is not active, but we've passed the note. Mark as missed and mute the track.
+				next_note_idx_per_lane[lane_index] += 1
+				if asp.volume_db != MUTED_VOLUME:
+					asp.volume_db = MUTED_VOLUME
+				# TODO: See if the passed note was the first note in the phrase
 				# and signal inactive_phrase_missed if it was
+
 			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
 				# We're past the hit window, should be a miss but check if it was already blasted
 				var note_node = note_nodes[note_idx] as SynRoadNote
@@ -134,6 +137,8 @@ func _process(delta: float):
 				if note_node and note_node.blasted:
 					# Blasted but the index didn't advance. We're done.
 					continue
+				if asp.volume_db != MUTED_VOLUME:
+					asp.volume_db = MUTED_VOLUME
 	# Phrase-level progression based on precomputed first beat
 	# Only auto-fail if we've WELL passed the window AND haven't started hitting this phrase
 #	if reset_countdown == 0 and phrase_first_beat > 0.0 and !blasting_phrase:
@@ -291,6 +296,17 @@ func try_blast(lane_index:int):
 	# 		if reset_countdown == 0:
 	# 			_process_phrase_at_measure(song_node.current_measure() + 1)
 
+func _advance_phrase():
+	if current_phrase_index >= 0:
+		# unmark the previous phrase
+		for i in range(track_data.phrase_lengths[current_phrase_index]):
+			pass
+	current_phrase_index += 1
+	if current_phrase_index < track_data.phrase_starts.size():
+		phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
+		for i in range(track_data.phrase_lengths[current_phrase_index]):
+			pass
+
 func set_active(active: bool):
 	_active_track = active
 	rails.visible = active
@@ -348,10 +364,10 @@ class GameplayTrackData:
 	var measure_note_counts: Dictionary[int,int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
 	# For phrases, keys will be the starting measure number
-	var phrase_keys: PackedInt32Array = []
-	var phrase_lengths: Dictionary[int,int] = {}
-	var phrase_note_indices: Dictionary[int,PackedInt32Array] = {}
-	var phrase_note_counts: Dictionary[int,int] = {}
-	var phrase_marker_positions: Dictionary[int,Vector2] = {}
-	var phrase_activation_lengths: Dictionary[int,int] = {}
-	var phrase_next_measures: Dictionary[int,int] = {}
+	var phrase_starts: PackedInt32Array = []
+	var phrase_lengths: PackedInt32Array = []
+	var phrase_note_indices: Array[PackedInt32Array] = []
+	var phrase_note_counts: PackedInt32Array = []
+	var phrase_marker_positions: PackedVector2Array = []
+	var phrase_activation_lengths: PackedInt32Array = []
+	var phrase_next_measures: PackedInt32Array = []

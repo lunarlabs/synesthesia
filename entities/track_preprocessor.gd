@@ -169,13 +169,13 @@ func _process_job(job:Dictionary):
 			if next_measure >= job.total_measures:
 				phrase_next_measures[m] = -1
 		
-	result.phrase_lengths = phrase_lengths
-	result.phrase_note_indices = phrase_note_indices
-	result.phrase_note_counts = phrase_note_counts
-	result.phrase_marker_positions = phrase_marker_positions
-	result.phrase_activation_lengths = phrase_activation_lengths
-	result.phrase_next_measures = phrase_next_measures
-	result.phrase_keys = PackedInt32Array(phrase_lengths.keys())
+	result.phrase_starts = PackedInt32Array(phrase_lengths.keys())
+	result.phrase_lengths = PackedInt32Array(phrase_lengths.values())
+	result.phrase_note_indices = phrase_note_indices.values()
+	result.phrase_note_counts = PackedInt32Array(phrase_note_counts.values())
+	result.phrase_marker_positions = PackedVector2Array(phrase_marker_positions.values())
+	result.phrase_activation_lengths = PackedInt32Array(phrase_activation_lengths.values())
+	result.phrase_next_measures = PackedInt32Array(phrase_next_measures.values())
 
 	return result
 		
