@@ -51,6 +51,10 @@ static func _worker(_userdata = null):
 
 		var track_node = manager_node.song_instance.tracks[track_idx] as SynRoadTrack
 		var track_data = track_node.track_data
+		var phrase_measures: Array[int] = []
+		for i in track_data.phrase_lengths[track_node.current_phrase_index]:
+			phrase_measures.append(track_data.phrase_starts[track_node.current_phrase_index] + i)
+		print(phrase_measures)
 		if track_node.chunks[chunk_idx] != null:
 			# The chunk is already loaded
 			continue
@@ -62,9 +66,12 @@ static func _worker(_userdata = null):
 			if not manager_node.suppressed_measures[i] or (i < track_node.reset_measure):
 				var new_measure = _measure_scene.instantiate() as Node3D
 				new_measure.name = "measure_%d" % i
-				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("this_track", track_idx)
-				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("measure_tint", track_node.lane_tint)
-				new_measure.get_node("track_geometry").get_node("Cube").set_instance_shader_parameter("phrase", false)
+				new_measure.get_node("track_geometry").get_node("Cube")\
+				.set_instance_shader_parameter("this_track", track_idx)
+				new_measure.get_node("track_geometry").get_node("Cube")\
+				.set_instance_shader_parameter("measure_tint", track_node.lane_tint)
+				new_measure.get_node("track_geometry").get_node("Cube")\
+				.set_instance_shader_parameter("phrase", i in phrase_measures)
 				new_measure.position.z = manager_node.measure_positions[i]
 				new_measure.scale.z = z_scale
 				track_node.measure_nodes[i] = new_measure

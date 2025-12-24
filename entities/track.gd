@@ -42,7 +42,7 @@ var chunks: Array[Node3D] = []
 var furthest_chunk_loaded := -1
 var reset_measure: int = 0
 var marker_measure_idx :int = 0
-var current_phrase_index: int = -1
+var current_phrase_index: int = 0
 var phrase_notes: Array[SynRoadNote]
 var phrase_notes_dict: Dictionary[SynRoadNote, bool]  # O(1) lookup instead of Array.has()
 var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
@@ -129,6 +129,8 @@ func _process(delta: float):
 					asp.volume_db = MUTED_VOLUME
 				# TODO: See if the passed note was the first note in the phrase
 				# and signal inactive_phrase_missed if it was
+				if note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
+					_advance_phrase()
 
 			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
 				# We're past the hit window, should be a miss but check if it was already blasted
@@ -139,6 +141,8 @@ func _process(delta: float):
 					continue
 				if asp.volume_db != MUTED_VOLUME:
 					asp.volume_db = MUTED_VOLUME
+				if note_idx in track_data.phrase_note_indices[current_phrase_index]:
+					_advance_phrase()
 	# Phrase-level progression based on precomputed first beat
 	# Only auto-fail if we've WELL passed the window AND haven't started hitting this phrase
 #	if reset_countdown == 0 and phrase_first_beat > 0.0 and !blasting_phrase:
@@ -298,19 +302,55 @@ func try_blast(lane_index:int):
 
 func _advance_phrase():
 	if current_phrase_index >= 0:
-		# unmark the previous phrase
+		# unmark previous phrase
 		for i in range(track_data.phrase_lengths[current_phrase_index]):
-			pass
+			var measure = track_data.phrase_starts[current_phrase_index] + i
+			var cube = measure_nodes[measure].get_node("track_geometry").get_node("Cube")
+			cube.set_instance_shader_parameter("phrase", false)
+		for i in track_data.phrase_note_indices[current_phrase_index]:
+			var note = note_nodes[i]
+			note.set_phrase_note(false)
+
 	current_phrase_index += 1
-	if current_phrase_index < track_data.phrase_starts.size():
-		phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
-		for i in range(track_data.phrase_lengths[current_phrase_index]):
-			pass
+	if current_phrase_index >= track_data.phrase_starts.size():
+		# no more phrases
+		return
+
+	while (
+	current_phrase_index < track_data.phrase_starts.size()
+	and song_node.current_measure > track_data.phrase_starts[current_phrase_index]
+	):
+		# if we're past the measure the phrase starts on, keep going forward
+		current_phrase_index += 1
+
+	if current_phrase_index >= track_data.phrase_starts.size():
+		return
+
+	var first_note_index = track_data.phrase_note_indices[current_phrase_index][0]
+	if song_node.time_elapsed > track_data.note_times[first_note_index]:
+		# if we've passed the first note in the measure, move to next.
+		current_phrase_index += 1
+
+	if current_phrase_index >= track_data.phrase_starts.size():
+		# Let's do the bounds check again!
+		return
+
+	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
+
+	for i in range(track_data.phrase_lengths[current_phrase_index]):
+		var measure = track_data.phrase_starts[current_phrase_index] + i
+		var cube = measure_nodes[measure].get_node("track_geometry").get_node("Cube")
+		cube.set_instance_shader_parameter("phrase", true)
+	for i in track_data.phrase_note_indices[current_phrase_index]:
+		var note = note_nodes[i]
+		if is_active:
+			note.set_phrase_note(true)
 
 func set_active(active: bool):
 	_active_track = active
 	rails.visible = active
-	for note in phrase_notes:
+	for i in track_data.phrase_note_indices[current_phrase_index]:
+		var note = note_nodes[i]
 		note.set_phrase_note(active)
 	if !active and blasting_phrase:
 		blasting_phrase = false
@@ -355,8 +395,11 @@ func _spawn_misblast_effect(beat_position: float, lane_index: int):
 	add_child(misblast)
 
 class GameplayTrackData:
+	## A map of the notes on the track. The key is its beat, the value is its lane.
 	var note_map: Dictionary[float,int] = {}
+	## An array of the note's times, in seconds.
 	var note_times: PackedFloat32Array = []
+	## An array of the note node positions in 3D space. The Y-value corresponds to Z-position in world-space
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
 	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
 	var measures_with_notes: PackedInt32Array = []
@@ -364,8 +407,11 @@ class GameplayTrackData:
 	var measure_note_counts: Dictionary[int,int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
 	# For phrases, keys will be the starting measure number
+	## An index of phrase starting measures.
 	var phrase_starts: PackedInt32Array = []
+	## Lengths of phrases, in measures.
 	var phrase_lengths: PackedInt32Array = []
+	## The note indices in a phrase
 	var phrase_note_indices: Array[PackedInt32Array] = []
 	var phrase_note_counts: PackedInt32Array = []
 	var phrase_marker_positions: PackedVector2Array = []

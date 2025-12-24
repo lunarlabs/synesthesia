@@ -34,4 +34,4 @@ func blast(emit:bool = false):
 	ghost.show()
 
 func set_phrase_note(is_phrase: bool):
-		capsule.material_override = PHRASE_MATERIAL if is_phrase else capsule_material
+		get_node("capsule").material_override = PHRASE_MATERIAL if is_phrase else capsule_material
