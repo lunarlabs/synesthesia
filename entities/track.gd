@@ -53,7 +53,6 @@ var beats_in_measure: Dictionary  # Cache beats per measure: int -> Array[float]
 var blasting_phrase: bool = false
 var next_note_index: int = 0
 var next_note_idx_per_lane: Array[int] = [0,0,0,]
-var reset_countdown: int = 0
 var _active_track := false
 var is_active: bool:
 	get: return _active_track
@@ -62,6 +61,7 @@ var just_activated: bool = false
 @onready var asp = $Music as AudioStreamPlayer
 @onready var miss_sound = $MissSound as AudioStreamPlayer
 @onready var marker = $Marker as Node3D
+@onready var pfx = $Whoosh as GPUParticles3D
 var vol_dB: float:
 	get:
 		return asp.volume_db
@@ -69,7 +69,7 @@ var vol_dB: float:
 signal started_phrase(phrase_score_value:int, start_measure:int, measure_count:int)
 signal track_activated(phrase_score_value:int, start_measure:int)
 signal streak_broken
-signal inactive_phrase_missed(track_name:String)
+signal inactive_phrase_missed(track_index:int)
 signal active_phrase_missed
 signal note_hit(timing:float)
 
@@ -98,6 +98,7 @@ func _ready():
 	asp.volume_db = UNFOCUSED_VOLUME
 	asp.add_to_group("AudioPlayers")
 	asp.add_to_group("TrackAudio")
+	pfx.process_material.color = lane_tint
 	marker.position.x = track_data.phrase_marker_positions[0].x
 	marker.position.z = track_data.phrase_marker_positions[0].y
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[0])
@@ -132,6 +133,7 @@ func _process(delta: float):
 				# and signal inactive_phrase_missed if it was
 				if note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
 					_advance_phrase()
+					inactive_phrase_missed.emit(track_index)
 
 			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
 				# We're past the hit window, should be a miss but check if it was already blasted
@@ -161,7 +163,7 @@ func _process(delta: float):
 ##					print("Track %s missed inactive phrase starting at measure %d" % [midi_name, phrase_start_measure])
 #					inactive_phrase_missed.emit(midi_name)
 #			if marker_measure == phrase_start_measure:	
-#				_move_marker(get_first_available_measure(current_measure + 1))
+#				move_marker(get_first_available_measure(current_measure + 1))
 #			marker.visible = !song_node._manager_node.hide_streak_hints
 #			
 #			if asp.volume_db != MUTED_VOLUME:
@@ -199,7 +201,7 @@ func _process(delta: float):
 #						if reset_countdown == 0:
 #							var next_measure = song_node.current_measure() + 1
 #							_process_phrase_at_measure(next_measure)
-#							_move_marker(get_first_available_measure(next_measure))
+#							move_marker(get_first_available_measure(next_measure))
 #							marker.visible = !song_node._manager_node.hide_streak_hints
 #				
 #				next_note_idx_per_lane[lane_index] += 1
@@ -249,6 +251,13 @@ func try_blast(lane_index:int):
 	var lane_note_index = next_note_idx_per_lane[lane_index]
 	if lane_note_index >= track_data.lane_notes[lane_index].size():
 		_misblast(song_node.current_beat, lane_index)
+		if blasting_phrase:
+			phrase_notes_blasted = 0
+			asp.volume_db = MUTED_VOLUME
+			blasting_phrase = false
+			active_phrase_missed.emit()
+			streak_broken.emit()
+			_advance_phrase()
 		return
 	var target_note_index = track_data.lane_notes[lane_index][lane_note_index]
 	var target_note_time = _get_note_time(target_note_index)
@@ -264,9 +273,29 @@ func try_blast(lane_index:int):
 		asp.volume_db = BLASTING_VOLUME
 		if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
 			phrase_notes_blasted += 1
+			if !blasting_phrase:
+				started_phrase.emit(
+					track_data.phrase_note_counts[current_phrase_index],
+					track_data.phrase_starts[current_phrase_index],
+					track_data.phrase_lengths[current_phrase_index]
+				)
+				blasting_phrase = true
+				marker.hide()
 			if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
 				activate(current_phrase_index)
 				phrase_notes_blasted = 0
+				blasting_phrase = false
+				marker.visible = song_node.manager_node.hide_streak_hints == false
+	else:
+		_misblast(song_node.current_beat, lane_index)
+		if blasting_phrase:
+			phrase_notes_blasted = 0
+			asp.volume_db = MUTED_VOLUME
+			blasting_phrase = false
+			active_phrase_missed.emit()
+			streak_broken.emit()
+			_advance_phrase()
+			
 		
 		
 	# # Allow a slight early hit on the first post-reset note (reset_countdown == 1) if within window and early (time_offset > 0)
@@ -345,7 +374,7 @@ func _advance_phrase():
 	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
 	if marker_measure_index < current_phrase_index:
 		marker_measure_index = current_phrase_index
-		_move_marker(marker_measure_index)
+		move_marker(marker_measure_index)
 
 	for i in range(track_data.phrase_lengths[current_phrase_index]):
 		var measure = track_data.phrase_starts[current_phrase_index] + i
@@ -356,7 +385,13 @@ func _advance_phrase():
 		if is_active:
 			note.set_phrase_note(true)
 
-func _move_marker(measure_index: int):
+func get_measure_index_after(measure_num: int) -> int:
+	for i in range(current_phrase_index, track_data.phrase_starts.size()):
+		if track_data.phrase_starts[i] > measure_num:
+			return i
+	return -1
+
+func move_marker(measure_index: int):
 	marker.position.x = track_data.phrase_marker_positions[measure_index].x
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
@@ -371,8 +406,11 @@ func set_active(active: bool):
 		note.set_phrase_note(active)
 	if !active and blasting_phrase:
 		blasting_phrase = false
+		phrase_notes_blasted = 0
 		print("  Track %s: Deactivating while blasting phrase, breaking streak" % midi_name)
+		active_phrase_missed.emit()
 		streak_broken.emit()
+		_advance_phrase()
 	if not active and asp.volume_db != MUTED_VOLUME:
 		asp.volume_db = UNFOCUSED_VOLUME
 	# When becoming active, update to the current phrase if not in reset countdown
@@ -403,9 +441,15 @@ func _request_chunks(furthest: int):
 
 func activate(phrase_idx:int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
+	blasting_phrase = false
+	asp.volume_db = UNFOCUSED_VOLUME
+	track_activated.emit(
+		track_data.phrase_note_counts[phrase_idx],
+		phrase_end_measure
+	)
 	if reset_measure != -1:
-		var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 		for i in range(phrase_end_measure, reset_measure):
 			if measure_nodes[i]:
 				var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
@@ -414,7 +458,9 @@ func activate(phrase_idx:int):
 				for j in track_data.notes_in_measure[i]:
 					if note_nodes[j]:
 						note_nodes[j].blast(false)
+		phrase_notes_blasted = 0
 		_advance_phrase()
+		marker.visible = song_node.manager_node.hide_streak_hints == false
 	
 
 func _misblast(beat_position: float, lane_index: int):

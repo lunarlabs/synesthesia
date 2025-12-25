@@ -375,7 +375,8 @@ func _on_started_phrase(phrase_score_value:int, start_measure:int, measure_count
 	for i in tracks.size():
 		if i != active_track:
 			var track = tracks[i] as SynRoadTrack
-			track.update_marker_for_inactive(next_phrase_measure)
+			var marker_idx = track.get_measure_index_after(next_phrase_measure - 1)
+			track.move_marker(marker_idx)
 
 func _on_track_activated(note_count:int, start_measure:int):
 	_inactive_safeguard_measure = start_measure # Prevents another phrase on the same measure from breaking streak
@@ -427,35 +428,29 @@ func _on_streak_broken():
 func _on_active_phrase_missed():
 	_phrases_missed += 1
 
-func _on_inactive_phrase_missed(trk_name:String):
+func _on_inactive_phrase_missed(track_idx:int):
 	if _inactive_safeguard_measure >= current_measure: # this measure already had a phrase activation, do not penalize
 		return
-	var measure = current_measure
 
 	# Enforce only one penalty per measure for inactive phrase misses
-	if measure == _last_inactive_penalty_measure:
+	if current_measure == _last_inactive_penalty_measure:
 		return
+		
 	var active_track_node = tracks[active_track] as SynRoadTrack
 	if active_track_node.blasting_phrase:
 		return
 	for track in tracks:
 		if (track as SynRoadTrack).just_activated:
 			return
-	# If on a track counting down its reset, apply a single penalty this measure
-	if active_track_node.reset_countdown > 0:
-		_last_inactive_penalty_measure = measure
-		print("Track %s breaking streak for inactive phrase miss at measure %d (active track on reset countdown)" % [trk_name, measure])
-		_on_streak_broken()
-		return
 	# Do not penalize if the track's next phrase begins this measure or earlier
-	if active_track_node.phrase_start_measure <= measure:
+	if active_track_node.track_data.phrase_starts[active_track_node.current_phrase_index] <= current_measure:
 		return
 	# Do not penalize if there are notes in this measure (player could play them instead)
-	var active_track_notes = active_track_node.get_notes_in_measure(measure)
-	if not active_track_notes.is_empty():
+	var has_notes_in_measure = current_measure in active_track_node.track_data.notes_in_measure
+	if has_notes_in_measure:
 		return
-	_last_inactive_penalty_measure = measure
-	print("Track %s breaking streak for inactive phrase miss at measure %d" % [name, measure])
+	_last_inactive_penalty_measure = current_measure
+#	print("Track %s breaking streak for inactive phrase miss at measure %d" % [name, current_measure])
 	_on_streak_broken()
 
 func _switch_active_track(new_active_track:int, use_tween: bool = true):
