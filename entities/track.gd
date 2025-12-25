@@ -28,7 +28,6 @@ var song_node: SynRoadSong
 var track_index: int = -1
 var track_data: GameplayTrackData
 var lane_tint: Color
-var midi_name: String
 var audio_file: String
 var instrument: int
 var instrument_note_material: StandardMaterial3D
@@ -69,7 +68,7 @@ var vol_dB: float:
 signal started_phrase(phrase_score_value:int, start_measure:int, measure_count:int)
 signal track_activated(phrase_score_value:int, start_measure:int)
 signal streak_broken
-signal inactive_phrase_missed(track_index:int)
+signal inactive_phrase_missed()
 signal active_phrase_missed
 signal note_hit(timing:float)
 
@@ -102,6 +101,7 @@ func _ready():
 	marker.position.x = track_data.phrase_marker_positions[0].x
 	marker.position.z = track_data.phrase_marker_positions[0].y
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[0])
+	song_node._update_track_reset_cache(track_index, track_data.phrase_starts[0])
 	reset_measure = track_data.phrase_starts[0]
 	marker.visible = song_node.manager_node.hide_streak_hints == false
 
@@ -131,9 +131,10 @@ func _process(delta: float):
 					asp.volume_db = MUTED_VOLUME
 				# TODO: See if the passed note was the first note in the phrase
 				# and signal inactive_phrase_missed if it was
-				if note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
+				if current_phrase_index < track_data.phrase_starts.size() \
+				and note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
 					_advance_phrase()
-					inactive_phrase_missed.emit(track_index)
+					inactive_phrase_missed.emit()
 
 			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
 				# We're past the hit window, should be a miss but check if it was already blasted
@@ -145,6 +146,8 @@ func _process(delta: float):
 				if asp.volume_db != MUTED_VOLUME:
 					asp.volume_db = MUTED_VOLUME
 				if note_idx in track_data.phrase_note_indices[current_phrase_index]:
+					active_phrase_missed.emit()
+					streak_broken.emit()
 					_advance_phrase()
 	# Phrase-level progression based on precomputed first beat
 	# Only auto-fail if we've WELL passed the window AND haven't started hitting this phrase
@@ -344,7 +347,7 @@ func _advance_phrase():
 		for i in track_data.phrase_note_indices[current_phrase_index]:
 			var note = note_nodes[i]
 			note.set_phrase_note(false)
-
+	phrase_notes_blasted = 0
 	current_phrase_index += 1
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# no more phrases
@@ -401,13 +404,14 @@ func move_marker(measure_index: int):
 func set_active(active: bool):
 	_active_track = active
 	rails.visible = active
-	for i in track_data.phrase_note_indices[current_phrase_index]:
-		var note = note_nodes[i]
-		note.set_phrase_note(active)
+	if current_phrase_index < track_data.phrase_starts.size():
+		for i in track_data.phrase_note_indices[current_phrase_index]:
+			var note = note_nodes[i]
+			note.set_phrase_note(active)
 	if !active and blasting_phrase:
 		blasting_phrase = false
 		phrase_notes_blasted = 0
-		print("  Track %s: Deactivating while blasting phrase, breaking streak" % midi_name)
+		print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
 		active_phrase_missed.emit()
 		streak_broken.emit()
 		_advance_phrase()
@@ -449,18 +453,19 @@ func activate(phrase_idx:int):
 		track_data.phrase_note_counts[phrase_idx],
 		phrase_end_measure
 	)
-	if reset_measure != -1:
-		for i in range(phrase_end_measure, reset_measure):
-			if measure_nodes[i]:
-				var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
-				cube.hide()
-			if i in track_data.notes_in_measure.keys():
-				for j in track_data.notes_in_measure[i]:
-					if note_nodes[j]:
-						note_nodes[j].blast(false)
-		phrase_notes_blasted = 0
-		_advance_phrase()
-		marker.visible = song_node.manager_node.hide_streak_hints == false
+	var activation_end_measure = reset_measure if reset_measure != -1 else song_node.total_measures
+	for i in range(phrase_end_measure, activation_end_measure):
+		if measure_nodes[i]:
+			var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
+			cube.hide()
+		if i in track_data.notes_in_measure.keys():
+			for j in track_data.notes_in_measure[i]:
+				if note_nodes[j]:
+					note_nodes[j].blast(false)
+	phrase_notes_blasted = 0
+	song_node._update_track_reset_cache(track_index, reset_measure)
+	_advance_phrase()
+	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 	
 
 func _misblast(beat_position: float, lane_index: int):

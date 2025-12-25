@@ -50,6 +50,7 @@ var _cached_active_track_node: SynRoadTrack  # Cache active track reference
 var _fast_slow_hide_timer: SceneTreeTimer  # Reusable timer for fast/slow label
 var _last_inactive_penalty_measure: int = -1  # Ensures only one energy/streak penalty per measure for inactive phrase misses
 var _track_marker_measures: PackedInt32Array  # Cache of marker measures for each track, updated by track._move_marker()
+var _track_reset_measures: PackedInt32Array  # Cache of reset measures for each track, updated by track.activate()
 var _targets: Array
 @onready var click_track_asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
@@ -95,6 +96,7 @@ func _ready():
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	_track_marker_measures.resize(6)  # Initialize cache for 6 instrument tracks
+	_track_reset_measures.resize(6)  # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.track_index = i
@@ -428,7 +430,7 @@ func _on_streak_broken():
 func _on_active_phrase_missed():
 	_phrases_missed += 1
 
-func _on_inactive_phrase_missed(track_idx:int):
+func _on_inactive_phrase_missed():
 	if _inactive_safeguard_measure >= current_measure: # this measure already had a phrase activation, do not penalize
 		return
 
@@ -545,6 +547,10 @@ func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
 func _update_track_marker_cache(track_idx: int, marker_measure: int) -> void:
 	if track_idx >= 0 and track_idx < _track_marker_measures.size():
 		_track_marker_measures[track_idx] = marker_measure
+
+func _update_track_reset_cache(track_idx: int, reset_measure: int) -> void:
+	if track_idx >= 0 and track_idx < _track_reset_measures.size():
+		_track_reset_measures[track_idx] = reset_measure
 
 func energy_change(amount:int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
