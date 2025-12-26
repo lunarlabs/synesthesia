@@ -61,6 +61,7 @@ var just_activated: bool = false
 @onready var miss_sound = $MissSound as AudioStreamPlayer
 @onready var marker = $Marker as Node3D
 @onready var pfx = $Whoosh as GPUParticles3D
+var rails: MultiMeshInstance3D
 var vol_dB: float:
 	get:
 		return asp.volume_db
@@ -72,23 +73,27 @@ signal inactive_phrase_missed()
 signal active_phrase_missed
 signal note_hit(timing:float)
 
-@onready var rails = $RailMaster
-
 func _enter_tree():
+	rails = get_node("MultiMesh") as MultiMeshInstance3D
 	lane_tint = INSTRUMENTS[instrument][1] as Color
 	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
+	rails.material_override = instrument_ghost_material
 	song_node = get_parent() as SynRoadSong
+	rails.multimesh.instance_count = song_node.total_measures * 2
 	length_per_beat = song_node.length_per_beat
 	chunks.resize(song_node.manager_node.chunk_count)
 	measure_nodes.resize(song_node.total_measures)
 	note_nodes.resize(track_data.note_map.keys().size())
-	for i in range(song_node.total_measures):
-		var new_rail = RAIL_SCENE.instantiate() as Node3D
-		new_rail.position.z = -(BEATS_PER_MEASURE * length_per_beat) * i
-		new_rail.scale.z = length_per_beat / STANDARD_LENGTH_PER_BEAT
-		new_rail.mat = instrument_ghost_material
-		get_node("RailMaster").add_child(new_rail)
+	for i in range(song_node.total_measures * 2):
+		var rail_transform = Transform3D.IDENTITY
+		@warning_ignore("integer_division")
+		var z_pos = -(BEATS_PER_MEASURE * length_per_beat) * (int(i / 2) + 0.5)
+		var x_pos = 1.17 if i % 2 == 0 else -1.17
+		rail_transform.origin = Vector3(x_pos, -0.25, z_pos)
+		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
+		rail_transform.basis = rail_transform.basis.scaled(Vector3(1.0, 1.0, scale_z))
+		rails.multimesh.set_instance_transform(i, rail_transform)
 	_request_chunks(CHUNK_LOAD_RANGE_FORWARD)
 
 func _ready():
@@ -377,7 +382,7 @@ func _advance_phrase():
 		return
 
 	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
-	if marker_measure_index < current_phrase_index:
+	if marker_measure_index != -1 and marker_measure_index < current_phrase_index:
 		marker_measure_index = current_phrase_index
 		move_marker(marker_measure_index)
 

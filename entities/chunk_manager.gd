@@ -1,16 +1,16 @@
-class_name ChunkManager
+extends Node
 
-static var _mutex: Mutex = Mutex.new()
-static var _semaphore: Semaphore = Semaphore.new()
-static var _thread: Thread
-static var _pending_jobs: Array[Vector2i] = []
-static var _exit_thread := false
-static var _running := false
-static var _note_scene: PackedScene
-static var _measure_scene: PackedScene
-static var manager_node: SynRoadSongManager
+var _mutex: Mutex = Mutex.new()
+var _semaphore: Semaphore = Semaphore.new()
+var _thread: Thread
+var _pending_jobs: Array[Vector2i] = []
+var _exit_thread := false
+var _running := false
+var _note_scene: PackedScene
+var _measure_scene: PackedScene
+var manager_node: SynRoadSongManager
 
-static func start_if_needed():
+func start_if_needed():
 	if _running:
 		return
 	_running = true
@@ -18,7 +18,7 @@ static func start_if_needed():
 	_thread = Thread.new()
 	_thread.start(_worker)
 
-static func stop():
+func stop():
 	_mutex.lock()
 	_exit_thread = true
 	_mutex.unlock()
@@ -26,7 +26,7 @@ static func stop():
 	_thread.wait_to_finish()
 	_pending_jobs.clear()
 
-static func _worker(_userdata = null):
+func _worker(_userdata = null):
 	if _note_scene == null:
 		_note_scene = load("res://entities/note.tscn")
 	if _measure_scene == null:
@@ -96,7 +96,7 @@ static func _worker(_userdata = null):
 	_running = false
 	return
 
-static func request_chunk(track: int, chunk: int):
+func request_chunk(track: int, chunk: int):
 	assert(manager_node, "No SongManager node was assigned to ChunkManager")
 #	print("Track %d requests chunk %d" % [track, chunk])
 	_mutex.lock()

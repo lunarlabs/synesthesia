@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 SongCatalog="*res://menu/song_catalog.gd"
 SessionManager="*res://menu/session_manager.gd"
+ChunkManager="*res://entities/chunk_manager.gd"
 
 [display]
 

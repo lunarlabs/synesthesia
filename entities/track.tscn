@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://l1yr652soejg"]
+[gd_scene load_steps=14 format=3 uid="uid://l1yr652soejg"]
 
 [ext_resource type="Script" uid="uid://dmuke66cpgwmx" path="res://entities/track.gd" id="1_q435s"]
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
@@ -53,6 +53,14 @@ distance_fade_min_distance = 656.41
 [sub_resource type="QuadMesh" id="QuadMesh_24ful"]
 material = SubResource("StandardMaterial3D_cidh0")
 
+[sub_resource type="BoxMesh" id="BoxMesh_tmkqs"]
+size = Vector3(0.1, 0.7, 16)
+subdivide_depth = 16
+
+[sub_resource type="MultiMesh" id="MultiMesh_3q0ve"]
+transform_format = 1
+mesh = SubResource("BoxMesh_tmkqs")
+
 [node name="Track" type="Node3D"]
 script = ExtResource("1_q435s")
 
@@ -73,9 +81,6 @@ visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 mesh = SubResource("PrismMesh_p7e7j")
 
-[node name="RailMaster" type="Node3D" parent="."]
-visible = false
-
 [node name="Whoosh" type="GPUParticles3D" parent="."]
 emitting = false
 amount = 300
@@ -83,3 +88,7 @@ lifetime = 0.5
 visibility_aabb = AABB(-1.995636, -2.1838531, -1.099652, 3.984741, 6.682971, 2.1992311)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")
 draw_pass_1 = SubResource("QuadMesh_24ful")
+
+[node name="MultiMesh" type="MultiMeshInstance3D" parent="."]
+visible = false
+multimesh = SubResource("MultiMesh_3q0ve")
