@@ -150,7 +150,8 @@ func _process(delta: float):
 					continue
 				if asp.volume_db != MUTED_VOLUME:
 					asp.volume_db = MUTED_VOLUME
-				if note_idx in track_data.phrase_note_indices[current_phrase_index]:
+				if current_phrase_index < track_data.phrase_note_indices.size()\
+				and note_idx in track_data.phrase_note_indices[current_phrase_index]:
 					active_phrase_missed.emit()
 					streak_broken.emit()
 					_advance_phrase()
