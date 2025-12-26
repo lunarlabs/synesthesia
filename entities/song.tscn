@@ -587,6 +587,7 @@ width = 300.0
 
 [node name="Camera3D" type="Camera3D" parent="Playhead"]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2.25)
+far = 200.0
 
 [node name="CountIn" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -5.2453663e-07, 1, 0, -12, -4.371139e-08, 0, 0, 0)
