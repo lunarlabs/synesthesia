@@ -10,6 +10,8 @@ var _note_scene: PackedScene
 var _measure_scene: PackedScene
 var manager_node: SynRoadSongManager
 
+signal queue_empty
+
 func start_if_needed():
 	if _running:
 		return
@@ -43,6 +45,7 @@ func _worker(_userdata = null):
 		
 		_mutex.lock()
 		var current_job = _pending_jobs.pop_front()
+		var jobs_remaining = _pending_jobs.size()
 		_mutex.unlock()
 		print("Chunk worker thread working on " + str(current_job))
 
@@ -92,6 +95,9 @@ func _worker(_userdata = null):
 		
 		track_node.chunks[chunk_idx] = chunk
 		track_node.add_child.call_deferred(chunk)
+
+		if jobs_remaining == 0:
+			queue_empty.emit()
 
 	_running = false
 	return

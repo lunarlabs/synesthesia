@@ -184,6 +184,9 @@ func _ready() -> void:
 	song_instance.song_finished.connect(_on_song_finished)
 	add_child.call_deferred(song_instance)
 
+func _exit_tree() -> void:
+	ChunkManager.stop()
+
 func _populate_load_screen() -> void:
 	lbl_difficulty.text = DIFFICULTY_NAMES[difficulty]
 	lbl_title.text = song_data.long_title
