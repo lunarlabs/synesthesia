@@ -438,22 +438,16 @@ func _on_inactive_phrase_missed():
 	if current_measure == _last_inactive_penalty_measure:
 		return
 		
+	# If the active track is reset and there are notes in the current measure, do not penalize
 	var active_track_node = tracks[active_track] as SynRoadTrack
-	if active_track_node.blasting_phrase:
-		return
-	for track in tracks:
-		if (track as SynRoadTrack).just_activated:
+	if active_track_node.reset_measure <= current_measure:
+		var notes_in_measure = active_track_node.get_note_count_in_measure(current_measure)
+		if notes_in_measure > 0:
 			return
-	# Do not penalize if the track's next phrase begins this measure or earlier
-	if active_track_node.track_data.phrase_starts[active_track_node.current_phrase_index] <= current_measure:
-		return
-	# Do not penalize if there are notes in this measure (player could play them instead)
-	var has_notes_in_measure = current_measure in active_track_node.track_data.notes_in_measure
-	if has_notes_in_measure:
-		return
+	
 	_last_inactive_penalty_measure = current_measure
-#	print("Track %s breaking streak for inactive phrase miss at measure %d" % [name, current_measure])
 	_on_streak_broken()
+	
 
 func _switch_active_track(new_active_track:int, use_tween: bool = true):
 	if new_active_track == active_track:

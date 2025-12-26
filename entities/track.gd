@@ -351,6 +351,7 @@ func _advance_phrase():
 	current_phrase_index += 1
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# no more phrases
+		move_marker(-1)
 		return
 
 	while (
@@ -362,6 +363,7 @@ func _advance_phrase():
 		current_phrase_index += 1
 
 	if current_phrase_index >= track_data.phrase_starts.size():
+		move_marker(-1)
 		return
 
 	var first_note_index = track_data.phrase_note_indices[current_phrase_index][0]
@@ -371,7 +373,7 @@ func _advance_phrase():
 
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# Let's do the bounds check again!
-		marker.hide()
+		move_marker(-1)
 		return
 
 	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
@@ -394,7 +396,16 @@ func get_measure_index_after(measure_num: int) -> int:
 			return i
 	return -1
 
+func get_note_count_in_measure(measure_num: int) -> int:
+	if track_data.measure_note_counts.has(measure_num):
+		return track_data.measure_note_counts[measure_num]
+	return 0
+
 func move_marker(measure_index: int):
+	if measure_index < 0 or measure_index >= track_data.phrase_marker_positions.size():
+		song_node._update_track_marker_cache(track_index, -1)
+		marker.hide()
+		return
 	marker.position.x = track_data.phrase_marker_positions[measure_index].x
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
