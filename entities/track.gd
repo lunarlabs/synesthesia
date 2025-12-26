@@ -279,6 +279,8 @@ func try_blast(lane_index:int):
 		note_node.blast(true)
 		note_hit.emit(time_offset)
 		asp.volume_db = BLASTING_VOLUME
+		if current_phrase_index > track_data.phrase_note_indices.size():
+			return
 		if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
 			phrase_notes_blasted += 1
 			if !blasting_phrase:
@@ -361,8 +363,8 @@ func _advance_phrase():
 
 	while (
 	current_phrase_index < track_data.phrase_starts.size()
-	and song_node.current_measure > track_data.phrase_starts[current_phrase_index]
-	or track_data.phrase_starts[current_phrase_index] < reset_measure
+	and (song_node.current_measure > track_data.phrase_starts[current_phrase_index]
+	or track_data.phrase_starts[current_phrase_index] < reset_measure)
 	):
 		# if we're past the measure the phrase starts on, keep going forward
 		current_phrase_index += 1
