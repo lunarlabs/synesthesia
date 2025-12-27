@@ -289,7 +289,6 @@ layout_mode = 2
 base_color = Color(0.125, 0.2, 0.1, 1)
 selected_color = Color(0.4, 1, 0.2, 1)
 difficulty_name = "DIFF_96"
-difficulty_value = 0
 
 [node name="IntermediateDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
@@ -298,7 +297,6 @@ layout_mode = 2
 base_color = Color(0.029599994, 0.18845335, 0.37, 1)
 selected_color = Color(0.07999998, 0.5093334, 1, 1)
 difficulty_name = "DIFF_102"
-difficulty_value = 0
 
 [node name="AdvancedDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
@@ -307,7 +305,6 @@ layout_mode = 2
 base_color = Color(0.4, 0.25626668, 0.007999993, 1)
 selected_color = Color(1, 0.64066666, 0.01999998, 1)
 difficulty_name = "DIFF_108"
-difficulty_value = 0
 
 [node name="ExpertDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
@@ -316,7 +313,6 @@ layout_mode = 2
 base_color = Color(0.31, 0.062000014, 0, 1)
 selected_color = Color(0.81, 0.16200005, 0, 1)
 difficulty_name = "DIFF_114"
-difficulty_value = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="LeftSide"]
 layout_mode = 2

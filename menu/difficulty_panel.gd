@@ -3,7 +3,7 @@ extends Control
 @export_color_no_alpha var base_color = Color(0.25,0.25,0.25)
 @export_color_no_alpha var selected_color = Color(1,1,1)
 @export var difficulty_name: String = "Difficulty"
-@export_range(0, 10, 1) var difficulty_value: int = 10
+@export_range(0, 11, 0.1) var difficulty_value: float = 10
 
 @onready var name_lbl = $DifficultyNameLabel
 @onready var value_lbl = $DifficultyValueLabel
@@ -26,7 +26,7 @@ func _ready():
 	
 func update():
 	name_lbl.text = difficulty_name
-	value_lbl.text = str(difficulty_value) if difficulty_value > 0 else "--"
+	value_lbl.text = "%.1f" % difficulty_value if difficulty_value > 0 else "--"
 	if difficulty_value <= 0:
 		unselected_tex.modulate = Color(0.25, 0.25, 0.25)
 		name_lbl.modulate = Color(0.5,0.5,0.5)

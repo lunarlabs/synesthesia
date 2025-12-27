@@ -1,7 +1,6 @@
 extends Control
 
 const SONG_MANAGER_SCENE = preload("res://menu/SongManager.tscn")
-const CATALOG_JSON_PATH = "user://song_catalog.json"
 const DIFFICULTY_VALUES = {
 	96: "Beginner",
 	102: "Intermediate",
@@ -84,27 +83,21 @@ var hi_speed_index: int = 0  # Default to 1.0x
 # UI References
 
 func _ready():
+	SongCatalog.load_entries_from_json()
 	var initialized = SongCatalog.is_initialized
 	await get_tree().process_frame  # Wait a frame for UI to initialize
 	if not initialized:
-		%LoadingContainer.visible = true
-		if FileAccess.file_exists(CATALOG_JSON_PATH):
-			print("Loading song catalog from disk...")
-			var error = SongCatalog.load_from_json(CATALOG_JSON_PATH)
-			if error:
-				print("Failed to load catalog from disk, reloading...")
-				SongCatalog.clear_catalog()
-				_load_async()
-				SongCatalog.save_to_json(CATALOG_JSON_PATH)
-		else:
-			await _load_async()
-			SongCatalog.save_to_json(CATALOG_JSON_PATH)
+		SongCatalog.scan_for_songs()
 		%LoadingContainer.visible = false
 		if SongCatalog.catalog.is_empty():
 			print("No valid songs found!")
 			push_error("No valid songs found!")
 			%PlayButton.disabled = true
 			return
+		else:
+			print("Song catalog generated with %d songs." % SongCatalog.catalog.size())
+			SongCatalog.save_difficulty_details_to_json()
+			SongCatalog.save_entries_to_json()
 	
 #	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
@@ -177,7 +170,7 @@ func _select_song(index: int):
 
 	anim.play("SongSelected")
 
-func _update_difficulty_panels(entry: SynRoadSongCatalog.SongEntry):
+func _update_difficulty_panels(entry: SongCatalog.SongEntry):
 	var panels = {
 		96: %BeginnerDifficulty,
 		102: %IntermediateDifficulty,
@@ -191,8 +184,8 @@ func _update_difficulty_panels(entry: SynRoadSongCatalog.SongEntry):
 	
 	for diff in [96, 102, 108, 114]:
 		var panel = panels[diff]
-		var rating = entry.difficulty_ratings.get(diff, 0)
-		panel.difficulty_value = int(rating)
+		var rating = entry.difficulty_ratings.get(diff, 0.0)
+		panel.difficulty_value = rating
 		panel.selected = (diff == selected_difficulty)
 		panel.update()
 	

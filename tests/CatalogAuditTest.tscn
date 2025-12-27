@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dy71sxg7doa3f"]
+
+[ext_resource type="Script" uid="uid://cos8ip5nbxb05" path="res://tests/catalog_audit_test.gd" id="1_xqs1k"]
+
+[node name="CatalogAuditTest" type="Node"]
+script = ExtResource("1_xqs1k")

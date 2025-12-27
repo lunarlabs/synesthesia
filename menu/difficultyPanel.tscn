@@ -27,7 +27,7 @@ base_font = ExtResource("1_xcwxj")
 variation_opentype = {
 1129599571: 0,
 1936486004: -10,
-2003072104: 200,
+2003072104: 155,
 2003265652: 600
 }
 opentype_features = {

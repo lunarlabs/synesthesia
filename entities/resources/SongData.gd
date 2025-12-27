@@ -121,6 +121,10 @@ var seconds_per_beat: float:
 		push_warning("No tempo event found in MIDI data.")
 		return 0.5  # Default seconds per beat if not found
 
+var total_measures: int:
+	get:
+		return lead_in_measures + playable_measures
+
 ## Returns a dictionary mapping timestamps to note values for a specific track and difficulty.
 ##
 ## This function retrieves the note mapping for a given track at a specified difficulty level.
