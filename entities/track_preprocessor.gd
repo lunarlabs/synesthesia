@@ -9,22 +9,29 @@ var running := false
 const LANE_GAP := 0.6
 
 func queue_job(
-	manager: SynRoadSongManager,
 	song_track_index: int,
 	events: Array,
-	ticks_per_beat:int,):
+	ticks_per_beat:int,
+	difficulty:int,
+	chunk_count:int,
+	suppressed_measures:Array,
+	track_reset:int,
+	seconds_per_beat:float,
+	length_per_beat:float,
+	total_measures:int
+	):
 	mutex.lock()
 	pending_jobs.append({
 		"song_track_index": song_track_index,
 		"events": events,
 		"ticks_per_beat": ticks_per_beat,
-		"difficulty_offset": manager.difficulty,
-		"chunk_count": manager.chunk_count,
-		"suppressed_measures": manager.suppressed_measures,
-		"track_reset": manager.fast_track_reset,
-		"seconds_per_beat": manager.seconds_per_beat,
-		"length_per_beat": manager.length_per_beat,
-		"total_measures": manager.total_measures,
+		"difficulty_offset": difficulty,
+		"chunk_count": chunk_count,
+		"suppressed_measures": suppressed_measures,
+		"track_reset": track_reset,
+		"seconds_per_beat": seconds_per_beat,
+		"length_per_beat": length_per_beat,
+		"total_measures": total_measures,
 	})
 	mutex.unlock()
 	_start_if_needed()

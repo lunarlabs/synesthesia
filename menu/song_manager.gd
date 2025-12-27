@@ -223,7 +223,8 @@ func _fetch_track_data() -> void:
 		if midi_track_idx == -1:
 			push_error("Track name %s not found in MIDI data." % track_info.midi_track_name)
 			continue
-		preprocessor.queue_job(self, i, midi_data.tracks[midi_track_idx].events, ticks_per_beat)
+		preprocessor.queue_job(i, midi_data.tracks[midi_track_idx].events, ticks_per_beat, difficulty, chunk_count, suppressed_measures, fast_track_reset, seconds_per_beat, length_per_beat, total_measures)
+
 
 func _apply_preprocessor_results(results: Array) -> void:
 	for result in results:

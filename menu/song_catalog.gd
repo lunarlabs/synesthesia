@@ -1,9 +1,28 @@
-class_name SynRoadSongCatalog
 extends Node
 
 var _song_catalog: Array[SongEntry] = []
+var _mutex: Mutex = Mutex.new()
 var _preprocessor: SynRoadCatalogPreprocessor = SynRoadCatalogPreprocessor.new()
 var _async_reload_in_progress: bool = false
+var _loaded_data: Array = []
+
+const CATALOG_JSON_PATH = "user://song_catalog.json"
+const SONG_DIRECTORY_PATH = "res://song/"
+const DIFFICULTY_LEVELS = [96, 102, 108, 114]  # MIDI note offsets for Easy, Medium, Hard, Expert
+const DIFFICULTY_NAMES = {
+	96: "Easy",
+	102: "Medium",
+	108: "Hard",
+	114: "Expert"
+}
+const INSTRUMENT_NAMES = [
+	"drums",
+	"bass",
+	"guitar",
+	"synth",
+	"vocals",
+	"fx",
+]
 
 var is_initialized: bool:
 	get:
@@ -12,6 +31,7 @@ var catalog:
 	get:
 		return _song_catalog
 
+# Represents a single song entry in the catalog.
 class SongEntry:
 	var file_path: String
 	var title: String
@@ -20,11 +40,20 @@ class SongEntry:
 	var genre: String
 	var bpm: float
 	var available_difficulties: Array
-	var note_counts: Dictionary
-	var note_densities: Dictionary
-	var difficulty_ratings: Dictionary
+	var instruments: PackedStringArray
+	var note_counts: Dictionary[int, int]
+	var difficulty_ratings: Dictionary[int, int]
+	var detailed_difficulty_info: Dictionary[int, DetailedDifficultyInfo]
 	var files_valid: bool
 	var error_message: String = ""
+
+# For each difficulty in each song, detailed info. Array index is instrument track index.
+class DetailedDifficultyInfo:
+	var track_note_counts: PackedInt32Array
+	var measure_note_counts: Array[PackedInt32Array]
+	var phrase_raw_difficulties: Array[PackedFloat32Array]
+	var track_avg_raw_difficulties: PackedFloat32Array
+	var avg_raw_difficulty: float
 
 static func _to_json(entry: SongEntry) -> Dictionary:
 	var dict := {
@@ -36,7 +65,6 @@ static func _to_json(entry: SongEntry) -> Dictionary:
 		"bpm": entry.bpm,
 		"available_difficulties": entry.available_difficulties,
 		"note_counts": entry.note_counts,
-		"note_densities": entry.note_densities,
 		"difficulty_ratings": entry.difficulty_ratings,
 		"files_valid": entry.files_valid,
 		"error_message": entry.error_message
@@ -150,9 +178,44 @@ func await_catalog_ready() -> Array[SongEntry]:
 	_song_catalog.sort_custom(func(a, b): return a.title < b.title)
 	return _song_catalog
 
-func _scan_for_songs() -> Array[SongEntry]:
+func _scan_for_songs():
 	print("Obsolete synchronous song scan called; use async variant instead.")
-	return []
+	_loaded_data = []
+	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
+	if not dir:
+		push_error("Failed to open song directory.")
+		return
+
+	dir.list_dir_begin()
+	var folder_name = dir.get_next()
+
+	while folder_name != "":
+		if dir.current_is_dir() and not folder_name.begins_with("."):
+			print("Found song folder: %s" % folder_name)
+			var song_resource_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".tres"
+			if FileAccess.file_exists(song_resource_path):
+				var song_data = ResourceLoader.load(song_resource_path) as SongData
+				if song_data:
+					var midi_data = song_data.midi_data
+					if not midi_data:
+						print("Failed to load MIDI data for song: %s" % song_resource_path)
+					else:
+						_loaded_data.append([folder_name, song_data, midi_data])
+						print("Queued song for preprocessing: %s" % song_resource_path)
+				else:
+					print("Failed to load SongData resource at: %s" % song_resource_path)
+			else:
+				print("No resource file found at expected path: %s" % song_resource_path)
+				push_warning("Missing resource file for song in folder: %s" % folder_name)
+		folder_name = dir.get_next()
+
+	dir.list_dir_end()
+	_song_catalog = []
+	_song_catalog.resize(_loaded_data.size())
+	var task_id = WorkerThreadPool.add_group_task(_process_song_data, _loaded_data.size())
+	print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
+	WorkerThreadPool.wait_for_group_task_completion(task_id)
+	return
 	# var song_entries: Array[SongEntry] = []
 	# var song_dir := "res://song/"
 	# var dir = DirAccess.open(song_dir)
@@ -182,6 +245,35 @@ func _scan_for_songs() -> Array[SongEntry]:
 	# song_entries.sort_custom(func(a, b): return a.song_data.title < b.song_data.title)
 
 	# return song_entries
+
+func _process_song_data(entry_idx: int):
+	var result := SongEntry.new()
+	var loaded = _loaded_data[entry_idx]
+	var folder_name: String = loaded[0]
+	var song_data: SongData = loaded[1]
+	var midi_data: MidiData = loaded[2]
+	song_data._midi_data = midi_data  # Ensure MIDI data is set
+
+	result.file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+	result.title = song_data.title
+	result.long_title = song_data.long_title
+	result.artist = song_data.artist
+	result.genre = song_data.genre
+	result.bpm = song_data.bpm
+
+	var midi_track_indices = song_data.song_track_locations.values()
+	var difficulty_maps := {}
+	for i in DIFFICULTY_LEVELS:
+		var track_map: Array[Dictionary] = []
+		var total_note_count := 0
+		for track_idx in midi_track_indices:
+			var note_map = song_data.get_note_map_from_track(track_idx, i)
+			total_note_count += note_map.size()
+			track_map.append(note_map)
+		if total_note_count > 0:
+			difficulty_maps[i] = track_map
+	
+	var detailed_diffs_info: Dictionary[int, DetailedDifficultyInfo] = {}
 
 # Async variant: queues jobs and returns immediately; call await_catalog_ready() to finish
 func _scan_for_songs_async() -> void:
