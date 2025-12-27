@@ -179,7 +179,6 @@ func await_catalog_ready() -> Array[SongEntry]:
 	return _song_catalog
 
 func _scan_for_songs():
-	print("Obsolete synchronous song scan called; use async variant instead.")
 	_loaded_data = []
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
@@ -216,35 +215,6 @@ func _scan_for_songs():
 	print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
 	WorkerThreadPool.wait_for_group_task_completion(task_id)
 	return
-	# var song_entries: Array[SongEntry] = []
-	# var song_dir := "res://song/"
-	# var dir = DirAccess.open(song_dir)
-	# if not dir:
-	# 	push_error("Failed to open song directory.")
-	# 	return song_entries
-
-	# dir.list_dir_begin()
-	# var folder_name = dir.get_next()
-
-	# while folder_name != "":
-	# 	if dir.current_is_dir() and not folder_name.begins_with("."):
-	# 		print("Found song folder: %s" % folder_name)
-	# 		var song_resource_path = song_dir + folder_name + "/" + folder_name + ".tres"
-	# 		if FileAccess.file_exists(song_resource_path):
-	# 			_preprocessor.queue_job(song_resource_path)
-	# 		else:
-	# 			print("No resource file found at expected path: %s" % song_resource_path)
-	# 			push_warning("Missing resource file for song in folder: %s" % folder_name)
-	# 	folder_name = dir.get_next()
-	
-	# dir.list_dir_end()
-	# _preprocessor.wait_for_all()
-	# var results = _preprocessor.take_completed()
-	# song_entries = _apply_preprocessor_results(results)
-
-	# song_entries.sort_custom(func(a, b): return a.song_data.title < b.song_data.title)
-
-	# return song_entries
 
 func _process_song_data(entry_idx: int):
 	var result := SongEntry.new()
@@ -260,6 +230,10 @@ func _process_song_data(entry_idx: int):
 	result.artist = song_data.artist
 	result.genre = song_data.genre
 	result.bpm = song_data.bpm
+	var instruments: Array[String]
+	var track_count = song_data.tracks.size()
+	for i in track_count:
+		instruments.append(INSTRUMENT_NAMES[song_data.tracks[i].instrument])
 
 	var midi_track_indices = song_data.song_track_locations.values()
 	var difficulty_maps := {}
@@ -272,8 +246,17 @@ func _process_song_data(entry_idx: int):
 			track_map.append(note_map)
 		if total_note_count > 0:
 			difficulty_maps[i] = track_map
-	
+	result.available_difficulties = difficulty_maps.keys()
+
 	var detailed_diffs_info: Dictionary[int, DetailedDifficultyInfo] = {}
+	for diff in difficulty_maps.keys():
+		var ddi := DetailedDifficultyInfo.new()
+		ddi.track_note_counts.resize(track_count)
+		ddi.measure_note_counts.resize(track_count)
+		ddi.phrase_raw_difficulties.resize(track_count)
+		ddi.track_avg_raw_difficulties.resize(track_count)
+		for i in range(track_count):
+			pass
 
 # Async variant: queues jobs and returns immediately; call await_catalog_ready() to finish
 func _scan_for_songs_async() -> void:
