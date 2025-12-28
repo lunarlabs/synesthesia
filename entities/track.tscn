@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dmuke66cpgwmx" path="res://entities/track.gd" id="1_q435s"]
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
-[ext_resource type="Texture2D" uid="uid://cmdvuhov0yqfu" path="res://addons/kenney_particle_pack/smoke_07.png" id="3_tmkqs"]
+[ext_resource type="Texture2D" uid="uid://c87dbicettps0" path="res://addons/kenney_particle_pack/flame_03.png" id="3_tmkqs"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_p7e7j"]
 size = Vector3(0.5, 2, 0.035)
@@ -31,7 +31,7 @@ angle_min = -179.99998
 angle_max = 180.00002
 direction = Vector3(0, 1, 0)
 spread = 5.0
-initial_velocity_max = 10.0
+initial_velocity_max = 7.0
 scale_min = 0.39999998
 scale_curve = SubResource("CurveTexture_4do6k")
 alpha_curve = SubResource("CurveTexture_7l36f")
@@ -41,7 +41,6 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(1, 1, 1, 0.33333334)
 albedo_texture = ExtResource("3_tmkqs")
 billboard_mode = 3
 billboard_keep_scale = true
@@ -83,7 +82,7 @@ mesh = SubResource("PrismMesh_p7e7j")
 
 [node name="Whoosh" type="GPUParticles3D" parent="."]
 emitting = false
-amount = 300
+amount = 600
 lifetime = 0.5
 visibility_aabb = AABB(-1.995636, -2.1838531, -1.099652, 3.984741, 6.682971, 2.1992311)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")

@@ -52,6 +52,7 @@ var _last_inactive_penalty_measure: int = -1  # Ensures only one energy/streak p
 var _track_marker_measures: PackedInt32Array  # Cache of marker measures for each track, updated by track._move_marker()
 var _track_reset_measures: PackedInt32Array  # Cache of reset measures for each track, updated by track.activate()
 var _targets: Array
+var _next_checkpoint: int = 0
 @onready var click_track_asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -66,7 +67,7 @@ var _targets: Array
 @onready var lbl_auto_blast = $HUD/AutoblastLabel
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 
-signal new_measure
+signal new_measure(measure)
 signal song_failed(stats)
 signal song_finished(stats)
 
@@ -122,27 +123,32 @@ func _ready():
 		add_child(introAsp)
 		introAsp.add_to_group("AudioPlayers")
 	song_data_ok = true
+	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
-#	new_measure.connect(start_gate._on_song_new_measure)
+	new_measure.connect(start_gate._on_song_new_measure)
 	start_gate.get_node("Text").text = "Song Start"
 	start_gate.name = "SongStart"
+	start_gate.fadeout_time = checkpoint_fade_time
 	start_gate.gate_location = lead_in_measures
 	start_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
-#	new_measure.connect(end_gate._on_song_new_measure)
+	new_measure.connect(end_gate._on_song_new_measure)
 	end_gate.get_node("Text").text = "Song End"
 	end_gate.name = "SongEnd"
+	end_gate.fadeout_time = checkpoint_fade_time
 	end_gate.gate_location = total_measures
 	end_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
 	add_child(end_gate)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
+		new_measure.connect(checkpoint._on_song_new_measure)
 		checkpoint.name = "Checkpoint%d" % (i)
+		checkpoint.fadeout_time = checkpoint_fade_time
 		var percentage = float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
-		checkpoint.gate_location = (measure + lead_in_measures - 1)
+		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
 		add_child(checkpoint)
 	match manager_node.energy_modifier:

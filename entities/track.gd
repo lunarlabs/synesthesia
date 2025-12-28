@@ -53,6 +53,7 @@ var blasting_phrase: bool = false
 var next_note_index: int = 0
 var next_note_idx_per_lane: Array[int] = [0,0,0,]
 var _active_track := false
+var pfx_speed: float
 var is_active: bool:
 	get: return _active_track
 var just_activated: bool = false
@@ -80,6 +81,7 @@ func _enter_tree():
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	rails.material_override = instrument_ghost_material
 	song_node = get_parent() as SynRoadSong
+	pfx_speed = song_node.manager_node.ideal_playhead_speed * 4.0
 	rails.multimesh.instance_count = song_node.total_measures * 2
 	length_per_beat = song_node.length_per_beat
 	chunks.resize(song_node.manager_node.chunk_count)
@@ -466,6 +468,15 @@ func _request_chunks(furthest: int):
 func activate(phrase_idx:int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
+	var activation_length = track_data.phrase_activation_lengths[phrase_idx]
+	var pfx_end_pos = -(phrase_end_measure + activation_length + 1) * BEATS_PER_MEASURE * length_per_beat
+	var pfx_time = (activation_length * BEATS_PER_MEASURE) * song_node.seconds_per_beat
+	pfx_time /= BEATS_PER_MEASURE
+	_play_pfx(
+		song_node.playhead.position.z - (length_per_beat * 0.1),
+		pfx_end_pos,
+		pfx_time
+	)
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
 	asp.volume_db = UNFOCUSED_VOLUME
@@ -486,7 +497,14 @@ func activate(phrase_idx:int):
 	song_node._update_track_reset_cache(track_index, reset_measure)
 	_advance_phrase()
 	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
-	
+
+func _play_pfx(start_pos: float, end_pos: float, time: float):
+	var hide_pfx_callable := Callable(pfx, "set_emitting").bind(false)
+	pfx.emitting = true
+	pfx.position.z = start_pos
+	var tweener = get_tree().create_tween()
+	tweener.tween_property(pfx, "position:z", end_pos, time)
+	tweener.tween_callback(hide_pfx_callable)
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
