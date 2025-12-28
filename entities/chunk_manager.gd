@@ -57,7 +57,7 @@ func _worker(_userdata = null):
 		var phrase_measures: Array[int] = []
 		for i in track_data.phrase_lengths[track_node.current_phrase_index]:
 			phrase_measures.append(track_data.phrase_starts[track_node.current_phrase_index] + i)
-		print(phrase_measures)
+#		print(phrase_measures)
 		if track_node.chunks[chunk_idx] != null:
 			# The chunk is already loaded
 			continue
@@ -97,10 +97,13 @@ func _worker(_userdata = null):
 		track_node.add_child.call_deferred(chunk)
 
 		if jobs_remaining == 0:
-			queue_empty.emit()
+			call_deferred_thread_group("report_empty")
 
 	_running = false
 	return
+
+func report_empty():
+	queue_empty.emit()
 
 func request_chunk(track: int, chunk: int):
 	assert(manager_node, "No SongManager node was assigned to ChunkManager")

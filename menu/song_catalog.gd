@@ -127,7 +127,7 @@ static func _entry_from_json(dict: Dictionary) -> SongEntry:
 	entry.genre = dict.get("genre", "")
 	entry.bpm = dict.get("bpm", 0.0)
 	entry.instruments = dict.get("instruments", [])
-	entry.available_difficulties = dict.get("available_difficulties", [])
+	entry.available_difficulties = []
 
 	entry.note_counts = {}
 	entry.note_densities = {}
@@ -135,6 +135,10 @@ static func _entry_from_json(dict: Dictionary) -> SongEntry:
 
 	entry.files_valid = dict.get("files_valid", false)
 	entry.error_message = dict.get("error_message", "")
+
+	var ad = dict.get("available_difficulties", [])
+	for diff in ad:
+		entry.available_difficulties.append(int(diff))
 
 	var nc = dict.get("note_counts", {})
 	for diff_str in nc.keys():

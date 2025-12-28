@@ -434,6 +434,7 @@ func set_active(active: bool):
 		active_phrase_missed.emit()
 		streak_broken.emit()
 		_advance_phrase()
+		marker.visible = song_node.manager_node.hide_streak_hints == false
 	if not active and asp.volume_db != MUTED_VOLUME:
 		asp.volume_db = UNFOCUSED_VOLUME
 	# When becoming active, update to the current phrase if not in reset countdown
