@@ -393,8 +393,10 @@ func _advance_phrase():
 
 	for i in range(track_data.phrase_lengths[current_phrase_index]):
 		var measure = track_data.phrase_starts[current_phrase_index] + i
-		var cube = measure_nodes[measure].get_node("track_geometry").get_node("Cube")
-		cube.set_instance_shader_parameter("phrase", true)
+		var measure_node = measure_nodes[measure]
+		if measure_node:
+			var cube = measure_node.get_node("track_geometry").get_node("Cube")
+			cube.set_instance_shader_parameter("phrase", true)
 	for i in track_data.phrase_note_indices[current_phrase_index]:
 		var note = note_nodes[i]
 		if is_active:
@@ -469,14 +471,6 @@ func activate(phrase_idx:int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	var activation_length = track_data.phrase_activation_lengths[phrase_idx]
-	var pfx_end_pos = -(phrase_end_measure + activation_length + 1) * BEATS_PER_MEASURE * length_per_beat
-	var pfx_time = (activation_length * BEATS_PER_MEASURE) * song_node.seconds_per_beat
-	pfx_time /= BEATS_PER_MEASURE
-	_play_pfx(
-		song_node.playhead.position.z - (length_per_beat * 0.1),
-		pfx_end_pos,
-		pfx_time
-	)
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
 	asp.volume_db = UNFOCUSED_VOLUME
@@ -499,12 +493,7 @@ func activate(phrase_idx:int):
 	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 
 func _play_pfx(start_pos: float, end_pos: float, time: float):
-	var hide_pfx_callable := Callable(pfx, "set_emitting").bind(false)
-	pfx.emitting = true
-	pfx.position.z = start_pos
-	var tweener = get_tree().create_tween()
-	tweener.tween_property(pfx, "position:z", end_pos, time)
-	tweener.tween_callback(hide_pfx_callable)
+	var pfx_process_material = pfx.process_material as ParticleProcessMaterial
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
