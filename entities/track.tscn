@@ -17,13 +17,14 @@ curve = SubResource("Curve_3q0ve")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dgpj8"]
 resource_local_to_scene = true
 lifetime_randomness = 1.0
-emission_shape_offset = Vector3(0, 0, -16)
+emission_shape_offset = Vector3(0, 0, -64)
 emission_shape = 3
-emission_box_extents = Vector3(1.25, 0.1, 16)
+emission_box_extents = Vector3(1.25, 0.1, -64)
 direction = Vector3(0, 1, 0)
-initial_velocity_max = 2.0
+spread = 10.0
 gravity = Vector3(0, 0, 0)
 scale_min = 0.39999998
+scale_max = 2.0
 scale_curve = SubResource("CurveTexture_3q0ve")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cidh0"]
@@ -72,11 +73,12 @@ mesh = SubResource("PrismMesh_p7e7j")
 
 [node name="Whoosh" type="GPUParticles3D" parent="."]
 emitting = false
-amount = 20000
+amount = 5000
 lifetime = 0.5
 one_shot = true
+preprocess = 0.1
 explosiveness = 1.0
-visibility_aabb = AABB(-1.995636, -2.1838531, -1.099652, 3.984741, 6.682971, 2.1992311)
+visibility_aabb = AABB(-2.393, -1, -128, 4.768, 2, 128)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")
 draw_pass_1 = SubResource("QuadMesh_24ful")
 

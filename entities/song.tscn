@@ -38,7 +38,6 @@ tonemap_mode = 2
 ssao_radius = 1.08
 ssao_intensity = 9.3
 ssao_horizon = 0.05
-ssil_enabled = true
 glow_enabled = true
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q2dmg"]

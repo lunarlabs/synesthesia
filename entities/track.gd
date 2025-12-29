@@ -53,7 +53,6 @@ var blasting_phrase: bool = false
 var next_note_index: int = 0
 var next_note_idx_per_lane: Array[int] = [0,0,0,]
 var _active_track := false
-var pfx_speed: float
 var is_active: bool:
 	get: return _active_track
 var just_activated: bool = false
@@ -81,7 +80,6 @@ func _enter_tree():
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	rails.material_override = instrument_ghost_material
 	song_node = get_parent() as SynRoadSong
-	pfx_speed = song_node.manager_node.ideal_playhead_speed * 4.0
 	rails.multimesh.instance_count = song_node.total_measures * 2
 	length_per_beat = song_node.length_per_beat
 	chunks.resize(song_node.manager_node.chunk_count)
@@ -470,7 +468,7 @@ func _request_chunks(furthest: int):
 func activate(phrase_idx:int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
-	var activation_length = track_data.phrase_activation_lengths[phrase_idx]
+	var activation_length = track_data.phrase_activation_lengths[phrase_idx] + 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
 	asp.volume_db = UNFOCUSED_VOLUME
@@ -478,6 +476,7 @@ func activate(phrase_idx:int):
 		track_data.phrase_note_counts[phrase_idx],
 		phrase_end_measure
 	)
+	_play_pfx(phrase_end_measure, phrase_end_measure + activation_length)
 	var activation_end_measure = reset_measure if reset_measure != -1 else song_node.total_measures
 	for i in range(phrase_end_measure, activation_end_measure):
 		if measure_nodes[i]:
@@ -492,8 +491,9 @@ func activate(phrase_idx:int):
 	_advance_phrase()
 	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 
-func _play_pfx(start_pos: float, end_pos: float, time: float):
-	var pfx_process_material = pfx.process_material as ParticleProcessMaterial
+func _play_pfx(start_measure: int, end_measure: int):
+	pfx.position.z = start_measure * -(BEATS_PER_MEASURE * length_per_beat)
+	pfx.emitting = true
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
