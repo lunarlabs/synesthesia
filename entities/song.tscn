@@ -542,7 +542,7 @@ material = SubResource("StandardMaterial3D_scy1h")
 size = Vector3(20, 0.02, 0.02)
 
 [node name="Song" type="Node3D"]
-process_mode = 1
+process_mode = 4
 script = ExtResource("1_jv32a")
 
 [node name="ClickTrack" type="AudioStreamPlayer" parent="." groups=["AudioPlayers", "LoopingAudio"]]

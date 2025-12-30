@@ -25,7 +25,6 @@ var lead_in_measures := 999_999
 var total_measures := 0
 var current_measure := -1
 var current_beat := 0.0
-var next_checkpoint := 0
 var phrase_start_measure := 0
 var finished := false
 var input_enabled := true
@@ -42,8 +41,8 @@ var _streak_breaks: int = 0
 var _autoblast_next_track: int
 var _track_transition_tween:Tween
 var _intro_tween:Tween
-var _max_hit_offset: float = NAN
-var _min_hit_offset: float = NAN
+var _max_hit_offset: float = -INF
+var _min_hit_offset: float = INF
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack  # Cache active track reference
@@ -188,6 +187,7 @@ func _song_start():
 		lbl_auto_blast.hide()
 	_set_instrument_label()
 	tracks[active_track].set_active(true)
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
 
 func _process(delta: float):
@@ -305,6 +305,13 @@ func _process(delta: float):
 				print(final_score_text)
 			else:
 				new_measure.emit(current_measure)
+				if _next_checkpoint < manager_node.checkpoint_measures.size():
+					var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
+					if current_measure == checkpoint_measure:
+						print("Reached checkpoint at measure %d" % checkpoint_measure)
+						_next_checkpoint += 1
+						if manager_node.energy_modifier == 0:
+							energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
 #				print("measure %d/%d" % [current_measure + 1, total_measures])
 				if mn.energy_modifier == 1 and (mn.suppressed_measures[current_measure] == false):
 					var any_unactivated = false
@@ -565,8 +572,8 @@ func _hide_fast_slow_label():
 	lbl_fast_slow.hide()
 
 func _on_note_hit(offset: float):
-	_max_hit_offset = max(_max_hit_offset, offset) if not is_nan(_max_hit_offset) else offset
-	_min_hit_offset = min(_min_hit_offset, offset) if not is_nan(_min_hit_offset) else offset
+	_max_hit_offset = max(_max_hit_offset, offset)
+	_min_hit_offset = min(_min_hit_offset, offset)
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
 	_notes_hit_count += 1
 	%NotesHitLabel.text = str(_notes_hit_count)

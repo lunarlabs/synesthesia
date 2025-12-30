@@ -14,6 +14,7 @@ var difficulty: int = 96
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
 
 const SONG_SCENE:PackedScene = preload("res://entities/song.tscn")
+
 const DIFFICULTY_NAMES = {
 	96: "Beginner",
 	102: "Intermediate",
@@ -137,7 +138,7 @@ func _ready() -> void:
 				suppressed_measures[actual_measure + 1] = true
 			1:
 				# Disabled -- leave the checkpoint gates as is but they won't do anything
-				pass
+				pass 
 			# TODO: Barrier logic.
 			2:
 				pass
@@ -403,3 +404,39 @@ func _on_quit_pressed() -> void:
 	get_tree().paused = false
 	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
+
+class SongResult:
+
+	enum ClearState{
+		NOT_PLAYED,
+		FAILED,
+		AUTOBLASTED,
+		LOOSE_CLEAR,
+		CLEAR,
+		STRICT_CLEAR,
+		PERFECT_RUN,
+	}
+
+	enum ClearRank{
+		AAA,
+		AA,
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+	}
+
+	var song_file: String
+	var difficulty: int
+	var energy_modifier: int
+	var checkpoint_modifier: int
+	var hide_streak_hints: bool
+	var timing_modifier: int
+	var fast_track_reset: int
+	var score: int
+	var max_streak: int
+	var accuracy: float
+	var streak_breaks: int
+	var clear_state: ClearState

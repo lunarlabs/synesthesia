@@ -34,6 +34,35 @@ const FAST_RESET_NAMES = {
 	8: "Fast Reset 2"
 }
 
+const SCORE_RANKS = [
+	"AAA",
+	"AA",
+	"A",
+	"B",
+	"C",
+	"D",
+	"E",
+	"F",
+]
+
+const ACCURACY_THRESHOLDS = {
+	"AAA": 0.97,
+	"AA": 0.93,
+	"A": 0.90,
+	"B": 0.80,
+	"C": 0.70,
+	"D": 0.60,
+	"E": 0.50,
+}
+
+enum ClearState{
+	NOT_PLAYED,
+	FAILED,
+	LOOSE_CLEAR,
+	CLEAR,
+	PERFECT_RUN,
+}
+
 var song_records: Dictionary = {}
 var session_data: Dictionary = {}
 var player_options: Dictionary = {}
