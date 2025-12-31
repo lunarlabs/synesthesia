@@ -1,6 +1,8 @@
 extends Node
 
 const CAMPAIGN_DATA_PATH = "user://campaign_data.json"
+const CAMPAIGN_FOLDER_PATH = "user://campaigns/"
+const SONG_RECORD_FILE = "song_record.json"
 const DIFFICULTY_VALUES = {
 	96: "Beginner",
 	102: "Intermediate",
@@ -116,3 +118,44 @@ func save_campaign_data() -> Error:
 	file.store_string(JSON.stringify(result))
 	file.close()
 	return OK
+
+func record_song_result(song_id: String, difficulty: int, result: SongResult) -> void:
+	if not song_records.has(song_id):
+		song_records[song_id] = {}
+	song_records[song_id][difficulty] = result
+
+class SongResult:
+
+	enum ClearState{
+		NOT_PLAYED,
+		FAILED,
+		AUTOBLASTED,
+		LOOSE_CLEAR,
+		CLEAR,
+		STRICT_CLEAR,
+		PERFECT_RUN,
+	}
+
+	enum ClearRank{
+		AAA,
+		AA,
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+	}
+
+	var energy_modifier: int
+	var checkpoint_modifier: int
+	var hide_streak_hints: bool
+	var timing_modifier: int
+	var fast_track_reset: int
+	var score: int
+	var max_streak: int
+	var accuracy: float
+	var streak_breaks: int
+	var clear_state: ClearState
+	var rank: ClearRank
+	var percent_completed: float

@@ -13,6 +13,8 @@ var difficulty: int = 96
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
 
+var can_pause := false
+
 const SONG_SCENE:PackedScene = preload("res://entities/song.tscn")
 
 const DIFFICULTY_NAMES = {
@@ -188,28 +190,6 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	ChunkManager.stop()
 
-func _populate_load_screen() -> void:
-	lbl_difficulty.text = DIFFICULTY_NAMES[difficulty]
-	lbl_title.text = song_data.long_title
-	lbl_artist.text = song_data.artist
-	lbl_genre.text = song_data.genre
-	if energy_modifier != 0:
-		lbl_mod_energy.theme_type_variation = "EnergyModifier"
-		lbl_mod_energy.text = ENERGY_MODIFIER_NAMES[energy_modifier]
-	if checkpoint_modifier != 0:
-		lbl_mod_checkpoint.theme_type_variation = "CheckpointModifier"
-		lbl_mod_checkpoint.text = CHECKPOINT_MODIFIER_NAMES[checkpoint_modifier]
-	if timing_modifier != 0:
-		lbl_mod_timing.theme_type_variation = "TimingModifier"
-		lbl_mod_timing.text = TIMING_MODIFIER_NAMES[timing_modifier]
-	if fast_track_reset != 12:
-		lbl_track_reset.theme_type_variation = "TimingModifier"
-		lbl_track_reset.text = FAST_RESET_NAMES[fast_track_reset]
-	if hide_streak_hints:
-		lbl_mod_hints.theme_type_variation = "HintModifier"
-	if autoblast:
-		lbl_mod_autoblast.theme_type_variation = "AutoblastModifier"
-
 func _fetch_track_data() -> void:
 	preprocessor = SynRoadTrackPreprocessor.new()
 	var midi_data = load(song_data.midi_file) as MidiData
@@ -288,6 +268,7 @@ func _on_song_failed(stats) -> void:
 	restart_btn.disabled = false
 
 func _on_song_finished(stats) -> void:
+	var song_stats := SessionManager.SongResult.new()
 	var finish_anim = result_screen.get_node("AnimationPlayer") as AnimationPlayer
 	# TODO: the rest of the result screen labels and then populate them with stats
 	result_screen.get_node("%SongTitleLabel").text = song_data.long_title
@@ -328,35 +309,6 @@ func _on_song_finished(stats) -> void:
 		rank = "D"
 	result_screen.get_node("%RankLabel").text = rank
 
-	if not autoblast:
-		if stats["miss_count"] == 0:
-			if energy_modifier == ENERGY_MODIFIER_NAMES.find("No Fail") or timing_modifier == TIMING_MODIFIER_NAMES.find("Loose"):
-				SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "assist perfect run"
-				SessionManager.song_records[song_data.title][difficulty]["rank"] = rank + "*"
-			else:
-				SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "perfect run"
-				SessionManager.song_records[song_data.title][difficulty]["rank"] = rank
-		elif energy_modifier == ENERGY_MODIFIER_NAMES.find("No Fail") or timing_modifier == TIMING_MODIFIER_NAMES.find("Loose"):
-			SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "assist clear"
-			SessionManager.song_records[song_data.title][difficulty]["rank"] = rank + "*"
-		else:
-			SessionManager.song_records[song_data.title][difficulty]["clear_state"] = "clear"
-			SessionManager.song_records[song_data.title][difficulty]["rank"] = rank
-
-		SessionManager.song_records[song_data.title][difficulty]["percent_completed"] = 100.0
-
-		if SessionManager.song_records[song_data.title][difficulty].get("score", 0) < stats.score:
-			SessionManager.song_records[song_data.title][difficulty]["score"] = stats.score
-		
-		if SessionManager.song_records[song_data.title][difficulty].get("max_streak", 0) < stats.max_streak:
-			SessionManager.song_records[song_data.title][difficulty]["max_streak"] = stats.max_streak
-		
-		if SessionManager.song_records[song_data.title][difficulty].get("accuracy", 0) < accuracy:
-			SessionManager.song_records[song_data.title][difficulty]["accuracy"] = accuracy
-
-		if SessionManager.song_records[song_data.title][difficulty].get("streak_breaks", 9999) > stats.streak_breaks:
-			SessionManager.song_records[song_data.title][difficulty]["streak_breaks"] = stats.streak_breaks
-
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
@@ -371,7 +323,7 @@ func _on_song_finished(stats) -> void:
 
 func _toggle_pause() -> void:
 	# Prevent pause if result or fail screen is visible
-	if result_screen.visible or fail_screen.visible:
+	if not can_pause:
 		return
 	
 	if not song_instance or not is_instance_valid(song_instance):
@@ -404,39 +356,3 @@ func _on_quit_pressed() -> void:
 	get_tree().paused = false
 	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
-
-class SongResult:
-
-	enum ClearState{
-		NOT_PLAYED,
-		FAILED,
-		AUTOBLASTED,
-		LOOSE_CLEAR,
-		CLEAR,
-		STRICT_CLEAR,
-		PERFECT_RUN,
-	}
-
-	enum ClearRank{
-		AAA,
-		AA,
-		A,
-		B,
-		C,
-		D,
-		E,
-		F,
-	}
-
-	var song_file: String
-	var difficulty: int
-	var energy_modifier: int
-	var checkpoint_modifier: int
-	var hide_streak_hints: bool
-	var timing_modifier: int
-	var fast_track_reset: int
-	var score: int
-	var max_streak: int
-	var accuracy: float
-	var streak_breaks: int
-	var clear_state: ClearState

@@ -189,6 +189,7 @@ func _song_start():
 	tracks[active_track].set_active(true)
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
+	manager_node.can_pause = true
 
 func _process(delta: float):
 	if !finished:
@@ -264,6 +265,7 @@ func _process(delta: float):
 			%SongProgress.value = current_measure
 			if current_measure >= total_measures:
 				finished = true
+				manager_node.can_pause = false
 				if not mn.autoblast:
 					if _miss_count == 0:
 						%HUDAnimations.play("PerfectRun")
@@ -599,6 +601,7 @@ func fail_song():
 	if _in_fail_state:
 		return
 	_in_fail_state = true
+	manager_node.can_pause = false
 	print("Song failed!")
 	input_enabled = false
 	hud.hide()
