@@ -878,7 +878,6 @@ directional_shadow_mode = 0
 environment = SubResource("Environment_0bd8t")
 
 [node name="HUD" type="Control" parent="."]
-process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
