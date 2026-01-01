@@ -818,7 +818,8 @@ script = ExtResource("1_jv32a")
 volume_db = -12.0
 
 [node name="DebugInfo" type="Label" parent="."]
-visible = false
+z_index = 100
+z_as_relative = false
 offset_right = 40.0
 offset_bottom = 23.0
 theme_override_font_sizes/font_size = 11
@@ -924,6 +925,7 @@ texture = ExtResource("3_0mt4k")
 
 [node name="PhraseValueLabel" type="Label" parent="HUD"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

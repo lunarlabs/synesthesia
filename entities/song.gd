@@ -77,6 +77,8 @@ var max_drift: float = 0.0
 var drift_samples: int = 0
 var total_drift: float = 0.0
 var frame_drops: int = 0
+var playhead_target_z: float = 0.0
+var playhead_velocity: float = 0.0
 
 func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
@@ -178,7 +180,7 @@ func _song_start():
 	camera.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Camera starting at x=%.2f" % camera.position.x)
 	%SongProgress.max_value = total_measures
-	%SongProgress.min_value = lead_in_measures
+	%SongProgress.min_value = lead_in_measures - 1
 	if manager_node.autoblast:
 		lbl_auto_blast.show()
 		_autoblast_next_track = _find_best_track_for_autoblast()
@@ -190,7 +192,6 @@ func _song_start():
 	tracks[active_track].set_active(true)
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
-	time_elapsed = 0.0
 	manager_node.can_pause = true
 
 func _process(delta: float):
@@ -199,7 +200,7 @@ func _process(delta: float):
 			print("Instant fail triggered.")
 			fail_song()
 			return
-		time_elapsed += delta
+
 		# Cache frequently-used members to avoid repeated lookups
 		var mn = manager_node
 		var trs = tracks
@@ -207,54 +208,47 @@ func _process(delta: float):
 
 		# Get current audio time with mix delay compensation
 		var audio_time = asp.get_playback_position() + AudioServer.get_time_since_last_mix()
-		var audio_beat = audio_time * (bpm * 0.016666666666666666)
-#		
-#		# Calculate drift from PREVIOUS frame's time + delta
-#		if previous_time_elapsed > 0:
-#			var expected_time = previous_time_elapsed + delta
-#			var drift = audio_time - expected_time
-#			
-#			if abs(drift) > 0.050:  # >50ms drift
-#				print("FRAME DROP: %.1fms @ beat %.2f (measure %d, mod8=%d, delta: %.3f, actual: %.3f, expected: %.3f)" % 
-#					[drift * 1000, audio_time / (seconds_per_beat),current_measure, current_measure % 8, delta, audio_time, expected_time])
-#				frame_drops += 1
-#
-#				if mn.autoblast:
-#					var _active_track_node = trs[active_track] as SynRoadTrack
-#					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
-#			elif abs(drift) > 0.010:
-#				drift_samples += 1
-#				total_drift += abs(drift)
-#				max_drift = max(max_drift, abs(drift))
 		
-#		previous_time_elapsed = audio_time
-#		time_elapsed = audio_time
+		# Calculate drift from PREVIOUS frame's time + delta
+		if previous_time_elapsed > 0:
+			var expected_time = previous_time_elapsed + delta
+			var drift = audio_time - expected_time
+			
+			if abs(drift) > 0.050:  # >50ms drift
+				print("FRAME DROP: %.1fms @ beat %.2f (measure %d, mod8=%d, delta: %.3f, actual: %.3f, expected: %.3f)" % 
+					[drift * 1000, audio_time / (seconds_per_beat),current_measure, current_measure % 8, delta, audio_time, expected_time])
+				frame_drops += 1
+
+				if mn.autoblast:
+					var _active_track_node = trs[active_track] as SynRoadTrack
+#					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
+			elif abs(drift) > 0.010:
+				drift_samples += 1
+				total_drift += abs(drift)
+				max_drift = max(max_drift, abs(drift))
+		
+		previous_time_elapsed = audio_time
+		time_elapsed = audio_time
 		
 		# Compute beat once, reuse values
 		current_beat = time_elapsed * (bpm * 0.016666666666666666) # bpm/60
-		%actualplayhead.position.z = audio_beat * -length_per_beat
+		%actualplayhead.position.z = current_beat * -length_per_beat
 		RenderingServer.global_shader_parameter_set("beat", fmod(current_beat, 1.0))
 
 		# Calculate target position from audio time (single predicted beat calc)
-#		var predicted_beat = (audio_time + PLAYHEAD_LEAD_TIME) * (bpm * 0.016666666666666666)
-#		playhead_target_z = -length_per_beat * predicted_beat
+		var predicted_beat = (audio_time + PLAYHEAD_LEAD_TIME) * (bpm * 0.016666666666666666)
+		playhead_target_z = -length_per_beat * predicted_beat
 		
 		# Smooth interpolation with spring damping
-#		var spring_strength = 100.0
-#		var damping = 15.0
+		var spring_strength = 100.0
+		var damping = 15.0
 		
-#		var displacement = playhead_target_z - playhead.position.z
-#		var spring_force = displacement * spring_strength
-#		var damping_force = -playhead_velocity * damping
+		var displacement = playhead_target_z - playhead.position.z
+		var spring_force = displacement * spring_strength
+		var damping_force = -playhead_velocity * damping
 		
-#		playhead_velocity += (spring_force + damping_force) * delta
-#		playhead.position.z += playhead_velocity * delta
-
-		var adjusted_playhead_velocity = _playhead_speed * click_track_asp.pitch_scale
-		var desync = audio_time - time_elapsed
-		if abs(desync) > DESYNC_LIMIT:
-			time_elapsed = audio_time
-		playhead.position.z += adjusted_playhead_velocity * delta
+		playhead_velocity += (spring_force + damping_force) * delta
+		playhead.position.z += playhead_velocity * delta
 
 		var new_active_track = active_track
 		if !mn.autoblast and input_enabled:

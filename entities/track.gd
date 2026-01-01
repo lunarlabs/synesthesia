@@ -297,7 +297,7 @@ func try_blast(lane_index:int):
 				phrase_notes_blasted = 0
 				blasting_phrase = false
 				marker.visible = song_node.manager_node.hide_streak_hints == false
-	else:
+	elif song_node.current_measure >= reset_measure:
 		_misblast(song_node.current_beat, lane_index)
 		if blasting_phrase:
 			phrase_notes_blasted = 0
