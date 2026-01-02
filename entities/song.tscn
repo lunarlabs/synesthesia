@@ -660,7 +660,7 @@ tracks/9/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_otm2r"]
-resource_name = "build_in"
+resource_name = "BuildIn"
 length = 2.0
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -797,10 +797,10 @@ tracks/10/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_82rk8"]
 _data = {
+&"BuildIn": SubResource("Animation_otm2r"),
 &"PerfectRun": SubResource("Animation_gkj2n"),
 &"RESET": SubResource("Animation_0yoam"),
-&"SongClear": SubResource("Animation_o2o53"),
-&"build_in": SubResource("Animation_otm2r")
+&"SongClear": SubResource("Animation_o2o53")
 }
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_scy1h"]
@@ -1252,9 +1252,19 @@ unique_name_in_owner = true
 libraries = {
 &"": SubResource("AnimationLibrary_82rk8")
 }
-autoplay = "build_in"
 
 [node name="actualplayhead" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 visible = false
 mesh = SubResource("BoxMesh_0mt4k")
+
+[node name="FadeOut" type="ColorRect" parent="."]
+unique_name_in_owner = true
+z_index = 10
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

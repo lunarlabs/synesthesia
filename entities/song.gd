@@ -177,7 +177,6 @@ func _ready():
 
 func _song_start():
 	print("Starting song playback.")
-	_intro_tween = get_tree().create_tween()		
 	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH)/2
 	print("Playhead starting at x=%.2f" % playhead.position.x)
 	current_track.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
@@ -198,6 +197,12 @@ func _song_start():
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
 	manager_node.can_pause = true
+	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
+	_intro_tween = get_tree().create_tween()
+	_intro_tween.tween_property(%FadeOut, "modulate", Color(1,1,1,0),
+	 (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE)\
+	.set_ease(Tween.EASE_IN)
+	_intro_tween.tween_callback(_intro_anim_call)
 
 func _process(delta: float):
 	if !finished:

@@ -429,14 +429,15 @@ func set_active(active: bool):
 		for i in track_data.phrase_note_indices[current_phrase_index]:
 			var note = note_nodes[i]
 			note.set_phrase_note(active)
-	if !active and blasting_phrase:
-		blasting_phrase = false
-		phrase_notes_blasted = 0
-		print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
-		active_phrase_missed.emit()
-		streak_broken.emit()
-		_advance_phrase()
+	if !active:
 		marker.visible = song_node.manager_node.hide_streak_hints == false
+		if blasting_phrase:
+			blasting_phrase = false
+			phrase_notes_blasted = 0
+			print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
+			active_phrase_missed.emit()
+			streak_broken.emit()
+			_advance_phrase()
 	if not active and asp.volume_db != MUTED_VOLUME:
 		asp.volume_db = UNFOCUSED_VOLUME
 	# When becoming active, update to the current phrase if not in reset countdown
