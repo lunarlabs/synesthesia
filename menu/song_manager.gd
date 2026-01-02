@@ -101,6 +101,7 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	print("Loading %s" % song_file)
 	song_data = load(song_file) as SongData
 	await get_tree().process_frame
 	if not song_data:
@@ -108,7 +109,6 @@ func _ready() -> void:
 		return
 
 	ChunkManager.manager_node = self
-	ChunkManager.start_if_needed()
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
 	seconds_per_beat = song_data.seconds_per_beat
@@ -121,6 +121,7 @@ func _ready() -> void:
 	total_measures = song_data.lead_in_measures + song_data.playable_measures
 	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
 	for i in range(total_measures + 2):
+		print("calculate chunk %d" % i)
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
 		@warning_ignore("integer_division")
@@ -130,6 +131,7 @@ func _ready() -> void:
 	chunk_count += 1
 
 	suppressed_measures.resize(total_measures)
+	print ("suppressing checkpoint measures")
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
 		checkpoint_measures.append(actual_measure)
@@ -176,22 +178,16 @@ func _ready() -> void:
 	fail_exit_btn.pressed.connect(_on_quit_pressed)
 	fail_restart_btn.pressed.connect(_on_restart_pressed)
 	
-	if not SessionManager.song_records.has(song_data.title):
-		SessionManager.song_records[song_data.title] = {}
-	SessionManager.song_records[song_data.title][difficulty] = {
-		"clear_state": "not_played",
-	}
 	song_instance = SONG_SCENE.instantiate() as SynRoadSong
 
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
+	print ("handing over to song node now")
 	add_child.call_deferred(song_instance)
-
-func _exit_tree() -> void:
-	ChunkManager.stop()
 
 func _fetch_track_data() -> void:
 	preprocessor = SynRoadTrackPreprocessor.new()
+	print("loading midi data")
 	var midi_data = load(song_data.midi_file) as MidiData
 	if not midi_data:
 		push_error("Failed to load MIDI data from %s" % song_data.midi_file)
@@ -208,6 +204,7 @@ func _fetch_track_data() -> void:
 
 
 func _apply_preprocessor_results(results: Array) -> void:
+	print("applying preprocessor results")
 	for result in results:
 		var track_info = song_data.tracks[result.track_index] as SongTrackData
 		if result.result.note_map.size() > 0:
@@ -235,30 +232,7 @@ func _on_song_failed(stats) -> void:
 	# "Song Failed" slams down as soon as the slowdown begins and covers the whole duration
 	# of the slowdown effect.
 	fail_screen.show()
-	if not autoblast:
-		# Update session record if it's not already clear or better
-		match SessionManager.song_records.get(song_data.title, {}).get(difficulty, {}).get("clear_state", "not_played"):
-			"not_played":
-				SessionManager.song_records[song_data.title][difficulty] = {
-					"clear_state": "failed",
-					"rank": "F",
-					"score": stats.score,
-					"max_streak": stats.max_streak,
-					"accuracy": accuracy,
-					"streak_breaks": stats.streak_breaks,
-					"percent_completed": percent_completed
-			}
-			"failed":
-				if SessionManager.song_records[song_data.title][difficulty].get("score", 0) < stats.score:
-					SessionManager.song_records[song_data.title][difficulty] = {
-						"clear_state": "failed",
-						"rank": "F",
-						"score": stats.score,
-						"max_streak": stats.max_streak,
-						"accuracy": accuracy,
-						"streak_breaks": stats.streak_breaks,
-						"percent_completed": percent_completed
-						}
+
 	fail_anim.play("Display")
 	# Enable buttons when animation finishes
 	var exit_btn = fail_screen.get_node("%ExitButton") as Button
@@ -279,18 +253,6 @@ func _on_song_finished(stats) -> void:
 	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
 	result_screen.get_node("%AccuracyLabel").text = "%.2f%%" % accuracy
 	result_screen.get_node("%StreakBreakLabel").text = str(stats.streak_breaks)
-	if SessionManager.song_records.get(song_data.title, {}).get(difficulty, {}).get("clear_state", "not_played") != "not_played":
-		result_screen.get_node("%PreviousBestsContainer").show()
-		result_screen.get_node("%PrevScoreLabel").text = str(SessionManager.song_records[song_data.title][difficulty]["score"])
-		result_screen.get_node("%PrevStreakLabel").text = str(SessionManager.song_records[song_data.title][difficulty]["max_streak"])
-		result_screen.get_node("%PrevAccLabel").text = "%.2f%%" % SessionManager.song_records[song_data.title][difficulty]["accuracy"]
-		result_screen.get_node("%PrevRankLabel").text = SessionManager.song_records[song_data.title][difficulty]["rank"]
-		result_screen.get_node("%ScoreDiffLabel").show()
-		result_screen.get_node("%ScoreDiffLabel").text = "%+d" % (stats.score - SessionManager.song_records[song_data.title][difficulty]["score"])
-		result_screen.get_node("%StreakDiffLabel").show()
-		result_screen.get_node("%StreakDiffLabel").text = "%+d" % (stats.max_streak - SessionManager.song_records[song_data.title][difficulty]["max_streak"])
-		result_screen.get_node("%AccuracyDiffLabel").show()
-		result_screen.get_node("%AccuracyDiffLabel").text = "%+.2f%%" % (accuracy - SessionManager.song_records[song_data.title][difficulty]["accuracy"])
 	# TODO: set color for rank label based on rank, currently white for all
 	var rank: String
 	if autoblast:
@@ -354,5 +316,5 @@ func _on_restart_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
-	SessionManager.save_campaign_data()
+#	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")

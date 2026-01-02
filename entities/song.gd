@@ -54,6 +54,7 @@ var _track_marker_measures: PackedInt32Array  # Cache of marker measures for eac
 var _track_reset_measures: PackedInt32Array  # Cache of reset measures for each track, updated by track.activate()
 var _targets: Array
 var _next_checkpoint: int = 0
+var _last_streak_break_measure: int = -1
 @onready var click_track_asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -101,6 +102,7 @@ func _ready():
 	_track_marker_measures.resize(6)  # Initialize cache for 6 instrument tracks
 	_track_reset_measures.resize(6)  # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
+		print ("instantiating track %d" % i)
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.track_index = i
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
@@ -117,6 +119,9 @@ func _ready():
 		newTrack.active_phrase_missed.connect(_on_active_phrase_missed)
 		newTrack.note_hit.connect(_on_note_hit)
 		add_child(newTrack)
+		ChunkManager.request_chunk(i, 0)
+		await ChunkManager.queue_empty
+	print("tracks added")
 	click_track_asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
 	for audioFileName in manager_node.song_data.intro_audio:
 		var introAsp = AudioStreamPlayer.new()
@@ -127,6 +132,7 @@ func _ready():
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
+	print("instantiating checkpoints")
 	new_measure.connect(start_gate._on_song_new_measure)
 	start_gate.get_node("Text").text = "Song Start"
 	start_gate.name = "SongStart"
@@ -167,7 +173,6 @@ func _ready():
 	for i in range(3):
 		await get_tree().process_frame
 
-	_print_new_measure_connections()
 	_song_start()
 
 func _song_start():
@@ -422,6 +427,9 @@ func _on_track_activated(note_count:int, start_measure:int):
 
 
 func _on_streak_broken():
+	if current_measure == _last_streak_break_measure:
+		return  # Prevent multiple penalties in the same measure
+	_last_streak_break_measure = current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
 	match manager_node.energy_modifier:

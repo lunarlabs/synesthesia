@@ -80,6 +80,7 @@ func _enter_tree():
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	rails.material_override = instrument_ghost_material
 	song_node = get_parent() as SynRoadSong
+	print("track %d instantiating rails" % track_index)
 	rails.multimesh.instance_count = song_node.total_measures * 2
 	length_per_beat = song_node.length_per_beat
 	chunks.resize(song_node.manager_node.chunk_count)
@@ -94,7 +95,6 @@ func _enter_tree():
 		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		rail_transform.basis = rail_transform.basis.scaled(Vector3(1.0, 1.0, scale_z))
 		rails.multimesh.set_instance_transform(i, rail_transform)
-	_request_chunks(CHUNK_LOAD_RANGE_FORWARD)
 
 func _ready():
 	asp.stream = load(audio_file) as AudioStream
@@ -454,13 +454,13 @@ func _on_song_new_measure(_measure_num: int):
 	var target_ahead = current_chunk + CHUNK_LOAD_RANGE_FORWARD
 	var target_behind = current_chunk - CHUNK_UNLOAD_RANGE_BEHIND
 	if furthest_chunk_loaded < target_ahead and target_ahead < song_node.manager_node.chunk_count:
-		_request_chunks(target_ahead)
+		request_chunks(target_ahead)
 	if target_behind >= 0 and chunks[target_behind]:
-		print("Track %d destroying chunk %d" % [track_index, target_behind])
-		chunks[target_behind].queue_free()
+		print("Track %d recycling chunk %d" % [track_index, target_behind])
+		ChunkManager.recycle_chunk(chunks[target_behind])
 		chunks[target_behind] = null
 
-func _request_chunks(furthest: int):
+func request_chunks(furthest: int):
 	while furthest_chunk_loaded < furthest:
 		furthest_chunk_loaded += 1
 		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
