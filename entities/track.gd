@@ -420,7 +420,7 @@ func move_marker(measure_index: int):
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
 	# tell the song node to update its marker cache with the actual measure number
-	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[current_phrase_index])
+	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[marker_measure_index])
 
 func set_active(active: bool):
 	_active_track = active
