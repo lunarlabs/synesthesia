@@ -265,11 +265,9 @@ func _process(delta: float):
 			if Input.is_action_just_pressed("track_next"):
 				new_active_track = (active_track + 1) % trs.size()
 				_switch_active_track(new_active_track)
-				RenderingServer.global_shader_parameter_set("current_track", active_track)
 			elif Input.is_action_just_pressed("track_prev"):
 				new_active_track = (active_track - 1 + trs.size()) % trs.size()
 				_switch_active_track(new_active_track)
-				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
 		# Use cached measure_times reference for boundary check
 		var mts = mn.measure_times
@@ -354,8 +352,7 @@ func _process(delta: float):
 			# Check for autoblast track switching every frame
 			if mn.autoblast and _autoblast_next_track != active_track:
 				if !_cached_active_track_node.blasting_phrase:
-					var next_track_node = trs[_autoblast_next_track] as SynRoadTrack
-					var switch_measure = next_track_node.phrase_start_measure
+					var switch_measure = _track_marker_measures[_autoblast_next_track]
 					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
 					if current_beat >= switch_beat:
 						_switch_active_track(_autoblast_next_track)
@@ -424,11 +421,10 @@ func _on_track_activated(note_count:int, start_measure:int):
 		1:
 			# Gain 3 energy per successful phrase
 			energy_change(3)
-#	if manager_node.autoblast and current_measure < total_measures:
+	if manager_node.autoblast and current_measure < total_measures:
 		# Queue up the next track to switch to on the next measure boundary
-#		_autoblast_next_track = _find_best_track_for_autoblast()
-#		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track] if _autoblast_next_track != active_track else 999
-#		print("Autoblast: Current track %d, queued next track %d (distance=%d)" % [active_track, _autoblast_next_track, _autoblast_track_distance])
+		_autoblast_next_track = _find_best_track_for_autoblast()
+		print("Autoblast: Current track %d, queued next track %d" % [active_track, _autoblast_next_track])
 
 
 func _on_streak_broken():
@@ -495,6 +491,7 @@ func _switch_active_track(new_active_track:int, use_tween: bool = true):
 	(tracks[active_track] as SynRoadTrack).set_active(false)
 	active_track = new_active_track
 	(tracks[active_track] as SynRoadTrack).set_active(true)
+	RenderingServer.global_shader_parameter_set("current_track", new_active_track)
 	_set_instrument_label()
 	var new_x_pos = (active_track * TRACK_WIDTH) - playhead.position.x
 	if lead_in_measures >= 0:
@@ -510,56 +507,58 @@ func _switch_active_track(new_active_track:int, use_tween: bool = true):
 
 
 func _find_best_track_for_autoblast() -> int:
-	# Find closest unactivated measure using track marker_measure
-	# Optimized single-pass comparison instead of multiple filter passes
 	var best_track = active_track
-	var best_measure_dist = 9999
-	var best_note_count = -1
-	var best_track_dist = 9999
+	var highest_score = -999999.0 # Start lower to account for negative penalties
+	
+	# Cache current measure to avoid repeated lookups
 	var curr_measure = current_measure
 	
 	for i in tracks.size():
-		if i == active_track:
+		# 1. VALIDITY CHECKS
+		# Get the next phrase start from cache
+		var start_measure = _track_marker_measures[i]
+		
+		# Skip if track has no future phrases or phrase is already passed
+		if start_measure <= 0 or start_measure <= curr_measure:
 			continue
+			
+		# 2. CALCULATE SCORE
+		var track_score = 1000.0
 		
-		var first_measure = _track_marker_measures[i]
+		# --- CRITICAL FIX: SAFETY CHECK ---
+		# Check if the track is currently "Activated" (Safe).
+		# If current_measure < reset_measure, we cannot break combo on this track.
+		# We should prioritize tracks that are NOT safe (Danger).
+		var reset_measure = _track_reset_measures[i]
+		if curr_measure < reset_measure:
+			# Massive penalty implies "Only pick this if literally nothing else is available"
+			track_score -= 50000.0 
 		
-		# Skip tracks with no future notes or whose phrase starts in the current measure or earlier
-		if first_measure <= 0 or first_measure <= curr_measure:
-			continue
+		# A. Distance Penalty (Urgency)
+		# The closer the phrase, the higher the priority.
+		var distance = start_measure - curr_measure
+		track_score -= (distance * 50.0) 
 		
-		var measure_distance = first_measure - curr_measure
+		# B. Value Bonus (Greed)
+		# Prefer high-value phrases if distances are similar.
+		track_score += tracks[i].phrase_score_value
 		
-		# Early exit if this track is farther than our current best
-		if measure_distance > best_measure_dist:
-			continue
+		# C. Switching Penalty (Stability)
+		# Small penalty for switching to prevent rapid jittering on ties.
+		if i != active_track:
+			track_score -= 5.0
+			
+		# D. Proximity Penalty (Humanization)
+		# Slight preference for nearby lanes (e.g. 0 -> 1 is better than 0 -> 2)
+		var lane_diff = abs(i - active_track)
+		track_score -= (lane_diff * 1.0)
 		
-		# Use precomputed phrase score value as note count (already available)
-		var note_count = tracks[i].phrase_score_value
-		
-		var track_distance = abs(i - active_track)
-		
-		# Compare using priority: measure_distance > note_count > track_distance > track_idx
-		var is_better = false
-		if measure_distance < best_measure_dist:
-			is_better = true
-		elif measure_distance == best_measure_dist:
-			if note_count > best_note_count:
-				is_better = true
-			elif note_count == best_note_count:
-				if track_distance < best_track_dist:
-					is_better = true
-				elif track_distance == best_track_dist:
-					# If equidistant, prefer right (higher index)
-					if i > best_track:
-						is_better = true
-		
-		if is_better:
+		print("autoblast score for track %d: %.2f" % [i, track_score])
+		# 3. SELECTION
+		if track_score > highest_score:
+			highest_score = track_score
 			best_track = i
-			best_measure_dist = measure_distance
-			best_note_count = note_count
-			best_track_dist = track_distance
-	
+
 	return best_track
 
 func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
@@ -647,3 +646,7 @@ func _print_new_measure_connections() -> void:
 		var target = callable.get_object()
 		var method = callable.get_method()
 		print(" -> %s.%s" % [target.name, method])
+
+func autoblast_flash(lane: int):
+	if manager_node.autoblast:
+		_targets[lane].flash()

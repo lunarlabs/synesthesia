@@ -111,149 +111,120 @@ func _ready():
 	marker.visible = song_node.manager_node.hide_streak_hints == false
 
 @warning_ignore("unused_parameter")
-func _process(delta: float):
+func _process(_delta: float):
 	var current_time = song_node.time_elapsed
+	
+	# --- 1. NEW AUTOBLAST LOGIC ---
+	# Run this BEFORE the miss detection logic to ensure we hit notes before they are counted as misses.
+	if is_active and song_node.manager_node.autoblast:
+		_process_autoblast(current_time)
+
 	marker.position.y = lerp(1.2, 1.7, fmod(song_node.current_beat, 1))
 	if song_node.lead_in_measures >= 0 or song_node.finished:
 		return
-#	if song_node.manager_node.autoblast:
-#		pass
-	else:
-		for lane_index in range(3):
-			var lane_notes = track_data.lane_notes[lane_index]
-			var next_lane_note_idx = next_note_idx_per_lane[lane_index]
-			if next_lane_note_idx >= lane_notes.size():
-				continue
-			var note_idx = lane_notes[next_lane_note_idx]
-			var note_time = _get_note_time(note_idx)
-			if song_node.current_measure < reset_measure and current_time > note_time:
-				# Track hasn't been reset yet, but we've passed the note. Just advance the index.
-				next_note_idx_per_lane[lane_index] += 1
-			elif (!is_active) and current_time > note_time:
-				# Track is not active, but we've passed the note. Mark as missed and mute the track.
-				next_note_idx_per_lane[lane_index] += 1
-				if asp.volume_db != MUTED_VOLUME:
-					asp.volume_db = MUTED_VOLUME
-				# TODO: See if the passed note was the first note in the phrase
-				# and signal inactive_phrase_missed if it was
-				if current_phrase_index < track_data.phrase_starts.size() \
-				and note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
-					_advance_phrase()
-					inactive_phrase_missed.emit()
 
-			elif is_active and current_time > note_time + song_node.manager_node.miss_window:
-				# We're past the hit window, should be a miss but check if it was already blasted
-				var note_node = note_nodes[note_idx] as SynRoadNote
+	# --- 2. MISS DETECTION LOGIC ---
+	for lane_index in range(3):
+		var lane_notes = track_data.lane_notes[lane_index]
+		var next_lane_note_idx = next_note_idx_per_lane[lane_index]
+		if next_lane_note_idx >= lane_notes.size():
+			continue
+		var note_idx = lane_notes[next_lane_note_idx]
+		var note_time = _get_note_time(note_idx)
+
+		# Case A: Track hasn't reset yet (wait for it)
+		if song_node.current_measure < reset_measure:
+			if current_time > note_time:
 				next_note_idx_per_lane[lane_index] += 1
-				if note_node and note_node.blasted:
-					# Blasted but the index didn't advance. We're done.
-					continue
-				if asp.volume_db != MUTED_VOLUME:
-					asp.volume_db = MUTED_VOLUME
-				if current_phrase_index < track_data.phrase_note_indices.size()\
-				and note_idx in track_data.phrase_note_indices[current_phrase_index]:
-					active_phrase_missed.emit()
-					streak_broken.emit()
-					_advance_phrase()
-	# Phrase-level progression based on precomputed first beat
-	# Only auto-fail if we've WELL passed the window AND haven't started hitting this phrase
-#	if reset_countdown == 0 and phrase_first_beat > 0.0 and !blasting_phrase:
-#		# If we've passed the phrase start beyond the miss window
-#		if current_beat > (phrase_first_beat + miss_beat_window):
-#			# We missed the entire phrase window without hitting any notes
-#			if is_active and current_measure >= phrase_start_measure and !song_node._manager_node.autoblast:
-#				active_phrase_missed.emit()
-#				print("Track %s breaking streak for missing phrase at measure %d (phrase_start_measure=%d, current_beat=%.2f, phrase_first_beat=%.2f)" % 
-#					[midi_name, current_measure, phrase_start_measure, current_beat, phrase_first_beat])
-#				streak_broken.emit()
-#			else:
-#				# Don't penalize for phrases at or past the song's end
-#				if !phrase_notes_dict.is_empty() and phrase_start_measure < song_node.total_measures and !song_node._manager_node.autoblast:
-##					print("Track %s missed inactive phrase starting at measure %d" % [midi_name, phrase_start_measure])
-#					inactive_phrase_missed.emit(midi_name)
-#			if marker_measure == phrase_start_measure:	
-#				move_marker(get_first_available_measure(current_measure + 1))
-#			marker.visible = !song_node._manager_node.hide_streak_hints
-#			
-#			if asp.volume_db != MUTED_VOLUME:
-#				asp.volume_db = MUTED_VOLUME
-#			
-#			# Advance to next phrase
-#
-#	if !song_node._manager_node.autoblast:
-#		# We are not in autoblast mode, just check for missed notes
-#		for lane_index in range(3):
-#			var lane_beats = track_data.lane_notes[lane_index]
-#			var note_index = next_note_idx_per_lane[lane_index]
-#			if note_index >= lane_beats.size():
-#				continue
-#			var target_beat = lane_beats[note_index]
-#			var target_time = target_beat * song_node.seconds_per_beat
-#			if current_time > target_time + MISS_BEAT_WINDOW:
-#				# Check if note was already blasted before marking as missed
-#				var note_node = note_nodes.get(target_beat) as SynRoadNote
-#				if note_node and note_node.blasted:
-#					# Note was already hit, just advance the index
-#					next_note_idx_per_lane[lane_index] += 1
-#					continue
-#				
-#				# If we're actively blasting a phrase and this note is part of it, break streak
-#				if blasting_phrase and note_node and phrase_notes_dict.has(note_node):
-#					if is_active:
-#						active_phrase_missed.emit()
-#						print("Track %s breaking streak for missing note at beat %.2f (measure %d)" % 
-#							[midi_name, target_beat, song_node.current_measure()])
-#						streak_broken.emit()
-#						blasting_phrase = false
-#						if asp.volume_db != MUTED_VOLUME:
-#							asp.volume_db = MUTED_VOLUME
-#						if reset_countdown == 0:
-#							var next_measure = song_node.current_measure() + 1
-#							_process_phrase_at_measure(next_measure)
-#							move_marker(get_first_available_measure(next_measure))
-#							marker.visible = !song_node._manager_node.hide_streak_hints
-#				
-#				next_note_idx_per_lane[lane_index] += 1
-#	else:
-#		if is_active:
-#			# TIME TO FAKE IT BABY!
-#			# Optimized: only process beats from current index until we find one that hasn't been reached
-#			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
-#			var notes_blasted = 0
-#			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= current_beat:
-#				var beat = phrase_beats[phrase_beat_index]
-#				asp.volume_db = BLASTING_VOLUME
-#				if !note_nodes[beat].blasted:
-#					note_nodes[beat].blast(true)
-#					# Emit note_hit signal with perfect timing (0.0 offset)
-#					note_hit.emit(0.0)
-#				# Check if this is the first note of the phrase
-#				if !blasting_phrase:
-#					var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
-#					started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-#					print("  Track %s: Starting autoblast phrase at measure %d" % [midi_name, phrase_start_measure])
-#					blasting_phrase = true
-#					marker.hide()
-#					#print("    Blasted beat %.2f" % beat)
-#					#print("    Remaining phrase beats: %s" % str(phrase_beats))
-#				phrase_beat_index += 1
-#				notes_blasted += 1
-#			
-#			# Check if phrase is complete
-#			if phrase_beat_index >= phrase_beats.size() and notes_blasted > 0:
-#				#print("  Track %s: Phrase complete, activating" % midi_name)
-#				activate(song_node.current_measure())
-#				blasting_phrase = false
-#		else:
-#			# Inactive track in autoblast mode: check if we've passed the phrase start
-#			if reset_countdown == 0:
-#				current_beat = song_node.current_beat()
-#				var phrase_start_beat = (phrase_start_measure - 1) * length_per_beat
-#				
-#				# If we've passed the phrase start, we missed it - mute the track
-#				if current_beat > phrase_start_beat + MISS_BEAT_WINDOW / song_node.seconds_per_beat:
-#					if asp.volume_db != MUTED_VOLUME:
-#						asp.volume_db = MUTED_VOLUME
+		
+		# Case B: Inactive Track Miss (Mute & Penalty)
+		elif (!is_active) and current_time > note_time:
+			next_note_idx_per_lane[lane_index] += 1
+			if asp.volume_db != MUTED_VOLUME:
+				asp.volume_db = MUTED_VOLUME
+			
+			if current_phrase_index < track_data.phrase_starts.size() \
+			and note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
+				_advance_phrase()
+				inactive_phrase_missed.emit()
+
+		# Case C: Active Track Miss (Streak Break)
+		# Note: Autoblast will have already hit the note above if logic works, preventing this.
+		elif is_active and current_time > note_time + song_node.manager_node.miss_window:
+			var note_node = note_nodes[note_idx] as SynRoadNote
+			next_note_idx_per_lane[lane_index] += 1
+			
+			# Safety check: If it was blasted, we are good.
+			if note_node and note_node.blasted:
+				continue
+				
+			if asp.volume_db != MUTED_VOLUME:
+				asp.volume_db = MUTED_VOLUME
+			
+			if current_phrase_index < track_data.phrase_note_indices.size()\
+			and note_idx in track_data.phrase_note_indices[current_phrase_index]:
+				active_phrase_missed.emit()
+				streak_broken.emit()
+				_advance_phrase()
+
+func _process_autoblast(current_time: float):
+	# Loop through all 3 lanes to handle chords (simultaneous notes)
+	for lane in range(3):
+		# Loop 'while' to catch up if a frame dropped and we missed multiple notes
+		while true:
+			var idx = next_note_idx_per_lane[lane]
+			if idx >= track_data.lane_notes[lane].size():
+				break
+
+			var note_idx = track_data.lane_notes[lane][idx]
+			var note_time = track_data.note_times[note_idx]
+			
+			# Hit logic: slightly before the note (0.01s) to ensure perfect registration
+			if current_time >= note_time - 0.01:
+				_perform_autoblast_hit(lane, note_idx)
+			else:
+				# Next note is in the future, stop checking this lane
+				break
+
+func _perform_autoblast_hit(lane_index: int, note_idx: int):
+	var note_node = note_nodes[note_idx] as SynRoadNote
+	
+	# Prevent double-hitting
+	if note_node.blasted:
+		next_note_idx_per_lane[lane_index] += 1
+		return
+
+	# 1. Visuals & Audio
+	note_node.blast(true)
+	song_node.autoblast_flash(lane_index)
+	asp.volume_db = BLASTING_VOLUME
+	
+	# 2. Logic Updates
+	next_note_idx_per_lane[lane_index] += 1
+	note_hit.emit(0.0) # Perfect timing signal
+	
+	# 3. Phrase Tracking
+	if current_phrase_index < track_data.phrase_note_indices.size():
+		var current_indices = track_data.phrase_note_indices[current_phrase_index]
+		
+		# Is this note part of the current phrase?
+		if note_idx in current_indices: # Note: This search is O(N), usually N is small (16-32)
+			phrase_notes_blasted += 1
+			
+			# Start Phrase Trigger
+			if !blasting_phrase:
+				started_phrase.emit(
+					track_data.phrase_note_counts[current_phrase_index],
+					track_data.phrase_starts[current_phrase_index],
+					track_data.phrase_lengths[current_phrase_index]
+				)
+				blasting_phrase = true
+				marker.hide()
+			
+			# End Phrase Trigger
+			if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
+				activate(current_phrase_index)
+				# Reset state is handled inside activate()
 
 func try_blast(lane_index:int):
 	var current_time = song_node.time_elapsed
@@ -306,44 +277,6 @@ func try_blast(lane_index:int):
 			active_phrase_missed.emit()
 			streak_broken.emit()
 			_advance_phrase()
-			
-		
-		
-	# # Allow a slight early hit on the first post-reset note (reset_countdown == 1) if within window and early (time_offset > 0)
-	# if abs(time_offset) <= song_node.manager_node.hit_window and (reset_countdown == 0 or (reset_countdown == 1 and time_offset > 0)):
-	# 	var note_node = note_nodes[target_note] as SynRoadNote
-	# 	if note_node.blasted:
-	# 		return # Don't double-blast
-	# 	note_node.blast(true)
-	# 	note_hit.emit(time_offset)
-	# 	#print("  Track %s: Blasted note at beat %.2f (offset %.3f)" % [midi_name, target_note, time_offset])
-	# 	if phrase_notes_dict.has(note_node):
-	# 		if !blasting_phrase:
-	# 			# preprocessed phrase measure count
-	# 			var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
-	# 			started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-	# 			blasting_phrase = true
-	# 			marker.hide()
-	# 		phrase_notes.erase(note_node)
-	# 		phrase_notes_count -= 1  # Keep in sync with phrase_notes array
-	# 		phrase_notes_dict.erase(note_node)
-	# 		if phrase_notes_count == 0:
-	# 			activate(floori(target_note / BEATS_PER_MEASURE) + 1)
-	# 			blasting_phrase = false
-	# 	asp.volume_db = BLASTING_VOLUME
-	# 	next_note_idx_per_lane[lane_index] += 1
-	# else:
-	# 	miss_sound.play()
-	# 	_spawn_misblast_effect(current_beat, lane_index)
-	# 	if blasting_phrase:
-	# 		asp.volume_db = MUTED_VOLUME
-	# 		blasting_phrase = false
-	# 		active_phrase_missed.emit()
-	# 		print("Track %s breaking streak for misblast at beat %.2f (measure %d)" % 
-	# 			[midi_name, current_beat, song_node.current_measure()])
-	# 		streak_broken.emit()
-	# 		if reset_countdown == 0:
-	# 			_process_phrase_at_measure(song_node.current_measure() + 1)
 
 func _advance_phrase():
 	if current_phrase_index >= 0:
@@ -420,7 +353,7 @@ func move_marker(measure_index: int):
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
 	# tell the song node to update its marker cache with the actual measure number
-	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[current_phrase_index])
+	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[marker_measure_index])
 
 func set_active(active: bool):
 	_active_track = active
