@@ -29,6 +29,7 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 	var track_node = manager_node.song_instance.tracks[track_idx] as SynRoadTrack
 
 	if track_node.chunks[chunk_idx] != null:
+		print("already loaded")
 		# The chunk is already loaded
 		return
 	var track_data = track_node.track_data

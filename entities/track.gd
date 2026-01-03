@@ -469,7 +469,6 @@ func request_chunks(furthest: int):
 func activate(phrase_idx:int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
-	var activation_length = track_data.phrase_activation_lengths[phrase_idx] + 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
 	asp.volume_db = UNFOCUSED_VOLUME
@@ -477,7 +476,7 @@ func activate(phrase_idx:int):
 		track_data.phrase_note_counts[phrase_idx],
 		phrase_end_measure
 	)
-	_play_pfx(phrase_end_measure, phrase_end_measure + activation_length)
+	_play_pfx(phrase_end_measure)
 	var activation_end_measure = reset_measure if reset_measure != -1 else song_node.total_measures
 	for i in range(phrase_end_measure, activation_end_measure):
 		if measure_nodes[i]:
@@ -492,9 +491,12 @@ func activate(phrase_idx:int):
 	_advance_phrase()
 	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 
-func _play_pfx(start_measure: int, end_measure: int):
+func _play_pfx(start_measure: int):
 	pfx.position.z = start_measure * -(BEATS_PER_MEASURE * length_per_beat)
 	pfx.emitting = true
+
+func current_measure_is_unactivated() -> bool:
+	return song_node.current_measure >= reset_measure and song_node.current_measure in track_data.phrase_starts
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()

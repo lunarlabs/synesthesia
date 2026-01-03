@@ -325,7 +325,7 @@ func _process(delta: float):
 					if current_measure == checkpoint_measure:
 						print("Reached checkpoint at measure %d" % checkpoint_measure)
 						_next_checkpoint += 1
-						if manager_node.energy_modifier == 0:
+						if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
 							energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
 #				print("measure %d/%d" % [current_measure + 1, total_measures])
 				if mn.energy_modifier == 1 and (mn.suppressed_measures[current_measure] == false):
