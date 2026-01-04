@@ -45,6 +45,8 @@ var _track_transition_tween:Tween
 var _intro_tween:Tween
 var _max_hit_offset: float = -INF
 var _min_hit_offset: float = INF
+var _early_note_hits: int = 0
+var _late_note_hits: int = 0
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack  # Cache active track reference
@@ -451,10 +453,10 @@ func _on_streak_broken():
 			fail_song()
 			return
 	lbl_phrase_value.hide()
-	print("Streak break, was %d at measure %d" % [streak, current_measure])
+#	print("Streak break, was %d at measure %d" % [streak, current_measure])
 	streak = 0
 	if had_streak:
-		print("Stat updated for proper streak break.")
+#		print("Stat updated for proper streak break.")
 		_streak_breaks += 1
 	lbl_streak.text = "x%d" % streak
 
@@ -595,15 +597,17 @@ func _on_note_hit(offset: float):
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
 	_notes_hit_count += 1
 	%NotesHitLabel.text = str(_notes_hit_count)
-	%EarlyHitLabel.text = "%d ms" % (_max_hit_offset * -1000)
+	%EarlyHitLabel.text = str(_early_note_hits)
 	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * -1000)
-	%LateHitLabel.text = "%d ms" % (_min_hit_offset * -1000)
+	%LateHitLabel.text = str(_late_note_hits)
 	if abs(offset) > 0.01:
 		lbl_fast_slow.show()
 		if offset > 0:
 			lbl_fast_slow.text = "FAST"
+			_early_note_hits += 1
 		else:
 			lbl_fast_slow.text = "SLOW"
+			_late_note_hits += 1
 		
 		# Reuse timer instead of creating new ones
 		# SceneTreeTimer auto-disconnects on completion, so no manual disconnect needed
