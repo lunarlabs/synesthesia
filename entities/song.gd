@@ -651,3 +651,7 @@ func _print_new_measure_connections() -> void:
 		var target = callable.get_object()
 		var method = callable.get_method()
 		print(" -> %s.%s" % [target.name, method])
+
+
+func _on_conductor_new_measure(measure: Variant) -> void:
+	pass # Replace with function body.

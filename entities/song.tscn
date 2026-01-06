@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dih2tkchgg7x0"]
+[gd_scene load_steps=34 format=3 uid="uid://dih2tkchgg7x0"]
 
 [ext_resource type="Script" uid="uid://cgr576c4m6vpp" path="res://entities/song.gd" id="1_jv32a"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_0bd8t"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://owpby88d13pj" path="res://assets/textures/energyarea.svg" id="8_otm2r"]
 [ext_resource type="Texture2D" uid="uid://5q8cu3on2cso" path="res://assets/textures/energybarempty.svg" id="9_jycet"]
 [ext_resource type="Texture2D" uid="uid://rc6bir30grrf" path="res://assets/textures/energybar.svg" id="10_nbke4"]
+[ext_resource type="Script" uid="uid://edb4dhq2llws" path="res://entities/conductor.gd" id="11_jycet"]
 
 [sub_resource type="FontVariation" id="FontVariation_q2dmg"]
 base_font = ExtResource("2_0bd8t")
@@ -1268,3 +1269,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
+
+[node name="Conductor" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("11_jycet")
+
+[connection signal="new_measure" from="Conductor" to="." method="_on_conductor_new_measure"]

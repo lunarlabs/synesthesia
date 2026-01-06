@@ -10,21 +10,25 @@ var current_measure: int
 var is_playing: bool = false
 
 var _audio_player: AudioStreamPlayer
-var _previous_time: float
+var _previous_time_elapsed: float = 0.0
 var _seconds_per_beat: float = 0.5
 
-signal new_measure(measure)
+signal new_measure(measure: int)
 
 func _init() -> void:
-    process_priority = -10
+	process_priority = -10
 
 func setup(audio_player: AudioStreamPlayer, song_bpm: float):
-    _audio_player = audio_player
-    bpm = song_bpm
-    _seconds_per_beat = 60.0 / song_bpm
-    set_process(true)
+	_audio_player = audio_player
+	bpm = song_bpm
+	_seconds_per_beat = 60.0 / song_bpm
+	set_process(true)
 
 func _process(delta: float):
-    if not is_playing or not _audio_player:
-        return
-
+	if not is_playing or not _audio_player:
+		return
+	
+	var audio_time = _audio_player.get_playback_position() + AudioServer.get_time_since_last_mix()
+	if _previous_time_elapsed > 0:
+		var expected_time = _previous_time_elapsed + delta
+		var drift = expected_time - audio_time
