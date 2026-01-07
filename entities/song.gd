@@ -5,7 +5,7 @@ const TRACK_SCENE:PackedScene = preload("res://entities/track.tscn")
 const CHECKPOINT_SCENE:PackedScene = preload("res://entities/checkpoint.tscn")
 const TRACK_WIDTH := 2.5
 const AUTOBLAST_LOOKAHEAD_MEASURES = 2
-const PLAYHEAD_LEAD_TIME := 0.132
+const PLAYHEAD_LEAD_DIST := 0.305
   # Tuned to minimize player hit offset
 const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
@@ -68,7 +68,6 @@ var _last_streak_break_measure: int = -1
 @onready var lbl_auto_blast = $HUD/AutoblastLabel
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 
-signal new_measure(measure)
 signal song_failed(stats)
 signal song_finished(stats)
 
@@ -78,6 +77,7 @@ var total_drift: float = 0.0
 var frame_drops: int = 0
 var playhead_target_z: float = 0.0
 var playhead_velocity: float = 0.0
+var lead_distance: float = 0.0
 
 func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
@@ -97,6 +97,7 @@ func _ready():
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_playhead_speed = -(length_per_beat / seconds_per_beat)
+	lead_distance = PLAYHEAD_LEAD_DIST * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	_track_marker_measures.resize(6)  # Initialize cache for 6 instrument tracks
 	_track_reset_measures.resize(6)  # Initialize cache for 6 instrument tracks
@@ -132,7 +133,7 @@ func _ready():
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	print("instantiating checkpoints")
-	new_measure.connect(start_gate._on_song_new_measure)
+	%Conductor.new_measure.connect(start_gate._on_song_new_measure)
 	start_gate.get_node("Text").text = "Song Start"
 	start_gate.name = "SongStart"
 	start_gate.fadeout_time = checkpoint_fade_time
@@ -140,7 +141,7 @@ func _ready():
 	start_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
-	new_measure.connect(end_gate._on_song_new_measure)
+	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
 	end_gate.get_node("Text").text = "Song End"
 	end_gate.name = "SongEnd"
 	end_gate.fadeout_time = checkpoint_fade_time
@@ -150,7 +151,7 @@ func _ready():
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
-		new_measure.connect(checkpoint._on_song_new_measure)
+		%Conductor.new_measure.connect(checkpoint._on_song_new_measure)
 		checkpoint.name = "Checkpoint%d" % (i)
 		checkpoint.fadeout_time = checkpoint_fade_time
 		var percentage = float(measure * 100) / total_measures
@@ -193,9 +194,13 @@ func _song_start():
 		lbl_auto_blast.hide()
 	_set_instrument_label()
 	tracks[active_track].set_active(true)
+	%Conductor.new_measure.emit(0)
+	_cached_active_track_node = tracks[active_track]
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
 	%Conductor.is_playing = true
+	playhead.position.z = -length_per_beat * %Conductor.current_beat
+	playhead_velocity = -length_per_beat * (bpm / 60.0)
 	manager_node.can_pause = true
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
 	_intro_tween = get_tree().create_tween()
@@ -215,23 +220,35 @@ func _process(delta: float):
 		var beat = %Conductor.current_beat
 		var mn = manager_node
 		var trs = tracks
-		var asp = click_track_asp
 
 		%actualplayhead.position.z = %Conductor.current_beat * -length_per_beat
 		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
-
-		# Calculate target position from audio time (single predicted beat calc)
-		playhead_target_z = -length_per_beat * beat
-		
 		# Smooth interpolation with spring damping
 		var spring_strength = 100.0
 		var damping = 15.0
+		# Calculate target position from audio time (single predicted beat calc)
+# ... inside _process ...
 		
+		# 1. RAW TARGET (No offset needed anymore)
+		playhead_target_z = -length_per_beat * beat
+		
+		# 2. FEEDFORWARD FORCE
+		# Calculate the speed the playhead SHOULD have (Units per Second)
+		# Velocity = Dist/Beat * Beats/Sec
+		# Note: This is negative because we move into negative Z
+		var target_velocity = -length_per_beat * (bpm / 60.0)
+		
+		# We add a force exactly equal to the expected drag (Velocity * Damping)
+		# This "pre-cancels" the damping, so the spring only handles position corrections
+		var feedforward_force = target_velocity * damping
+
+		# 3. STANDARD SPRING PHYSICS
 		var displacement = playhead_target_z - playhead.position.z
 		var spring_force = displacement * spring_strength
 		var damping_force = -playhead_velocity * damping
 		
-		playhead_velocity += (spring_force + damping_force) * delta
+		# Apply all forces
+		playhead_velocity += (spring_force + damping_force + feedforward_force) * delta
 		playhead.position.z += playhead_velocity * delta
 
 		var new_active_track = active_track
@@ -246,98 +263,7 @@ func _process(delta: float):
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
 		# Use cached measure_times reference for boundary check
-		var mts = mn.measure_times
-		if %Conductor.time_elapsed > mts[%Conductor.current_measure + 1]:
-			%Conductor.current_measure += 1
-			%SongProgress.value = %Conductor.current_measure
-			if %Conductor.current_measure >= total_measures:
-				finished = true
-				manager_node.can_pause = false
-				if not mn.autoblast:
-					if _miss_count == 0:
-						%HUDAnimations.play("PerfectRun")
-					else:
-						%HUDAnimations.play("SongClear")
-				var tween = get_tree().create_tween()
-				tween.set_parallel(true)
-				tween.tween_property(camera, "position", Vector3(0, 3, 1), 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-				tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-				tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
-				for track in trs:
-					track.asp.volume_db = -6.0
-				playhead.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
-				var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
-				print("Song finished!")
-				var final_score_text = "Final Score: %d\nMax Streak: %d" % [score, max_streak]
-				if mn.autoblast:
-					print("Autoblast was enabled.")
-				else:
-					print("Total frame drops: %d" % frame_drops)
-					print("Average drift: %.3f ms over %d samples" % [ (total_drift / drift_samples) * 1000, drift_samples])
-					print("Max drift: %.3f ms" % (max_drift * 1000))
-					print("Hit offsets: Max %.3f s, Min %.3f s, Avg %.3f s over %d notes" % 
-						[_max_hit_offset, _min_hit_offset, _avg_hit_offset, _notes_hit_count])
-					if _streak_breaks == 0:
-						final_score_text += "\nPerfect Run!"
-					else:
-						final_score_text += "\nPhrases Completed: %d\nPhrases Missed: %d\nPhrase Capture Accuracy: %.2f%%" % \
-							[_phrases_completed, _phrases_missed, _phrase_capture_accuracy]
-				var stats = {
-					"score": score,
-					"max_streak": max_streak,
-					"phrases_completed": _phrases_completed,
-					"phrases_missed": _phrases_missed,
-					"streak_breaks": _streak_breaks,
-					"miss_count": _miss_count,
-				}
-				emit_signal("song_finished", stats)
-				print(final_score_text)
-			else:
-				new_measure.emit(current_measure)
-				if _next_checkpoint < manager_node.checkpoint_measures.size():
-					var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
-					if current_measure == checkpoint_measure:
-						print("Reached checkpoint at measure %d" % checkpoint_measure)
-						_next_checkpoint += 1
-						if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
-							energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
-#				print("measure %d/%d" % [current_measure + 1, total_measures])
-				if mn.energy_modifier == 1 and (mn.suppressed_measures[current_measure] == false):
-					var any_unactivated = false
-					for track in trs:
-						if (track as SynRoadTrack).current_measure_is_unactivated():
-							any_unactivated = true
-							break
-					if any_unactivated:
-						if energy == 0 and trs[active_track].blasting_phrase == false:
-							fail_song()
-							return
-						else:
-							energy_change(-1)
-				if lead_in_measures > 0:
-					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
-					count_in.text = str(lead_in_measures)
-					lead_in_measures -= 1
-				elif lead_in_measures == 0:
-					lead_in_measures = -1
-						
-		if lead_in_measures < 1:
-			# Cache active track node reference for this frame
-			_cached_active_track_node = trs[active_track] as SynRoadTrack
-			
-			# Check for autoblast track switching every frame
-			if mn.autoblast and _autoblast_next_track != active_track:
-				if !_cached_active_track_node.blasting_phrase:
-					var next_track_node = trs[_autoblast_next_track] as SynRoadTrack
-					var switch_measure = next_track_node.phrase_start_measure
-					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
-					if current_beat >= switch_beat:
-						_switch_active_track(_autoblast_next_track)
-						# Update cached reference after switch
-						_cached_active_track_node = tracks[active_track] as SynRoadTrack
-#					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
-	
-	#lblDebugInfo.text = debug_info()
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if manager_node.autoblast or not input_enabled:
@@ -371,8 +297,8 @@ func debug_info() -> String:
 		lines.append("Song finished")
 	else:
 		lines.append("Elapsed Audio Time: %.3f" % %Conductor.time_elapsed)
-		lines.append("Beat: %.4f" % current_beat)
-		lines.append("Measure: %d : %.1f" % [%Conductor.current_measure, fmod(current_beat, BEATS_PER_MEASURE)])
+		lines.append("Beat: %.4f" % %Conductor.current_beat)
+		lines.append("Measure: %d : %.1f" % [%Conductor.current_measure, fmod(%Conductor.current_beat, BEATS_PER_MEASURE)])
 		lines.append("Phrase start position: %d\n" % phrase_start_measure)
 	lines.append("Tracks:")
 	for i in tracks.size():
@@ -638,6 +564,66 @@ func _print_new_measure_connections() -> void:
 
 func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
-	if %Conductor.current_measure >= total_measures:
+	if measure >= total_measures:
 		finished = true
 		manager_node.can_pause = false
+		if not manager_node.autoblast:
+			if _miss_count == 0:
+				%HUDAnimations.play("PerfectRun")
+			else:
+				%HUDAnimations.play("SongClear")
+		var tween = get_tree().create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(camera, "position", Vector3(0, 3, 1), 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
+		for track in tracks:
+			track.asp.volume_db = -6.0
+		playhead.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
+		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
+		print("Song finished!")
+	else:
+		if _next_checkpoint < manager_node.checkpoint_measures.size():
+			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
+			if measure == checkpoint_measure:
+				print("Reached checkpoint at measure %d" % checkpoint_measure)
+				_next_checkpoint += 1
+				if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
+					energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
+#				print("measure %d/%d" % [current_measure + 1, total_measures])
+			if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
+				var any_unactivated = false
+				for track in tracks:
+					if (track as SynRoadTrack).current_measure_is_unactivated():
+						any_unactivated = true
+						break
+				if any_unactivated:
+					if energy == 0 and tracks[active_track].blasting_phrase == false:
+						fail_song()
+						return
+					else:
+						energy_change(-1)
+			if lead_in_measures > 0:
+				count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
+				count_in.text = str(lead_in_measures)
+				lead_in_measures -= 1
+			elif lead_in_measures == 0:
+				lead_in_measures = -1
+						
+		if lead_in_measures < 1:
+			# Cache active track node reference for this frame
+			_cached_active_track_node = tracks[active_track] as SynRoadTrack
+			
+			# Check for autoblast track switching every frame
+			if manager_node.autoblast and _autoblast_next_track != active_track:
+				if !_cached_active_track_node.blasting_phrase:
+					var next_track_node = tracks[_autoblast_next_track] as SynRoadTrack
+					var switch_measure = next_track_node.phrase_start_measure
+					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
+					if %Conductor.current_beat >= switch_beat:
+						_switch_active_track(_autoblast_next_track)
+						# Update cached reference after switch
+						_cached_active_track_node = tracks[active_track] as SynRoadTrack
+#					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
+	
+	#lblDebugInfo.text = debug_info()

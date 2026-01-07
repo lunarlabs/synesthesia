@@ -128,7 +128,7 @@ func _process(delta: float):
 				continue
 			var note_idx = lane_notes[next_lane_note_idx]
 			var note_time = _get_note_time(note_idx)
-			if song_node.current_measure < reset_measure and current_time > note_time:
+			if conductor.current_measure < reset_measure and current_time > note_time:
 				# Track hasn't been reset yet, but we've passed the note. Just advance the index.
 				next_note_idx_per_lane[lane_index] += 1
 			elif (!is_active) and current_time > note_time:
@@ -203,7 +203,7 @@ func try_blast(lane_index:int, specific_time: float = -1.0):
 	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
 	var lane_note_index = next_note_idx_per_lane[lane_index]
 	if lane_note_index >= track_data.lane_notes[lane_index].size():
-		_misblast(song_node.current_beat, lane_index)
+		_misblast(conductor.current_beat, lane_index)
 		if blasting_phrase:
 			phrase_notes_blasted = 0
 			asp.volume_db = MUTED_VOLUME
@@ -216,7 +216,7 @@ func try_blast(lane_index:int, specific_time: float = -1.0):
 	var target_note_time = _get_note_time(target_note_index)
 	var time_offset = (target_note_time - current_time)
 	if abs(time_offset) <= song_node.manager_node.hit_window \
-	and song_node.current_measure >= reset_measure - 1:
+	and conductor.current_measure >= reset_measure - 1:
 		var note_node = note_nodes[target_note_index] as SynRoadNote
 		if note_node.blasted:
 			return # Don't double-blast
@@ -241,8 +241,8 @@ func try_blast(lane_index:int, specific_time: float = -1.0):
 				phrase_notes_blasted = 0
 				blasting_phrase = false
 				marker.visible = song_node.manager_node.hide_streak_hints == false
-	elif song_node.current_measure >= reset_measure:
-		_misblast(song_node.current_beat, lane_index)
+	elif conductor.current_measure >= reset_measure:
+		_misblast(conductor.current_beat, lane_index)
 		if blasting_phrase:
 			phrase_notes_blasted = 0
 			asp.volume_db = MUTED_VOLUME
@@ -308,7 +308,7 @@ func _advance_phrase():
 
 	while (
 	current_phrase_index < track_data.phrase_starts.size()
-	and (song_node.current_measure > track_data.phrase_starts[current_phrase_index]
+	and (conductor.current_measure > track_data.phrase_starts[current_phrase_index]
 	or track_data.phrase_starts[current_phrase_index] < reset_measure)
 	):
 		# if we're past the measure the phrase starts on, keep going forward
@@ -319,7 +319,7 @@ func _advance_phrase():
 		return
 
 	var first_note_index = track_data.phrase_note_indices[current_phrase_index][0]
-	if song_node.time_elapsed > track_data.note_times[first_note_index]:
+	if conductor.time_elapsed > track_data.note_times[first_note_index]:
 		# if we've passed the first note in the measure, move to next.
 		current_phrase_index += 1
 
@@ -440,7 +440,7 @@ func _play_pfx(start_measure: int):
 	pfx.emitting = true
 
 func current_measure_is_unactivated() -> bool:
-	return song_node.current_measure >= reset_measure and song_node.current_measure in track_data.phrase_starts
+	return conductor.current_measure >= reset_measure and conductor.current_measure in track_data.phrase_starts
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
