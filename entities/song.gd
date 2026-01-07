@@ -218,7 +218,7 @@ func _process(delta: float):
 		var asp = click_track_asp
 
 		%actualplayhead.position.z = %Conductor.current_beat * -length_per_beat
-		RenderingServer.global_shader_parameter_set("beat", fmod(current_beat, 1.0))
+		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
 
 		# Calculate target position from audio time (single predicted beat calc)
 		playhead_target_z = -length_per_beat * beat
@@ -247,10 +247,10 @@ func _process(delta: float):
 
 		# Use cached measure_times reference for boundary check
 		var mts = mn.measure_times
-		if time_elapsed > mts[current_measure + 1]:
-			current_measure += 1
-			%SongProgress.value = current_measure
-			if current_measure >= total_measures:
+		if %Conductor.time_elapsed > mts[%Conductor.current_measure + 1]:
+			%Conductor.current_measure += 1
+			%SongProgress.value = %Conductor.current_measure
+			if %Conductor.current_measure >= total_measures:
 				finished = true
 				manager_node.can_pause = false
 				if not mn.autoblast:
@@ -315,7 +315,7 @@ func _process(delta: float):
 						else:
 							energy_change(-1)
 				if lead_in_measures > 0:
-					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (current_measure + 1)
+					count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 					count_in.text = str(lead_in_measures)
 					lead_in_measures -= 1
 				elif lead_in_measures == 0:
@@ -370,9 +370,9 @@ func debug_info() -> String:
 	if finished:
 		lines.append("Song finished")
 	else:
-		lines.append("Elapsed Audio Time: %.3f" % time_elapsed)
+		lines.append("Elapsed Audio Time: %.3f" % %Conductor.time_elapsed)
 		lines.append("Beat: %.4f" % current_beat)
-		lines.append("Measure: %d : %.1f" % [current_measure, fmod(current_beat, BEATS_PER_MEASURE)])
+		lines.append("Measure: %d : %.1f" % [%Conductor.current_measure, fmod(current_beat, BEATS_PER_MEASURE)])
 		lines.append("Phrase start position: %d\n" % phrase_start_measure)
 	lines.append("Tracks:")
 	for i in tracks.size():
@@ -416,9 +416,9 @@ func _on_track_activated(note_count:int, start_measure:int):
 
 
 func _on_streak_broken():
-	if current_measure == _last_streak_break_measure:
+	if %Conductor.current_measure == _last_streak_break_measure:
 		return  # Prevent multiple penalties in the same measure
-	_last_streak_break_measure = current_measure
+	_last_streak_break_measure = %Conductor.current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
 	match manager_node.energy_modifier:
@@ -446,21 +446,21 @@ func _on_active_phrase_missed():
 	_phrases_missed += 1
 
 func _on_inactive_phrase_missed():
-	if _inactive_safeguard_measure >= current_measure: # this measure already had a phrase activation, do not penalize
+	if _inactive_safeguard_measure >= %Conductor.current_measure: # this measure already had a phrase activation, do not penalize
 		return
 
 	# Enforce only one penalty per measure for inactive phrase misses
-	if current_measure == _last_inactive_penalty_measure:
+	if %Conductor.current_measure == _last_inactive_penalty_measure:
 		return
 		
 	# If the active track is reset and there are notes in the current measure, do not penalize
 	var active_track_node = tracks[active_track] as SynRoadTrack
-	if active_track_node.reset_measure <= current_measure:
-		var notes_in_measure = active_track_node.get_note_count_in_measure(current_measure)
+	if active_track_node.reset_measure <= %Conductor.current_measure:
+		var notes_in_measure = active_track_node.get_note_count_in_measure(%Conductor.current_measure)
 		if notes_in_measure > 0:
 			return
 	
-	_last_inactive_penalty_measure = current_measure
+	_last_inactive_penalty_measure = %Conductor.current_measure
 	_on_streak_broken()
 	
 
@@ -501,7 +501,7 @@ func _find_best_track_for_autoblast() -> int:
 	var best_measure_dist = 9999
 	var best_note_count = -1
 	var best_track_dist = 9999
-	var curr_measure = current_measure
+	var curr_measure = %Conductor.current_measure
 	
 	for i in tracks.size():
 		if i == active_track:
@@ -610,7 +610,7 @@ func fail_song():
 	hud.hide()
 	var stats = {
 		"score": score,
-		"measure": current_measure,
+		"measure": %Conductor.current_measure,
 		"max_streak": max_streak,
 		"phrases_completed": _phrases_completed,
 		"phrases_missed": _phrases_missed,
@@ -638,6 +638,6 @@ func _print_new_measure_connections() -> void:
 
 func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
-	if current_measure >= total_measures:
+	if %Conductor.current_measure >= total_measures:
 		finished = true
 		manager_node.can_pause = false
