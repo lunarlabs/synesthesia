@@ -20,13 +20,10 @@ var midi_data:MidiData
 var tracks:Array[Node]
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var length_multiplier: float = 1.0
-var time_elapsed := 0.0
 var _playhead_speed: float
 var active_track := 0
 var lead_in_measures := 999_999
 var total_measures := 0
-var current_measure := -1
-var current_beat := 0.0
 var phrase_start_measure := 0
 var finished := false
 var input_enabled := true
@@ -75,7 +72,6 @@ signal new_measure(measure)
 signal song_failed(stats)
 signal song_finished(stats)
 
-var previous_time_elapsed: float = 0.0
 var max_drift: float = 0.0
 var drift_samples: int = 0
 var total_drift: float = 0.0
@@ -97,6 +93,7 @@ func _ready():
 	length_multiplier = manager_node.length_multiplier
 	total_measures = manager_node.song_data.playable_measures + lead_in_measures
 	bpm = manager_node.song_data.bpm
+	%Conductor.setup(click_track_asp, bpm)
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_playhead_speed = -(length_per_beat / seconds_per_beat)
@@ -113,7 +110,7 @@ func _ready():
 		newTrack.audio_file = ResourceUID.path_to_uid(manager_node.track_data[i].track_info.audio_file)
 		newTrack.track_data = manager_node.track_data[i].track_data
 		tracks.append(newTrack)
-		new_measure.connect(newTrack._on_song_new_measure)
+		%Conductor.new_measure.connect(newTrack._on_song_new_measure)
 		newTrack.track_activated.connect(_on_track_activated)
 		newTrack.inactive_phrase_missed.connect(_on_inactive_phrase_missed)
 		newTrack.streak_broken.connect(_on_streak_broken)
@@ -198,6 +195,7 @@ func _song_start():
 	tracks[active_track].set_active(true)
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
+	%Conductor.is_playing = true
 	manager_node.can_pause = true
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
 	_intro_tween = get_tree().create_tween()
@@ -214,42 +212,16 @@ func _process(delta: float):
 			return
 
 		# Cache frequently-used members to avoid repeated lookups
+		var beat = %Conductor.current_beat
 		var mn = manager_node
 		var trs = tracks
 		var asp = click_track_asp
 
-		# Get current audio time with mix delay compensation
-		var audio_time = asp.get_playback_position() + AudioServer.get_time_since_last_mix()
-		
-		# Calculate drift from PREVIOUS frame's time + delta
-		if previous_time_elapsed > 0:
-			var expected_time = previous_time_elapsed + delta
-			var drift = audio_time - expected_time
-			
-			if abs(drift) > 0.050:  # >50ms drift
-				print("FRAME DROP: %.1fms @ beat %.2f (measure %d, mod8=%d, delta: %.3f, actual: %.3f, expected: %.3f)" % 
-					[drift * 1000, audio_time / (seconds_per_beat),current_measure, current_measure % 8, delta, audio_time, expected_time])
-				frame_drops += 1
-
-				if mn.autoblast:
-					var _active_track_node = trs[active_track] as SynRoadTrack
-#					_active_track_node._catch_up_missed_notes(previous_time_elapsed, audio_time)
-			elif abs(drift) > 0.010:
-				drift_samples += 1
-				total_drift += abs(drift)
-				max_drift = max(max_drift, abs(drift))
-		
-		previous_time_elapsed = audio_time
-		time_elapsed = audio_time
-		
-		# Compute beat once, reuse values
-		current_beat = time_elapsed * (bpm * 0.016666666666666666) # bpm/60
-		%actualplayhead.position.z = current_beat * -length_per_beat
+		%actualplayhead.position.z = %Conductor.current_beat * -length_per_beat
 		RenderingServer.global_shader_parameter_set("beat", fmod(current_beat, 1.0))
 
 		# Calculate target position from audio time (single predicted beat calc)
-		var predicted_beat = (audio_time + PLAYHEAD_LEAD_TIME) * (bpm * 0.016666666666666666)
-		playhead_target_z = -length_per_beat * predicted_beat
+		playhead_target_z = -length_per_beat * beat
 		
 		# Smooth interpolation with spring damping
 		var spring_strength = 100.0
@@ -364,18 +336,28 @@ func _process(delta: float):
 						# Update cached reference after switch
 						_cached_active_track_node = tracks[active_track] as SynRoadTrack
 #					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
-			if not manager_node.autoblast and input_enabled:
-				if Input.is_action_just_pressed("note_left"):
-					_targets[0].flash()
-					_cached_active_track_node.try_blast(0)
-				elif Input.is_action_just_pressed("note_center"):
-					_targets[1].flash()
-					_cached_active_track_node.try_blast(1)
-				elif Input.is_action_just_pressed("note_right"):
-					_targets[2].flash()
-					_cached_active_track_node.try_blast(2)
 	
 	#lblDebugInfo.text = debug_info()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if manager_node.autoblast or not input_enabled:
+		return
+
+	if event.is_action_pressed("note_left")\
+	or event.is_action_pressed("note_center")\
+	or event.is_action_pressed("note_right"):
+		var fresh_time = %Conductor.get_audio_time()
+		fresh_time += (%Conductor.input_offset_ms / 1000.0)
+
+		if event.is_action_pressed("note_left"):
+			_targets[0].flash()
+			_cached_active_track_node.try_blast(0, fresh_time)
+		elif event.is_action_pressed("note_center"):
+			_targets[1].flash()
+			_cached_active_track_node.try_blast(1, fresh_time)
+		elif Input.is_action_just_pressed("note_right"):
+			_targets[2].flash()
+			_cached_active_track_node.try_blast(2, fresh_time)
 
 func _set_instrument_label():
 	if tracks.size() > 0:
@@ -485,6 +467,7 @@ func _on_inactive_phrase_missed():
 func _switch_active_track(new_active_track:int, use_tween: bool = true):
 	if new_active_track == active_track:
 		return
+	_cached_active_track_node = tracks[new_active_track]
 #	print("Switching active track from %d to %d at beat %.2f" % [active_track, new_active_track, current_beat])
 #	print_stack()
 	if playhead.position.x <= 0:
@@ -654,4 +637,7 @@ func _print_new_measure_connections() -> void:
 
 
 func _on_conductor_new_measure(measure: Variant) -> void:
-	pass # Replace with function body.
+	%SongProgress.value = measure
+	if current_measure >= total_measures:
+		finished = true
+		manager_node.can_pause = false

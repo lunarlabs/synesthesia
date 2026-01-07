@@ -25,6 +25,7 @@ const NOTE_VISIBILITY_RANGE_BEATS = 64.0
 const STANDARD_LENGTH_PER_BEAT = 4.0
 const BEATS_PER_MEASURE = 4.0
 var song_node: SynRoadSong
+var conductor
 var track_index: int = -1
 var track_data: GameplayTrackData
 var lane_tint: Color
@@ -80,6 +81,7 @@ func _enter_tree():
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
 	rails.material_override = instrument_ghost_material
 	song_node = get_parent() as SynRoadSong
+	conductor = song_node.get_node("Conductor")
 	print("track %d instantiating rails" % track_index)
 	rails.multimesh.instance_count = song_node.total_measures * 2
 	length_per_beat = song_node.length_per_beat
@@ -112,8 +114,8 @@ func _ready():
 
 @warning_ignore("unused_parameter")
 func _process(delta: float):
-	var current_time = song_node.time_elapsed
-	marker.position.y = lerp(1.2, 1.7, fmod(song_node.current_beat, 1))
+	var current_time = conductor.time_elapsed
+	marker.position.y = lerp(1.2, 1.7, fmod(conductor.current_beat, 1))
 	if song_node.lead_in_measures >= 0 or song_node.finished:
 		return
 #	if song_node.manager_node.autoblast:
@@ -197,8 +199,8 @@ func _process(delta: float):
 #					if asp.volume_db != MUTED_VOLUME:
 #						asp.volume_db = MUTED_VOLUME
 
-func try_blast(lane_index:int):
-	var current_time = song_node.time_elapsed
+func try_blast(lane_index:int, specific_time: float = -1.0):
+	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
 	var lane_note_index = next_note_idx_per_lane[lane_index]
 	if lane_note_index >= track_data.lane_notes[lane_index].size():
 		_misblast(song_node.current_beat, lane_index)
