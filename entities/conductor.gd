@@ -35,7 +35,13 @@ func _process(delta: float):
 	
 	if _resync_time >= RESYNC_INTERVAL_SECONDS:
 		_resync_time = 0.0
-		time_elapsed = lerp(time_elapsed, get_audio_time(), 0.1)
+		var audio_time = get_audio_time()
+		var drift = time_elapsed - audio_time
+		
+		if abs(drift) > 0.05:
+			time_elapsed = audio_time
+		else:
+			time_elapsed = lerp(time_elapsed, audio_time, 0.1)
 
 	current_beat = time_elapsed / _seconds_per_beat
 
