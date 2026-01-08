@@ -249,7 +249,7 @@ func _process(delta: float):
 		
 		# Apply all forces
 		playhead_velocity += (spring_force + damping_force + feedforward_force) * delta
-		playhead.position.z += playhead_velocity * delta
+		playhead.position.z = %actualplayhead.position.z
 
 		var new_active_track = active_track
 		if !mn.autoblast and input_enabled:
@@ -564,7 +564,7 @@ func _print_new_measure_connections() -> void:
 
 func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
-	if measure >= total_measures:
+	if measure >= total_measures and !finished:
 		finished = true
 		manager_node.can_pause = false
 		if not manager_node.autoblast:
@@ -582,7 +582,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		playhead.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
-	else:
+	elif not finished:
 		if _next_checkpoint < manager_node.checkpoint_measures.size():
 			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
 			if measure == checkpoint_measure:
