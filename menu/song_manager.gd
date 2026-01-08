@@ -101,6 +101,7 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	get_window().focus_exited.connect(_on_lose_focus)
 	print("Loading %s" % song_file)
 	song_data = load(song_file) as SongData
 	await get_tree().process_frame
@@ -243,6 +244,15 @@ func _on_song_failed(stats) -> void:
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
+	song_stats.energy_modifier = energy_modifier
+	song_stats.checkpoint_modifier = checkpoint_modifier
+	song_stats.hide_streak_hints = hide_streak_hints
+	song_stats.fast_track_reset = fast_track_reset
+	song_stats.score = stats["score"]
+	song_stats.max_streak = stats["max_streak"]
+	song_stats.accuracy = stats["accuracy"]
+	song_stats.streak_breaks = stats["streak_breaks"]
+	song_stats.percent_completed = 100.0
 	var finish_anim = result_screen.get_node("AnimationPlayer") as AnimationPlayer
 	# TODO: the rest of the result screen labels and then populate them with stats
 	result_screen.get_node("%SongTitleLabel").text = song_data.long_title
@@ -318,3 +328,7 @@ func _on_quit_pressed() -> void:
 	get_tree().paused = false
 #	SessionManager.save_campaign_data()
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
+
+func _on_lose_focus():
+	if not get_tree().paused:
+		_toggle_pause()
