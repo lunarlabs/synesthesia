@@ -250,46 +250,18 @@ func _on_song_finished(stats) -> void:
 	song_stats.fast_track_reset = fast_track_reset
 	song_stats.score = stats["score"]
 	song_stats.max_streak = stats["max_streak"]
-	song_stats.accuracy = stats["accuracy"]
+	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
+	song_stats.accuracy = accuracy
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = 100.0
-	var finish_anim = result_screen.get_node("AnimationPlayer") as AnimationPlayer
-	# TODO: the rest of the result screen labels and then populate them with stats
-	result_screen.get_node("%SongTitleLabel").text = song_data.long_title
-	result_screen.get_node("%ArtistLabel").text = song_data.artist
-	result_screen.get_node("%DifficultyLabel").text = DIFFICULTY_NAMES[difficulty]
-	result_screen.get_node("%ScoreLabel").text = str(stats.score)
-	result_screen.get_node("%StreakLabel").text = str(stats.max_streak)
-	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
-	result_screen.get_node("%AccuracyLabel").text = "%.2f%%" % accuracy
-	result_screen.get_node("%StreakBreakLabel").text = str(stats.streak_breaks)
-	# TODO: set color for rank label based on rank, currently white for all
-	var rank: String
-	if autoblast:
-		rank = "auto"
-	elif stats.streak_breaks == 0:
-		rank = "AAA"
-	elif accuracy >= 95.0:
-		rank = "AA"
-	elif accuracy >= 90.0:
-		rank = "A"
-	elif accuracy >= 80.0:
-		rank = "B"
-	elif accuracy >= 70.0:
-		rank = "C"
-	else:
-		rank = "D"
-	result_screen.get_node("%RankLabel").text = rank
 
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
 	result_screen.show()
-	finish_anim.play("Display")
 	# Enable buttons when animation finishes
 	var exit_btn = result_screen.get_node("%ExitButton") as Button
 	var restart_btn = result_screen.get_node("%RestartButton") as Button
-	await finish_anim.animation_finished
 	exit_btn.disabled = false
 	restart_btn.disabled = false
 

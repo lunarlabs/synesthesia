@@ -55,6 +55,7 @@ const ACCURACY_THRESHOLDS = {
 	"C": 0.70,
 	"D": 0.60,
 	"E": 0.50,
+	"F": 0.00,
 }
 
 enum ClearState{

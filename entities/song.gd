@@ -509,7 +509,7 @@ func _on_note_hit(offset: float):
 	%EarlyHitLabel.text = str(_early_note_hits)
 	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * -1000)
 	%LateHitLabel.text = str(_late_note_hits)
-	if abs(offset) > 0.01:
+	if abs(offset) > 0.025:
 		lbl_fast_slow.show()
 		if offset > 0:
 			lbl_fast_slow.text = "FAST"
@@ -566,6 +566,14 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
 	if measure >= total_measures and !finished:
 		finished = true
+		var results := {
+			"score": score,
+			"max_streak": max_streak,
+			"phrases_completed": _phrases_completed,
+			"phrases_missed": _phrases_missed,
+			"streak_breaks": _streak_breaks,
+		}
+		song_finished.emit(results)
 		manager_node.can_pause = false
 		if not manager_node.autoblast:
 			if _miss_count == 0:
