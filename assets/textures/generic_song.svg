@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="180"
+   height="180"
+   viewBox="0 0 180 180"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="generic_song.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showguides="true"
+     inkscape:zoom="1"
+     inkscape:cx="90"
+     inkscape:cy="90"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <sodipodi:guide
+       position="-27.178218,90"
+       orientation="0,1"
+       id="guide1"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="90,-4.9009901"
+       orientation="-1,0"
+       id="guide4"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,134,229)" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient13"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop13" />
+      <stop
+         style="stop-color:#939393;stop-opacity:1;"
+         offset="1"
+         id="stop14" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient10"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop11" />
+      <stop
+         style="stop-color:#d5d5d5;stop-opacity:1;"
+         offset="1"
+         id="stop12" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient9"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#e6e6e6;stop-opacity:1;"
+         offset="0"
+         id="stop9" />
+      <stop
+         style="stop-color:#7b7b7b;stop-opacity:1;"
+         offset="1"
+         id="stop10" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient9"
+       id="linearGradient8"
+       x1="29.628716"
+       y1="26.064358"
+       x2="145.24753"
+       y2="159.28218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient10"
+       id="linearGradient12"
+       x1="25.39604"
+       y1="7.3514853"
+       x2="25.39604"
+       y2="175.32178"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient13"
+       id="linearGradient14"
+       x1="110.71782"
+       y1="0.61577815"
+       x2="110.71782"
+       y2="15.634766"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:url(#linearGradient12);stroke:#999999;stroke-width:1;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;fill-opacity:1"
+       id="rect7"
+       width="179"
+       height="179"
+       x="0.5"
+       y="0.5"
+       ry="11.361386" />
+    <circle
+       style="fill:url(#linearGradient8);stroke-width:1;paint-order:fill markers stroke;stroke:#999999;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       id="path1"
+       cx="90"
+       cy="90"
+       r="80" />
+    <g
+       id="g6"
+       style="fill:#f9f9f9;opacity:0.58872651">
+      <path
+         style="fill:#f9f9f9;stroke:none;stroke-width:1;stroke-dasharray:none;paint-order:fill markers stroke"
+         id="path5"
+         sodipodi:type="arc"
+         sodipodi:cx="90"
+         sodipodi:cy="90"
+         sodipodi:rx="79.5"
+         sodipodi:ry="79.5"
+         sodipodi:start="0.98183649"
+         sodipodi:end="1.7486871"
+         sodipodi:arc-type="slice"
+         d="M 134.16196,156.10576 A 79.5,79.5 0 0 1 75.932155,168.24542 L 90,90 Z" />
+      <path
+         style="fill:#f9f9f9;stroke:none;stroke-width:1;stroke-dasharray:none;paint-order:fill markers stroke"
+         id="path6"
+         sodipodi:type="arc"
+         sodipodi:cx="90"
+         sodipodi:cy="90"
+         sodipodi:rx="79.5"
+         sodipodi:ry="79.5"
+         sodipodi:start="1.8796274"
+         sodipodi:end="2.2557584"
+         sodipodi:arc-type="slice"
+         d="M 65.836355,165.73882 A 79.5,79.5 0 0 1 39.704831,151.56822 L 90,90 Z" />
+    </g>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g6"
+       id="use6"
+       inkscape:transform-center-x="13.910758"
+       inkscape:transform-center-y="-38.825252"
+       transform="rotate(180,90,90)" />
+    <path
+       id="path4"
+       style="fill:#666666;stroke:#333333;stroke-width:1;stroke-dasharray:none;paint-order:fill markers stroke"
+       d="m 2,65 v 50 h 88 c 13.80712,0 25,-11.19288 25,-25 0,-13.807119 -11.19288,-25 -25,-25 z"
+       sodipodi:nodetypes="ccsssc" />
+    <rect
+       style="opacity:1;fill:url(#linearGradient14);stroke:#999999;stroke-width:1.00087;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;fill-opacity:1"
+       id="rect12"
+       width="178.99913"
+       height="15.018988"
+       x="0.61577815"
+       y="0.61577815" />
+    <path
+       style="fill:none;stroke:#666666;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 90.115343,3.861505 75.668672,12.389039 H 104.56201 Z"
+       id="path14"
+       sodipodi:nodetypes="cccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8px;line-height:1.25;font-family:'Science Gothic';-inkscape-font-specification:'Science Gothic, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#f9f9f9;stroke-width:0.579039"
+       x="8.2614775"
+       y="91.826744"
+       id="text14"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         x="8.2614775"
+         y="91.826744"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8px;font-family:'Science Gothic';-inkscape-font-specification:'Science Gothic, Normal';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#f9f9f9;stroke-width:0.579039">SYNESTHESIA ROAD</tspan></text>
+  </g>
+</svg>
