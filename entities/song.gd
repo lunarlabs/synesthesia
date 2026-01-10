@@ -210,7 +210,7 @@ func _song_start():
 	_intro_tween.tween_callback(_intro_anim_call)
 
 func _process(delta: float):
-	if !finished:
+	if !finished and !_in_fail_state:
 		if Input.is_action_just_pressed("instant_fail") and OS.is_debug_build():
 			print("Instant fail triggered.")
 			fail_song()
@@ -599,24 +599,24 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
 					energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
 #				print("measure %d/%d" % [current_measure + 1, total_measures])
-			if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
-				var any_unactivated = false
-				for track in tracks:
-					if (track as SynRoadTrack).current_measure_is_unactivated():
-						any_unactivated = true
-						break
-				if any_unactivated:
-					if energy == 0 and tracks[active_track].blasting_phrase == false:
-						fail_song()
-						return
-					else:
-						energy_change(-1)
-			if lead_in_measures > 0:
-				count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
-				count_in.text = str(lead_in_measures)
-				lead_in_measures -= 1
-			elif lead_in_measures == 0:
-				lead_in_measures = -1
+		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
+			var any_unactivated = false
+			for track in tracks:
+				if (track as SynRoadTrack).current_measure_is_unactivated():
+					any_unactivated = true
+					break
+			if any_unactivated:
+				if energy == 0 and tracks[active_track].blasting_phrase == false:
+					fail_song()
+					return
+				else:
+					energy_change(-1)
+		if lead_in_measures > 0:
+			count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
+			count_in.text = str(lead_in_measures)
+			lead_in_measures -= 1
+		elif lead_in_measures == 0:
+			lead_in_measures = -1
 						
 		if lead_in_measures < 1:
 			# Cache active track node reference for this frame
