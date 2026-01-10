@@ -1,13 +1,11 @@
 [gd_scene load_steps=11 format=3 uid="uid://dm4hcmhaewyp6"]
 
+[ext_resource type="Texture2D" uid="uid://ctgrn6k5ee6x3" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_eskt4"]
 [ext_resource type="LabelSettings" uid="uid://6badunbbjt4m" path="res://menu/theme/previousbestlable.tres" id="3_cnqnt"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
 font_size = 24
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_eskt4"]
-size = Vector2(512, 512)
 
 [sub_resource type="FontVariation" id="FontVariation_bsqdo"]
 base_font = ExtResource("2_eskt4")
@@ -479,7 +477,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-texture = SubResource("PlaceholderTexture2D_eskt4")
+texture = ExtResource("1_eskt4")
 expand_mode = 3
 stretch_mode = 5
 
