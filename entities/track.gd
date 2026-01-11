@@ -224,7 +224,7 @@ func try_blast(lane_index:int, specific_time: float = -1.0):
 		note_node.blast(true)
 		note_hit.emit(time_offset)
 		asp.volume_db = BLASTING_VOLUME
-		if current_phrase_index > track_data.phrase_note_indices.size():
+		if current_phrase_index >= track_data.phrase_note_indices.size():
 			return
 		if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
 			phrase_notes_blasted += 1

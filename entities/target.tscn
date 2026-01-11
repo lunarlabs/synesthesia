@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://c3ixmuikuxhov"]
+[gd_scene load_steps=15 format=3 uid="uid://c3ixmuikuxhov"]
 
 [ext_resource type="Shader" uid="uid://557g0yaormii" path="res://entities/target.tres" id="1_5laoc"]
 [ext_resource type="Script" uid="uid://dq5h127wm57ve" path="res://entities/target.gd" id="2_vwvyh"]
+[ext_resource type="Texture2D" uid="uid://3duuaosaims8" path="res://addons/kenney_particle_pack/light_03.png" id="3_4qu1o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0yoam"]
 render_priority = 0
@@ -11,6 +12,48 @@ shader = ExtResource("1_5laoc")
 material = SubResource("ShaderMaterial_0yoam")
 size = Vector2(0.5, 0.5)
 
+[sub_resource type="Curve" id="Curve_rl3px"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_ejsy5"]
+curve = SubResource("Curve_rl3px")
+
+[sub_resource type="Gradient" id="Gradient_db30j"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.14285715, 0.2857143, 0.42857143, 0.5714286, 0.71428573, 0.85714287, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.7, 0.7, 1, 1, 1, 0.6, 1, 0.5, 1, 0.5, 1, 0.39999998, 1, 1, 1, 0.3, 0.3, 1, 1, 1, 0.19999999, 1, 1, 1, 0.100000024, 0.100000024, 1)
+metadata/_snap_enabled = true
+metadata/_snap_count = 7
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ja756"]
+gradient = SubResource("Gradient_db30j")
+
+[sub_resource type="Curve" id="Curve_xwgye"]
+_data = [Vector2(0, 0.25), 0.0, 1.4, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_8asps"]
+curve = SubResource("Curve_xwgye")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_y6cig"]
+emission_shape_offset = Vector3(0, 0.01, 0)
+gravity = Vector3(0, 0, 0)
+scale_curve = SubResource("CurveTexture_8asps")
+color_ramp = SubResource("GradientTexture1D_ja756")
+alpha_curve = SubResource("CurveTexture_ejsy5")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ukd8x"]
+transparency = 1
+blend_mode = 1
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("3_4qu1o")
+
+[sub_resource type="QuadMesh" id="QuadMesh_bancj"]
+material = SubResource("StandardMaterial3D_ukd8x")
+size = Vector2(2, 2)
+orientation = 1
+
 [node name="Target" type="MeshInstance3D"]
 layers = 2
 instance_shader_parameters/hit = false
@@ -18,7 +61,15 @@ mesh = SubResource("PlaneMesh_jv32a")
 script = ExtResource("2_vwvyh")
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 0.05
+wait_time = 0.1
 one_shot = true
+
+[node name="Poof" type="GPUParticles3D" parent="."]
+emitting = false
+lifetime = 0.4
+one_shot = true
+explosiveness = 0.5
+process_material = SubResource("ParticleProcessMaterial_y6cig")
+draw_pass_1 = SubResource("QuadMesh_bancj")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

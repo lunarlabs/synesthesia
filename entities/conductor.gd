@@ -30,7 +30,7 @@ func _process(delta: float):
 	if not is_playing or not _audio_player:
 		return
 	
-	time_elapsed += delta
+	time_elapsed += delta * _audio_player.pitch_scale
 	_resync_time += delta
 	
 	if _resync_time >= RESYNC_INTERVAL_SECONDS:

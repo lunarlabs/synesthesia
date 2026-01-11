@@ -210,7 +210,7 @@ func _song_start():
 	_intro_tween.tween_callback(_intro_anim_call)
 
 func _process(delta: float):
-	if !finished and !_in_fail_state:
+	if !finished:
 		if Input.is_action_just_pressed("instant_fail") and OS.is_debug_build():
 			print("Instant fail triggered.")
 			fail_song()

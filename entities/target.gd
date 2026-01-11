@@ -1,6 +1,7 @@
 extends MeshInstance3D
 
 @onready var timer = $Timer
+@onready var pfx = $Poof as GPUParticles3D
 
 func flash():
 	set_instance_shader_parameter("hit", true)
