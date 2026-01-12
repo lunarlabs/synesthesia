@@ -1,16 +1,19 @@
-[gd_scene load_steps=34 format=3 uid="uid://dih2tkchgg7x0"]
+[gd_scene load_steps=47 format=3 uid="uid://dih2tkchgg7x0"]
 
 [ext_resource type="Script" uid="uid://cgr576c4m6vpp" path="res://entities/song.gd" id="1_jv32a"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_0bd8t"]
 [ext_resource type="PackedScene" uid="uid://c3ixmuikuxhov" path="res://entities/target.tscn" id="2_gkj2n"]
 [ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="2_scy1h"]
 [ext_resource type="Texture2D" uid="uid://cb3t3wrdorm6v" path="res://addons/kenney_particle_pack/circle_01.png" id="3_0mt4k"]
+[ext_resource type="Texture2D" uid="uid://868nvo23i8n8" path="res://addons/kenney_particle_pack/circle_05.png" id="4_36g15"]
 [ext_resource type="Texture2D" uid="uid://dil27tl3d85hr" path="res://assets/textures/scorearea.svg" id="5_q2dmg"]
 [ext_resource type="FontVariation" uid="uid://cxlh2wreioa5o" path="res://menu/theme/tabularmenufont.tres" id="7_0yoam"]
 [ext_resource type="Texture2D" uid="uid://owpby88d13pj" path="res://assets/textures/energyarea.svg" id="8_otm2r"]
 [ext_resource type="Texture2D" uid="uid://5q8cu3on2cso" path="res://assets/textures/energybarempty.svg" id="9_jycet"]
 [ext_resource type="Texture2D" uid="uid://rc6bir30grrf" path="res://assets/textures/energybar.svg" id="10_nbke4"]
+[ext_resource type="Texture2D" uid="uid://cenaxc1qvl3ig" path="res://assets/textures/progressmeter.svg" id="11_a22vp"]
 [ext_resource type="Script" uid="uid://edb4dhq2llws" path="res://entities/conductor.gd" id="11_jycet"]
+[ext_resource type="Texture2D" uid="uid://n0gwuuqgxkfc" path="res://assets/textures/progressmeter.png" id="12_36g15"]
 
 [sub_resource type="FontVariation" id="FontVariation_q2dmg"]
 base_font = ExtResource("2_0bd8t")
@@ -20,6 +23,62 @@ variation_opentype = {
 2003072104: 120,
 2003265652: 400
 }
+
+[sub_resource type="Curve" id="Curve_bn0wb"]
+_data = [Vector2(0, 1), 0.0, -1.1209677, 0, 1, Vector2(0.8920863, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_qk6wt"]
+curve = SubResource("Curve_bn0wb")
+
+[sub_resource type="Gradient" id="Gradient_gwrde"]
+offsets = PackedFloat32Array(0.30952382, 0.5952381)
+colors = PackedColorArray(1, 1, 1, 1, 1, 0.19999999, 0.19999999, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_gxnb8"]
+gradient = SubResource("Gradient_gwrde")
+
+[sub_resource type="Curve" id="Curve_tgeyx"]
+_data = [Vector2(0.334, 0), 0.0, 2.3730662, 0, 1, Vector2(0.7553957, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_xubvx"]
+curve = SubResource("Curve_tgeyx")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_u2oep"]
+emission_shape = 3
+emission_box_extents = Vector3(0.85, 0.01, 0.1)
+direction = Vector3(0, 1, 0)
+spread = 75.0
+initial_velocity_min = 2.0
+initial_velocity_max = 2.0
+gravity = Vector3(0, 0, 0)
+damping_max = 2.0
+scale_min = 0.19999999
+color_ramp = SubResource("GradientTexture1D_gxnb8")
+alpha_curve = SubResource("CurveTexture_qk6wt")
+hue_variation_min = -0.5
+hue_variation_max = 0.49999997
+hue_variation_curve = SubResource("CurveTexture_xubvx")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_afjmx"]
+transparency = 1
+blend_mode = 1
+no_depth_test = true
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("4_36g15")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+distance_fade_mode = 1
+distance_fade_min_distance = 1.0
+distance_fade_max_distance = 2.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_e81dl"]
+material = SubResource("StandardMaterial3D_afjmx")
 
 [sub_resource type="FontVariation" id="FontVariation_scy1h"]
 base_font = ExtResource("2_0bd8t")
@@ -64,6 +123,9 @@ font = ExtResource("2_scy1h")
 font_size = 72
 outline_size = 3
 outline_color = Color(0, 0, 0, 1)
+shadow_size = 10
+shadow_color = Color(0, 0, 0, 1)
+shadow_offset = Vector2(2, 2)
 
 [sub_resource type="FontVariation" id="FontVariation_0mt4k"]
 base_font = ExtResource("2_0bd8t")
@@ -243,6 +305,18 @@ tracks/10/keys = {
 "transitions": PackedFloat32Array(0.8, 1),
 "update": 0,
 "values": [-320.0, 0.0]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("%SongProgress:modulate")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(1, 1.5333334),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_gkj2n"]
@@ -671,6 +745,18 @@ tracks/22/keys = {
 "update": 0,
 "values": [-320.0]
 }
+tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("%SongProgress:modulate")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_o2o53"]
 resource_name = "SongClear"
@@ -796,12 +882,89 @@ tracks/9/keys = {
 "values": [Vector2(0.5, 0.5), Vector2(5, 5)]
 }
 
+[sub_resource type="Animation" id="Animation_36g15"]
+resource_name = "SongFailed"
+length = 2.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SongClearedLabel:text")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["HUD_SONG_FAILED"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SongClearedLabel:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.06666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SongClearedLabel:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.13333334, 2.1666667, 2.4),
+"transitions": PackedFloat32Array(0.70710677, 1, 2, 1),
+"update": 0,
+"values": [Vector2(1, 20), Vector2(1, 1), Vector2(1, 1), Vector2(3, 1e-05)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SongClearedLabel:self_modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 0, 0, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("SongClearedLabel/MarginContainer/TextureRect:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.59, 0.59, 0.59, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("SongClearedLabel:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_82rk8"]
 _data = {
 &"BuildIn": SubResource("Animation_otm2r"),
 &"PerfectRun": SubResource("Animation_gkj2n"),
 &"RESET": SubResource("Animation_0yoam"),
-&"SongClear": SubResource("Animation_o2o53")
+&"SongClear": SubResource("Animation_o2o53"),
+&"SongFailed": SubResource("Animation_36g15")
 }
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_scy1h"]
@@ -832,14 +995,17 @@ theme_override_font_sizes/font_size = 11
 [node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
+visible = false
 
 [node name="TargetCenter" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+visible = false
 
 [node name="TargetRight" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
+visible = false
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)
@@ -854,6 +1020,16 @@ font = SubResource("FontVariation_q2dmg")
 font_size = 25
 uppercase = true
 width = 300.0
+
+[node name="TargetPfx" type="GPUParticles3D" parent="Playhead/CurrentTrack"]
+unique_name_in_owner = true
+emitting = false
+amount = 40
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_u2oep")
+draw_pass_1 = SubResource("QuadMesh_e81dl")
 
 [node name="Camera3D" type="Camera3D" parent="Playhead"]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2.25)
@@ -1236,17 +1412,23 @@ text = "FAST"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SongProgress" type="ProgressBar" parent="HUD"]
+[node name="SongProgress" type="TextureProgressBar" parent="HUD"]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.02
-anchor_top = 0.2
 anchor_right = 0.02
-anchor_bottom = 0.95
-offset_right = 30.0
+anchor_bottom = 1.0
+offset_top = 132.0
+offset_right = 30.000002
+offset_bottom = -30.0
 fill_mode = 3
-show_percentage = false
+nine_patch_stretch = true
+stretch_margin_top = 11
+stretch_margin_bottom = 11
+texture_under = ExtResource("11_a22vp")
+texture_progress = ExtResource("12_36g15")
 
 [node name="HUDAnimations" type="AnimationPlayer" parent="HUD"]
 unique_name_in_owner = true

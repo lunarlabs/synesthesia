@@ -551,6 +551,7 @@ func fail_song():
 	await slow_tween.finished
 	finished = true
 	get_tree().call_group("AudioPlayers", "stop")
+	%Conductor.is_playing = false
 
 func _print_new_measure_connections() -> void:
 	var conns: Array = get_signal_connection_list("new_measure")
@@ -566,6 +567,9 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
 	if measure >= total_measures and !finished:
 		finished = true
+		%TargetPfx.emitting = true
+		for tgt in _targets:
+			tgt.hide()
 		var results := {
 			"score": score,
 			"max_streak": max_streak,
@@ -597,6 +601,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				print("Reached checkpoint at measure %d" % checkpoint_measure)
 				_next_checkpoint += 1
 				if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
+					%TargetPfx.emitting = true
 					energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
 #				print("measure %d/%d" % [current_measure + 1, total_measures])
 		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
@@ -614,6 +619,10 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		if lead_in_measures > 0:
 			count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
+			if lead_in_measures == 1:
+				%TargetPfx.emitting = true
+				for tgt in _targets:
+					tgt.show()
 			lead_in_measures -= 1
 		elif lead_in_measures == 0:
 			lead_in_measures = -1
