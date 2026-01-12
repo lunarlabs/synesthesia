@@ -832,14 +832,17 @@ theme_override_font_sizes/font_size = 11
 [node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
+visible = false
 
 [node name="TargetCenter" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+visible = false
 
 [node name="TargetRight" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
+visible = false
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)

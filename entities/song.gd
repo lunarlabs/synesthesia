@@ -614,6 +614,9 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		if lead_in_measures > 0:
 			count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
+			if lead_in_measures == 1:
+				for tgt in _targets:
+					tgt.show()
 			lead_in_measures -= 1
 		elif lead_in_measures == 0:
 			lead_in_measures = -1

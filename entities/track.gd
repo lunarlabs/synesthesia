@@ -202,54 +202,54 @@ func _process(delta: float):
 func try_blast(lane_index:int, specific_time: float = -1.0):
 	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
 	var lane_note_index = next_note_idx_per_lane[lane_index]
-	if lane_note_index >= track_data.lane_notes[lane_index].size():
-		_misblast(conductor.current_beat, lane_index)
-		if blasting_phrase:
-			phrase_notes_blasted = 0
-			asp.volume_db = MUTED_VOLUME
-			blasting_phrase = false
-			active_phrase_missed.emit()
-			streak_broken.emit()
-			_advance_phrase()
-		return
-	var target_note_index = track_data.lane_notes[lane_index][lane_note_index]
-	var target_note_time = _get_note_time(target_note_index)
-	var time_offset = (target_note_time - current_time)
-	if abs(time_offset) <= song_node.manager_node.hit_window \
-	and conductor.current_measure >= reset_measure - 1:
-		var note_node = note_nodes[target_note_index] as SynRoadNote
-		if note_node.blasted:
-			return # Don't double-blast
-		next_note_idx_per_lane[lane_index] += 1
-		note_node.blast(true)
-		note_hit.emit(time_offset)
-		asp.volume_db = BLASTING_VOLUME
-		if current_phrase_index >= track_data.phrase_note_indices.size():
-			return
-		if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
-			phrase_notes_blasted += 1
-			if !blasting_phrase:
-				started_phrase.emit(
-					track_data.phrase_note_counts[current_phrase_index],
-					track_data.phrase_starts[current_phrase_index],
-					track_data.phrase_lengths[current_phrase_index]
-				)
-				blasting_phrase = true
-				marker.hide()
-			if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
-				activate(current_phrase_index)
+	if conductor.current_measure >= reset_measure - 1:
+		if lane_note_index >= track_data.lane_notes[lane_index].size():
+			_misblast(conductor.current_beat, lane_index)
+			if blasting_phrase:
 				phrase_notes_blasted = 0
+				asp.volume_db = MUTED_VOLUME
 				blasting_phrase = false
-				marker.visible = song_node.manager_node.hide_streak_hints == false
-	elif conductor.current_measure >= reset_measure:
-		_misblast(conductor.current_beat, lane_index)
-		if blasting_phrase:
-			phrase_notes_blasted = 0
-			asp.volume_db = MUTED_VOLUME
-			blasting_phrase = false
-			active_phrase_missed.emit()
-			streak_broken.emit()
-			_advance_phrase()
+				active_phrase_missed.emit()
+				streak_broken.emit()
+				_advance_phrase()
+			return
+		var target_note_index = track_data.lane_notes[lane_index][lane_note_index]
+		var target_note_time = _get_note_time(target_note_index)
+		var time_offset = (target_note_time - current_time)
+		if abs(time_offset) <= song_node.manager_node.hit_window:
+			var note_node = note_nodes[target_note_index] as SynRoadNote
+			if note_node.blasted:
+				return # Don't double-blast
+			next_note_idx_per_lane[lane_index] += 1
+			note_node.blast(true)
+			note_hit.emit(time_offset)
+			asp.volume_db = BLASTING_VOLUME
+			if current_phrase_index >= track_data.phrase_note_indices.size():
+				return
+			if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
+				phrase_notes_blasted += 1
+				if !blasting_phrase:
+					started_phrase.emit(
+						track_data.phrase_note_counts[current_phrase_index],
+						track_data.phrase_starts[current_phrase_index],
+						track_data.phrase_lengths[current_phrase_index]
+					)
+					blasting_phrase = true
+					marker.hide()
+				if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
+					activate(current_phrase_index)
+					phrase_notes_blasted = 0
+					blasting_phrase = false
+					marker.visible = song_node.manager_node.hide_streak_hints == false
+		elif conductor.current_measure >= reset_measure:
+			_misblast(conductor.current_beat, lane_index)
+			if blasting_phrase:
+				phrase_notes_blasted = 0
+				asp.volume_db = MUTED_VOLUME
+				blasting_phrase = false
+				active_phrase_missed.emit()
+				streak_broken.emit()
+				_advance_phrase()
 			
 		
 		
