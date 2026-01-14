@@ -1,8 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://dm4hcmhaewyp6"]
+[gd_scene load_steps=10 format=3 uid="uid://dm4hcmhaewyp6"]
 
-[ext_resource type="Texture2D" uid="uid://ctgrn6k5ee6x3" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
+[ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_eskt4"]
-[ext_resource type="LabelSettings" uid="uid://6badunbbjt4m" path="res://menu/theme/previousbestlable.tres" id="3_cnqnt"]
+[ext_resource type="PackedScene" uid="uid://51eeo5x4q33x" path="res://menu/result_box.tscn" id="3_eskt4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
 font_size = 24
@@ -25,104 +25,101 @@ font_size = 72
 outline_size = 6
 outline_color = Color(0, 0, 0, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_dr1j0"]
-font_size = 36
-
-[sub_resource type="Animation" id="Animation_eskt4"]
-resource_name = "Display"
-length = 0.7
+[sub_resource type="Animation" id="Animation_cnqnt"]
+resource_name = "BuildIn"
+length = 3.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer2/AccuracyDiffLabel:visible_ratio")
+tracks/0/path = NodePath("LeftSide:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.20000002),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("RightSide/Stats/GridContainer/AccuracyTitle:visible_ratio")
+tracks/1/path = NodePath("RightSide/RankPanel:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.20000002),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("RightSide/RankPanel/VBoxContainer/RankLabel:modulate")
+tracks/2/path = NodePath("RightSide/ClearPanel:modulate")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0.4, 0.7),
-"transitions": PackedFloat32Array(2, 1),
+"times": PackedFloat32Array(0.1, 0.30000004),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer2/AccuracyLabel:visible_ratio")
+tracks/3/path = NodePath("RightSide/ScorePanel:modulate")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.3, 0.5),
+"times": PackedFloat32Array(0.2, 0.40000004),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("RightSide/Stats/GridContainer/StreakBreakLabel:visible_ratio")
+tracks/4/path = NodePath("RightSide/StreakPanel:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0.3, 0.5),
+"times": PackedFloat32Array(0.3, 0.50000006),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer/StreakLabel:visible_ratio")
+tracks/5/path = NodePath("RightSide/AccuracyPanel:modulate")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0.3, 0.5),
+"times": PackedFloat32Array(0.4, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer/ScoreLabel:visible_ratio")
+tracks/6/path = NodePath("RightSide/TimingStats:modulate")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0.3, 0.5),
+"times": PackedFloat32Array(0.5, 0.70000005),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 1.0]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("RightSide/Stats/GridContainer/StreakBreakTitle:visible_ratio")
+tracks/7/path = NodePath("LeftSide/LeftSide/SongTitleLabel:visible_ratio")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.20000002, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -130,11 +127,11 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer/StreakDiffLabel:visible_ratio")
+tracks/8/path = NodePath("LeftSide/LeftSide/ArtistLabel:visible_ratio")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.20000002, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -142,11 +139,11 @@ tracks/8/keys = {
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer/ScoreDiffLabel:visible_ratio")
+tracks/9/path = NodePath("LeftSide/LeftSide/DifficultyLabel:visible_ratio")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.20000002, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -154,11 +151,11 @@ tracks/9/keys = {
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("RightSide/Stats/GridContainer/StreakTitle:visible_ratio")
+tracks/10/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/Title:visible_ratio")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.30000004, 0.59999996),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -166,11 +163,11 @@ tracks/10/keys = {
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/ScoreTitle:visible_ratio")
+tracks/11/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/Previous:visible_ratio")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0.30000004, 0.59999996),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -178,11 +175,11 @@ tracks/11/keys = {
 tracks/12/type = "value"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath("RightSide/RankPanel/VBoxContainer/RankTitle:visible_ratio")
+tracks/12/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/Title:visible_ratio")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
 tracks/12/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.30000004, 0.59999996),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -190,11 +187,11 @@ tracks/12/keys = {
 tracks/13/type = "value"
 tracks/13/imported = false
 tracks/13/enabled = true
-tracks/13/path = NodePath("PanelContainer/LeftSide/DifficultyLabel:visible_ratio")
+tracks/13/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/Previous:visible_ratio")
 tracks/13/interp = 1
 tracks/13/loop_wrap = true
 tracks/13/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.30000004, 0.59999996),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -202,11 +199,11 @@ tracks/13/keys = {
 tracks/14/type = "value"
 tracks/14/imported = false
 tracks/14/enabled = true
-tracks/14/path = NodePath("PanelContainer/LeftSide/ArtistLabel:visible_ratio")
+tracks/14/path = NodePath("RightSide/ClearPanel/VBoxContainer/CompletionBox/Title:visible_ratio")
 tracks/14/interp = 1
 tracks/14/loop_wrap = true
 tracks/14/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.30000004, 0.59999996),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -214,106 +211,406 @@ tracks/14/keys = {
 tracks/15/type = "value"
 tracks/15/imported = false
 tracks/15/enabled = true
-tracks/15/path = NodePath("PanelContainer/LeftSide/SongTitleLabel:visible_ratio")
+tracks/15/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/Title:visible_ratio")
 tracks/15/interp = 1
 tracks/15/loop_wrap = true
 tracks/15/keys = {
-"times": PackedFloat32Array(0, 0.20000002),
+"times": PackedFloat32Array(0.40000004, 0.7),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
 }
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0.40000004, 0.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/Title:visible_ratio")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0.50000006, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0.50000006, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
+tracks/19/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/Title:visible_ratio")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
+tracks/19/keys = {
+"times": PackedFloat32Array(0.6, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
+tracks/20/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
+tracks/20/keys = {
+"times": PackedFloat32Array(0.6, 0.9),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
+tracks/21/path = NodePath("RightSide/TimingStats/VBoxContainer/StreakBreaksTitle:visible_ratio")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
+tracks/21/keys = {
+"times": PackedFloat32Array(0.70000005, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
+tracks/22/path = NodePath("RightSide/TimingStats/VBoxContainer/NotesHitTitle:visible_ratio")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
+tracks/22/keys = {
+"times": PackedFloat32Array(0.70000005, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("RightSide/TimingStats/VBoxContainer/EarlyHitTitle:visible_ratio")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(0.70000005, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
+tracks/24/path = NodePath("RightSide/TimingStats/VBoxContainer/LateHitTitle:visible_ratio")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
+tracks/24/keys = {
+"times": PackedFloat32Array(0.70000005, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("RightSide/TimingStats/VBoxContainer/AvgHitTitle:visible_ratio")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
+"times": PackedFloat32Array(0.70000005, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/New:visible_ratio")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/27/type = "value"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/New:visible_ratio")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/28/type = "value"
+tracks/28/imported = false
+tracks/28/enabled = true
+tracks/28/path = NodePath("RightSide/ClearPanel/VBoxContainer/CompletionBox/Value:visible_ratio")
+tracks/28/interp = 1
+tracks/28/loop_wrap = true
+tracks/28/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/29/type = "value"
+tracks/29/imported = false
+tracks/29/enabled = true
+tracks/29/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/29/interp = 1
+tracks/29/loop_wrap = true
+tracks/29/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/30/type = "value"
+tracks/30/imported = false
+tracks/30/enabled = true
+tracks/30/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/30/interp = 1
+tracks/30/loop_wrap = true
+tracks/30/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/31/type = "value"
+tracks/31/imported = false
+tracks/31/enabled = true
+tracks/31/path = NodePath("RightSide/ScorePanel/PanelContainer/Difference:visible_ratio")
+tracks/31/interp = 1
+tracks/31/loop_wrap = true
+tracks/31/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/32/type = "value"
+tracks/32/imported = false
+tracks/32/enabled = true
+tracks/32/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/32/interp = 1
+tracks/32/loop_wrap = true
+tracks/32/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/33/type = "value"
+tracks/33/imported = false
+tracks/33/enabled = true
+tracks/33/path = NodePath("RightSide/AccuracyPanel/PanelContainer/Difference:visible_ratio")
+tracks/33/interp = 1
+tracks/33/loop_wrap = true
+tracks/33/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/34/type = "value"
+tracks/34/imported = false
+tracks/34/enabled = true
+tracks/34/path = NodePath("RightSide/StreakPanel/PanelContainer/Difference:visible_ratio")
+tracks/34/interp = 1
+tracks/34/loop_wrap = true
+tracks/34/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/35/type = "value"
+tracks/35/imported = false
+tracks/35/enabled = true
+tracks/35/path = NodePath("RightSide/TimingStats/VBoxContainer/NotesHitLabel:visible_ratio")
+tracks/35/interp = 1
+tracks/35/loop_wrap = true
+tracks/35/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/36/type = "value"
+tracks/36/imported = false
+tracks/36/enabled = true
+tracks/36/path = NodePath("RightSide/TimingStats/VBoxContainer/EarlyHitLabel:visible_ratio")
+tracks/36/interp = 1
+tracks/36/loop_wrap = true
+tracks/36/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/37/type = "value"
+tracks/37/imported = false
+tracks/37/enabled = true
+tracks/37/path = NodePath("RightSide/TimingStats/VBoxContainer/LateHitLabel:visible_ratio")
+tracks/37/interp = 1
+tracks/37/loop_wrap = true
+tracks/37/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/38/type = "value"
+tracks/38/imported = false
+tracks/38/enabled = true
+tracks/38/path = NodePath("RightSide/TimingStats/VBoxContainer/AvgHitLabel:visible_ratio")
+tracks/38/interp = 1
+tracks/38/loop_wrap = true
+tracks/38/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/39/type = "value"
+tracks/39/imported = false
+tracks/39/enabled = true
+tracks/39/path = NodePath("RightSide/TimingStats/VBoxContainer/StreakBreaksLabel:visible_ratio")
+tracks/39/interp = 1
+tracks/39/loop_wrap = true
+tracks/39/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/40/type = "value"
+tracks/40/imported = false
+tracks/40/enabled = true
+tracks/40/path = NodePath("RightSide/RankPanel/RankLabel:modulate")
+tracks/40/interp = 1
+tracks/40/loop_wrap = true
+tracks/40/keys = {
+"times": PackedFloat32Array(1.2, 1.5000001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
 
-[sub_resource type="Animation" id="Animation_cnqnt"]
+[sub_resource type="Animation" id="Animation_xsivx"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer2/AccuracyDiffLabel:visible_ratio")
+tracks/0/path = NodePath("LeftSide:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("RightSide/Stats/GridContainer/AccuracyTitle:visible_ratio")
+tracks/1/path = NodePath("RightSide/RankPanel:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("RightSide/RankPanel/VBoxContainer/RankLabel:modulate")
+tracks/2/path = NodePath("RightSide/ClearPanel:modulate")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Color(1, 1, 1, 1)]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer2/AccuracyLabel:visible_ratio")
+tracks/3/path = NodePath("RightSide/ScorePanel:modulate")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("RightSide/Stats/GridContainer/StreakBreakLabel:visible_ratio")
+tracks/4/path = NodePath("RightSide/StreakPanel:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer/StreakLabel:visible_ratio")
+tracks/5/path = NodePath("RightSide/AccuracyPanel:modulate")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer/ScoreLabel:visible_ratio")
+tracks/6/path = NodePath("RightSide/TimingStats:modulate")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.0]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("RightSide/Stats/GridContainer/StreakBreakTitle:visible_ratio")
+tracks/7/path = NodePath("LeftSide/LeftSide/SongTitleLabel:visible_ratio")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -325,7 +622,7 @@ tracks/7/keys = {
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("RightSide/Stats/GridContainer/VBoxContainer/StreakDiffLabel:visible_ratio")
+tracks/8/path = NodePath("LeftSide/LeftSide/ArtistLabel:visible_ratio")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
@@ -337,7 +634,7 @@ tracks/8/keys = {
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer/ScoreDiffLabel:visible_ratio")
+tracks/9/path = NodePath("LeftSide/LeftSide/DifficultyLabel:visible_ratio")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
@@ -349,7 +646,7 @@ tracks/9/keys = {
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("RightSide/Stats/GridContainer/StreakTitle:visible_ratio")
+tracks/10/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/Title:visible_ratio")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
@@ -361,7 +658,7 @@ tracks/10/keys = {
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("RightSide/RightTop/ScorePanel/VBoxContainer/ScoreTitle:visible_ratio")
+tracks/11/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/Previous:visible_ratio")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
@@ -373,7 +670,7 @@ tracks/11/keys = {
 tracks/12/type = "value"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath("RightSide/RankPanel/VBoxContainer/RankTitle:visible_ratio")
+tracks/12/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/Title:visible_ratio")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
 tracks/12/keys = {
@@ -385,7 +682,7 @@ tracks/12/keys = {
 tracks/13/type = "value"
 tracks/13/imported = false
 tracks/13/enabled = true
-tracks/13/path = NodePath("PanelContainer/LeftSide/DifficultyLabel:visible_ratio")
+tracks/13/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/Previous:visible_ratio")
 tracks/13/interp = 1
 tracks/13/loop_wrap = true
 tracks/13/keys = {
@@ -397,7 +694,7 @@ tracks/13/keys = {
 tracks/14/type = "value"
 tracks/14/imported = false
 tracks/14/enabled = true
-tracks/14/path = NodePath("PanelContainer/LeftSide/ArtistLabel:visible_ratio")
+tracks/14/path = NodePath("RightSide/ClearPanel/VBoxContainer/CompletionBox/Title:visible_ratio")
 tracks/14/interp = 1
 tracks/14/loop_wrap = true
 tracks/14/keys = {
@@ -409,7 +706,7 @@ tracks/14/keys = {
 tracks/15/type = "value"
 tracks/15/imported = false
 tracks/15/enabled = true
-tracks/15/path = NodePath("PanelContainer/LeftSide/SongTitleLabel:visible_ratio")
+tracks/15/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/Title:visible_ratio")
 tracks/15/interp = 1
 tracks/15/loop_wrap = true
 tracks/15/keys = {
@@ -418,39 +715,344 @@ tracks/15/keys = {
 "update": 0,
 "values": [1.0]
 }
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/Title:visible_ratio")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
+tracks/19/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/Title:visible_ratio")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
+tracks/19/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
+tracks/20/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/Previous:visible_ratio")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
+tracks/20/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
+tracks/21/path = NodePath("RightSide/TimingStats/VBoxContainer/StreakBreaksTitle:visible_ratio")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
+tracks/21/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
+tracks/22/path = NodePath("RightSide/TimingStats/VBoxContainer/NotesHitTitle:visible_ratio")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
+tracks/22/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("RightSide/TimingStats/VBoxContainer/EarlyHitTitle:visible_ratio")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
+tracks/24/path = NodePath("RightSide/TimingStats/VBoxContainer/LateHitTitle:visible_ratio")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
+tracks/24/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("RightSide/TimingStats/VBoxContainer/AvgHitTitle:visible_ratio")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/New:visible_ratio")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/27/type = "value"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath("RightSide/ClearPanel/VBoxContainer/RankBox/New:visible_ratio")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/28/type = "value"
+tracks/28/imported = false
+tracks/28/enabled = true
+tracks/28/path = NodePath("RightSide/ClearPanel/VBoxContainer/CompletionBox/Value:visible_ratio")
+tracks/28/interp = 1
+tracks/28/loop_wrap = true
+tracks/28/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/29/type = "value"
+tracks/29/imported = false
+tracks/29/enabled = true
+tracks/29/path = NodePath("RightSide/StreakPanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/29/interp = 1
+tracks/29/loop_wrap = true
+tracks/29/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/30/type = "value"
+tracks/30/imported = false
+tracks/30/enabled = true
+tracks/30/path = NodePath("RightSide/ScorePanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/30/interp = 1
+tracks/30/loop_wrap = true
+tracks/30/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/31/type = "value"
+tracks/31/imported = false
+tracks/31/enabled = true
+tracks/31/path = NodePath("RightSide/ScorePanel/PanelContainer/Difference:visible_ratio")
+tracks/31/interp = 1
+tracks/31/loop_wrap = true
+tracks/31/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/32/type = "value"
+tracks/32/imported = false
+tracks/32/enabled = true
+tracks/32/path = NodePath("RightSide/AccuracyPanel/ScorePanel/VBoxContainer/New:visible_ratio")
+tracks/32/interp = 1
+tracks/32/loop_wrap = true
+tracks/32/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/33/type = "value"
+tracks/33/imported = false
+tracks/33/enabled = true
+tracks/33/path = NodePath("RightSide/AccuracyPanel/PanelContainer/Difference:visible_ratio")
+tracks/33/interp = 1
+tracks/33/loop_wrap = true
+tracks/33/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/34/type = "value"
+tracks/34/imported = false
+tracks/34/enabled = true
+tracks/34/path = NodePath("RightSide/StreakPanel/PanelContainer/Difference:visible_ratio")
+tracks/34/interp = 1
+tracks/34/loop_wrap = true
+tracks/34/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/35/type = "value"
+tracks/35/imported = false
+tracks/35/enabled = true
+tracks/35/path = NodePath("RightSide/TimingStats/VBoxContainer/NotesHitLabel:visible_ratio")
+tracks/35/interp = 1
+tracks/35/loop_wrap = true
+tracks/35/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/36/type = "value"
+tracks/36/imported = false
+tracks/36/enabled = true
+tracks/36/path = NodePath("RightSide/TimingStats/VBoxContainer/EarlyHitLabel:visible_ratio")
+tracks/36/interp = 1
+tracks/36/loop_wrap = true
+tracks/36/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/37/type = "value"
+tracks/37/imported = false
+tracks/37/enabled = true
+tracks/37/path = NodePath("RightSide/TimingStats/VBoxContainer/LateHitLabel:visible_ratio")
+tracks/37/interp = 1
+tracks/37/loop_wrap = true
+tracks/37/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/38/type = "value"
+tracks/38/imported = false
+tracks/38/enabled = true
+tracks/38/path = NodePath("RightSide/TimingStats/VBoxContainer/AvgHitLabel:visible_ratio")
+tracks/38/interp = 1
+tracks/38/loop_wrap = true
+tracks/38/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/39/type = "value"
+tracks/39/imported = false
+tracks/39/enabled = true
+tracks/39/path = NodePath("RightSide/TimingStats/VBoxContainer/StreakBreaksLabel:visible_ratio")
+tracks/39/interp = 1
+tracks/39/loop_wrap = true
+tracks/39/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/40/type = "value"
+tracks/40/imported = false
+tracks/40/enabled = true
+tracks/40/path = NodePath("RightSide/RankPanel/RankLabel:modulate")
+tracks/40/interp = 1
+tracks/40/loop_wrap = true
+tracks/40/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xsivx"]
 _data = {
-&"Display": SubResource("Animation_eskt4"),
-&"RESET": SubResource("Animation_cnqnt")
+&"BuildIn": SubResource("Animation_cnqnt"),
+&"RESET": SubResource("Animation_xsivx")
 }
 
 [node name="SongResult" type="HBoxContainer"]
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"PanelBox"
 alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="LeftSide" type="PanelContainer" parent="."]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(0, 550)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="LeftSide" type="VBoxContainer" parent="LeftSide"]
 layout_mode = 2
 
-[node name="LeftSide" type="VBoxContainer" parent="PanelContainer"]
-layout_mode = 2
-
-[node name="SongTitleLabel" type="Label" parent="PanelContainer/LeftSide"]
+[node name="SongTitleLabel" type="Label" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Song Title "
 label_settings = SubResource("LabelSettings_xsivx")
 horizontal_alignment = 2
+autowrap_mode = 3
 visible_characters_behavior = 1
 
-[node name="ArtistLabel" type="Label" parent="PanelContainer/LeftSide"]
+[node name="ArtistLabel" type="Label" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -459,10 +1061,10 @@ horizontal_alignment = 2
 autowrap_mode = 3
 visible_characters_behavior = 1
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/LeftSide"]
+[node name="HSeparator" type="HSeparator" parent="LeftSide/LeftSide"]
 layout_mode = 2
 
-[node name="DifficultyLabel" type="Label" parent="PanelContainer/LeftSide"]
+[node name="DifficultyLabel" type="Label" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -470,48 +1072,42 @@ text = "Difficulty"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="HSeparator2" type="HSeparator" parent="PanelContainer/LeftSide"]
+[node name="HSeparator2" type="HSeparator" parent="LeftSide/LeftSide"]
 layout_mode = 2
 
-[node name="AlbumCover" type="TextureRect" parent="PanelContainer/LeftSide"]
+[node name="AlbumCover" type="TextureRect" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("1_eskt4")
-expand_mode = 3
 stretch_mode = 5
 
-[node name="ExitButton" type="Button" parent="PanelContainer/LeftSide"]
+[node name="ExitButton" type="Button" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
-text = "Exit to Song Select"
+text = "MENU_EXIT_TO_SONG_SELECT"
 
-[node name="RestartButton" type="Button" parent="PanelContainer/LeftSide"]
+[node name="RestartButton" type="Button" parent="LeftSide/LeftSide"]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
-text = "Restart"
+text = "MENU_RESTART_SONG"
 
 [node name="RightSide" type="VBoxContainer" parent="."]
 layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_type_variation = &"PanelBox"
 alignment = 1
 
 [node name="RankPanel" type="PanelContainer" parent="RightSide"]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/RankPanel"]
-layout_mode = 2
-alignment = 1
-
-[node name="RankTitle" type="Label" parent="RightSide/RankPanel/VBoxContainer"]
-layout_mode = 2
-text = "RATING"
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="RankLabel" type="Label" parent="RightSide/RankPanel/VBoxContainer"]
+[node name="RankLabel" type="Label" parent="RightSide/RankPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
@@ -519,212 +1115,234 @@ text = "???"
 label_settings = SubResource("LabelSettings_dn0fs")
 horizontal_alignment = 1
 
-[node name="RightTop" type="HBoxContainer" parent="RightSide"]
-layout_mode = 2
-
-[node name="ScorePanel" type="PanelContainer" parent="RightSide/RightTop"]
+[node name="ClearPanel" type="PanelContainer" parent="RightSide"]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="VBoxContainer" type="HBoxContainer" parent="RightSide/RightTop/ScorePanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/ClearPanel"]
+layout_mode = 2
+
+[node name="ClearTypeBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="ScoreTitle" type="Label" parent="RightSide/RightTop/ScorePanel/VBoxContainer"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
 layout_mode = 2
-size_flags_vertical = 0
-text = "Score"
+text = "MENU_CLEARTYPETITLE"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/RightTop/ScorePanel/VBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
 layout_mode = 2
+size_flags_horizontal = 10
 
-[node name="ScoreLabel" type="Label" parent="RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
+[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-text = "0"
-label_settings = SubResource("LabelSettings_dr1j0")
-horizontal_alignment = 2
+theme_override_font_sizes/font_size = 12
+text = "MENU_NOTPLAYED"
+horizontal_alignment = 1
 vertical_alignment = 1
-visible_characters_behavior = 1
-
-[node name="ScoreDiffLabel" type="Label" parent="RightSide/RightTop/ScorePanel/VBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "N/A"
-label_settings = ExtResource("3_cnqnt")
-horizontal_alignment = 2
 uppercase = true
+max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="Stats" type="PanelContainer" parent="RightSide"]
+[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
-
-[node name="GridContainer" type="GridContainer" parent="RightSide/Stats"]
-layout_mode = 2
-columns = 2
-
-[node name="StreakTitle" type="Label" parent="RightSide/Stats/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-text = "Longest streak:"
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/Stats/GridContainer"]
-layout_mode = 2
-
-[node name="StreakLabel" type="Label" parent="RightSide/Stats/GridContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 8
-text = "00"
-label_settings = SubResource("LabelSettings_dr1j0")
-horizontal_alignment = 2
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="StreakDiffLabel" type="Label" parent="RightSide/Stats/GridContainer/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-text = "N/A"
-label_settings = ExtResource("3_cnqnt")
-horizontal_alignment = 2
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="StreakBreakTitle" type="Label" parent="RightSide/Stats/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Streak breaks:"
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="StreakBreakLabel" type="Label" parent="RightSide/Stats/GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 8
-text = "0"
-horizontal_alignment = 2
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="AccuracyTitle" type="Label" parent="RightSide/Stats/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-text = "Phrase accuracy:"
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="VBoxContainer2" type="VBoxContainer" parent="RightSide/Stats/GridContainer"]
-layout_mode = 2
-
-[node name="AccuracyLabel" type="Label" parent="RightSide/Stats/GridContainer/VBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 8
-text = "100.00%"
-label_settings = SubResource("LabelSettings_dr1j0")
-horizontal_alignment = 2
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="AccuracyDiffLabel" type="Label" parent="RightSide/Stats/GridContainer/VBoxContainer2"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-text = "N/A"
-label_settings = ExtResource("3_cnqnt")
-horizontal_alignment = 2
-uppercase = true
-visible_characters_behavior = 1
-
-[node name="PreviousBestsContainer" type="PanelContainer" parent="RightSide"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/PreviousBestsContainer"]
-layout_mode = 2
-
-[node name="PreviousBestsTitle" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer"]
-layout_mode = 2
-text = "MENU_PREV_BESTS"
+text = "→"
 horizontal_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="RightSide/PreviousBestsContainer/VBoxContainer"]
+[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-columns = 2
-
-[node name="PrevScoreTitle" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(175, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-text = "MENU_SCORETITLE"
+theme_override_font_sizes/font_size = 12
+text = "MENU_LOOSE_CLEARED_SHORT"
+horizontal_alignment = 1
+vertical_alignment = 1
 uppercase = true
+max_lines_visible = 1
+visible_characters_behavior = 1
 
-[node name="PrevScoreLabel" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
+[node name="RankBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-text = "0"
-horizontal_alignment = 2
+alignment = 1
 
-[node name="PrevRankTitle" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_RANKTITLE"
 uppercase = true
+visible_characters_behavior = 1
 
-[node name="PrevRankLabel" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "RANK_F"
+horizontal_alignment = 1
+vertical_alignment = 1
+max_lines_visible = 1
+visible_characters_behavior = 1
+
+[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "→"
+horizontal_alignment = 1
+
+[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "RANK_AAA"
+horizontal_alignment = 1
+vertical_alignment = 1
+max_lines_visible = 1
+visible_characters_behavior = 1
+
+[node name="CompletionBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
-size_flags_horizontal = 3
-text = "--"
-horizontal_alignment = 2
-uppercase = true
+alignment = 1
 
-[node name="PrevStreakTitle" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+text = "MENU_SONGCOMPLETION"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Value" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+text = "100.00%"
+horizontal_alignment = 2
+vertical_alignment = 1
+max_lines_visible = 1
+visible_characters_behavior = 1
+
+[node name="ScorePanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="Title" parent="RightSide/ScorePanel/ScorePanel/VBoxContainer" index="0"]
+text = "MENU_SCORETITLE"
+
+[node name="StreakPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="Title" parent="RightSide/StreakPanel/ScorePanel/VBoxContainer" index="0"]
 text = "MENU_LONGESTSTREAKTITLE"
-uppercase = true
 
-[node name="PrevStreakLabel" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
+[node name="AccuracyPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+modulate = Color(1, 1, 1, 0)
 layout_mode = 2
-size_flags_horizontal = 3
-horizontal_alignment = 2
 
-[node name="PrevAccTitle" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+[node name="Title" parent="RightSide/AccuracyPanel/ScorePanel/VBoxContainer" index="0"]
 text = "MENU_PHRASEACCURACYTITLE"
-uppercase = true
 
-[node name="PrevAccLabel" type="Label" parent="RightSide/PreviousBestsContainer/VBoxContainer/GridContainer"]
+[node name="TimingStats" type="PanelContainer" parent="RightSide"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="VBoxContainer" type="GridContainer" parent="RightSide/TimingStats"]
+layout_mode = 2
+size_flags_horizontal = 0
+columns = 2
+
+[node name="StreakBreaksTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "MENU_STREAKBREAKSTITLE"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="StreakBreaksLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
-size_flags_horizontal = 3
+text = "0"
 horizontal_alignment = 2
+visible_characters_behavior = 1
+
+[node name="NotesHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "HUD_NOTES_HIT"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="NotesHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 2
+visible_characters_behavior = 1
+
+[node name="EarlyHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "HUD_FAST_HITS"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="EarlyHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 2
+visible_characters_behavior = 1
+
+[node name="LateHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "HUD_SLOW_HITS"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="LateHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "0"
+horizontal_alignment = 2
+visible_characters_behavior = 1
+
+[node name="AvgHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "HUD_AVG_OFFSET"
+uppercase = true
+visible_characters_behavior = 1
+
+[node name="AvgHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "0 ms"
+horizontal_alignment = 2
+visible_characters_behavior = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_xsivx")
 }
+
+[editable path="RightSide/ScorePanel"]
+[editable path="RightSide/StreakPanel"]
+[editable path="RightSide/AccuracyPanel"]

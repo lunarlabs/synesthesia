@@ -30,5 +30,8 @@ variation_opentype = {
 [resource]
 default_font = SubResource("FontVariation_b4i3g")
 default_font_size = 18
+BoxContainer/constants/separation = 5
 Panel/styles/panel = SubResource("StyleBoxTexture_yb0ku")
+PanelBox/base_type = &"BoxContainer"
+PanelBox/constants/separation = 22
 PanelContainer/styles/panel = SubResource("StyleBoxTexture_yb0ku")
