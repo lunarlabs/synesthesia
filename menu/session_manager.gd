@@ -47,9 +47,6 @@ const SCORE_RANKS = [
 	"F",
 ]
 
-
-
-
 var song_records: Dictionary = {}
 var session_data: Dictionary = {}
 var player_options: Dictionary = {}
@@ -69,23 +66,7 @@ func load_campaign_data():
 	var json = JSON.new()
 	var error = json.parse(file.get_as_text())
 	if error == OK:
-		var data = json.data
-		if typeof(data) == TYPE_DICTIONARY:
-			# TODO: Player options and player records
-			var sr = data.get("song_records", {})
-			for song in sr.keys():
-				song_records[song] = {}
-				for diff in DIFFICULTY_VALUES.keys():
-					if sr[song].has(str(diff)):
-						song_records[song][diff] = {
-							"accuracy": sr[song][str(diff)].get("accuracy", 0.0),
-							"clear_state": sr[song][str(diff)].get("clear_state", "not_played"),
-							"max_streak": int(sr[song][str(diff)].get("max_streak", 0)),
-							"percent_completed": sr[song][str(diff)].get("percent_completed", 0.0),
-							"rank": sr[song][str(diff)].get("rank", ""),
-							"score": int(sr[song][str(diff)].get("score", 0)),
-							"streak_breaks": int(sr[song][str(diff)].get("streak_breaks", 0)),
-						}
+		pass
 					
 	else:
 		push_error("Failed to parse JSON data: %s" % json.get_error_message())
@@ -97,7 +78,6 @@ func save_campaign_data() -> Error:
 		push_error("Failed to open file for writing: %s" % CAMPAIGN_DATA_PATH)
 		return file.get_error()
 	var result = {}
-	result["song_records"] = song_records
 	result["player_options"] = player_options
 	result["player_records"] = player_records
 	file.store_string(JSON.stringify(result))
@@ -107,7 +87,24 @@ func save_campaign_data() -> Error:
 func record_song_result(song_id: String, difficulty: int, result: SongResult) -> void:
 	if not song_records.has(song_id):
 		song_records[song_id] = {}
-	song_records[song_id][difficulty] = result
+	var sr = song_records[song_id]
+	if not sr.has(str(difficulty)):
+		sr[str(difficulty)] = result
+	else:
+		var sd = sr[str(difficulty)] as SongResult
+		sd.score = max(result.score, sd.score)
+		sd.max_streak = max(result.max_streak, sd.max_streak)
+		sd.accuracy = max(result.accuracy, sd.accuracy)
+		sd.streak_breaks = min(result.streak_breaks, sd.streak_breaks)
+		sd.percent_completed = max(result.percent_completed, sd.percent_completed)
+		sd.clear_state = max(result.clear_state, sd.clear_state)
+		sd.rank = max(result.rank, sd.rank)
+
+func get_song_record(song_id: String, difficulty: int) -> SongResult:
+	if song_records.has(song_id):
+		return song_records[song_id].get(str(difficulty), SongResult.new())
+	else:
+		return SongResult.new()
 
 class SongResult:
 
@@ -149,13 +146,13 @@ class SongResult:
 	var hide_streak_hints: bool
 	var timing_modifier: int
 	var fast_track_reset: int
-	var score: int
-	var max_streak: int
-	var accuracy: float
-	var streak_breaks: int
-	var clear_state: ClearState
+	var score: int = 0
+	var max_streak: int = 0
+	var accuracy: float = 0.0
+	var streak_breaks: int = 9999
+	var clear_state: ClearState = ClearState.NOT_PLAYED
 	var rank: ClearRank = ClearRank.INVALID
-	var percent_completed: float
+	var percent_completed: float = 0.0
 
 	func calculate_rank():
 		for threshold in ACCURACY_THRESHOLDS.keys():
@@ -202,3 +199,35 @@ class SongResult:
 				return tr("MENU_PERFECTRUN_SHORT") if short else tr("MENU_PERFECTRUN")
 			_:
 				return "???"
+
+	func to_dict() -> Dictionary:
+		return {
+			"energy_modifier" = energy_modifier,
+			"checkpoint_modifier" = checkpoint_modifier,
+			"hide_streak_hints" = hide_streak_hints,
+			"timing_modifier" = timing_modifier,
+			"fast_track_reset" = fast_track_reset,
+			"score" = score,
+			"max_streak" = max_streak,
+			"accuracy" = accuracy,
+			"streak_breaks" = streak_breaks,
+			"clear_state" = clear_state,
+			"rank" = rank,
+			"percent_completed" = percent_completed,
+		}
+
+	static func from_dict(dict: Dictionary) -> SongResult:
+		var result = SongResult.new()
+		result.energy_modifier = int(dict.get("energy_modifier", 0))
+		result.checkpoint_modifier = int(dict.get("checkpoint_modifier", 0))
+		result.hide_streak_hints = dict.get("hide_streak_hints", false)
+		result.fast_track_reset = int(dict.get("fast_track_reset", 0))
+		result.score = int(dict.get("score", 0))
+		result.max_streak = int(dict.get("max_streak", 0))
+		result.accuracy = dict.get("accuracy", 0.0)
+		result.streak_breaks = int(dict.get("streak_breaks", 9999))
+		result.clear_state = int(dict.get("clear_state", ClearState.NOT_PLAYED))
+		result.rank = int(dict.get("rank", ClearRank.INVALID))
+		result.percent_completed = dict.get("percent_completed", 0.0)
+		return result
+
