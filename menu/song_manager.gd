@@ -66,20 +66,6 @@ const CHUNK_LENGTH_IN_MEASURES = 8
 const TIMING_WINDOWS = [0.06, 0.08, 0.04,]
 const MISS_WINDOW_OFFSET = 0.01
 
-@onready var load_screen: Control = $LoadScreen
-@onready var anim: AnimationPlayer = $LoadScreen/AnimationPlayer
-@onready var lbl_difficulty: Label = $LoadScreen/StageData/VBoxContainer/TopArea/DifficultyLabel
-@onready var song_info: Container = $LoadScreen/SongInfo
-@onready var lbl_title: Label = $LoadScreen/SongInfo/TitleLabel
-@onready var lbl_artist: Label = $LoadScreen/SongInfo/ArtistLabel
-@onready var lbl_genre: Label = $LoadScreen/SongInfo/GenreLabel
-@onready var stage_data: Container = $LoadScreen/StageData
-@onready var lbl_mod_energy: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/EnergyModLabel
-@onready var lbl_mod_checkpoint: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/CheckpointModLabel
-@onready var lbl_mod_hints: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/HintsModLabel
-@onready var lbl_mod_timing: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TimingModLabel
-@onready var lbl_track_reset: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/TrackResetModLabel
-@onready var lbl_mod_autoblast: Label = $LoadScreen/StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid/AutoblastModLabel
 @onready var pause_panel: PanelContainer = $PausePanel
 @onready var btn_continue: Button = $PausePanel/VBoxContainer/ContinueButton
 @onready var btn_restart: Button = $PausePanel/VBoxContainer/RestartButton
@@ -265,6 +251,7 @@ func _on_song_finished(stats) -> void:
 	song_stats.accuracy = accuracy
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = 100.0
+	song_stats.calculate_rank()
 
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
@@ -306,7 +293,6 @@ func _on_restart_pressed() -> void:
 	add_child(song_instance)
 	await get_tree().process_frame
 #	song_instance.start_song()
-	load_screen.hide()
 
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
