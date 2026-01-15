@@ -1,8 +1,8 @@
 extends Node
 
 const CAMPAIGN_DATA_PATH = "user://campaign_data.json"
-const CAMPAIGN_FOLDER_PATH = "user://campaigns/"
-const SONG_RECORD_FILE = "song_record.json"
+const CONFIGURATION_PATH = "user://syn_road.cfg"
+const SONG_RECORD_PATH = "user://song_records.json"
 const DIFFICULTY_VALUES = {
 	96: "Beginner",
 	102: "Intermediate",
@@ -47,24 +47,8 @@ const SCORE_RANKS = [
 	"F",
 ]
 
-const ACCURACY_THRESHOLDS = {
-	"AAA": 0.97,
-	"AA": 0.93,
-	"A": 0.90,
-	"B": 0.80,
-	"C": 0.70,
-	"D": 0.60,
-	"E": 0.50,
-	"F": 0.00,
-}
 
-enum ClearState{
-	NOT_PLAYED,
-	FAILED,
-	LOOSE_CLEAR,
-	CLEAR,
-	PERFECT_RUN,
-}
+
 
 var song_records: Dictionary = {}
 var session_data: Dictionary = {}
@@ -129,8 +113,8 @@ class SongResult:
 
 	enum ClearState{
 		NOT_PLAYED,
-		FAILED,
 		AUTOBLASTED,
+		FAILED,
 		LOOSE_CLEAR,
 		CLEAR,
 		STRICT_CLEAR,
@@ -138,6 +122,7 @@ class SongResult:
 	}
 
 	enum ClearRank{
+		INVALID = -1,
 		AAA,
 		AA,
 		A,
@@ -146,6 +131,17 @@ class SongResult:
 		D,
 		E,
 		F,
+	}
+
+	const ACCURACY_THRESHOLDS = {
+		0.97: ClearRank.AAA,
+		0.93: ClearRank.AA,
+		0.90: ClearRank.A,
+		0.80: ClearRank.B,
+		0.70: ClearRank.C,
+		0.60: ClearRank.D,
+		0.50: ClearRank.E,
+		0.00: ClearRank.F,
 	}
 
 	var energy_modifier: int
@@ -158,5 +154,51 @@ class SongResult:
 	var accuracy: float
 	var streak_breaks: int
 	var clear_state: ClearState
-	var rank: ClearRank
+	var rank: ClearRank = ClearRank.INVALID
 	var percent_completed: float
+
+	func calculate_rank():
+		for threshold in ACCURACY_THRESHOLDS.keys():
+			if accuracy >= threshold:
+				clear_state = ACCURACY_THRESHOLDS[threshold]
+				break
+	
+	func get_rank_string() -> String:
+		match rank:
+			ClearRank.AAA:
+				return tr("RANK_AAA")
+			ClearRank.AA:
+				return tr("RANK_AA")
+			ClearRank.A:
+				return tr("RANK_A")
+			ClearRank.B:
+				return tr("RANK_B")
+			ClearRank.C:
+				return tr("RANK_C")
+			ClearRank.D:
+				return tr("RANK_D")
+			ClearRank.E:
+				return tr("RANK_E")
+			ClearRank.F:
+				return tr("RANK_F")
+			_:
+				return "--"
+	
+	func get_clear_string(short:= false) -> String:
+		match clear_state:
+			ClearState.NOT_PLAYED:
+				return tr("MENU_NOTPLAYED")
+			ClearState.AUTOBLASTED:
+				return tr("RANK_AUTOBLAST")
+			ClearState.FAILED:
+				return tr("MENU_FAILED")
+			ClearState.LOOSE_CLEAR:
+				return tr("MENU_LOOSE_CLEARED_SHORT") if short else tr("MENU_LOOSE_CLEARED")
+			ClearState.CLEAR:
+				return tr("MENU_CLEARED")
+			ClearState.STRICT_CLEAR:
+				return tr("MENU_LOOSE_TIGHT_SHORT") if short else tr("MENU_TIGHT_CLEARED")
+			ClearState.PERFECT_RUN:
+				return tr("MENU_PERFECTRUN_SHORT") if short else tr("MENU_PERFECTRUN")
+			_:
+				return "???"

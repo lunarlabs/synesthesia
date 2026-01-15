@@ -49,6 +49,17 @@ const FAST_RESET_NAMES = {
 	8: "Fast Reset 2"
 }
 
+const ACCURACY_THRESHOLDS = {
+	"AAA": 0.97,
+	"AA": 0.93,
+	"A": 0.90,
+	"B": 0.80,
+	"C": 0.70,
+	"D": 0.60,
+	"E": 0.50,
+	"F": 0.00,
+}
+
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
@@ -259,6 +270,7 @@ func _on_song_finished(stats) -> void:
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
 	result_screen.show()
+	result_screen.get_node("AnimationPlayer").play("BuildIn")
 	# Enable buttons when animation finishes
 	var exit_btn = result_screen.get_node("%ExitButton") as Button
 	var restart_btn = result_screen.get_node("%RestartButton") as Button

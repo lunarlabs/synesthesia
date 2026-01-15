@@ -1,5 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://dm4hcmhaewyp6"]
+[gd_scene load_steps=11 format=3 uid="uid://dm4hcmhaewyp6"]
 
+[ext_resource type="Script" uid="uid://cijh26pewr7t7" path="res://menu/song_result.gd" id="1_cnqnt"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_eskt4"]
 [ext_resource type="PackedScene" uid="uid://51eeo5x4q33x" path="res://menu/result_box.tscn" id="3_eskt4"]
@@ -1023,7 +1024,7 @@ _data = {
 }
 
 [node name="SongResult" type="HBoxContainer"]
-anchors_preset = -1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -1032,6 +1033,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"PanelBox"
 alignment = 1
+script = ExtResource("1_cnqnt")
 
 [node name="LeftSide" type="PanelContainer" parent="."]
 modulate = Color(1, 1, 1, 0)
@@ -1208,7 +1210,6 @@ visible_characters_behavior = 1
 
 [node name="CompletionBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 alignment = 1
 
@@ -1232,6 +1233,7 @@ max_lines_visible = 1
 visible_characters_behavior = 1
 
 [node name="ScorePanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
@@ -1239,6 +1241,7 @@ layout_mode = 2
 text = "MENU_SCORETITLE"
 
 [node name="StreakPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
@@ -1246,6 +1249,7 @@ layout_mode = 2
 text = "MENU_LONGESTSTREAKTITLE"
 
 [node name="AccuracyPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
@@ -1253,7 +1257,6 @@ layout_mode = 2
 text = "MENU_PHRASEACCURACYTITLE"
 
 [node name="TimingStats" type="PanelContainer" parent="RightSide"]
-visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_horizontal = 8
