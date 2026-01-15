@@ -230,4 +230,3 @@ class SongResult:
 		result.rank = int(dict.get("rank", ClearRank.INVALID))
 		result.percent_completed = dict.get("percent_completed", 0.0)
 		return result
-
