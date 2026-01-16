@@ -55,6 +55,13 @@ const MIDI_META_TEMPO_EVENT = 0x51
 @export var fixed_bpm: float = 120.0
 
 var _bpm = NAN
+var _err = Error.ERR_INVALID_DATA
+
+var midi_error: Error:
+	get:
+		if not _midi_data:
+			_load_midi_data()
+		return _err
 
 var _midi_data: MidiResource
 var ticks_per_beat: int:
@@ -77,7 +84,10 @@ var track_names: Array[String]:
 			_load_midi_data()
 		var names: Array[String] = []
 		for i in _midi_data.tracks.size():
-			names.append(_midi_data.tracks[i]["name"])
+			for event in _midi_data.tracks[i].events:
+				if event["type"] == "meta" and event["subtype"] == 3:
+					names.append(event["data"])
+					break
 		if names.size() == 0:
 			push_warning("No track names found in MIDI data.")
 		return names
@@ -148,9 +158,9 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 
 func _load_midi_data() -> void:
 	_midi_data = MidiResource.new()
-	var err = _midi_data.load_file(ResourceUID.ensure_path(midi_file))
-	assert(err == OK)
-	if err != OK:
+	_err = _midi_data.load_file(ResourceUID.ensure_path(midi_file))
+	assert(_err == OK)
+	if _err != OK:
 		push_error("Failed to load MIDI data from %s" % midi_file)
 
 func _get_song_track_locations() -> Dictionary[String, int]:
@@ -160,8 +170,9 @@ func _get_song_track_locations() -> Dictionary[String, int]:
 	var cached_names = track_names
 	for i in tracks.size():
 		var index = cached_names.find(tracks[i].midi_track_name)
+		assert(index != -1, "Track name %s not found in MIDI data." % tracks[i].midi_track_name)
 		if index != -1:
 			locations[tracks[i].midi_track_name] = index
 		else:
-			push_warning("Track name %s not found in MIDI data." % tracks[i].midi_track_name)
+			push_error("Track name %s not found in MIDI data." % tracks[i].midi_track_name)
 	return locations

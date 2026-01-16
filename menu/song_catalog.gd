@@ -2,6 +2,7 @@ extends Node
 
 var _song_catalog: Array[SongEntry] = []
 var _loaded_data: Array = []
+var additions: Array = []
 
 const CATALOG_JSON_PATH = "user://song_catalog.json"
 const DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
@@ -275,7 +276,6 @@ func load_entries_from_json() -> Error:
 		var entry := _entry_from_json(entry_dict)
 		_song_catalog.append(entry)
 
-	_song_catalog.sort_custom(_compare_song_titles)
 	return OK
 
 func load_difficulty_details_from_json() -> Error:
@@ -334,6 +334,8 @@ func scan_for_songs(rescan := false):
 		for i in _song_catalog.size():
 			var entry = _song_catalog[i] as SongEntry
 			_known_folders.append(entry.folder)
+	else:
+		_song_catalog.clear()
 	_loaded_data = []
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
@@ -348,7 +350,6 @@ func scan_for_songs(rescan := false):
 			print("Found song folder: %s" % folder_name)
 			var song_resource_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".tres"
 			if FileAccess.file_exists(song_resource_path):
-				var midi_data := MidiResource.new()
 				print("Loading SongData from: %s" % song_resource_path)
 				var song_data = ResourceLoader.load(song_resource_path) as SongData
 				if song_data:
@@ -356,22 +357,22 @@ func scan_for_songs(rescan := false):
 					if not FileAccess.file_exists(midi_path):
 						print("MIDI file doesn't exist: %s\nTrying fallback..." % midi_path)
 						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
-						if FileAccess.file_exists(midi_path):
-							var uid = ResourceUID.create_id_for_path(midi_path)
-							if not ResourceUID.has_id(uid):
-								ResourceUID.add_id(uid, midi_path)
-							song_data.midi_file = ResourceUID.id_to_text(uid)
-							ResourceSaver.save(song_data)
-						else:
-							print("Fallback MIDI file doesn't exist, giving up on this one.")
-							continue
-					print("Loading MIDI data for song: %s" % song_resource_path)
-					var err = midi_data.load_file(midi_path)
-					if err:
-						print("Failed to load MIDI data for song: %s" % song_resource_path)
+					if FileAccess.file_exists(midi_path):
+						song_data.midi_file = midi_path
+						ResourceSaver.save(song_data)
 					else:
-						_loaded_data.append([folder_name, song_data, midi_data])
+						print("Fallback MIDI file doesn't exist, giving up on this one.")
+						continue
+					if _known_folders.find(folder_name) == -1:
+						print("Loading MIDI data for song: %s" % song_resource_path)
+						var err = song_data.midi_error # this has the benefit of preloading the MIDI data before we go into the threads
+						if err:
+							print("Failed to load MIDI data for song: %s" % song_resource_path)
+							continue
+						_loaded_data.append([folder_name, song_data])
 						print("Queued song for preprocessing: %s" % song_resource_path)
+					else:
+						print("Skipping known song: %s" % song_resource_path)
 				else:
 					print("Failed to load SongData resource at: %s" % song_resource_path)
 			else:
@@ -380,12 +381,17 @@ func scan_for_songs(rescan := false):
 		folder_name = dir.get_next()
 
 	dir.list_dir_end()
-	_song_catalog = []
-	_song_catalog.resize(_loaded_data.size())
-	var task_id = WorkerThreadPool.add_group_task(_process_song_data, _loaded_data.size())
-	print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
-	WorkerThreadPool.wait_for_group_task_completion(task_id)
-	_song_catalog.sort_custom(_compare_song_titles)
+	if not _loaded_data.is_empty():
+		additions = []
+		additions.resize(_loaded_data.size())
+		var task_id = WorkerThreadPool.add_group_task(_process_song_data, _loaded_data.size())
+		print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
+		WorkerThreadPool.wait_for_group_task_completion(task_id)
+		_song_catalog.append_array(additions)
+		_song_catalog.sort_custom(_compare_song_titles)
+		save_difficulty_details_to_json()
+		save_entries_to_json()
+		print("additions done.")
 	return
 
 func _process_song_data(entry_idx: int):
@@ -395,6 +401,7 @@ func _process_song_data(entry_idx: int):
 	var song_data: SongData = loaded[1]
 	print("Processing song: %s" % folder_name)
 
+	result.folder = folder_name
 	result.file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
 	result.title = song_data.title
 	result.long_title = song_data.long_title
@@ -468,7 +475,7 @@ func _process_song_data(entry_idx: int):
 	result.detailed_difficulty_info = detailed_diffs_info
 	result.files_valid = true
 	print("Finished processing song: %s" % folder_name)
-	_song_catalog[entry_idx] = result
+	additions[entry_idx] = result
 
 func _calculate_phrase_difficulty(
 	note_map: Dictionary, # Kept for looking up lanes

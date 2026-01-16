@@ -83,21 +83,16 @@ var hi_speed_index: int = 0  # Default to 1.0x
 # UI References
 
 func _ready():
-	SongCatalog.load_entries_from_json()
-	var initialized = SongCatalog.is_initialized
 	await get_tree().process_frame  # Wait a frame for UI to initialize
-	if not initialized:
-		SongCatalog.scan_for_songs()
-		%LoadingContainer.visible = false
-		if SongCatalog.catalog.is_empty():
-			print("No valid songs found!")
-			push_error("No valid songs found!")
-			%PlayButton.disabled = true
-			return
-		else:
-			print("Song catalog generated with %d songs." % SongCatalog.catalog.size())
-			SongCatalog.save_difficulty_details_to_json()
-			SongCatalog.save_entries_to_json()
+	SongCatalog.scan_for_songs()
+	%LoadingContainer.visible = false
+	if SongCatalog.catalog.is_empty():
+		print("No valid songs found!")
+		push_error("No valid songs found!")
+		%PlayButton.disabled = true
+		return
+	else:
+		print("Song catalog generated with %d songs." % SongCatalog.catalog.size())
 	
 #	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
