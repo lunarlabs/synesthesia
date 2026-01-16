@@ -300,7 +300,6 @@ func _advance_phrase():
 			var note = note_nodes[i]
 			note.set_phrase_note(false)
 	phrase_notes_blasted = 0
-	current_phrase_index += 1
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# no more phrases
 		move_marker(-1)
