@@ -42,6 +42,7 @@ var catalog:
 
 # Represents a single song entry in the catalog.
 class SongEntry:
+	var folder: String
 	var file_path: String
 	var title: String
 	var long_title: String
@@ -67,6 +68,7 @@ class DetailedDifficultyInfo:
 
 static func _entry_to_json(entry: SongEntry) -> Dictionary:
 	var dict := {
+		"folder": entry.folder,
 		"file_path": entry.file_path,
 		"title": entry.title,
 		"long_title": entry.long_title,
@@ -120,6 +122,7 @@ static func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
 static func _entry_from_json(dict: Dictionary) -> SongEntry:
 	var entry := SongEntry.new()
 
+	entry.folder = dict.get("folder", "")
 	entry.file_path = dict.get("file_path", "")
 	entry.title = dict.get("title", "")
 	entry.long_title = dict.get("long_title", "")
@@ -324,7 +327,13 @@ func load_difficulty_details_from_json() -> Error:
 
 	return OK
 
-func scan_for_songs():
+func scan_for_songs(rescan := false):
+	var _known_folders = []
+	if not rescan:
+		load_entries_from_json()
+		for i in _song_catalog.size():
+			var entry = _song_catalog[i] as SongEntry
+			_known_folders.append(entry.folder)
 	_loaded_data = []
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
@@ -339,12 +348,26 @@ func scan_for_songs():
 			print("Found song folder: %s" % folder_name)
 			var song_resource_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".tres"
 			if FileAccess.file_exists(song_resource_path):
-				var song_data = ResourceLoader.load(song_resource_path) as SongData
+				var midi_data := MidiResource.new()
 				print("Loading SongData from: %s" % song_resource_path)
+				var song_data = ResourceLoader.load(song_resource_path) as SongData
 				if song_data:
-					var midi_data = song_data.midi_data
+					var midi_path = ResourceUID.ensure_path(song_data.midi_file)
+					if not FileAccess.file_exists(midi_path):
+						print("MIDI file doesn't exist: %s\nTrying fallback..." % midi_path)
+						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
+						if FileAccess.file_exists(midi_path):
+							var uid = ResourceUID.create_id_for_path(midi_path)
+							if not ResourceUID.has_id(uid):
+								ResourceUID.add_id(uid, midi_path)
+							song_data.midi_file = ResourceUID.id_to_text(uid)
+							ResourceSaver.save(song_data)
+						else:
+							print("Fallback MIDI file doesn't exist, giving up on this one.")
+							continue
 					print("Loading MIDI data for song: %s" % song_resource_path)
-					if not midi_data:
+					var err = midi_data.load_file(midi_path)
+					if err:
 						print("Failed to load MIDI data for song: %s" % song_resource_path)
 					else:
 						_loaded_data.append([folder_name, song_data, midi_data])

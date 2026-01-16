@@ -148,7 +148,9 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 
 func _load_midi_data() -> void:
 	_midi_data = MidiResource.new()
-	if _midi_data.load_file(midi_file) != OK:
+	var err = _midi_data.load_file(ResourceUID.ensure_path(midi_file))
+	assert(err == OK)
+	if err != OK:
 		push_error("Failed to load MIDI data from %s" % midi_file)
 
 func _get_song_track_locations() -> Dictionary[String, int]:

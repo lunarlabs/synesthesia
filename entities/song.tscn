@@ -995,17 +995,14 @@ theme_override_font_sizes/font_size = 11
 [node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
-visible = false
 
 [node name="TargetCenter" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
-visible = false
 
 [node name="TargetRight" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
-visible = false
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)
@@ -1032,7 +1029,8 @@ process_material = SubResource("ParticleProcessMaterial_u2oep")
 draw_pass_1 = SubResource("QuadMesh_e81dl")
 
 [node name="Camera3D" type="Camera3D" parent="Playhead"]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2.25)
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2)
+fov = 80.0
 far = 200.0
 
 [node name="CountIn" type="Label3D" parent="."]
