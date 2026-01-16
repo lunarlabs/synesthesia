@@ -353,7 +353,12 @@ func scan_for_songs(rescan := false):
 				print("Loading SongData from: %s" % song_resource_path)
 				var song_data = ResourceLoader.load(song_resource_path) as SongData
 				if song_data:
-					var midi_path = ResourceUID.ensure_path(song_data.midi_file)
+					var midi_path
+					if not song_data.midi_file:
+						print("Null value in MIDI file field. Trying fallback...")
+						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
+					else:
+						midi_path = ResourceUID.ensure_path(song_data.midi_file)
 					if not FileAccess.file_exists(midi_path):
 						print("MIDI file doesn't exist: %s\nTrying fallback..." % midi_path)
 						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
