@@ -370,9 +370,7 @@ func _process_song_data(entry_idx: int):
 	var loaded = _loaded_data[entry_idx]
 	var folder_name: String = loaded[0]
 	var song_data: SongData = loaded[1]
-	var midi_data: MidiData = loaded[2]
 	print("Processing song: %s" % folder_name)
-	song_data._midi_data = midi_data  # Ensure MIDI data is set
 
 	result.file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
 	result.title = song_data.title

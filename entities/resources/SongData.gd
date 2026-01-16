@@ -7,6 +7,9 @@ class_name SongData
 ## including MIDI file reference, song information, track data, timing settings,
 ## and audio resources.
 
+const MICROSECONDS_PER_MINUTE = 60_000_000.0
+const MIDI_META_TEMPO_EVENT = 0x51
+
 ##Path to the MIDI file for this song
 @export_file("*.mid") var midi_file
 
@@ -51,14 +54,16 @@ class_name SongData
 ## Fixed BPM value to use if bpm_fix is true
 @export var fixed_bpm: float = 120.0
 
-var _midi_data: MidiData
+var _bpm = NAN
+
+var _midi_data: MidiResource
 var ticks_per_beat: int:
 	get:
 		if !_midi_data:
 			_load_midi_data()
-		return _midi_data.header.ticks_per_beat
+		return _midi_data.division
 
-var midi_data: MidiData:
+var midi_data: MidiResource:
 	get:
 		if !_midi_data:
 			_load_midi_data()
@@ -72,12 +77,7 @@ var track_names: Array[String]:
 			_load_midi_data()
 		var names: Array[String] = []
 		for i in _midi_data.tracks.size():
-			var track_data = _midi_data.tracks[i] as MidiData.Track
-			if track_data:
-				for event in track_data.events:
-					if event is MidiData.TrackName:
-						names.append(event.text)
-						break
+			names.append(_midi_data.tracks[i]["name"])
 		if names.size() == 0:
 			push_warning("No track names found in MIDI data.")
 		return names
@@ -99,12 +99,14 @@ var bpm: float:
 			return fixed_bpm
 		elif !_midi_data:
 			_load_midi_data()
-		for event in _midi_data.tracks[0].events:
-			if event is MidiData.Tempo:
-				fixed_bpm = event.bpm
-				return event.bpm
-		push_warning("No tempo event found in MIDI data.")
-		return 120.0  # Default BPM if not found
+		if is_nan(_bpm):
+			for event in _midi_data.tracks[0].events:
+				if event["type"] == "meta" and event["subtype"] == MIDI_META_TEMPO_EVENT:
+					_bpm = MICROSECONDS_PER_MINUTE / float(event["data"])
+			if is_nan(_bpm):
+				push_warning("No tempo event found in MIDI data.")
+				return 120.0  # Default BPM if not found
+		return _bpm
 
 ## The duration of one beat in seconds.
 ## Calculated as 60.0 / BPM (beats per minute).
@@ -113,13 +115,8 @@ var seconds_per_beat: float:
 	get:
 		if bpm_fix:
 			return 60.0 / fixed_bpm
-		elif !_midi_data:
-			_load_midi_data()
-		for event in _midi_data.tracks[0].events:
-			if event is MidiData.Tempo:
-				return 60.0 / event.bpm
-		push_warning("No tempo event found in MIDI data.")
-		return 0.5  # Default seconds per beat if not found
+		else:
+			return 60 / bpm
 
 var total_measures: int:
 	get:
@@ -139,8 +136,8 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 	var tick := 0
 	for i in _midi_data.tracks[track].events.size():
 		var event = _midi_data.tracks[track].events[i]
-		tick += event.delta_time
-		if event is MidiData.NoteOn and event.velocity > 0:
+		tick += event.delta
+		if event.subtype == MIDI_MESSAGE_NOTE_ON and event.data > 0:
 			if valid_note_positions.has(event.note):
 				var beat_position: float = float(tick) / float(ticks_per_beat)
 				note_map[beat_position] = valid_note_positions.find(event.note)
@@ -150,8 +147,8 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 	return note_map
 
 func _load_midi_data() -> void:
-	_midi_data = load(midi_file) as MidiData
-	if !_midi_data:
+	_midi_data = MidiResource.new()
+	if _midi_data.load_file(midi_file) != OK:
 		push_error("Failed to load MIDI data from %s" % midi_file)
 
 func _get_song_track_locations() -> Dictionary[String, int]:

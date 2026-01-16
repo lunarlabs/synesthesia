@@ -16,7 +16,6 @@ var manager_node:SynRoadSongManager
 var bpm:float = 120.0
 var seconds_per_beat:float = 0.5
 var ticks_per_beat:int = -1
-var midi_data:MidiData
 var tracks:Array[Node]
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var length_multiplier: float = 1.0

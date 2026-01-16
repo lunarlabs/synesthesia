@@ -1414,6 +1414,9 @@ vertical_alignment = 1
 
 [node name="SongProgress" type="TextureProgressBar" parent="HUD"]
 unique_name_in_owner = true
+process_thread_group = 2
+process_thread_group_order = 0
+process_thread_messages = 0
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1

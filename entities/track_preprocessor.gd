@@ -8,31 +8,9 @@ var running := false
 
 const LANE_GAP := 0.6
 
-func queue_job(
-	song_track_index: int,
-	events: Array,
-	ticks_per_beat:int,
-	difficulty:int,
-	chunk_count:int,
-	suppressed_measures:Array,
-	track_reset:int,
-	seconds_per_beat:float,
-	length_per_beat:float,
-	total_measures:int
-	):
+func queue_job(job: Dictionary):
 	mutex.lock()
-	pending_jobs.append({
-		"song_track_index": song_track_index,
-		"events": events,
-		"ticks_per_beat": ticks_per_beat,
-		"difficulty_offset": difficulty,
-		"chunk_count": chunk_count,
-		"suppressed_measures": suppressed_measures,
-		"track_reset": track_reset,
-		"seconds_per_beat": seconds_per_beat,
-		"length_per_beat": length_per_beat,
-		"total_measures": total_measures,
-	})
+	pending_jobs.append(job)
 	mutex.unlock()
 	_start_if_needed()
 
@@ -67,16 +45,7 @@ func _worker(_userdata = null):
 func _process_job(job:Dictionary):
 	var result: SynRoadTrack.GameplayTrackData = SynRoadTrack.GameplayTrackData.new()
 	## map of beat (float) to lane (int)
-	var note_map: Dictionary[float,int] = {}
-	var valid_note_positions: Array[int] = [job.difficulty_offset, job.difficulty_offset + 2, job.difficulty_offset + 4]
-	var tick := 0
-
-	for i in range(job.events.size()):
-		var event = job.events[i]
-		tick += event.delta_time
-		if event is MidiData.NoteOn and event.velocity > 0 and valid_note_positions.has(event.note):
-			var beat_position: float = float(tick) / float(job.ticks_per_beat)
-			note_map[beat_position] = valid_note_positions.find(event.note)
+	var note_map: Dictionary[float,int] = job.note_map
 
 	note_map.sort()
 	var sorted_beats: Array[float] = note_map.keys()

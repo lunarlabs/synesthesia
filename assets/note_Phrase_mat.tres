@@ -10,7 +10,6 @@ grow_amount = 0.03
 stencil_mode = 3
 stencil_flags = 1
 stencil_compare = 5
-stencil_reference = 4
 metadata/_stencil_owned = true
 
 [resource]
@@ -21,5 +20,4 @@ emission = Color(1, 1, 1, 1)
 emission_energy_multiplier = 2.0
 stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 4
 stencil_outline_thickness = 0.03

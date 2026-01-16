@@ -78,6 +78,7 @@ const MISS_WINDOW_OFFSET = 0.01
 var song_data:SongData
 var song_instance:SynRoadSong
 var preprocessor:SynRoadTrackPreprocessor
+var note_maps:Array[Dictionary]
 var track_data:Array[Dictionary]
 var total_measures: int
 var length_multiplier: float
@@ -106,6 +107,7 @@ func _ready() -> void:
 		push_error("Failed to load song data from %s" % song_file)
 		return
 
+	note_maps = _get_note_maps()
 	ChunkManager.manager_node = self
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
@@ -149,7 +151,7 @@ func _ready() -> void:
 			4:
 				pass
 
-
+	track_data.resize(song_data.tracks.size())
 	_fetch_track_data()
 	preprocessor.wait_for_all()
 	var results = preprocessor.take_completed()
@@ -186,20 +188,35 @@ func _ready() -> void:
 func _fetch_track_data() -> void:
 	preprocessor = SynRoadTrackPreprocessor.new()
 	print("loading midi data")
-	var midi_data = load(song_data.midi_file) as MidiData
-	if not midi_data:
-		push_error("Failed to load MIDI data from %s" % song_data.midi_file)
-		return
-	var ticks_per_beat = midi_data.header.ticks_per_beat
-	track_data.resize(song_data.tracks.size())
 	for i in song_data.tracks.size():
 		var track_info = song_data.tracks[i] as SongTrackData
 		var midi_track_idx = song_data.song_track_locations.get(track_info.midi_track_name, -1)
 		if midi_track_idx == -1:
 			push_error("Track name %s not found in MIDI data." % track_info.midi_track_name)
 			continue
-		preprocessor.queue_job(i, midi_data.tracks[midi_track_idx].events, ticks_per_beat, difficulty, chunk_count, suppressed_measures, fast_track_reset, seconds_per_beat, length_per_beat, total_measures)
+		var job = {
+			"song_track_index" : i,
+			"note_map": note_maps[i],
+			"seconds_per_beat": 60.0 / song_data.bpm,
+			"chunk_count": chunk_count,
+			"suppressed_measures": suppressed_measures,
+			"track_reset": fast_track_reset,
+			"length_per_beat": length_per_beat,
+			"total_measures": total_measures,
+		}
+		preprocessor.queue_job(job)
 
+func _get_note_maps() -> Array[Dictionary]:
+	print ("getting note maps...")
+	var result: Array[Dictionary] = []
+	for i in song_data.tracks.size():
+		var track_info = song_data.tracks[i] as SongTrackData
+		var midi_track_idx = song_data.song_track_locations.get(track_info.midi_track_name, -1)
+		if midi_track_idx == -1:
+			push_error("Track name %s not found in MIDI data." % track_info.midi_track_name)
+			continue
+		result.append(song_data.get_note_map_from_track(midi_track_idx, difficulty))
+	return result
 
 func _apply_preprocessor_results(results: Array) -> void:
 	print("applying preprocessor results")
