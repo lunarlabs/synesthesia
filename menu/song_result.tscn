@@ -1105,6 +1105,7 @@ theme_type_variation = &"PanelBox"
 alignment = 1
 
 [node name="RankPanel" type="PanelContainer" parent="RightSide"]
+unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_vertical = 4
@@ -1282,6 +1283,7 @@ horizontal_alignment = 2
 visible_characters_behavior = 1
 
 [node name="NotesHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "HUD_NOTES_HIT"
@@ -1290,6 +1292,7 @@ visible_characters_behavior = 1
 
 [node name="NotesHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 text = "0"
@@ -1297,6 +1300,7 @@ horizontal_alignment = 2
 visible_characters_behavior = 1
 
 [node name="EarlyHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "HUD_FAST_HITS"
@@ -1305,6 +1309,7 @@ visible_characters_behavior = 1
 
 [node name="EarlyHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 text = "0"
@@ -1312,6 +1317,7 @@ horizontal_alignment = 2
 visible_characters_behavior = 1
 
 [node name="LateHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "HUD_SLOW_HITS"
@@ -1320,6 +1326,7 @@ visible_characters_behavior = 1
 
 [node name="LateHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 text = "0"
@@ -1327,6 +1334,7 @@ horizontal_alignment = 2
 visible_characters_behavior = 1
 
 [node name="AvgHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "HUD_AVG_OFFSET"
@@ -1335,6 +1343,7 @@ visible_characters_behavior = 1
 
 [node name="AvgHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 text = "0 ms"

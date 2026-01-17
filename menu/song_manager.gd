@@ -18,10 +18,10 @@ var can_pause := false
 const SONG_SCENE:PackedScene = preload("res://entities/song.tscn")
 
 const DIFFICULTY_NAMES = {
-	96: "Beginner",
-	102: "Intermediate",
-	108: "Advanced",
-	114: "Expert"
+	96: "DIFF_96",
+	102: "DIFF_102",
+	108: "DIFF_108",
+	114: "DIFF_114"
 }
 const ENERGY_MODIFIER_NAMES = [
 	"Energy",
@@ -50,13 +50,13 @@ const FAST_RESET_NAMES = {
 }
 
 const ACCURACY_THRESHOLDS = {
-	"AAA": 0.97,
-	"AA": 0.93,
-	"A": 0.90,
-	"B": 0.80,
-	"C": 0.70,
-	"D": 0.60,
-	"E": 0.50,
+	"AAA": 97.0,
+	"AA": 93.0,
+	"A": 90.0,
+	"B": 80.0,
+	"C": 70.0,
+	"D": 60.0,
+	"E": 50.0,
 	"F": 0.00,
 }
 
@@ -78,6 +78,7 @@ const MISS_WINDOW_OFFSET = 0.01
 var song_data:SongData
 var song_instance:SynRoadSong
 var preprocessor:SynRoadTrackPreprocessor
+var song_name: String
 var note_maps:Array[Dictionary]
 var track_data:Array[Dictionary]
 var total_measures: int
@@ -107,6 +108,7 @@ func _ready() -> void:
 		push_error("Failed to load song data from %s" % song_file)
 		return
 
+	song_name = song_file.get_file().get_slice(".", 0)
 	note_maps = _get_note_maps()
 	ChunkManager.manager_node = self
 	hit_window = TIMING_WINDOWS[timing_modifier]
@@ -258,6 +260,9 @@ func _on_song_failed(stats) -> void:
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
+	song_stats.title = song_data.title
+	song_stats.artist = song_data.artist
+	song_stats.difficulty = difficulty
 	song_stats.energy_modifier = energy_modifier
 	song_stats.checkpoint_modifier = checkpoint_modifier
 	song_stats.hide_streak_hints = hide_streak_hints
@@ -269,12 +274,14 @@ func _on_song_finished(stats) -> void:
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = 100.0
 	song_stats.calculate_rank()
+	var finish_state = 2 if song_stats.energy_modifier == 4 else 0
+		
 
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
-	result_screen.show()
-	result_screen.get_node("AnimationPlayer").play("BuildIn")
+	result_screen.display(finish_state, song_stats, 
+		SessionManager.get_song_record(song_name, difficulty))
 	# Enable buttons when animation finishes
 	var exit_btn = result_screen.get_node("%ExitButton") as Button
 	var restart_btn = result_screen.get_node("%RestartButton") as Button
