@@ -131,16 +131,19 @@ class SongResult:
 	}
 
 	const ACCURACY_THRESHOLDS = {
-		0.97: ClearRank.AAA,
-		0.93: ClearRank.AA,
-		0.90: ClearRank.A,
-		0.80: ClearRank.B,
-		0.70: ClearRank.C,
-		0.60: ClearRank.D,
-		0.50: ClearRank.E,
+		97.0: ClearRank.AAA,
+		93.0: ClearRank.AA,
+		90.0: ClearRank.A,
+		80.0: ClearRank.B,
+		70.0: ClearRank.C,
+		60.0: ClearRank.D,
+		50.0: ClearRank.E,
 		0.00: ClearRank.F,
 	}
-
+	var song: String
+	var title: String
+	var artist: String
+	var difficulty: int = 102
 	var energy_modifier: int
 	var checkpoint_modifier: int
 	var hide_streak_hints: bool
@@ -157,7 +160,7 @@ class SongResult:
 	func calculate_rank():
 		for threshold in ACCURACY_THRESHOLDS.keys():
 			if accuracy >= threshold:
-				clear_state = ACCURACY_THRESHOLDS[threshold]
+				rank = ACCURACY_THRESHOLDS[threshold]
 				break
 	
 	func get_rank_string() -> String:
@@ -202,6 +205,10 @@ class SongResult:
 
 	func to_dict() -> Dictionary:
 		return {
+			"song" = song,
+			"title" = title,
+			"artist" = artist,
+			"difficulty" = difficulty, 
 			"energy_modifier" = energy_modifier,
 			"checkpoint_modifier" = checkpoint_modifier,
 			"hide_streak_hints" = hide_streak_hints,
@@ -218,6 +225,10 @@ class SongResult:
 
 	static func from_dict(dict: Dictionary) -> SongResult:
 		var result = SongResult.new()
+		result.song = dict.get("song", "")
+		result.title = dict.get("title", "Unknown Song")
+		result.artist = dict.get("artist", "Unknown Artist")
+		result.difficulty = int(dict.get("difficulty", 102))
 		result.energy_modifier = int(dict.get("energy_modifier", 0))
 		result.checkpoint_modifier = int(dict.get("checkpoint_modifier", 0))
 		result.hide_streak_hints = dict.get("hide_streak_hints", false)
