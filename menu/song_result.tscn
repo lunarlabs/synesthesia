@@ -1129,6 +1129,7 @@ layout_mode = 2
 
 [node name="ClearTypeBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 alignment = 1
 
@@ -1172,6 +1173,7 @@ visible_characters_behavior = 1
 
 [node name="RankBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 alignment = 1
 
