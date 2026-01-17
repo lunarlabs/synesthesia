@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dm4hcmhaewyp6"]
+[gd_scene load_steps=13 format=3 uid="uid://dm4hcmhaewyp6"]
 
 [ext_resource type="Script" uid="uid://cijh26pewr7t7" path="res://menu/song_result.gd" id="1_cnqnt"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
@@ -25,6 +25,24 @@ font = SubResource("FontVariation_bsqdo")
 font_size = 72
 outline_size = 6
 outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_cnqnt"]
+base_font = ExtResource("2_eskt4")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 65,
+2003265652: 350
+}
+
+[sub_resource type="FontVariation" id="FontVariation_xsivx"]
+base_font = ExtResource("2_eskt4")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 65,
+2003265652: 350
+}
 
 [sub_resource type="Animation" id="Animation_cnqnt"]
 resource_name = "BuildIn"
@@ -348,7 +366,7 @@ tracks/26/path = NodePath("RightSide/ClearPanel/VBoxContainer/ClearTypeBox/New:v
 tracks/26/interp = 1
 tracks/26/loop_wrap = true
 tracks/26/keys = {
-"times": PackedFloat32Array(1.2, 1.5000001),
+"times": PackedFloat32Array(0.76666665, 1.0666667),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -1050,7 +1068,7 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Song Title "
 label_settings = SubResource("LabelSettings_xsivx")
-horizontal_alignment = 2
+horizontal_alignment = 1
 autowrap_mode = 3
 visible_characters_behavior = 1
 
@@ -1059,7 +1077,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Artist"
-horizontal_alignment = 2
+horizontal_alignment = 1
 autowrap_mode = 3
 visible_characters_behavior = 1
 
@@ -1071,7 +1089,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Difficulty"
-horizontal_alignment = 2
+horizontal_alignment = 1
 visible_characters_behavior = 1
 
 [node name="HSeparator2" type="HSeparator" parent="LeftSide/LeftSide"]
@@ -1129,13 +1147,13 @@ layout_mode = 2
 
 [node name="ClearTypeBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 alignment = 1
 
 [node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
 layout_mode = 2
 text = "MENU_CLEARTYPETITLE"
+vertical_alignment = 1
 uppercase = true
 visible_characters_behavior = 1
 
@@ -1146,7 +1164,7 @@ size_flags_horizontal = 10
 [node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_fonts/font = SubResource("FontVariation_cnqnt")
 text = "MENU_NOTPLAYED"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1161,9 +1179,10 @@ text = "→"
 horizontal_alignment = 1
 
 [node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_fonts/font = SubResource("FontVariation_xsivx")
+theme_override_font_sizes/font_size = 30
 text = "MENU_LOOSE_CLEARED_SHORT"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1173,7 +1192,6 @@ visible_characters_behavior = 1
 
 [node name="RankBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 alignment = 1
 
@@ -1203,7 +1221,7 @@ text = "→"
 horizontal_alignment = 1
 
 [node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(140, 45)
 layout_mode = 2
 text = "RANK_AAA"
 horizontal_alignment = 1
@@ -1227,10 +1245,10 @@ layout_mode = 2
 size_flags_horizontal = 10
 
 [node name="Value" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(280, 45)
 layout_mode = 2
 text = "100.00%"
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
 max_lines_visible = 1
 visible_characters_behavior = 1

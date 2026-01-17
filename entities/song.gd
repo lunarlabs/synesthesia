@@ -532,7 +532,6 @@ func fail_song():
 	manager_node.can_pause = false
 	print("Song failed!")
 	input_enabled = false
-	hud.hide()
 	var stats = {
 		"score": score,
 		"measure": %Conductor.current_measure,
@@ -541,16 +540,17 @@ func fail_song():
 		"phrases_missed": _phrases_missed,
 		"streak_breaks": _streak_breaks
 	}
-	song_failed.emit(stats)
+	%HUDAnimations.play("SongFailed")
 	var slow_tween = get_tree().create_tween().set_parallel(true)
 	var asps = get_tree().get_nodes_in_group("AudioPlayers")
 	slow_tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
 	for asp in asps:
 		slow_tween.tween_property(asp, "pitch_scale", 0.01, 3.0)
-	await slow_tween.finished
+	await %HUDAnimations.animation_finished
 	finished = true
 	get_tree().call_group("AudioPlayers", "stop")
 	%Conductor.is_playing = false
+	song_failed.emit(stats)
 
 func _print_new_measure_connections() -> void:
 	var conns: Array = get_signal_connection_list("new_measure")
@@ -575,6 +575,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			"phrases_completed": _phrases_completed,
 			"phrases_missed": _phrases_missed,
 			"streak_breaks": _streak_breaks,
+			"perfect": _miss_count == 0,
 		}
 		song_finished.emit(results)
 		manager_node.can_pause = false

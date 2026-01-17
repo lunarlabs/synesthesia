@@ -3,7 +3,8 @@ extends HBoxContainer
 enum FinishMode {
 	COMPLETE,
 	FAILED,
-	PRACTICE
+	PRACTICE,
+	AUTOBLAST,
 }
 
 @onready var anim = $AnimationPlayer as AnimationPlayer
@@ -62,6 +63,12 @@ func display(
 			%RankPanel.hide()
 			%RankBox.hide()
 			%ClearTypeBox.hide()
+		FinishMode.AUTOBLAST:
+			$RightSide.hide()
+			%RestartButton.hide()
 	
 	show()
 	anim.play("BuildIn")
+	await anim.animation_finished
+	%RestartButton.disabled = false
+	%ExitButton.disabled = false

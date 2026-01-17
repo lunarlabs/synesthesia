@@ -23,6 +23,29 @@ const DIFFICULTY_NAMES = {
 	108: "DIFF_108",
 	114: "DIFF_114"
 }
+
+enum EnergyModifiers {
+	NORMAL,
+	DRAIN,
+	NO_RECOVER,
+	SUDDEN_DEATH,
+	NO_FAIL,
+}
+
+enum CheckpointModifiers {
+	CHECKPOINT,
+	NO_CHECKPOINT_RECOVERY,
+	BARRIER_2X,
+	BARRIER_3X,
+	BARRIER_4X,
+}
+
+enum TimingModifiers {
+	NORMAL,
+	LOOSE,
+	STRICT,
+}
+
 const ENERGY_MODIFIER_NAMES = [
 	"Energy",
 	"Drain",
@@ -233,33 +256,34 @@ func _input(event: InputEvent) -> void:
 		_toggle_pause()
 
 func _on_song_failed(stats) -> void:
-	var fail_anim = fail_screen.get_node("AnimationPlayer") as AnimationPlayer
-	# TODO: the rest of the fail screen labels and then populate them with stats
-	# TODO: we have %TipLabel but no tips yet so you'll just see the "no fail" tip all the time
 	var percent_completed = (float(stats.measure) / (song_data.playable_measures + song_data.lead_in_measures)) * 100.0
-	fail_screen.get_node("%SongTitleLabel").text = song_data.long_title
-	fail_screen.get_node("%ArtistLabel").text = song_data.artist
-	fail_screen.get_node("%DifficultyLabel").text = DIFFICULTY_NAMES[difficulty]
-	fail_screen.get_node("%PercentCompletedLabel").text = "%.2f%%" % percent_completed
-	fail_screen.get_node("%ScoreLabel").text = str(stats.score)
-	fail_screen.get_node("%StreakLabel").text = str(stats.max_streak)
+	var song_stats := SessionManager.SongResult.new()
+	song_stats.song = song_name
+	song_stats.title = song_data.title
+	song_stats.artist = song_data.artist
+	song_stats.difficulty = difficulty
+	song_stats.energy_modifier = energy_modifier
+	song_stats.checkpoint_modifier = checkpoint_modifier
+	song_stats.hide_streak_hints = hide_streak_hints
+	song_stats.fast_track_reset = fast_track_reset
+	song_stats.score = stats["score"]
+	song_stats.max_streak = stats["max_streak"]
 	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
-	fail_screen.get_node("%AccuracyLabel").text = "%.2f%%" % accuracy
-	fail_screen.get_node("%StreakBreakLabel").text = str(stats.streak_breaks)
-	# "Song Failed" slams down as soon as the slowdown begins and covers the whole duration
-	# of the slowdown effect.
-	fail_screen.show()
+	song_stats.accuracy = accuracy
+	song_stats.streak_breaks = stats["streak_breaks"]
+	song_stats.percent_completed = percent_completed
+	song_stats.clear_state = SessionManager.SongResult.ClearState.FAILED
+	var finish_state = 1
 
-	fail_anim.play("Display")
-	# Enable buttons when animation finishes
-	var exit_btn = fail_screen.get_node("%ExitButton") as Button
-	var restart_btn = fail_screen.get_node("%RestartButton") as Button
-	await fail_anim.animation_finished
-	exit_btn.disabled = false
-	restart_btn.disabled = false
+	song_instance.hud.hide()
+	result_screen.display(finish_state, song_stats, 
+		SessionManager.get_song_record(song_name, difficulty))
+	song_stats.accuracy = 0.0
+	SessionManager.record_song_result(song_name, difficulty, song_stats)
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
+	song_stats.song = song_name
 	song_stats.title = song_data.title
 	song_stats.artist = song_data.artist
 	song_stats.difficulty = difficulty
@@ -275,18 +299,31 @@ func _on_song_finished(stats) -> void:
 	song_stats.percent_completed = 100.0
 	song_stats.calculate_rank()
 	var finish_state = 2 if song_stats.energy_modifier == 4 else 0
-		
-
+	var valid_record := false
+	if autoblast:
+		song_stats.clear_state = SessionManager.SongResult.ClearState.AUTOBLASTED
+	elif song_stats.energy_modifier == 4:
+		song_stats.clear_state = SessionManager.SongResult.ClearState.NOT_PLAYED
+	else:
+		valid_record = true
+		if stats["perfect"]:
+			song_stats.clear_state = SessionManager.SongResult.ClearState.PERFECT_RUN
+		else:
+			match timing_modifier:
+				TimingModifiers.LOOSE:
+					song_stats.clear_state = SessionManager.SongResult.ClearState.LOOSE_CLEAR
+				TimingModifiers.STRICT:
+					song_stats.clear_state = SessionManager.SongResult.ClearState.STRICT_CLEAR
+				_:
+					song_stats.clear_state = SessionManager.SongResult.ClearState.CLEAR
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats, 
 		SessionManager.get_song_record(song_name, difficulty))
-	# Enable buttons when animation finishes
-	var exit_btn = result_screen.get_node("%ExitButton") as Button
-	var restart_btn = result_screen.get_node("%RestartButton") as Button
-	exit_btn.disabled = false
-	restart_btn.disabled = false
+	
+	if valid_record:
+		SessionManager.record_song_result(song_name, difficulty, song_stats)
 
 func _toggle_pause() -> void:
 	# Prevent pause if result or fail screen is visible

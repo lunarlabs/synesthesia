@@ -29,7 +29,6 @@ size_flags_horizontal = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.6966666, 1, 1)
 text = "0
 "
 horizontal_alignment = 2
@@ -45,8 +44,9 @@ horizontal_alignment = 1
 
 [node name="New" type="Label" parent="ScorePanel/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 text = "0"
 horizontal_alignment = 2
 vertical_alignment = 1
