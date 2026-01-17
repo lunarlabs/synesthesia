@@ -122,12 +122,6 @@ func _ready():
 		await ChunkManager.queue_empty
 	print("tracks added")
 	click_track_asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
-	for audioFileName in manager_node.song_data.intro_audio:
-		var introAsp = AudioStreamPlayer.new()
-		introAsp.stream = load(ResourceUID.path_to_uid(audioFileName))
-		introAsp.volume_db = -7.0
-		add_child(introAsp)
-		introAsp.add_to_group("AudioPlayers")
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D

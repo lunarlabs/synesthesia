@@ -14,16 +14,16 @@ const MIDI_META_TEMPO_EVENT = 0x51
 @export_file("*.mid") var midi_file
 
 ##Short title of the song
-@export var title: String
+@export var title: String = "Unknown Track"
 
 ## Full/extended title of the song
 @export var long_title: String
 
 ## Name of the artist or composer
-@export var artist: String
+@export var artist: String = "Unknown Artist"
 
 ##  Musical genre classification
-@export var genre: String
+@export var genre: String = "Unknown Genre"
 
 ## Description or background information about the song
 @export_multiline var description: String
@@ -43,10 +43,7 @@ const MIDI_META_TEMPO_EVENT = 0x51
 @export var checkpoints: Array[int]
 
 ## Path to the audio file for the song's main track
-@export_file("*.wav") var click_track
-
-## Array of audio file paths for introductory segments before the main track
-@export var intro_audio: Array[String]
+@export_file("*.wav") var click_track = ""
 
 ## Whether to use a fixed BPM value instead of reading from the MIDI file
 @export var bpm_fix: bool = false

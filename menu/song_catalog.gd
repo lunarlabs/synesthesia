@@ -367,12 +367,14 @@ func scan_for_songs(rescan := false):
 						ResourceSaver.save(song_data)
 					else:
 						print("Fallback MIDI file doesn't exist, giving up on this one.")
+						folder_name = dir.get_next()
 						continue
 					if _known_folders.find(folder_name) == -1:
 						print("Loading MIDI data for song: %s" % song_resource_path)
 						var err = song_data.midi_error # this has the benefit of preloading the MIDI data before we go into the threads
 						if err:
 							print("Failed to load MIDI data for song: %s" % song_resource_path)
+							folder_name = dir.get_next()
 							continue
 						_loaded_data.append([folder_name, song_data])
 						print("Queued song for preprocessing: %s" % song_resource_path)

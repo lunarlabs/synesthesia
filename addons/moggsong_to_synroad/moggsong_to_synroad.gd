@@ -173,26 +173,26 @@ func _on_import_button_pressed() -> void:
 			for t in _current_songdata.tracks:
 				current_track_names.append(t.midi_track_name)
 			if track_name in current_track_names:
-				continue  # Avoid duplicate tracks
+				continue # Avoid duplicate tracks
 			var trackdata = SongTrackData.new()
 			trackdata.midi_track_name = track_name
 			# The character following "catch:" indicates the instrument type
 			var instr_char = track_name.get_slice(":", 1).to_lower()
 			match instr_char[0]:
 				"d":
-					trackdata.instrument = 0  # Drums
+					trackdata.instrument = 0 # Drums
 				"b":
-					trackdata.instrument = 1  # Bass
+					trackdata.instrument = 1 # Bass
 				"g":
-					trackdata.instrument = 2  # Guitar
+					trackdata.instrument = 2 # Guitar
 				"s":
-					trackdata.instrument = 3  # Synth
+					trackdata.instrument = 3 # Synth
 				"v":
-					trackdata.instrument = 4  # Vocals
+					trackdata.instrument = 4 # Vocals
 				"f":
-					trackdata.instrument = 5  # FX
+					trackdata.instrument = 5 # FX
 				_:
-					trackdata.instrument = 0  # Drums (can't find a better match)
+					trackdata.instrument = 0 # Drums (can't find a better match)
 			_current_songdata.tracks.append(trackdata)
 	_warning_label.text = "Imported MIDI with %d tracks." % _current_songdata.tracks.size()
 	_populate_gui_from_songdata(_current_songdata)
@@ -377,20 +377,28 @@ func _clear_gui() -> void:
 ## IMPORT FUNCTIONS GO HERE ##
 func _read_midi_file(path: String) -> Dictionary:
 	var result: Dictionary = {}
-	var midi_data = load(path) as MidiData
-	if not midi_data:
+	var midi_data = MidiResource.new()
+	var err = midi_data.load_file(path)
+	if err != OK:
 		result["error_message"] = "Failed to load MIDI data from %s" % path
 		return result
 	
 	var track_names: Array[String] = []
 	var bpm: float = 120.0
+	
+	# MidiResource stores tracks as objects that have an 'events' property which is an Array of Dictionaries
 	for i in range(midi_data.tracks.size()):
-		var track = midi_data.tracks[i] as MidiData.Track
+		var track = midi_data.tracks[i]
 		for event in track.events:
-			if event is MidiData.TrackName:
-				track_names.append(event.text)
-			elif event is MidiData.Tempo:
-				bpm = event.bpm
+			if event.get("type") == "meta":
+				var subtype = event.get("subtype")
+				if subtype == 3: # Track Name
+					track_names.append(event.get("data", ""))
+				elif subtype == 81: # Tempo (0x51)
+					var microseconds_per_quarter = float(event.get("data", 500000))
+					if microseconds_per_quarter > 0:
+						bpm = 60_000_000.0 / microseconds_per_quarter
+						
 	result["track_names"] = track_names
 	result["bpm"] = bpm
 	return result

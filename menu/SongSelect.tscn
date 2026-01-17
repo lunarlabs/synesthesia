@@ -457,7 +457,6 @@ text = "MOD_HISPEED"
 
 [node name="LoadingContainer" type="CenterContainer" parent="."]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.72800004

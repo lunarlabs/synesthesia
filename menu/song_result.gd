@@ -33,8 +33,8 @@ func display(
 	%SongTitleLabel.text = result.title
 	%ArtistLabel.text = result.artist
 	%DifficultyLabel.text = SynRoadSongManager.DIFFICULTY_NAMES[result.difficulty]
-	lbl_clear_type_prev.text = prev.get_clear_string()
-	lbl_clear_type_new.text = result.get_clear_string()
+	lbl_clear_type_prev.text = prev.get_clear_string(true)
+	lbl_clear_type_new.text = result.get_clear_string(true)
 	lbl_rank_prev.text = prev.get_rank_string()
 	lbl_rank_new.text = result.get_rank_string()
 	%RankLabel.text = result.get_rank_string()
