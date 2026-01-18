@@ -613,7 +613,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		if lead_in_measures > 0:
 			count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
-			if lead_in_measures == 1:
+			if lead_in_measures == 2:
 				%TargetPfx.emitting = true
 				for tgt in _targets:
 					tgt.show()
