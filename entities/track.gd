@@ -340,7 +340,7 @@ func _advance_phrase():
 			cube.set_instance_shader_parameter("phrase", true)
 	for i in track_data.phrase_note_indices[current_phrase_index]:
 		var note = note_nodes[i]
-		if is_active:
+		if note and is_active:
 			note.set_phrase_note(true)
 
 func get_measure_index_after(measure_num: int) -> int:
@@ -371,7 +371,8 @@ func set_active(active: bool):
 	if current_phrase_index < track_data.phrase_starts.size():
 		for i in track_data.phrase_note_indices[current_phrase_index]:
 			var note = note_nodes[i]
-			note.set_phrase_note(active)
+			if note:
+				note.set_phrase_note(active)
 	if !active:
 		marker.visible = song_node.manager_node.hide_streak_hints == false
 		if blasting_phrase:
