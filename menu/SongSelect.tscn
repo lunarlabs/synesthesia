@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cj5qbqo5phlu1"]
+[gd_scene load_steps=25 format=3 uid="uid://cj5qbqo5phlu1"]
 
 [ext_resource type="Theme" uid="uid://cm4v2e2f0im5p" path="res://menu/theme/MenuTheme.tres" id="1_0tx4y"]
 [ext_resource type="Script" uid="uid://bwqk5wogs7fgg" path="res://menu/song_select.gd" id="1_etro7"]
@@ -16,6 +16,35 @@ shader_parameter/spacing = 4.0
 shader_parameter/torus_size = Vector2(1.5, 0.2)
 shader_parameter/object_color = Color(0.1, 0.6, 0.9, 1)
 shader_parameter/fog_color = Color(0.05, 0.05, 0.1, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_ctryq"]
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 85,
+2003265652: 600
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_21003"]
+resource_local_to_scene = true
+font = SubResource("FontVariation_ctryq")
+font_size = 20
+
+[sub_resource type="FontVariation" id="FontVariation_hjgwb"]
+base_font = ExtResource("3_mbci5")
+variation_opentype = {
+1129599571: 20,
+1936486004: 0,
+2003072104: 125,
+2003265652: 600
+}
+opentype_features = {
+1953396077: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_ctryq"]
+font = SubResource("FontVariation_hjgwb")
+font_size = 43
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mbci5"]
 blend_mode = 3
@@ -320,22 +349,25 @@ alignment = 1
 [node name="PanelContainer" type="PanelContainer" parent="LeftSide/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
+size_flags_vertical = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer"]
 layout_mode = 2
 
 [node name="PreviousBestsTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 text = "MENU_PREV_BESTS"
-horizontal_alignment = 1
 uppercase = true
 
-[node name="GridContainer" type="GridContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
 columns = 2
 
-[node name="PrevScoreTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevScoreTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(175, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -343,42 +375,27 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_SCORETITLE"
 uppercase = true
 
-[node name="PrevScoreLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevScoreLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="PrevRankTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-text = "MENU_RANKTITLE"
-uppercase = true
-
-[node name="PrevRankLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "--"
-horizontal_alignment = 2
-uppercase = true
-
-[node name="PrevStreakTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevStreakTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_LONGESTSTREAKTITLE"
 uppercase = true
 
-[node name="PrevStreakLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevStreakLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="PrevAccTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevAccTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -387,12 +404,39 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_PHRASEACCURACYTITLE"
 uppercase = true
 
-[node name="PrevAccLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/GridContainer"]
+[node name="PrevAccLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
+
+[node name="VSeparator" type="VSeparator" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="PrevClearLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "NOT PLAYED"
+label_settings = SubResource("LabelSettings_21003")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="PrevRankLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "AAA"
+label_settings = SubResource("LabelSettings_ctryq")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
 
 [node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer"]
 layout_mode = 2

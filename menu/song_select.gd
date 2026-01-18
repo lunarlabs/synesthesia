@@ -277,22 +277,22 @@ func _on_timing_option_pressed() -> void:
 
 func _update_previous_bests():
 	var entry = SongCatalog.catalog[selected_song_index]
-	if SessionManager.song_records.get(entry.title, {}).get(selected_difficulty, {}).get("clear_state", "not_played") == "not_played":
-		%PreviousBestsTitle.text = "MENU_NOTPLAYED"
+	var record = SessionManager.song_records.get(entry.folder, {}).get(str(selected_difficulty), null)
+	if not record or record.clear_state == SessionManager.SongResult.ClearState.NOT_PLAYED:
+		%PrevClearLabel.text = "MENU_NOTPLAYED"
 		%PrevScoreLabel.text = ""
-		%PrevRankLabel.text = ""
+		%PrevRankLabel.text = "--"
 		%PrevStreakLabel.text = ""
 		%PrevAccTitle.text = "MENU_SONGCOMPLETION"
 		%PrevAccLabel.text = "0.00%"
 	else:
-		var record = SessionManager.song_records[entry.title][selected_difficulty]
-		%PreviousBestsTitle.text = "MENU_PREV_BESTS" if record["clear_state"] != "failed" else "MENU_FAILED"
-		%PrevScoreLabel.text = str(record["score"])
-		%PrevRankLabel.text = record.get("rank", "")
-		%PrevStreakLabel.text = str(record["max_streak"])
-		if record["clear_state"] == "failed":
+		%PrevClearLabel.text = record.get_clear_string(true)
+		%PrevRankLabel.text = record.get_rank_string()
+		%PrevStreakLabel.text = str(record.max_streak)
+		%PrevScoreLabel.text = str(record.score)
+		if record.clear_state == SessionManager.SongResult.ClearState.FAILED:
 			%PrevAccTitle.text = "MENU_SONGCOMPLETION"
-			%PrevAccLabel.text = "%.2f%%" % (record["percent_completed"])
+			%PrevAccLabel.text = "%.2f%%" % (record.percent_completed)
 		else:
 			%PrevAccTitle.text = "MENU_PHRASEACCURACYTITLE"
-			%PrevAccLabel.text = "%.2f%%" % (record["accuracy"])
+			%PrevAccLabel.text = "%.2f%%" % (record.accuracy)

@@ -232,7 +232,7 @@ class SongResult:
 			ClearState.CLEAR:
 				return tr("MENU_CLEARED")
 			ClearState.STRICT_CLEAR:
-				return tr("MENU_CLEARED_TIGHT_SHORT") if short else tr("MENU_CLEARED_TIGHT")
+				return tr("MENU_TIGHT_CLEARED_SHORT") if short else tr("MENU_TIGHT_CLEARED")
 			ClearState.PERFECT_RUN:
 				return tr("MENU_PERFECTRUN_SHORT") if short else tr("MENU_PERFECTRUN")
 			_:

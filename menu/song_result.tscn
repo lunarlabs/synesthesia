@@ -21,6 +21,7 @@ opentype_features = {
 }
 
 [sub_resource type="LabelSettings" id="LabelSettings_dn0fs"]
+resource_local_to_scene = true
 font = SubResource("FontVariation_bsqdo")
 font_size = 72
 outline_size = 6
