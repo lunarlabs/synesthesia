@@ -15,7 +15,7 @@ var difficulty: int = 96
 
 var can_pause := false
 
-const SONG_SCENE:PackedScene = preload("res://entities/song.tscn")
+const SONG_SCENE: PackedScene = preload("res://entities/song.tscn")
 
 const DIFFICULTY_NAMES = {
 	96: "DIFF_96",
@@ -86,7 +86,7 @@ const ACCURACY_THRESHOLDS = {
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
-const TIMING_WINDOWS = [0.06, 0.08, 0.04,]
+const TIMING_WINDOWS = [0.06, 0.08, 0.04, ]
 const MISS_WINDOW_OFFSET = 0.01
 
 @onready var pause_panel: PanelContainer = $PausePanel
@@ -98,12 +98,12 @@ const MISS_WINDOW_OFFSET = 0.01
 
 # For this refactor, we'll use time instead of beats for everything
 # Also measures will be zero-indexed
-var song_data:SongData
-var song_instance:SynRoadSong
-var preprocessor:SynRoadTrackPreprocessor
+var song_data: SongData
+var song_instance: SynRoadSong
+var preprocessor: SynRoadTrackPreprocessor
 var song_name: String
-var note_maps:Array[Dictionary]
-var track_data:Array[Dictionary]
+var note_maps: Array[Dictionary]
+var track_data: Array[Dictionary]
 var total_measures: int
 var length_multiplier: float
 var seconds_per_beat: float
@@ -138,7 +138,7 @@ func _ready() -> void:
 	miss_window = hit_window + MISS_WINDOW_OFFSET
 	seconds_per_beat = song_data.seconds_per_beat
 	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
-	print ("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
+	print("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	ideal_playhead_speed = length_per_beat / seconds_per_beat
 	print("Ideal playhead speed: %.3f units/sec" % ideal_playhead_speed)
@@ -156,18 +156,18 @@ func _ready() -> void:
 	chunk_count += 1
 
 	suppressed_measures.resize(total_measures)
-	print ("suppressing checkpoint measures")
+	print("suppressing checkpoint measures")
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
 		checkpoint_measures.append(actual_measure)
 		checkpoint_positions.append(measure_positions[actual_measure])
 		match checkpoint_modifier:
 			0:
-				suppressed_measures[actual_measure] =  true
+				suppressed_measures[actual_measure] = true
 				suppressed_measures[actual_measure + 1] = true
 			1:
 				# Disabled -- leave the checkpoint gates as is but they won't do anything
-				pass 
+				pass
 			# TODO: Barrier logic.
 			2:
 				pass
@@ -207,7 +207,7 @@ func _ready() -> void:
 
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
-	print ("handing over to song node now")
+	print("handing over to song node now")
 	add_child.call_deferred(song_instance)
 
 func _fetch_track_data() -> void:
@@ -220,7 +220,7 @@ func _fetch_track_data() -> void:
 			push_error("Track name %s not found in MIDI data." % track_info.midi_track_name)
 			continue
 		var job = {
-			"song_track_index" : i,
+			"song_track_index": i,
 			"note_map": note_maps[i],
 			"seconds_per_beat": 60.0 / song_data.bpm,
 			"chunk_count": chunk_count,
@@ -232,7 +232,7 @@ func _fetch_track_data() -> void:
 		preprocessor.queue_job(job)
 
 func _get_note_maps() -> Array[Dictionary]:
-	print ("getting note maps...")
+	print("getting note maps...")
 	var result: Array[Dictionary] = []
 	for i in song_data.tracks.size():
 		var track_info = song_data.tracks[i] as SongTrackData
@@ -266,6 +266,7 @@ func _on_song_failed(stats) -> void:
 	song_stats.checkpoint_modifier = checkpoint_modifier
 	song_stats.hide_streak_hints = hide_streak_hints
 	song_stats.fast_track_reset = fast_track_reset
+	song_stats.timing_modifier = timing_modifier
 	song_stats.score = stats["score"]
 	song_stats.max_streak = stats["max_streak"]
 	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
@@ -276,10 +277,11 @@ func _on_song_failed(stats) -> void:
 	var finish_state = 1
 
 	song_instance.hud.hide()
-	result_screen.display(finish_state, song_stats, 
+	result_screen.display(finish_state, song_stats,
 		SessionManager.get_song_record(song_name, difficulty))
 	song_stats.accuracy = 0.0
 	SessionManager.record_song_result(song_name, difficulty, song_stats)
+	SessionManager.save_song_records()
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
@@ -291,6 +293,7 @@ func _on_song_finished(stats) -> void:
 	song_stats.checkpoint_modifier = checkpoint_modifier
 	song_stats.hide_streak_hints = hide_streak_hints
 	song_stats.fast_track_reset = fast_track_reset
+	song_stats.timing_modifier = timing_modifier
 	song_stats.score = stats["score"]
 	song_stats.max_streak = stats["max_streak"]
 	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
@@ -319,11 +322,12 @@ func _on_song_finished(stats) -> void:
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
-	result_screen.display(finish_state, song_stats, 
+	result_screen.display(finish_state, song_stats,
 		SessionManager.get_song_record(song_name, difficulty))
 	
 	if valid_record:
 		SessionManager.record_song_result(song_name, difficulty, song_stats)
+		SessionManager.save_song_records()
 
 func _toggle_pause() -> void:
 	# Prevent pause if result or fail screen is visible

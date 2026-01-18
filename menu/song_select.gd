@@ -72,18 +72,19 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 @onready var anim = $AnimationPlayer
 
 var selected_song_index: int = 0
-var selected_difficulty: int = 102  # Default to Intermediate
+var selected_difficulty: int = 102 # Default to Intermediate
 
 var energy_modifier_index: int = 0
 var checkpoint_modifier_index: int = 0
 var timing_modifier_index: int = 0
 var reset_modifier_index: int = 0
-var hi_speed_index: int = 0  # Default to 1.0x
+var hi_speed_index: int = 0 # Default to 1.0x
 
 # UI References
 
 func _ready():
-	await get_tree().process_frame  # Wait a frame for UI to initialize
+	SessionManager.load_song_records()
+	await get_tree().process_frame # Wait a frame for UI to initialize
 	SongCatalog.scan_for_songs()
 	%LoadingContainer.visible = false
 	if SongCatalog.catalog.is_empty():
@@ -171,7 +172,7 @@ func _update_difficulty_panels(entry: SongCatalog.SongEntry):
 		102: %IntermediateDifficulty,
 		108: %AdvancedDifficulty,
 		114: %ExpertDifficulty
-	} 
+	}
 	# Auto-select first available difficulty if current not available
 	if not entry.available_difficulties.has(selected_difficulty):
 		if entry.available_difficulties.size() > 0:

@@ -106,9 +106,44 @@ func get_song_record(song_id: String, difficulty: int) -> SongResult:
 	else:
 		return SongResult.new()
 
-class SongResult:
+func save_song_records() -> Error:
+	var file = FileAccess.open(SONG_RECORD_PATH, FileAccess.WRITE)
+	if not file:
+		push_error("Failed to open file for writing: %s" % SONG_RECORD_PATH)
+		return file.get_error()
+	var out_json := {}
+	for song_id in song_records.keys():
+		out_json[song_id] = {}
+		for diff in song_records[song_id].keys():
+			out_json[song_id][diff] = song_records[song_id][diff].to_dict()
+	file.store_string(JSON.stringify(out_json))
+	file.close()
+	return OK
 
-	enum ClearState{
+func load_song_records() -> Error:
+	if not FileAccess.file_exists(SONG_RECORD_PATH):
+		return OK
+	var file = FileAccess.open(SONG_RECORD_PATH, FileAccess.READ)
+	if not file:
+		push_error("Failed to open file for reading: %s" % SONG_RECORD_PATH)
+		return file.get_error()
+	var json = JSON.new()
+	var error = json.parse(file.get_as_text())
+	if error == OK:
+		pass
+	else:
+		push_error("Failed to parse JSON data: %s" % json.get_error_message())
+		return error
+	var in_json = json.get_data()
+	for song_id in in_json.keys():
+		song_records[song_id] = {}
+		for diff in in_json[song_id].keys():
+			song_records[song_id][diff] = SongResult.from_dict(in_json[song_id][diff])
+	file.close()
+	return OK
+
+class SongResult:
+	enum ClearState {
 		NOT_PLAYED,
 		AUTOBLASTED,
 		FAILED,
@@ -118,7 +153,7 @@ class SongResult:
 		PERFECT_RUN,
 	}
 
-	enum ClearRank{
+	enum ClearRank {
 		INVALID = -1,
 		AAA,
 		AA,
@@ -184,7 +219,7 @@ class SongResult:
 			_:
 				return "--"
 	
-	func get_clear_string(short:= false) -> String:
+	func get_clear_string(short := false) -> String:
 		match clear_state:
 			ClearState.NOT_PLAYED:
 				return tr("MENU_NOTPLAYED")
@@ -197,7 +232,7 @@ class SongResult:
 			ClearState.CLEAR:
 				return tr("MENU_CLEARED")
 			ClearState.STRICT_CLEAR:
-				return tr("MENU_LOOSE_TIGHT_SHORT") if short else tr("MENU_TIGHT_CLEARED")
+				return tr("MENU_CLEARED_TIGHT_SHORT") if short else tr("MENU_CLEARED_TIGHT")
 			ClearState.PERFECT_RUN:
 				return tr("MENU_PERFECTRUN_SHORT") if short else tr("MENU_PERFECTRUN")
 			_:
@@ -208,7 +243,7 @@ class SongResult:
 			"song" = song,
 			"title" = title,
 			"artist" = artist,
-			"difficulty" = difficulty, 
+			"difficulty" = difficulty,
 			"energy_modifier" = energy_modifier,
 			"checkpoint_modifier" = checkpoint_modifier,
 			"hide_streak_hints" = hide_streak_hints,
