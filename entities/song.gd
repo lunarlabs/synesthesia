@@ -1,8 +1,8 @@
 class_name SynRoadSong
 extends Node3D
 
-const TRACK_SCENE:PackedScene = preload("res://entities/track.tscn")
-const CHECKPOINT_SCENE:PackedScene = preload("res://entities/checkpoint.tscn")
+const TRACK_SCENE: PackedScene = preload("res://entities/track.tscn")
+const CHECKPOINT_SCENE: PackedScene = preload("res://entities/checkpoint.tscn")
 const TRACK_WIDTH := 2.5
 const AUTOBLAST_LOOKAHEAD_MEASURES = 2
 const PLAYHEAD_LEAD_DIST := 0.305
@@ -12,11 +12,11 @@ const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
 const DESYNC_LIMIT := 0.03
 var energy: int = MAX_ENERGY
-var manager_node:SynRoadSongManager
-var bpm:float = 120.0
-var seconds_per_beat:float = 0.5
-var ticks_per_beat:int = -1
-var tracks:Array[Node]
+var manager_node: SynRoadSongManager
+var bpm: float = 120.0
+var seconds_per_beat: float = 0.5
+var ticks_per_beat: int = -1
+var tracks: Array[Node]
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var length_multiplier: float = 1.0
 var _playhead_speed: float
@@ -37,19 +37,19 @@ var _phrases_completed: int = 0
 var _phrases_missed: int = 0
 var _streak_breaks: int = 0
 var _autoblast_next_track: int
-var _track_transition_tween:Tween
-var _intro_tween:Tween
-var _max_hit_offset: float = -INF
+var _track_transition_tween: Tween
+var _intro_tween: Tween
+var _note_hit_tween: Tween
+var _max_hit_offset: float = - INF
 var _min_hit_offset: float = INF
 var _early_note_hits: int = 0
 var _late_note_hits: int = 0
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
-var _cached_active_track_node: SynRoadTrack  # Cache active track reference
-var _fast_slow_hide_timer: SceneTreeTimer  # Reusable timer for fast/slow label
-var _last_inactive_penalty_measure: int = -1  # Ensures only one energy/streak penalty per measure for inactive phrase misses
-var _track_marker_measures: PackedInt32Array  # Cache of marker measures for each track, updated by track._move_marker()
-var _track_reset_measures: PackedInt32Array  # Cache of reset measures for each track, updated by track.activate()
+var _cached_active_track_node: SynRoadTrack # Cache active track reference
+var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak penalty per measure for inactive phrase misses
+var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
+var _track_reset_measures: PackedInt32Array # Cache of reset measures for each track, updated by track.activate()
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
@@ -58,7 +58,7 @@ var _last_streak_break_measure: int = -1
 @onready var playhead = $Playhead
 @onready var current_track = $Playhead/CurrentTrack
 @onready var instrument_label = $Playhead/CurrentTrack/InstrumentLabel
-@onready var camera:Camera3D = $Playhead/Camera3D
+@onready var camera: Camera3D = $Playhead/Camera3D
 @onready var count_in = $CountIn
 @onready var hud = $HUD
 @onready var lbl_score = %ScoreLabel
@@ -66,6 +66,7 @@ var _last_streak_break_measure: int = -1
 @onready var lbl_phrase_value = $HUD/PhraseValueLabel
 @onready var lbl_auto_blast = $HUD/AutoblastLabel
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
+@onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
 
 signal song_failed(stats)
 signal song_finished(stats)
@@ -82,7 +83,8 @@ func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
 
 func _ready():
-	RenderingServer.global_shader_parameter_set("danger", false )
+	%FadeOut.show()
+	RenderingServer.global_shader_parameter_set("danger", false)
 	RenderingServer.global_shader_parameter_set("current_track", 0)
 	if not manager_node.song_data:
 		print("No SongData assigned, aborting")
@@ -95,13 +97,13 @@ func _ready():
 	%Conductor.setup(click_track_asp, bpm)
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
-	_playhead_speed = -(length_per_beat / seconds_per_beat)
+	_playhead_speed = - (length_per_beat / seconds_per_beat)
 	lead_distance = PLAYHEAD_LEAD_DIST * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
-	_track_marker_measures.resize(6)  # Initialize cache for 6 instrument tracks
-	_track_reset_measures.resize(6)  # Initialize cache for 6 instrument tracks
+	_track_marker_measures.resize(6) # Initialize cache for 6 instrument tracks
+	_track_reset_measures.resize(6) # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
-		print ("instantiating track %d" % i)
+		print("instantiating track %d" % i)
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
 		newTrack.track_index = i
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
@@ -131,7 +133,7 @@ func _ready():
 	start_gate.name = "SongStart"
 	start_gate.fadeout_time = checkpoint_fade_time
 	start_gate.gate_location = lead_in_measures
-	start_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
+	start_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
@@ -139,7 +141,7 @@ func _ready():
 	end_gate.name = "SongEnd"
 	end_gate.fadeout_time = checkpoint_fade_time
 	end_gate.gate_location = total_measures
-	end_gate.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
+	end_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
 	add_child(end_gate)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
@@ -170,7 +172,7 @@ func _ready():
 
 func _song_start():
 	print("Starting song playback.")
-	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH)/2
+	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
 	print("Playhead starting at x=%.2f" % playhead.position.x)
 	current_track.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Current track starting at x=%.2f" % current_track.position.x)
@@ -192,13 +194,13 @@ func _song_start():
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().call_group("AudioPlayers", "play")
 	%Conductor.is_playing = true
-	playhead.position.z = -length_per_beat * %Conductor.current_beat
-	playhead_velocity = -length_per_beat * (bpm / 60.0)
+	playhead.position.z = - length_per_beat * %Conductor.current_beat
+	playhead_velocity = - length_per_beat * (bpm / 60.0)
 	manager_node.can_pause = true
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
 	_intro_tween = get_tree().create_tween()
-	_intro_tween.tween_property(%FadeOut, "modulate", Color(1,1,1,0),
-	 (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE)\
+	_intro_tween.tween_property(%FadeOut, "modulate", Color(1, 1, 1, 0),
+	 (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
 	.set_ease(Tween.EASE_IN)
 	_intro_tween.tween_callback(_intro_anim_call)
 
@@ -223,13 +225,13 @@ func _process(delta: float):
 # ... inside _process ...
 		
 		# 1. RAW TARGET (No offset needed anymore)
-		playhead_target_z = -length_per_beat * beat
+		playhead_target_z = - length_per_beat * beat
 		
 		# 2. FEEDFORWARD FORCE
 		# Calculate the speed the playhead SHOULD have (Units per Second)
 		# Velocity = Dist/Beat * Beats/Sec
 		# Note: This is negative because we move into negative Z
-		var target_velocity = -length_per_beat * (bpm / 60.0)
+		var target_velocity = - length_per_beat * (bpm / 60.0)
 		
 		# We add a force exactly equal to the expected drag (Velocity * Damping)
 		# This "pre-cancels" the damping, so the spring only handles position corrections
@@ -238,7 +240,7 @@ func _process(delta: float):
 		# 3. STANDARD SPRING PHYSICS
 		var displacement = playhead_target_z - playhead.position.z
 		var spring_force = displacement * spring_strength
-		var damping_force = -playhead_velocity * damping
+		var damping_force = - playhead_velocity * damping
 		
 		# Apply all forces
 		playhead_velocity += (spring_force + damping_force + feedforward_force) * delta
@@ -262,8 +264,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if manager_node.autoblast or not input_enabled:
 		return
 
-	if event.is_action_pressed("note_left")\
-	or event.is_action_pressed("note_center")\
+	if event.is_action_pressed("note_left") \
+	or event.is_action_pressed("note_center") \
 	or event.is_action_pressed("note_right"):
 		var fresh_time = %Conductor.get_audio_time()
 		fresh_time += (%Conductor.input_offset_ms / 1000.0)
@@ -298,9 +300,9 @@ func debug_info() -> String:
 		lines.append("%02d: %s" % [i, tracks[i].debug_info()])
 	return "\n".join(lines)
 
-func _on_started_phrase(phrase_score_value:int, start_measure:int, measure_count:int):
+func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_count: int):
 	streak += 1
-	lbl_streak.text = "x%d" % min(streak,4)
+	lbl_streak.text = "x%d" % min(streak, 4)
 	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, 4))
 	lbl_phrase_value.show()
 	# Tell inactive tracks to position their markers after this phrase
@@ -311,7 +313,7 @@ func _on_started_phrase(phrase_score_value:int, start_measure:int, measure_count
 			var marker_idx = track.get_measure_index_after(next_phrase_measure - 1)
 			track.move_marker(marker_idx)
 
-func _on_track_activated(note_count:int, start_measure:int):
+func _on_track_activated(note_count: int, start_measure: int):
 	_inactive_safeguard_measure = start_measure # Prevents another phrase on the same measure from breaking streak
 	score += note_count * min(streak, 4)
 	if streak > max_streak:
@@ -319,7 +321,7 @@ func _on_track_activated(note_count:int, start_measure:int):
 	_phrases_completed += 1
 	lbl_phrase_value.hide()
 	lbl_score.text = "%d" % score
-	lbl_streak.text = "x%d" % min(streak,4)
+	lbl_streak.text = "x%d" % min(streak, 4)
 	match manager_node.energy_modifier:
 		0:
 			# Gain 1 energy per successful phrase
@@ -336,7 +338,7 @@ func _on_track_activated(note_count:int, start_measure:int):
 
 func _on_streak_broken():
 	if %Conductor.current_measure == _last_streak_break_measure:
-		return  # Prevent multiple penalties in the same measure
+		return # Prevent multiple penalties in the same measure
 	_last_streak_break_measure = %Conductor.current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
@@ -383,7 +385,7 @@ func _on_inactive_phrase_missed():
 	_on_streak_broken()
 	
 
-func _switch_active_track(new_active_track:int, use_tween: bool = true):
+func _switch_active_track(new_active_track: int, use_tween: bool = true):
 	if new_active_track == active_track:
 		return
 	_cached_active_track_node = tracks[new_active_track]
@@ -466,7 +468,7 @@ func _find_best_track_for_autoblast() -> int:
 	
 	return best_track
 
-func _minimum_positive_integer_in_array(arr:Array[int]) -> int:
+func _minimum_positive_integer_in_array(arr: Array[int]) -> int:
 	var min_value = 9999
 	for value in arr:
 		if value > 0 and value < min_value:
@@ -481,19 +483,25 @@ func _update_track_reset_cache(track_idx: int, reset_measure: int) -> void:
 	if track_idx >= 0 and track_idx < _track_reset_measures.size():
 		_track_reset_measures[track_idx] = reset_measure
 
-func energy_change(amount:int) -> void:
+func energy_change(amount: int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
 #	print("Energy changed by %d, new value: %d" % [amount, energy])
 	if energy < 3:
 		RenderingServer.global_shader_parameter_set("danger", true)
 	elif energy >= 3:
-		RenderingServer.global_shader_parameter_set("danger", false )
+		RenderingServer.global_shader_parameter_set("danger", false)
 	%EnergyBar.value = energy
 
 func _hide_fast_slow_label():
-	lbl_fast_slow.hide()
+	lbl_fast_slow.remove_theme_color_override("font_color")
+	lbl_fast_slow.text = ""
 
 func _on_note_hit(offset: float):
+	if _note_hit_tween:
+		_note_hit_tween.kill()
+	_note_hit_tween = create_tween()
+	lbl_phrase_value.scale = Vector2(1.25, 1.25)
+	_note_hit_tween.tween_property(lbl_phrase_value, "scale", Vector2(1.0, 1.0), 0.1)
 	_max_hit_offset = max(_max_hit_offset, offset)
 	_min_hit_offset = min(_min_hit_offset, offset)
 	_avg_hit_offset = ((_avg_hit_offset * _notes_hit_count) + offset) / (_notes_hit_count + 1)
@@ -505,19 +513,17 @@ func _on_note_hit(offset: float):
 	if abs(offset) > 0.025:
 		lbl_fast_slow.show()
 		if offset > 0:
+			lbl_fast_slow.add_theme_color_override("font_color", Color.LIGHT_CORAL)
 			lbl_fast_slow.text = "FAST"
 			_early_note_hits += 1
 		else:
+			lbl_fast_slow.add_theme_color_override("font_color", Color.LIGHT_BLUE)
 			lbl_fast_slow.text = "SLOW"
 			_late_note_hits += 1
-		
-		# Reuse timer instead of creating new ones
-		# SceneTreeTimer auto-disconnects on completion, so no manual disconnect needed
-		if not _fast_slow_hide_timer or _fast_slow_hide_timer.time_left <= 0:
-			_fast_slow_hide_timer = get_tree().create_timer(0.5)
-			_fast_slow_hide_timer.timeout.connect(_hide_fast_slow_label)
+		fast_slow_timer.start(0.5)
 	else:
-		lbl_fast_slow.hide()
+		fast_slow_timer.stop()
+		_hide_fast_slow_label()
 
 func fail_song():
 	if _in_fail_state:
@@ -585,7 +591,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
 		for track in tracks:
 			track.asp.volume_db = -6.0
-		playhead.position.z = -(BEATS_PER_MEASURE * length_per_beat) * total_measures
+		playhead.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
 	elif not finished:
@@ -596,7 +602,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				_next_checkpoint += 1
 				if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
 					%TargetPfx.emitting = true
-					energy_change(2)  # Reward 2 energy at checkpoints for energy modifier 0
+					energy_change(2) # Reward 2 energy at checkpoints for energy modifier 0
 #				print("measure %d/%d" % [current_measure + 1, total_measures])
 		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
 			var any_unactivated = false
@@ -611,7 +617,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				else:
 					energy_change(-1)
 		if lead_in_measures > 0:
-			count_in.position.z = -(BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
+			count_in.position.z = - (BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
 			if lead_in_measures == 2:
 				%TargetPfx.emitting = true

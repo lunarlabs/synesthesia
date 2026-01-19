@@ -25,6 +25,7 @@ func _process(delta: float) -> void:
 	emit_signal("queue_empty")
 
 func generate_chunk(track_idx: int, chunk_idx: int):
+	var time_start = Time.get_ticks_usec()
 	print("generating chunk %d at track %d" % [track_idx, chunk_idx])
 	var track_node = manager_node.song_instance.tracks[track_idx] as SynRoadTrack
 
@@ -57,11 +58,11 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 			else:
 				new_measure = _measure_scene.instantiate() as Node3D
 			new_measure.name = "measure_%d" % i
-			new_measure.get_node("track_geometry").get_node("Cube")\
+			new_measure.get_node("track_geometry").get_node("Cube") \
 			.set_instance_shader_parameter("this_track", track_idx)
-			new_measure.get_node("track_geometry").get_node("Cube")\
+			new_measure.get_node("track_geometry").get_node("Cube") \
 			.set_instance_shader_parameter("measure_tint", track_node.lane_tint)
-			new_measure.get_node("track_geometry").get_node("Cube")\
+			new_measure.get_node("track_geometry").get_node("Cube") \
 			.set_instance_shader_parameter("phrase", i in phrase_measures)
 			new_measure.get_node("track_geometry").get_node("Cube").show()
 			new_measure.position.z = manager_node.measure_positions[i]
@@ -90,6 +91,8 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 				new_note.blast(false)
 			new_note_nodes[j] = new_note
 			chunk.add_child(new_note)
+	var time_end = Time.get_ticks_usec()
+	print("generated chunk %d at track %d in %d microseconds" % [track_idx, chunk_idx, time_end - time_start])
 	call_deferred("_apply_chunk_data", track_idx, chunk_idx, chunk, new_measure_nodes, new_note_nodes)
 
 func _apply_chunk_data(track_idx: int, chunk_idx: int, chunk: Node3D, measures: Dictionary[int, Node3D], notes: Dictionary[int, SynRoadNote]):
@@ -113,6 +116,7 @@ func request_chunk(track: int, chunk: int):
 	set_process(true)
 
 func recycle_chunk(chunk: Node3D):
+	var time_start = Time.get_ticks_usec()
 	if chunk.is_inside_tree():
 		chunk.get_parent().remove_child(chunk)
 	for child in chunk.get_children():
@@ -128,3 +132,5 @@ func recycle_chunk(chunk: Node3D):
 			_measure_stack.append(child)
 			_mutex.unlock()
 	chunk.queue_free()
+	var time_end = Time.get_ticks_usec()
+	print("recycled chunk in %d microseconds" % [time_end - time_start])
