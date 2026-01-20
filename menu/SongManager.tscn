@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://rehe4hobdmbl"]
+[gd_scene load_steps=4 format=3 uid="uid://rehe4hobdmbl"]
 
 [ext_resource type="Script" uid="uid://dnco7owat03n4" path="res://menu/song_manager.gd" id="1_o7bha"]
 [ext_resource type="PackedScene" uid="uid://bshtgri8guqec" path="res://menu/load_screen.tscn" id="2_tr38k"]
-[ext_resource type="PackedScene" uid="uid://xt6k04euw0of" path="res://menu/song_fail.tscn" id="3_4pkhu"]
 [ext_resource type="PackedScene" uid="uid://dm4hcmhaewyp6" path="res://menu/song_result.tscn" id="4_hvuvw"]
 
 [node name="SongManager" type="Node"]
@@ -50,9 +49,6 @@ text = "Restart"
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Exit to Song Select"
-
-[node name="SongFail" parent="." instance=ExtResource("3_4pkhu")]
-visible = false
 
 [node name="SongResult" parent="." instance=ExtResource("4_hvuvw")]
 visible = false

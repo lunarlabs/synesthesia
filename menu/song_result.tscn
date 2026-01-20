@@ -47,7 +47,7 @@ variation_opentype = {
 
 [sub_resource type="Animation" id="Animation_cnqnt"]
 resource_name = "BuildIn"
-length = 3.0
+length = 1.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true

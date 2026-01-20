@@ -93,7 +93,6 @@ const MISS_WINDOW_OFFSET = 0.01
 @onready var btn_continue: Button = $PausePanel/VBoxContainer/ContinueButton
 @onready var btn_restart: Button = $PausePanel/VBoxContainer/RestartButton
 @onready var btn_quit: Button = $PausePanel/VBoxContainer/QuitButton
-@onready var fail_screen: Control = $SongFail
 @onready var result_screen: Control = $SongResult
 
 # For this refactor, we'll use time instead of beats for everything
@@ -198,10 +197,6 @@ func _ready() -> void:
 	result_restart_btn.pressed.connect(_on_restart_pressed)
 	
 	# Connect fail screen buttons
-	var fail_exit_btn = fail_screen.get_node("%ExitButton") as Button
-	var fail_restart_btn = fail_screen.get_node("%RestartButton") as Button
-	fail_exit_btn.pressed.connect(_on_quit_pressed)
-	fail_restart_btn.pressed.connect(_on_restart_pressed)
 	
 	song_instance = SONG_SCENE.instantiate() as SynRoadSong
 
@@ -347,7 +342,6 @@ func _on_restart_pressed() -> void:
 	get_tree().paused = false
 	pause_panel.hide()
 	result_screen.hide()
-	fail_screen.hide()
 	# TODO: Add fade out transition here
 	if song_instance and is_instance_valid(song_instance):
 		song_instance.queue_free()

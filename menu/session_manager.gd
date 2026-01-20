@@ -98,7 +98,7 @@ func record_song_result(song_id: String, difficulty: int, result: SongResult) ->
 		sd.streak_breaks = min(result.streak_breaks, sd.streak_breaks)
 		sd.percent_completed = max(result.percent_completed, sd.percent_completed)
 		sd.clear_state = max(result.clear_state, sd.clear_state)
-		sd.rank = min(result.rank, sd.rank)
+		sd.rank = min(result.rank, sd.rank) if result.rank != SongResult.ClearRank.INVALID else sd.rank
 
 func get_song_record(song_id: String, difficulty: int) -> SongResult:
 	if song_records.has(song_id):
