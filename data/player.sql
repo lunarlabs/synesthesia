@@ -1,5 +1,7 @@
 BEGIN TRANSACTION;
 
+PRAGMA user_version = 1;
+
 -- lookup tables
 DROP TABLE IF EXISTS "ranks";
 CREATE TABLE "ranks" (
