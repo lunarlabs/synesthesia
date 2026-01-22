@@ -2,3 +2,7 @@
 .godot/
 /android/
 song/
+addons/godot-sqlite/bin/~*
+addons/godot_midi/bin/linux/~*
+addons/godot_midi/bin/windows/~*
+addons/godot_midi/bin/macos/~*
