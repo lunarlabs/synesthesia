@@ -18,9 +18,9 @@ config/icon="res://icon.svg"
 [autoload]
 
 SongCatalog="*res://menu/song_catalog.gd"
-SessionManager="*res://menu/session_manager.gd"
 ChunkManager="*res://entities/chunk_manager.gd"
 DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
+SessionManager="*res://entities/managers/session_manager.gd"
 
 [display]
 

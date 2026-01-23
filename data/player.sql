@@ -16,7 +16,7 @@ CREATE TABLE "clear_statuses" (
 );
 
 DROP TABLE IF EXISTS "energy_modifiers";
-CREATE TABLE "energy_modifier" (
+CREATE TABLE "energy_modifiers" (
     "energy_id"     INTEGER PRIMARY KEY,
     "energy_name"   TEXT NOT NULL UNIQUE
 );

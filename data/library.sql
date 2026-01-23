@@ -22,7 +22,7 @@ CREATE TABLE "songs" (
     "sub_title"     TEXT,
     "artist"        TEXT NOT NULL DEFAULT 'Unknown Artist',
     "genre"         TEXT NOT NULL DEFAULT 'Unknown Genre',
-    "bpm"           INTEGER NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
+    "bpm"           REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
     "source"        INTEGER,
     "desc"          TEXT,
     "inst_layout"   TEXT NOT NULL CHECK("inst_layout" = TRIM("inst_layout") 
@@ -84,5 +84,59 @@ FROM "songs" s
 LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
 LEFT JOIN "difficulty_levels" dl ON d."difficulty_offset" = dl."offset"
 LEFT JOIN "sources" src ON s."source" = src."source_id";
+
+DROP VIEW IF EXISTS "v_song_insert";
+CREATE VIEW "v_song_insert" AS
+SELECT
+    s."folder_id",
+    s."title",
+    s."sub_title",
+    s."artist",
+    s."genre",
+    s."bpm",
+    s."desc",
+    s."inst_layout",
+    s."files_ok",
+    s."resource_hash",
+    s."midi_hash",
+    src."name" AS "source_name"
+FROM "songs" s
+LEFT JOIN "sources" src ON s."source" = src."source_id";
+
+DROP TRIGGER IF EXISTS "trg_v_song_insert";
+CREATE TRIGGER "trg_v_song_insert"
+INSTEAD OF INSERT ON "v_song_insert"
+BEGIN
+    INSERT OR IGNORE INTO "sources" ("name") 
+    VALUES (NEW."source_name");
+
+    INSERT INTO "songs" (
+        "folder_id",
+        "title",
+        "sub_title",
+        "artist",
+        "genre",
+        "bpm",
+        "desc",
+        "inst_layout",
+        "files_ok",
+        "resource_hash",
+        "midi_hash",
+        "source"
+    ) VALUES (
+        NEW."folder_id",
+        NEW."title",
+        NEW."sub_title",
+        NEW."artist",
+        NEW."genre",
+        NEW."bpm",
+        NEW."desc",
+        NEW."inst_layout",
+        NEW."files_ok",
+        NEW."resource_hash",
+        NEW."midi_hash",
+        (SELECT "source_id" FROM "sources" WHERE "name" = NEW."source_name")
+    );
+END;
 
 COMMIT;

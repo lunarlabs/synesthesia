@@ -7,7 +7,7 @@ var additions: Array = []
 const CATALOG_JSON_PATH = "user://song_catalog.json"
 const DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
 const SONG_DIRECTORY_PATH = "res://song/"
-const DIFFICULTY_LEVELS = [96, 102, 108, 114]  # MIDI note offsets for Easy, Medium, Hard, Expert
+const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 const DIFFICULTY_NAMES = {
 	96: "Easy",
 	102: "Medium",
@@ -28,10 +28,10 @@ const QUANT_FACTOR_EIGHTH = 1.1
 const QUANT_FACTOR_SIXTEENTH = 1.3
 const QUANT_FACTOR_THIRTY_SECOND = 1.5
 const BASE_SPEED_WEIGHT = 1.0
-const JACK_SPEED_THRESHOLD = 0.2  # seconds between notes to consider "jacking"
-const PATTERN_WEIGHT_JACK = 2.5   # Penalty for fast repeated notes
-const PATTERN_WEIGHT_JUMP = 1.5   # Penalty for Lane 0 -> Lane 2
-const PATTERN_WEIGHT_EASY = 0.8   # Bonus for slow repeated notes
+const JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
+const PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
+const PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
+const PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
 const ARTICLE_LIST = ["a ", "an ", "the "]
 
 var is_initialized: bool:
@@ -46,9 +46,10 @@ class SongEntry:
 	var folder: String
 	var file_path: String
 	var title: String
-	var long_title: String
+	var sub_title: String
 	var artist: String
 	var genre: String
+	var source: String
 	var bpm: float
 	var available_difficulties: Array
 	var instruments: PackedStringArray
@@ -435,6 +436,7 @@ func _process_song_data(entry_idx: int):
 			result.note_densities[i] = float(total_note_count) / float(song_data.total_measures)
 	result.available_difficulties = difficulty_maps.keys()
 
+	# TODO: How am I going to store this data?
 	var detailed_diffs_info: Dictionary[int, DetailedDifficultyInfo] = {}
 	for diff in difficulty_maps.keys():
 		var ddi := DetailedDifficultyInfo.new()
@@ -486,10 +488,9 @@ func _process_song_data(entry_idx: int):
 
 func _calculate_phrase_difficulty(
 	note_map: Dictionary, # Kept for looking up lanes
-	sorted_beats: Array,  # NEW: The sorted time keys
+	sorted_beats: Array, # NEW: The sorted time keys
 	note_indices: PackedInt32Array,
 	seconds_per_beat: float) -> float:
-	
 	var total_strain := 0.0
 	
 	if note_indices.size() > 1:
@@ -502,13 +503,13 @@ func _calculate_phrase_difficulty(
 			var beat_b = sorted_beats[idx_current]
 			
 			var interval = beat_b - beat_a
-			if interval <= 0.001: 
+			if interval <= 0.001:
 				interval = 0.001 # Clamp to avoid division by zero
 			
 			var time_interval = interval * seconds_per_beat
 			
 			# 1. Speed Strain: Penalize density
-			var speed_strain = 1.0 / max(time_interval, 0.05) 
+			var speed_strain = 1.0 / max(time_interval, 0.05)
 
 			# 2. Quantization: Check the beat timestamp (beat_b), not the interval
 			var quant_modifier = _get_beat_quantization_factor(beat_b)
@@ -574,11 +575,11 @@ func _get_pattern_weight(
 			else:
 				return PATTERN_WEIGHT_EASY
 		1:
-			return 1.0  # Neutral weight for single lane changes
+			return 1.0 # Neutral weight for single lane changes
 		2:
 			return PATTERN_WEIGHT_JUMP
 		_:
-			return 1.0  # Fallback neutral weight
+			return 1.0 # Fallback neutral weight
 
 func _compare_song_titles(a: SongEntry, b: SongEntry) -> bool:
 	var title_a = _strip_leading_articles(a.title)
