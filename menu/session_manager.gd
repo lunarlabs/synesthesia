@@ -7,6 +7,7 @@ const PLAYER_DB_PATH = "res://data/player.db"
 
 var library_db: SQLite = null
 var player_db: SQLite = null
+var player_attached := false
 
 func _ready():
 	library_db = SQLite.new()
@@ -19,3 +20,13 @@ func _exit_tree():
 	player_db.close()
 	library_db = null
 	player_db = null
+
+func _prepare_library_db():
+	if not library_db:
+		library_db = SQLite.new()
+		library_db.path = LIBRARY_DB_PATH
+		library_db.foreign_keys = true
+		if library_db.open_db() == false:
+			printerr("Problem opening library database!")
+			return
+		library_db.query("PRAGMA user_version;")
