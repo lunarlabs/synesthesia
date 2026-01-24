@@ -9,10 +9,10 @@ const DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
 const SONG_DIRECTORY_PATH = "res://song/"
 const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 const DIFFICULTY_NAMES = {
-	96: "Easy",
-	102: "Medium",
-	108: "Hard",
-	114: "Expert"
+	96: "Beginner",
+	102: "Basic",
+	108: "Advanced",
+	114: "Expert",
 }
 const INSTRUMENT_NAMES = [
 	"drums",
@@ -97,7 +97,7 @@ static func _entry_to_json(entry: SongEntry) -> Dictionary:
 
 	return dict
 
-static func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
+func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
 	assert(ddi.track_note_counts.size() > 0)
 	assert(ddi.track_avg_raw_difficulties.size() == ddi.track_note_counts.size())
 
@@ -159,7 +159,7 @@ static func _entry_from_json(dict: Dictionary) -> SongEntry:
 
 	return entry
 
-static func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
+func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
 	var ddi := DetailedDifficultyInfo.new()
 
 	# Track note counts
@@ -402,30 +402,77 @@ func scan_for_songs(rescan := false):
 		print("additions done.")
 	return
 
+func process_song(folder_name: String):
+	const SONGS_TABLE = "songs"
+	const DIFFICULTIES_TABLE = "difficulties"
+	const SONG_INSERT_VIEW = "v_song_upsert"
+	var db = SessionManager.library_db
+
+	# Handle song metadata first
+	var song_data = null
+	var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+	var resource_hash = null
+	var file_exists = FileAccess.file_exists(file_path)
+	if file_exists:
+		resource_hash = FileAccess.get_md5(file_path)
+	var condition_string = "folder_id = '%s'" % folder_name
+	var select_array: Array = db.select_rows(SONGS_TABLE, condition_string, ["resource_hash", "midi_hash"])
+	var result_is_empty := select_array.size() == 0
+	if result_is_empty or select_array[0]["resource_hash"] != resource_hash:
+		print("Processing song: %s" % folder_name)
+		var upsert_dict = {
+			"folder_id": folder_name,
+			"resource_hash": resource_hash,
+		}
+		if file_exists:
+			song_data = ResourceLoader.load(file_path) as SongData
+			upsert_dict.merge(_extract_songdata_meta(song_data))
+			db.insert_row(SONG_INSERT_VIEW, upsert_dict) # if the row exists, this will update it
+		else:
+			upsert_dict["files_ok"] = 0
+			upsert_dict["midi_hash"] = null
+			db.insert_row(SONGS_TABLE, upsert_dict)
+	
+	if song_data:
+		var midi_hash = null
+		if song_data.midi_file:
+			midi_hash = FileAccess.get_md5(ResourceUID.ensure_path(song_data.midi_file))
+			if result_is_empty or midi_hash != select_array[0]["midi_hash"]:
+				var difficulty_rows = []
+				var midi_track_indices = song_data.song_track_locations.values()
+				for i in DIFFICULTY_LEVELS:
+					var track_map: Array[Dictionary] = []
+					var total_note_count := 0
+					for track_idx in midi_track_indices:
+						var note_map = song_data.get_note_map_from_track(track_idx, i)
+						total_note_count += note_map.size()
+						track_map.append(note_map)
+					if total_note_count > 0:
+						print("Processing difficulty: %s" % i)
+						var ddi: DetailedDifficultyInfo = _calculate_detailed_difficulty(track_map, song_data)
+						var row = {
+							"song_folder": folder_name,
+							"difficulty_offset": i,
+							"difficulty_rating": ddi.avg_raw_difficulty,
+							"details_json": JSON.stringify(_difficulty_info_to_json(ddi))
+						}
+						difficulty_rows.append(row)
+				if not difficulty_rows.is_empty():
+					db.insert_rows(DIFFICULTIES_TABLE, difficulty_rows)
+
+
 ## Creates a dictionary of song metadata for INSERT or UPDATE statements.
 ## Does not create difficulty entries.
-func _create_db_song_entry(folder_name: String) -> Dictionary:
-	var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
-	var song_data = ResourceLoader.load(file_path) as SongData
+func _extract_songdata_meta(song_data: SongData) -> Dictionary:
 	var files_ok := false
-	if not song_data:
-		print("Failed to load SongData resource at: %s" % file_path)
-		return {
-			"folder_id": folder_name,
-			"files_ok": 0,
-			"resource_hash": null,
-			"midi_hash": null
-		}
-	var resource_hash := FileAccess.get_md5(file_path)
 	var result := {
-		"folder_id": folder_name,
-		"resource_hash": resource_hash,
 		"title": song_data.title,
-		"sub_title": song_data.long_title,
+		"sub_title": song_data.sub_title,
 		"artist": song_data.artist,
 		"genre": song_data.genre,
 		"bpm": song_data.bpm,
 		"desc": song_data.description,
+		"source_name": song_data.source,
 		}
 	var midi_path = ResourceUID.ensure_path(song_data.midi_file)
 	if not FileAccess.file_exists(midi_path):
@@ -437,8 +484,9 @@ func _create_db_song_entry(folder_name: String) -> Dictionary:
 		result["files_ok"] = 0
 		return result
 	files_ok = FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track))
+	var track_count := song_data.tracks.size()
 	var inst_layout := ""
-	for i in song_data.tracks.size():
+	for i in track_count:
 		var track = song_data.tracks[i]
 		inst_layout += INSTRUMENT_NAMES[track.instrument][0]
 		files_ok = files_ok and FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file))
@@ -446,7 +494,7 @@ func _create_db_song_entry(folder_name: String) -> Dictionary:
 	result["files_ok"] = files_ok
 	return result
 
-func _process_song_data(folder_name: String, song_data: SongData = null) -> SongEntry:
+func _process_song_data_to_entry(folder_name: String, song_data: SongData = null) -> SongEntry:
 	print("Processing song: %s" % folder_name)
 	var result = SongEntry.new()
 
@@ -485,47 +533,10 @@ func _process_song_data(folder_name: String, song_data: SongData = null) -> Song
 	# TODO: How am I going to store this data?
 	var detailed_diffs_info: Dictionary[int, DetailedDifficultyInfo] = {}
 	for diff in difficulty_maps.keys():
-		var ddi := DetailedDifficultyInfo.new()
-		ddi.track_note_counts.resize(track_count)
-		ddi.measure_note_counts.resize(track_count)
-		ddi.phrase_raw_difficulties.resize(track_count)
-		ddi.track_avg_raw_difficulties.resize(track_count)
-		for i in range(track_count):
-			var note_map = difficulty_maps[diff][i]
-			ddi.track_note_counts[i] = note_map.size()
-			var sorted_keys = note_map.keys()
-			sorted_keys.sort()
-			var measure_counts: PackedInt32Array = PackedInt32Array()
-			measure_counts.resize(song_data.total_measures)
-			for beat_pos in sorted_keys:
-				var measure_idx = int(floor(beat_pos / 4.0))
-				if measure_idx >= 0 and measure_idx < song_data.total_measures:
-					measure_counts[measure_idx] += 1
-			ddi.measure_note_counts[i] = measure_counts
-			var phrase_difficulties: PackedFloat32Array = PackedFloat32Array()
-			phrase_difficulties.resize(song_data.total_measures)
-			var track_raw_difficulty := 0.0
-			var phrase_map = _build_phrase_map_single_pass(note_map.keys())
-			for start_measure in phrase_map.keys():
-				if start_measure >= phrase_difficulties.size():
-					break
-				var note_indices = phrase_map[start_measure]
-				var raw_difficulty = _calculate_phrase_difficulty(
-					note_map,
-					sorted_keys,
-					note_indices,
-					song_data.seconds_per_beat)
-				phrase_difficulties[start_measure] = raw_difficulty
-				track_raw_difficulty += raw_difficulty
-			ddi.phrase_raw_difficulties[i] = phrase_difficulties
-			ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
-		# Average across all tracks
-		var total_avg := 0.0
-		for i in range(track_count):
-			total_avg += ddi.track_avg_raw_difficulties[i]
-		ddi.avg_raw_difficulty = total_avg / float(track_count)
+		var ddi := _calculate_detailed_difficulty(difficulty_maps[diff], song_data)
 		result.difficulty_ratings[diff] = ddi.avg_raw_difficulty
 		detailed_diffs_info[diff] = ddi
+
 	
 	result.detailed_difficulty_info = detailed_diffs_info
 	result.files_valid = true
@@ -538,8 +549,51 @@ func _process_song_data_in_queue(entry_idx: int):
 	var loaded = _loaded_data[entry_idx]
 	var folder_name: String = loaded[0]
 	var song_data: SongData = loaded[1]
-	result = _process_song_data(folder_name, song_data)
+	result = _process_song_data_to_entry(folder_name, song_data)
 	additions[entry_idx] = result
+
+func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> DetailedDifficultyInfo:
+	var ddi := DetailedDifficultyInfo.new()
+	var track_count = track_maps.size()
+	ddi.track_note_counts.resize(track_count)
+	ddi.measure_note_counts.resize(track_count)
+	ddi.phrase_raw_difficulties.resize(track_count)
+	ddi.track_avg_raw_difficulties.resize(track_count)
+	for i in range(track_count):
+		var note_map = track_maps[i]
+		ddi.track_note_counts[i] = note_map.size()
+		var sorted_keys = note_map.keys()
+		sorted_keys.sort()
+		var measure_counts: PackedInt32Array = PackedInt32Array()
+		measure_counts.resize(song_data.total_measures)
+		for beat_pos in sorted_keys:
+			var measure_idx = int(floor(beat_pos / 4.0))
+			if measure_idx >= 0 and measure_idx < song_data.total_measures:
+				measure_counts[measure_idx] += 1
+		ddi.measure_note_counts[i] = measure_counts
+		var phrase_difficulties: PackedFloat32Array = PackedFloat32Array()
+		phrase_difficulties.resize(song_data.total_measures)
+		var track_raw_difficulty := 0.0
+		var phrase_map = _build_phrase_map_single_pass(note_map.keys())
+		for start_measure in phrase_map.keys():
+			if start_measure >= phrase_difficulties.size():
+				break
+			var note_indices = phrase_map[start_measure]
+			var raw_difficulty = _calculate_phrase_difficulty(
+				note_map,
+				sorted_keys,
+				note_indices,
+				song_data.seconds_per_beat)
+			phrase_difficulties[start_measure] = raw_difficulty
+			track_raw_difficulty += raw_difficulty
+		ddi.phrase_raw_difficulties[i] = phrase_difficulties
+		ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
+	# Average across all tracks
+	var total_avg := 0.0
+	for i in range(track_count):
+		total_avg += ddi.track_avg_raw_difficulties[i]
+	ddi.avg_raw_difficulty = total_avg / float(track_count)
+	return ddi
 
 func _calculate_phrase_difficulty(
 	note_map: Dictionary, # Kept for looking up lanes

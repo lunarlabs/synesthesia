@@ -5,7 +5,7 @@ PRAGMA user_version = 1;
 DROP TABLE IF EXISTS "sources";
 CREATE TABLE "sources" (
     "source_id"    INTEGER PRIMARY KEY,
-    "name"         TEXT NOT NULL
+    "name"         TEXT NOT NULL UNIQUE COLLATE NOCASE
 );
 
 DROP TABLE IF EXISTS "difficulty_levels";
@@ -25,9 +25,11 @@ CREATE TABLE "songs" (
     "bpm"           REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
     "source"        INTEGER,
     "desc"          TEXT,
-    "inst_layout"   TEXT CHECK("inst_layout" = TRIM("inst_layout") 
+    "inst_layout"   TEXT CHECK("inst_layout" = TRIM("inst_layout")
+                    AND LENGTH("inst_layout") > 0
                     AND UPPER("inst_layout") GLOB '[DBGSVF]*'),
-    "files_ok"      INTEGER NOT NULL DEFAULT 0 CHECK("files_ok" IN (0, 1)),
+    "files_ok"      INTEGER NOT NULL DEFAULT 0 CHECK("files_ok" = 0 
+                    OR ("resource_hash" IS NOT NULL AND "midi_hash" IS NOT NULL)),
     -- if hashes are null the files don't exist
     "resource_hash" TEXT CHECK("resource_hash" = TRIM("resource_hash") 
                     AND LENGTH("resource_hash") = 32
@@ -62,6 +64,9 @@ INSERT INTO "difficulty_levels" ("offset","name") VALUES (114,'Expert');
 CREATE INDEX "idx_songs_title_artist" ON "songs" ("title", "artist");
 CREATE INDEX "idx_difficulties_rating" ON "difficulties" ("difficulty_rating");
 CREATE INDEX "idx_songs_bpm" ON "songs" ("bpm");
+CREATE INDEX "idx_difficulties_song" ON "difficulties" ("song_folder");
+CREATE INDEX "idx_songs_source" ON "songs" ("source");
+
 
 DROP VIEW IF EXISTS "v_full_library";
 CREATE VIEW "v_full_library" AS
@@ -87,8 +92,8 @@ LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
 LEFT JOIN "difficulty_levels" dl ON d."difficulty_offset" = dl."offset"
 LEFT JOIN "sources" src ON s."source" = src."source_id";
 
-DROP VIEW IF EXISTS "v_song_insert";
-CREATE VIEW "v_song_insert" AS
+DROP VIEW IF EXISTS "v_song_upsert";
+CREATE VIEW "v_song_upsert" AS
 SELECT
     s."folder_id",
     s."title",
@@ -107,10 +112,11 @@ LEFT JOIN "sources" src ON s."source" = src."source_id";
 
 DROP TRIGGER IF EXISTS "trg_v_song_insert";
 CREATE TRIGGER "trg_v_song_insert"
-INSTEAD OF INSERT ON "v_song_insert"
+INSTEAD OF INSERT ON "v_song_upsert"
 BEGIN
     INSERT OR IGNORE INTO "sources" ("name") 
-    VALUES (NEW."source_name");
+    SELECT NEW."source_name"
+    WHERE NEW."source_name" IS NOT NULL;
 
     INSERT INTO "songs" (
         "folder_id",
@@ -138,7 +144,19 @@ BEGIN
         NEW."resource_hash",
         NEW."midi_hash",
         (SELECT "source_id" FROM "sources" WHERE "name" = NEW."source_name")
-    );
+    )
+    ON CONFLICT("folder_id") DO UPDATE SET
+        title = excluded.title,
+        sub_title = excluded.sub_title,
+        artist = excluded.artist,
+        genre = excluded.genre,
+        bpm = excluded.bpm,
+        desc = excluded.desc,
+        inst_layout = excluded.inst_layout,
+        files_ok = excluded.files_ok,
+        resource_hash = excluded.resource_hash,
+        midi_hash = excluded.midi_hash,
+        source = excluded.source;
 END;
 
 COMMIT;
