@@ -25,7 +25,7 @@ CREATE TABLE "songs" (
     "bpm"           REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
     "source"        INTEGER,
     "desc"          TEXT,
-    "inst_layout"   TEXT NOT NULL CHECK("inst_layout" = TRIM("inst_layout") 
+    "inst_layout"   TEXT CHECK("inst_layout" = TRIM("inst_layout") 
                     AND UPPER("inst_layout") GLOB '[DBGSVF]*'),
     "files_ok"      INTEGER NOT NULL DEFAULT 0 CHECK("files_ok" IN (0, 1)),
     -- if hashes are null the files don't exist
@@ -45,6 +45,7 @@ CREATE TABLE "difficulties" (
     "difficulty_offset" INTEGER NOT NULL,
     -- currently the highest rating is 10.7 but future songs may have higher ratings
     "difficulty_rating" REAL NOT NULL CHECK ("difficulty_rating" BETWEEN 0 AND 20),
+    "details_json"      TEXT, -- Stores the DetailedDifficultyInfo serializer as JSON
     PRIMARY KEY("song_folder","difficulty_offset"),
     FOREIGN KEY("difficulty_offset") REFERENCES "difficulty_levels"("offset"),
     FOREIGN KEY("song_folder") REFERENCES "songs"("folder_id") ON DELETE CASCADE
@@ -78,6 +79,7 @@ SELECT
     s."midi_hash",
     d."difficulty_offset",
     d."difficulty_rating",
+    d."details_json",
     dl."name" AS "difficulty_name",
     src."name" AS "source_name"
 FROM "songs" s

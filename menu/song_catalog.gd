@@ -392,7 +392,7 @@ func scan_for_songs(rescan := false):
 	if not _loaded_data.is_empty():
 		additions = []
 		additions.resize(_loaded_data.size())
-		var task_id = WorkerThreadPool.add_group_task(_process_song_data, _loaded_data.size())
+		var task_id = WorkerThreadPool.add_group_task(_process_song_data_in_queue, _loaded_data.size())
 		print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
 		WorkerThreadPool.wait_for_group_task_completion(task_id)
 		_song_catalog.append_array(additions)
@@ -402,15 +402,61 @@ func scan_for_songs(rescan := false):
 		print("additions done.")
 	return
 
-func _process_song_data(entry_idx: int):
-	var result := SongEntry.new()
-	var loaded = _loaded_data[entry_idx]
-	var folder_name: String = loaded[0]
-	var song_data: SongData = loaded[1]
+## Creates a dictionary of song metadata for INSERT or UPDATE statements.
+## Does not create difficulty entries.
+func _create_db_song_entry(folder_name: String) -> Dictionary:
+	var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+	var song_data = ResourceLoader.load(file_path) as SongData
+	var files_ok := false
+	if not song_data:
+		print("Failed to load SongData resource at: %s" % file_path)
+		return {
+			"folder_id": folder_name,
+			"files_ok": 0,
+			"resource_hash": null,
+			"midi_hash": null
+		}
+	var resource_hash := FileAccess.get_md5(file_path)
+	var result := {
+		"folder_id": folder_name,
+		"resource_hash": resource_hash,
+		"title": song_data.title,
+		"sub_title": song_data.long_title,
+		"artist": song_data.artist,
+		"genre": song_data.genre,
+		"bpm": song_data.bpm,
+		"desc": song_data.description,
+		}
+	var midi_path = ResourceUID.ensure_path(song_data.midi_file)
+	if not FileAccess.file_exists(midi_path):
+		result["files_ok"] = 0
+		result["midi_hash"] = null
+		return result
+	result["midi_hash"] = FileAccess.get_md5(midi_path)
+	if song_data.tracks.size() == 0:
+		result["files_ok"] = 0
+		return result
+	files_ok = FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track))
+	var inst_layout := ""
+	for i in song_data.tracks.size():
+		var track = song_data.tracks[i]
+		inst_layout += INSTRUMENT_NAMES[track.instrument][0]
+		files_ok = files_ok and FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file))
+	result["inst_layout"] = inst_layout
+	result["files_ok"] = files_ok
+	return result
+
+func _process_song_data(folder_name: String, song_data: SongData = null) -> SongEntry:
 	print("Processing song: %s" % folder_name)
+	var result = SongEntry.new()
 
 	result.folder = folder_name
 	result.file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+	if not song_data:
+		song_data = ResourceLoader.load(result.file_path) as SongData
+	if not song_data:
+		print("Failed to load SongData resource at: %s" % result.file_path)
+		return result
 	result.title = song_data.title
 	result.long_title = song_data.long_title
 	result.artist = song_data.artist
@@ -484,6 +530,15 @@ func _process_song_data(entry_idx: int):
 	result.detailed_difficulty_info = detailed_diffs_info
 	result.files_valid = true
 	print("Finished processing song: %s" % folder_name)
+	return result
+
+
+func _process_song_data_in_queue(entry_idx: int):
+	var result := SongEntry.new()
+	var loaded = _loaded_data[entry_idx]
+	var folder_name: String = loaded[0]
+	var song_data: SongData = loaded[1]
+	result = _process_song_data(folder_name, song_data)
 	additions[entry_idx] = result
 
 func _calculate_phrase_difficulty(
