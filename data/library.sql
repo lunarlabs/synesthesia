@@ -37,6 +37,17 @@ CREATE TABLE "songs" (
     "midi_hash"     TEXT CHECK("midi_hash" = TRIM("midi_hash") 
                     AND LENGTH("midi_hash") = 32
                     AND midi_hash GLOB '[0-9A-Fa-f]*'),
+    "sort_key" TEXT GENERATED ALWAYS AS (
+        CASE
+            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'the %'
+                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 5)
+            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'an %'
+                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 4)
+            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'a %'
+                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 3)
+            ELSE concat_ws(' ', title, nullif(sub_title, ''))
+        END
+    ) STORED,
     PRIMARY KEY("folder_id"),
     FOREIGN KEY("source") REFERENCES "sources"("source_id") ON DELETE SET NULL
 );
@@ -61,6 +72,7 @@ INSERT INTO "difficulty_levels" ("offset","name") VALUES (108,'Advanced');
 INSERT INTO "difficulty_levels" ("offset","name") VALUES (114,'Expert');
 
 -- common indices
+CREATE INDEX "idx_title" ON "songs" ("sort_key");
 CREATE INDEX "idx_songs_title_artist" ON "songs" ("title", "artist");
 CREATE INDEX "idx_difficulties_rating" ON "difficulties" ("difficulty_rating");
 CREATE INDEX "idx_songs_bpm" ON "songs" ("bpm");
@@ -78,6 +90,7 @@ SELECT
     s."genre",
     s."bpm",
     s."desc",
+    s."sort_key",
     s."inst_layout",
     s."files_ok",
     s."resource_hash",
