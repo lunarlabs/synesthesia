@@ -83,7 +83,6 @@ var hi_speed_index: int = 0 # Default to 1.0x
 # UI References
 
 func _ready():
-	SessionManager.load_song_records()
 	await get_tree().process_frame # Wait a frame for UI to initialize
 	SongCatalog.scan_for_songs()
 	%LoadingContainer.visible = false

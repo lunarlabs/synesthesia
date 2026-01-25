@@ -11,6 +11,9 @@ var _library_db: SQLite = null
 var _player_db: SQLite = null
 var player_attached := false
 
+var previous_select_options: Dictionary = {}
+
+
 var library_db: SQLite:
 	get: return _library_db
 
