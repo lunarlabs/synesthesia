@@ -42,6 +42,7 @@ var catalog:
 		return _song_catalog
 
 # Represents a single song entry in the catalog.
+# To be obsoleted by the database.
 class SongEntry:
 	var folder: String
 	var file_path: String
@@ -68,6 +69,10 @@ class DetailedDifficultyInfo:
 	var track_avg_raw_difficulties: PackedFloat32Array
 	var avg_raw_difficulty: float
 
+# TODO: function to get song details from database
+# as well as sorting and filtering
+
+# To be obsoleted by the database.
 static func _entry_to_json(entry: SongEntry) -> Dictionary:
 	var dict := {
 		"folder": entry.folder,
@@ -97,6 +102,7 @@ static func _entry_to_json(entry: SongEntry) -> Dictionary:
 
 	return dict
 
+# To be obsoleted by the database.
 func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
 	assert(ddi.track_note_counts.size() > 0)
 	assert(ddi.track_avg_raw_difficulties.size() == ddi.track_note_counts.size())
@@ -121,6 +127,7 @@ func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
 
 	return dict
 
+# To be obsoleted by the database.
 static func _entry_from_json(dict: Dictionary) -> SongEntry:
 	var entry := SongEntry.new()
 
@@ -195,6 +202,7 @@ func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
 
 	return ddi
 
+# To be obsoleted by the database.
 func save_entries_to_json() -> Error:
 	var file := FileAccess.open(CATALOG_JSON_PATH, FileAccess.WRITE)
 	if file == null:
@@ -218,6 +226,7 @@ func save_entries_to_json() -> Error:
 
 	return OK
 
+# To be obsoleted by the database.
 func save_difficulty_details_to_json() -> Error:
 	var file := FileAccess.open(DIFFICULTY_DETAILS_JSON_PATH, FileAccess.WRITE)
 	if file == null:
@@ -244,6 +253,7 @@ func save_difficulty_details_to_json() -> Error:
 
 	return OK
 
+# To be obsoleted by the database.
 func load_entries_from_json() -> Error:
 	if not FileAccess.file_exists(CATALOG_JSON_PATH):
 		push_error("Song catalog JSON not found: %s" % CATALOG_JSON_PATH)
@@ -279,6 +289,7 @@ func load_entries_from_json() -> Error:
 
 	return OK
 
+# Keeping this because the JSON is stored in the difficulties table.
 func load_difficulty_details_from_json() -> Error:
 	if not FileAccess.file_exists(DIFFICULTY_DETAILS_JSON_PATH):
 		push_error("Difficulty details JSON not found: %s" % DIFFICULTY_DETAILS_JSON_PATH)
@@ -329,6 +340,7 @@ func load_difficulty_details_from_json() -> Error:
 	return OK
 
 func scan_for_songs(rescan := false):
+	# TODO: Replace with database building like in sqlite_test.gd
 	var _known_folders = []
 	if not rescan:
 		load_entries_from_json()
