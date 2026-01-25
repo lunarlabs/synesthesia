@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cj5qbqo5phlu1"]
+[gd_scene load_steps=26 format=3 uid="uid://cj5qbqo5phlu1"]
 
 [ext_resource type="Theme" uid="uid://cm4v2e2f0im5p" path="res://menu/theme/MenuTheme.tres" id="1_0tx4y"]
 [ext_resource type="Script" uid="uid://bwqk5wogs7fgg" path="res://menu/song_select.gd" id="1_etro7"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="5_hjgwb"]
 [ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
 [ext_resource type="AudioStream" uid="uid://rpnnp1hrsh8d" path="res://assets/songsel2.mp3" id="8_hjgwb"]
+[ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
 shader = ExtResource("3_vojec")
@@ -615,6 +616,13 @@ root_node = NodePath("../TopBox/SongInfo")
 libraries = {
 &"": SubResource("AnimationLibrary_hjgwb")
 }
+
+[node name="Carousel" parent="." instance=ExtResource("9_ctryq")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.66
+offset_left = 40.0
+grow_horizontal = 1
 
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/EnergyOption" to="." method="_on_energy_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/CheckpointOption" to="." method="_on_checkpoint_option_pressed"]

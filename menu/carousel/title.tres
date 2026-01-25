@@ -1,0 +1,18 @@
+[gd_resource type="LabelSettings" load_steps=3 format=3 uid="uid://dv77xww5lwkf4"]
+
+[ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_t68qc"]
+
+[sub_resource type="FontVariation" id="FontVariation_etny0"]
+base_font = ExtResource("1_t68qc")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 85,
+2003265652: 500
+}
+
+[resource]
+font = SubResource("FontVariation_etny0")
+font_size = 24
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)

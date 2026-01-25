@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpchno0oyio6o"]
+
+[ext_resource type="Script" uid="uid://e1kcn5jekptv" path="res://menu/carousel/carousel.gd" id="1_8h0xm"]
+
+[node name="Carousel" type="Container"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8h0xm")
