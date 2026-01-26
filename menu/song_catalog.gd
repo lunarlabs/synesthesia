@@ -32,7 +32,41 @@ const JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
 const PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
 const PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
 const PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
-const ARTICLE_LIST = ["a ", "an ", "the "]
+
+#region Query Constants
+const BASE_QUERY = """SELECT 
+	folder_id, 
+	title, 
+	sub_title, 
+	artist, 
+	genre, 
+	bpm, 
+	available_difficulties, 
+	source_name, 
+	files_ok, 
+	resource_hash,
+	midi_hash
+FROM v_song_select"""
+
+const DIFFICULTY_QUERY = """SELECT 
+	folder_id, 
+	title, 
+	sub_title, 
+	artist, 
+	genre, 
+	bpm, 
+	difficulty_offset,
+	difficulty_rating, 
+	source_name, 
+	files_ok, 
+	resource_hash,
+	midi_hash
+FROM v_full_library"""
+
+const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC;"
+const BPM_ORDER_BY = "ORDER BY bpm ASC;"
+const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating DESC;"
+#endregion
 
 var is_initialized: bool:
 	get:
@@ -59,7 +93,6 @@ class SongEntry:
 	var difficulty_ratings: Dictionary[int, float]
 	var detailed_difficulty_info: Dictionary[int, DetailedDifficultyInfo]
 	var files_valid: bool
-	var error_message: String = ""
 
 # For each difficulty in each song, detailed info. Array index is instrument track index.
 class DetailedDifficultyInfo:
@@ -340,16 +373,6 @@ func load_difficulty_details_from_json() -> Error:
 	return OK
 
 func scan_for_songs(rescan := false):
-	# TODO: Replace with database building like in sqlite_test.gd
-	var _known_folders = []
-	if not rescan:
-		load_entries_from_json()
-		for i in _song_catalog.size():
-			var entry = _song_catalog[i] as SongEntry
-			_known_folders.append(entry.folder)
-	else:
-		_song_catalog.clear()
-	_loaded_data = []
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
 		push_error("Failed to open song directory.")
@@ -357,64 +380,14 @@ func scan_for_songs(rescan := false):
 
 	dir.list_dir_begin()
 	var folder_name = dir.get_next()
-
 	while folder_name != "":
 		if dir.current_is_dir() and not folder_name.begins_with("."):
 			print("Found song folder: %s" % folder_name)
-			var song_resource_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".tres"
-			if FileAccess.file_exists(song_resource_path):
-				print("Loading SongData from: %s" % song_resource_path)
-				var song_data = ResourceLoader.load(song_resource_path) as SongData
-				if song_data:
-					var midi_path
-					if not song_data.midi_file:
-						print("Null value in MIDI file field. Trying fallback...")
-						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
-					else:
-						midi_path = ResourceUID.ensure_path(song_data.midi_file)
-					if not FileAccess.file_exists(midi_path):
-						print("MIDI file doesn't exist: %s\nTrying fallback..." % midi_path)
-						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
-					if FileAccess.file_exists(midi_path):
-						song_data.midi_file = midi_path
-						ResourceSaver.save(song_data)
-					else:
-						print("Fallback MIDI file doesn't exist, giving up on this one.")
-						folder_name = dir.get_next()
-						continue
-					if _known_folders.find(folder_name) == -1:
-						print("Loading MIDI data for song: %s" % song_resource_path)
-						var err = song_data.midi_error # this has the benefit of preloading the MIDI data before we go into the threads
-						if err:
-							print("Failed to load MIDI data for song: %s" % song_resource_path)
-							folder_name = dir.get_next()
-							continue
-						_loaded_data.append([folder_name, song_data])
-						print("Queued song for preprocessing: %s" % song_resource_path)
-					else:
-						print("Skipping known song: %s" % song_resource_path)
-				else:
-					print("Failed to load SongData resource at: %s" % song_resource_path)
-			else:
-				print("No resource file found at expected path: %s" % song_resource_path)
-				push_warning("Missing resource file for song in folder: %s" % folder_name)
+			process_song(folder_name, rescan)
 		folder_name = dir.get_next()
-
 	dir.list_dir_end()
-	if not _loaded_data.is_empty():
-		additions = []
-		additions.resize(_loaded_data.size())
-		var task_id = WorkerThreadPool.add_group_task(_process_song_data_in_queue, _loaded_data.size())
-		print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
-		WorkerThreadPool.wait_for_group_task_completion(task_id)
-		_song_catalog.append_array(additions)
-		_song_catalog.sort_custom(_compare_song_titles)
-		save_difficulty_details_to_json()
-		save_entries_to_json()
-		print("additions done.")
-	return
 
-func process_song(folder_name: String):
+func process_song(folder_name: String, force_rescan := false):
 	const SONGS_TABLE = "songs"
 	const DIFFICULTIES_TABLE = "difficulties"
 	const SONG_INSERT_VIEW = "v_song_upsert"
@@ -430,7 +403,7 @@ func process_song(folder_name: String):
 	var condition_string = "folder_id = '%s'" % folder_name
 	var select_array: Array = db.select_rows(SONGS_TABLE, condition_string, ["resource_hash", "midi_hash"])
 	var result_is_empty := select_array.size() == 0
-	if result_is_empty or select_array[0]["resource_hash"] != resource_hash:
+	if force_rescan or result_is_empty or select_array[0]["resource_hash"] != resource_hash:
 		print("Processing song: %s" % folder_name)
 		var upsert_dict = {
 			"folder_id": folder_name,
@@ -701,16 +674,3 @@ func _get_pattern_weight(
 			return PATTERN_WEIGHT_JUMP
 		_:
 			return 1.0 # Fallback neutral weight
-
-func _compare_song_titles(a: SongEntry, b: SongEntry) -> bool:
-	var title_a = _strip_leading_articles(a.title)
-	var title_b = _strip_leading_articles(b.title)
-	return title_a < title_b
-
-func _strip_leading_articles(text: String) -> String:
-	text = text.strip_edges()
-	var lower_name = text.to_lower()
-	for article in ARTICLE_LIST:
-		if lower_name.begins_with(article):
-			return text.substr(article.length(), text.length() - article.length())
-	return text
