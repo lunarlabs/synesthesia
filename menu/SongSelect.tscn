@@ -443,7 +443,6 @@ vertical_alignment = 1
 uppercase = true
 
 [node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer"]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
