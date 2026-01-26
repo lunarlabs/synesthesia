@@ -101,6 +101,8 @@ var song_data: SongData
 var song_instance: SynRoadSong
 var preprocessor: SynRoadTrackPreprocessor
 var song_name: String
+var resource_hash: String
+var midi_hash: String
 var note_maps: Array[Dictionary]
 var track_data: Array[Dictionary]
 var total_measures: int

@@ -1302,7 +1302,6 @@ theme_override_fonts/font = SubResource("FontVariation_0yoam")
 text = "STREAK"
 
 [node name="TimingStats" type="PanelContainer" parent="HUD/ScoreBar"]
-visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -1469,7 +1468,7 @@ offset_bottom = 71.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
+theme_override_constants/outline_size = 5
 horizontal_alignment = 1
 vertical_alignment = 1
 
