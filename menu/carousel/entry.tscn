@@ -39,13 +39,8 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="Entry" type="ColorRect"]
 custom_minimum_size = Vector2(395.2, 0)
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -60.0
 offset_right = 395.2
-offset_bottom = 15.0
-grow_vertical = 2
+offset_bottom = 75.0
 color = Color(0.36282945, 0.36282945, 0.36282945, 1)
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
