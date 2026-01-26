@@ -45,7 +45,7 @@ DROP TABLE IF EXISTS "player_records";
 CREATE TABLE "player_records" (
     "record_id"             INTEGER PRIMARY KEY,
     "midi_hash"             TEXT NOT NULL CHECK(LENGTH("midi_hash") = 32),
-    "timestamp"             TEXT NOT NULL,
+    "timestamp"             TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "difficulty"            INTEGER NOT NULL CHECK("difficulty" IN (96, 102, 108, 114)),
     "score"                 INTEGER NOT NULL,
     "percent_complete"      REAL NOT NULL CHECK("percent_complete" BETWEEN 0.0 AND 100.0),
@@ -70,7 +70,7 @@ INSERT INTO "ranks" ("rank_label")
 VALUES ('F'), ('E'), ('D'), ('C'), ('B'), ('A'), ('AA'), ('AAA');
 
 INSERT INTO "clear_statuses" ("status_label")
-VALUES ('Failed'), ('Cleared'), ('Perfect');
+VALUES ('Invalid'), ('Failed'), ('Cleared'), ('Perfect');
 
 INSERT INTO "energy_modifiers" ("energy_name")
 VALUES ('Normal'), ('Drain'), ('No Recovery'), ('Sudden Death'), ('No Fail');
@@ -84,6 +84,6 @@ VALUES ('Normal'), ('Loose'), ('Strict');
 INSERT INTO "track_resets" ("reset_len", "reset_name")
 VALUES (12, 'Normal'), (10, 'Fast Reset 1'), (8, 'Fast Reset 2');
 
-CREATE INDEX "idx_player_pb" ON "player_records" ("midi_hash", "difficulty", "score");
+CREATE INDEX "idx_player_pb" ON "player_records" ("midi_hash", "difficulty");
 
 COMMIT;

@@ -275,10 +275,10 @@ func _on_song_failed(stats) -> void:
 
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,
-		SessionManager.get_song_record(song_name, difficulty))
+		SessionManager.get_song_best_record(midi_hash, difficulty))
 	song_stats.accuracy = 0.0
-	SessionManager.record_song_result(song_name, difficulty, song_stats)
-	SessionManager.save_song_records()
+	SessionManager.record_song_result(midi_hash, song_stats)
+	#SessionManager.save_song_records()
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
@@ -320,11 +320,11 @@ func _on_song_finished(stats) -> void:
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,
-		SessionManager.get_song_record(song_name, difficulty))
+		SessionManager.get_song_best_record(midi_hash, difficulty))
 	
 	if valid_record:
-		SessionManager.record_song_result(song_name, difficulty, song_stats)
-		SessionManager.save_song_records()
+		SessionManager.record_song_result(midi_hash, song_stats)
+		#SessionManager.save_song_records()
 
 func _toggle_pause() -> void:
 	# Prevent pause if result or fail screen is visible

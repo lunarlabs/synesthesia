@@ -13,7 +13,7 @@ var player_attached := false
 
 var previous_select_options: Dictionary = {}
 
-
+#region Database Functions
 var library_db: SQLite:
 	get:
 		if not _library_db:
@@ -83,7 +83,9 @@ func _prepare_player_db():
 		else:
 			printerr("Player database version mismatch!")
 			return
+#endregion
 
+#region Player Data
 class SongResult:
 	enum ClearState {
 		NOT_PLAYED,
@@ -96,7 +98,7 @@ class SongResult:
 	}
 
 	enum ClearRank {
-		INVALID = -1,
+		INVALID,
 		F,
 		E,
 		D,
@@ -209,7 +211,7 @@ class SongResult:
 		result.energy_modifier = int(dict.get("energy_modifier", 0))
 		result.checkpoint_modifier = int(dict.get("checkpoint_modifier", 0))
 		result.hide_streak_hints = dict.get("hide_streak_hints", false)
-		result.fast_track_reset = int(dict.get("fast_track_reset", 0))
+		result.fast_track_reset = int(dict.get("fast_track_reset", 12))
 		result.score = int(dict.get("score", 0))
 		result.max_streak = int(dict.get("max_streak", 0))
 		result.accuracy = dict.get("accuracy", 0.0)
@@ -218,3 +220,40 @@ class SongResult:
 		result.rank = int(dict.get("rank", ClearRank.INVALID))
 		result.percent_completed = dict.get("percent_completed", 0.0)
 		return result
+
+func record_song_result(midi_hash: String, song_stats: SongResult):
+	var insert_row := {
+		"midi_hash" = midi_hash,
+		"difficulty" = song_stats.difficulty,
+		"score" = song_stats.score,
+		"percent_complete" = song_stats.percent_completed,
+		"capture_accuracy" = song_stats.accuracy,
+		"streak_breaks" = song_stats.streak_breaks,
+		"energy_modifier" = song_stats.energy_modifier + 1, # the SQL records are 1-based
+		"checkpoint_modifier" = song_stats.checkpoint_modifier + 1,
+		"timing_modifier" = song_stats.timing_modifier + 1,
+		"track_reset" = song_stats.fast_track_reset,
+		"max_streak" = song_stats.max_streak,
+	}
+
+	if song_stats.rank != SongResult.ClearRank.INVALID:
+		insert_row["rank"] = song_stats.rank
+
+	match song_stats.clear_state:
+		SongResult.ClearState.PERFECT_RUN:
+			insert_row["status"] = 4
+		SongResult.ClearState.CLEAR, SongResult.ClearState.LOOSE_CLEAR, SongResult.ClearState.STRICT_CLEAR:
+			insert_row["status"] = 3
+		SongResult.ClearState.FAILED:
+			insert_row["status"] = 2
+		SongResult.ClearState.NOT_PLAYED, SongResult.ClearState.AUTOBLASTED, _:
+			insert_row["status"] = 1
+
+	var success = SessionManager.player_db.insert_row("player_records", insert_row)
+	if not success:
+		printerr(SessionManager.player_db.error_message)
+
+@warning_ignore("unused_parameter")
+func get_song_best_record(midi_hash: String, difficulty:int) -> SongResult:
+	return SongResult.new()
+#endregion
