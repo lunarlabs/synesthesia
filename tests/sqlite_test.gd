@@ -16,3 +16,22 @@ func _ready():
 			SongCatalog.process_song(folder_name)
 		folder_name = dir.get_next()
 	dir.list_dir_end()
+	_test_queries()
+
+func _test_queries():
+	var success = SessionManager.library_db.query("""SELECT 
+	folder_id, 
+	title, 
+	sub_title, 
+	artist, 
+	genre, 
+	bpm, 
+	available_difficulties, 
+	source_name, 
+	files_ok, 
+	resource_hash,
+	midi_hash
+	FROM v_song_select;""")
+	var result = SessionManager.library_db.query_result
+	print(success)
+	print(result)

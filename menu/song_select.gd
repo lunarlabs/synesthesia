@@ -86,13 +86,13 @@ func _ready():
 	await get_tree().process_frame # Wait a frame for UI to initialize
 	SongCatalog.scan_for_songs()
 	%LoadingContainer.visible = false
-	if SongCatalog.catalog.is_empty():
+	if SongCatalog.song_catalog.is_empty():
 		print("No valid songs found!")
 		push_error("No valid songs found!")
 		%PlayButton.disabled = true
 		return
 	else:
-		print("Song catalog generated with %d songs." % SongCatalog.catalog.size())
+		print("Song catalog generated with %d songs." % SongCatalog.song_catalog.size())
 	
 #	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
@@ -122,14 +122,14 @@ func _load_async():
 
 func _populate_song_list():
 	%SongList.clear()
-	for entry in SongCatalog.catalog:
+	for entry in SongCatalog.song_catalog:
 		var display_text = entry.title
-		if not entry.files_valid:
+		if not entry.files_ok:
 			display_text = "[INVALID] " + display_text
 		
 		%SongList.add_item(display_text)
 		
-		if not entry.files_valid:
+		if not entry.files_ok:
 			%SongList.set_item_custom_fg_color(%SongList.item_count - 1, Color.RED)
 
 func _connect_signals():
@@ -143,17 +143,17 @@ func _connect_signals():
 	%ExpertDifficulty.gui_input.connect(_on_difficulty_clicked.bind(114))
 
 func _select_song(index: int):
-	if index < 0 or index >= SongCatalog.catalog.size():
+	if index < 0 or index >= SongCatalog.song_catalog.size():
 		return
 	
 	selected_song_index = index
 	%SongList.select(index)
 	
-	var entry = SongCatalog.catalog[index]
+	var entry = SongCatalog.song_catalog[index]
 	
 	# Update song info
 	%ArtistLabel.text = entry.artist
-	%TitleLabel.text = entry.long_title
+	%TitleLabel.text = "%s %s" % [entry.title, entry.sub_title] if entry.sub_title else entry.title
 	%GenreLabel.text = entry.genre
 	%TempoLabel.text = "%.0f BPM" % entry.bpm
 	
@@ -161,11 +161,18 @@ func _select_song(index: int):
 	_update_difficulty_panels(entry)
 	
 	# Enable/disable play button
-	%PlayButton.disabled = not entry.files_valid
+	%PlayButton.disabled = not entry.files_ok
 
 	anim.play("SongSelected")
 
-func _update_difficulty_panels(entry: SongCatalog.SongEntry):
+func _update_difficulty_panels(entry):
+	var available_difficulties_str
+	var available_difficulties = []
+	if entry.available_difficulties:
+		available_difficulties_str = entry.available_difficulties.split(",")
+		available_difficulties.resize(available_difficulties_str.size())
+		for i in available_difficulties_str.size():
+			available_difficulties[i] = int(available_difficulties_str[i])
 	var panels = {
 		96: %BeginnerDifficulty,
 		102: %IntermediateDifficulty,
@@ -173,13 +180,13 @@ func _update_difficulty_panels(entry: SongCatalog.SongEntry):
 		114: %ExpertDifficulty
 	}
 	# Auto-select first available difficulty if current not available
-	if not entry.available_difficulties.has(selected_difficulty):
-		if entry.available_difficulties.size() > 0:
-			selected_difficulty = entry.available_difficulties[0]
+	if not available_difficulties.has(selected_difficulty):
+		if available_difficulties.size() > 0:
+			selected_difficulty = available_difficulties[0]
 	
 	for diff in [96, 102, 108, 114]:
 		var panel = panels[diff]
-		var rating = entry.difficulty_ratings.get(diff, 0.0)
+		var rating = SongCatalog.get_difficulty_rating(entry.folder_id, diff)
 		panel.difficulty_value = rating
 		panel.selected = (diff == selected_difficulty)
 		panel.update()
@@ -191,20 +198,29 @@ func _on_song_selected(index: int):
 
 func _on_difficulty_clicked(event: InputEvent, difficulty: int):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var entry = SongCatalog.catalog[selected_song_index]
-		if entry.available_difficulties.has(difficulty):
+		var entry = SongCatalog.song_catalog[selected_song_index]
+		var available_difficulties_str
+		var available_difficulties = []
+		if entry.available_difficulties:
+			available_difficulties_str = entry.available_difficulties.split(",")
+			available_difficulties.resize(available_difficulties_str.size())
+			for i in available_difficulties_str.size():
+				available_difficulties[i] = int(available_difficulties_str[i])
+		if available_difficulties.has(difficulty):
 			selected_difficulty = difficulty
 			_update_difficulty_panels(entry)
 
 func _on_play_pressed():
-	var entry = SongCatalog.catalog[selected_song_index]
-	if not entry.files_valid:
+	var entry = SongCatalog.song_catalog[selected_song_index]
+	if not entry.files_ok:
 		return
 	
 	# Create song manager instance
 	var manager = SONG_MANAGER_SCENE.instantiate()
-	manager.song_file = entry.file_path
+	manager.song_file = SongCatalog.get_resource_path(entry.folder_id)
 	manager.difficulty = selected_difficulty
+	manager.resource_hash = entry.resource_hash
+	manager.midi_hash = entry.midi_hash
 	
 	# Apply modifiers
 	# TODO: Button cycling and values not implemented yet
@@ -275,6 +291,7 @@ func _on_timing_option_pressed() -> void:
 	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])
 
 func _update_previous_bests():
+	return
 	var entry = SongCatalog.catalog[selected_song_index]
 	var record = SessionManager.song_records.get(entry.folder, {}).get(str(selected_difficulty), null)
 	if not record or record.clear_state == SessionManager.SongResult.ClearState.NOT_PLAYED:

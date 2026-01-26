@@ -186,7 +186,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.0, 0.725]
+"values": [0.0, 0.66]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -311,6 +311,7 @@ layout_mode = 2
 [node name="Difficulties" type="HBoxContainer" parent="LeftSide/PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_constants/separation = -3
 
 [node name="BeginnerDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
@@ -442,7 +443,6 @@ vertical_alignment = 1
 uppercase = true
 
 [node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer"]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -618,6 +618,7 @@ libraries = {
 }
 
 [node name="Carousel" parent="." instance=ExtResource("9_ctryq")]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.66

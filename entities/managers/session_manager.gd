@@ -15,20 +15,30 @@ var previous_select_options: Dictionary = {}
 
 
 var library_db: SQLite:
-	get: return _library_db
+	get:
+		if not _library_db:
+			_prepare_library_db()
+		return _library_db
 
 var player_db: SQLite:
-	get: return _player_db
+	get:
+		if not _player_db:
+			_prepare_player_db()
+		return _player_db
 
-func _ready():
-	_prepare_library_db()
-	_prepare_player_db()
+func close_library_db():
+	if _library_db:
+		_library_db.close_db()
+		_library_db = null
+
+func close_player_db():
+	if _player_db:
+		_player_db.close_db()
+		_player_db = null
 
 func _exit_tree():
-	_library_db.close_db()
-	_player_db.close_db()
-	_library_db = null
-	_player_db = null
+	close_library_db()
+	close_player_db()
 
 func _prepare_library_db():
 	if not _library_db:

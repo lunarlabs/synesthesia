@@ -66,10 +66,10 @@ CREATE TABLE "difficulties" (
 
 -- pre-existing immutable data
 -- the moggsong standard difficulty levels
-INSERT INTO "difficulty_levels" ("offset","name") VALUES (96,'Beginner');
-INSERT INTO "difficulty_levels" ("offset","name") VALUES (102,'Basic');
-INSERT INTO "difficulty_levels" ("offset","name") VALUES (108,'Advanced');
-INSERT INTO "difficulty_levels" ("offset","name") VALUES (114,'Expert');
+INSERT INTO "difficulty_levels" ("offset","name") VALUES (96,'DIFF_92');
+INSERT INTO "difficulty_levels" ("offset","name") VALUES (102,'DIFF_102');
+INSERT INTO "difficulty_levels" ("offset","name") VALUES (108,'DIFF_108');
+INSERT INTO "difficulty_levels" ("offset","name") VALUES (114,'DIFF_114');
 
 -- common indices
 CREATE INDEX "idx_title" ON "songs" ("sort_key");
@@ -79,13 +79,32 @@ CREATE INDEX "idx_songs_bpm" ON "songs" ("bpm");
 CREATE INDEX "idx_difficulties_song" ON "difficulties" ("song_folder");
 CREATE INDEX "idx_songs_source" ON "songs" ("source");
 
+DROP VIEW IF EXISTS "v_song_select";
+CREATE VIEW "v_song_select" AS
+SELECT
+    s."folder_id",
+    s."sort_key",
+    s."title",
+    nullif(s."sub_title", '') AS "sub_title",
+    s."artist",
+    s."genre",
+    s."bpm",
+    group_concat(d."difficulty_offset" ORDER BY d."difficulty_offset" ASC) AS "available_difficulties",
+    src."name" AS "source_name",
+    s."files_ok",
+    s."resource_hash",
+    s."midi_hash"
+FROM "songs" s
+LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
+LEFT JOIN "sources" src ON s."source" = src."source_id"
+GROUP BY s."folder_id";
 
 DROP VIEW IF EXISTS "v_full_library";
 CREATE VIEW "v_full_library" AS
 SELECT
     s."folder_id",
     s."title",
-    s."sub_title",
+    nullif(s."sub_title", '') AS "sub_title",
     s."artist",
     s."genre",
     s."bpm",

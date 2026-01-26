@@ -204,6 +204,7 @@ func _song_start():
 	.set_ease(Tween.EASE_IN)
 	_intro_tween.tween_callback(_intro_anim_call)
 
+@warning_ignore("unused_parameter")
 func _process(delta: float):
 	if !finished:
 		if Input.is_action_just_pressed("instant_fail") and OS.is_debug_build():
@@ -211,40 +212,11 @@ func _process(delta: float):
 			fail_song()
 			return
 
-		# Cache frequently-used members to avoid repeated lookups
-		var beat = %Conductor.current_beat
 		var mn = manager_node
 		var trs = tracks
 
-		%actualplayhead.position.z = %Conductor.current_beat * -length_per_beat
+		playhead.position.z = %Conductor.current_beat * -length_per_beat
 		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
-		# Smooth interpolation with spring damping
-		var spring_strength = 100.0
-		var damping = 15.0
-		# Calculate target position from audio time (single predicted beat calc)
-# ... inside _process ...
-		
-		# 1. RAW TARGET (No offset needed anymore)
-		playhead_target_z = - length_per_beat * beat
-		
-		# 2. FEEDFORWARD FORCE
-		# Calculate the speed the playhead SHOULD have (Units per Second)
-		# Velocity = Dist/Beat * Beats/Sec
-		# Note: This is negative because we move into negative Z
-		var target_velocity = - length_per_beat * (bpm / 60.0)
-		
-		# We add a force exactly equal to the expected drag (Velocity * Damping)
-		# This "pre-cancels" the damping, so the spring only handles position corrections
-		var feedforward_force = target_velocity * damping
-
-		# 3. STANDARD SPRING PHYSICS
-		var displacement = playhead_target_z - playhead.position.z
-		var spring_force = displacement * spring_strength
-		var damping_force = - playhead_velocity * damping
-		
-		# Apply all forces
-		playhead_velocity += (spring_force + damping_force + feedforward_force) * delta
-		playhead.position.z = %actualplayhead.position.z
 
 		var new_active_track = active_track
 		if !mn.autoblast and input_enabled:
