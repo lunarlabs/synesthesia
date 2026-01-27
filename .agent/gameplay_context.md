@@ -19,7 +19,7 @@ Synesthesia is a multi-track rhythm game where the player acts as a dynamic "mix
 ### Game Entities
 *   **SynRoad**: The internal class prefix and project name for the gameplay logic.
 *   **Song (SynRoadSong)**: The main controller (`entities/song.gd`) for a gameplay session. Manages the conductor, score, energy, and game state.
-*   **Track (SynRoadTrack)**: Represents a single instrument lane (`entities/track.gd`). Handles not spawning, visual rails, and audio stems.
+*   **Track (SynRoadTrack)**: Represents a single instrument lane (`entities/track.gd`). Handles note spawning, visual rails, and audio stems.
 *   **Note (SynRoadNote)**: The interactive hit objects (`entities/note.gd`). Notes are lane-specific (Left, Center, Right).
 *   **Playhead**: The visual representation of the player's focus. It moves across the x-axis to select tracks.
 

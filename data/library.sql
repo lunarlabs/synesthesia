@@ -25,6 +25,7 @@ CREATE TABLE "songs" (
     "bpm"           REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
     "source"        INTEGER,
     "desc"          TEXT,
+    "cover_art"     BLOB,
     "inst_layout"   TEXT CHECK("inst_layout" = TRIM("inst_layout")
                     AND LENGTH("inst_layout") > 0
                     AND UPPER("inst_layout") GLOB '[DBGSVF]*'),

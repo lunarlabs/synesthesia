@@ -30,6 +30,8 @@ const MIDI_META_TEMPO_EVENT = 0x51
 ## The game the song is from
 @export var source: String = ""
 
+@export var cover_art: Texture2D
+
 ## Description or background information about the song
 @export_multiline var description: String
 
@@ -40,6 +42,10 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 ## Path to the audio file for the song's main track
 @export_file("*.wav") var click_track = ""
+
+@export_file("*.wav") var preview_audio = ""
+
+@export_file("*.wav","*.mp3","*.ogg") var selection_audio = "res://assets/transition.mp3"
 
 @export_category("Gameplay")
 
