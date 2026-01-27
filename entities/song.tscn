@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://dih2tkchgg7x0"]
+[gd_scene format=3 uid="uid://dih2tkchgg7x0"]
 
 [ext_resource type="Script" uid="uid://cgr576c4m6vpp" path="res://entities/song.gd" id="1_jv32a"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_0bd8t"]
@@ -1034,39 +1034,39 @@ shading_mode = 0
 material = SubResource("StandardMaterial3D_scy1h")
 size = Vector3(20, 0.02, 0.02)
 
-[node name="Song" type="Node3D"]
+[node name="Song" type="Node3D" unique_id=1923928850]
 script = ExtResource("1_jv32a")
 
-[node name="ClickTrack" type="AudioStreamPlayer" parent="." groups=["AudioPlayers", "LoopingAudio"]]
+[node name="ClickTrack" type="AudioStreamPlayer" parent="." unique_id=1984526006 groups=["AudioPlayers", "LoopingAudio"]]
 volume_db = -12.0
 
-[node name="DebugInfo" type="Label" parent="."]
+[node name="DebugInfo" type="Label" parent="." unique_id=1195024175]
 z_index = 100
 z_as_relative = false
 offset_right = 40.0
 offset_bottom = 23.0
 theme_override_font_sizes/font_size = 11
 
-[node name="Playhead" type="Marker3D" parent="."]
+[node name="Playhead" type="Marker3D" parent="." unique_id=700915107]
 
-[node name="CurrentTrack" type="Marker3D" parent="Playhead"]
+[node name="CurrentTrack" type="Marker3D" parent="Playhead" unique_id=597148115]
 
-[node name="TargetLeft" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+[node name="TargetLeft" parent="Playhead/CurrentTrack" unique_id=1410025260 instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.01, 0)
 visible = false
 
-[node name="TargetCenter" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+[node name="TargetCenter" parent="Playhead/CurrentTrack" unique_id=1131440010 instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
 visible = false
 
-[node name="TargetRight" parent="Playhead/CurrentTrack" instance=ExtResource("2_gkj2n")]
+[node name="TargetRight" parent="Playhead/CurrentTrack" unique_id=573005419 instance=ExtResource("2_gkj2n")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.01, 0)
 visible = false
 
-[node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack"]
+[node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack" unique_id=373394203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)
 pixel_size = 0.006
 billboard = 1
@@ -1080,7 +1080,7 @@ font_size = 25
 uppercase = true
 width = 300.0
 
-[node name="TargetPfx" type="GPUParticles3D" parent="Playhead/CurrentTrack"]
+[node name="TargetPfx" type="GPUParticles3D" parent="Playhead/CurrentTrack" unique_id=1722355392]
 unique_name_in_owner = true
 emitting = false
 amount = 40
@@ -1090,12 +1090,12 @@ local_coords = true
 process_material = SubResource("ParticleProcessMaterial_u2oep")
 draw_pass_1 = SubResource("QuadMesh_e81dl")
 
-[node name="Camera3D" type="Camera3D" parent="Playhead"]
+[node name="Camera3D" type="Camera3D" parent="Playhead" unique_id=340278828]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2)
 fov = 80.0
 far = 200.0
 
-[node name="CountIn" type="Label3D" parent="."]
+[node name="CountIn" type="Label3D" parent="." unique_id=926558052]
 transform = Transform3D(1, 0, 0, 0, -5.2453663e-07, 1, 0, -12, -4.371139e-08, 0, 0, 0)
 pixel_size = 0.01
 render_priority = -1
@@ -1107,15 +1107,15 @@ outline_size = 20
 vertical_alignment = 0
 width = 1000.0
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=803851345]
 transform = Transform3D(0.9981166, 0.05234906, -0.03198038, 1.3554622e-08, 0.5213224, 0.8533598, 0.061344683, -0.85175264, 0.5203406, 0, 0, 0)
 shadow_enabled = true
 directional_shadow_mode = 0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=907215071]
 environment = SubResource("Environment_0bd8t")
 
-[node name="HUD" type="Control" parent="."]
+[node name="HUD" type="Control" parent="." unique_id=1465989098]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -1124,7 +1124,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Gleam1" type="TextureRect" parent="HUD"]
+[node name="Gleam1" type="TextureRect" parent="HUD" unique_id=195540251]
 visible = false
 material = SubResource("CanvasItemMaterial_q2dmg")
 layout_mode = 1
@@ -1142,7 +1142,7 @@ grow_vertical = 2
 pivot_offset = Vector2(256, 256)
 texture = ExtResource("3_0mt4k")
 
-[node name="Gleam2" type="TextureRect" parent="HUD"]
+[node name="Gleam2" type="TextureRect" parent="HUD" unique_id=169466189]
 visible = false
 material = SubResource("CanvasItemMaterial_q2dmg")
 layout_mode = 1
@@ -1160,7 +1160,7 @@ grow_vertical = 2
 pivot_offset = Vector2(256, 256)
 texture = ExtResource("3_0mt4k")
 
-[node name="PhraseValueLabel" type="Label" parent="HUD"]
+[node name="PhraseValueLabel" type="Label" parent="HUD" unique_id=620704031]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(170, 0)
@@ -1183,7 +1183,7 @@ label_settings = SubResource("LabelSettings_scy1h")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EnergyArea" type="TextureRect" parent="HUD"]
+[node name="EnergyArea" type="TextureRect" parent="HUD" unique_id=1421754843]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.08
@@ -1196,7 +1196,7 @@ rotation = 1.5707964
 pivot_offset = Vector2(240, 0)
 texture = ExtResource("8_otm2r")
 
-[node name="EnergyBar" type="TextureProgressBar" parent="HUD/EnergyArea"]
+[node name="EnergyBar" type="TextureProgressBar" parent="HUD/EnergyArea" unique_id=1249021695]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -1217,7 +1217,7 @@ texture_under = ExtResource("9_jycet")
 texture_progress = ExtResource("10_nbke4")
 tint_progress = Color(0, 0.63394016, 0.03212304, 1)
 
-[node name="StreakTitle2" type="Label" parent="HUD/EnergyArea"]
+[node name="StreakTitle2" type="Label" parent="HUD/EnergyArea" unique_id=1451252044]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 offset_left = 112.84003
@@ -1227,7 +1227,7 @@ offset_bottom = 37.0
 theme_override_fonts/font = SubResource("FontVariation_0yoam")
 text = "ENERGY"
 
-[node name="ScoreBar" type="TextureRect" parent="HUD"]
+[node name="ScoreBar" type="TextureRect" parent="HUD" unique_id=1287903720]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.92
@@ -1241,7 +1241,7 @@ rotation = -1.5707964
 pivot_offset = Vector2(316, 0)
 texture = ExtResource("5_q2dmg")
 
-[node name="ScoreLabel" type="Label" parent="HUD/ScoreBar"]
+[node name="ScoreLabel" type="Label" parent="HUD/ScoreBar" unique_id=27608941]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -1259,7 +1259,7 @@ label_settings = SubResource("LabelSettings_0bd8t")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="StreakLabel" type="Label" parent="HUD/ScoreBar"]
+[node name="StreakLabel" type="Label" parent="HUD/ScoreBar" unique_id=1635420137]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -1276,7 +1276,7 @@ label_settings = SubResource("LabelSettings_q2dmg")
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="ScoreTitle" type="Label" parent="HUD/ScoreBar"]
+[node name="ScoreTitle" type="Label" parent="HUD/ScoreBar" unique_id=2051510449]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 1
@@ -1291,7 +1291,7 @@ theme_override_fonts/font = SubResource("FontVariation_o2o53")
 text = "SCORE"
 horizontal_alignment = 2
 
-[node name="StreakTitle" type="Label" parent="HUD/ScoreBar"]
+[node name="StreakTitle" type="Label" parent="HUD/ScoreBar" unique_id=1326843720]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 offset_left = 68.56006
@@ -1301,7 +1301,7 @@ offset_bottom = 37.0
 theme_override_fonts/font = SubResource("FontVariation_0yoam")
 text = "STREAK"
 
-[node name="TimingStats" type="PanelContainer" parent="HUD/ScoreBar"]
+[node name="TimingStats" type="PanelContainer" parent="HUD/ScoreBar" unique_id=1973754546]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -1312,18 +1312,18 @@ anchor_bottom = 1.0
 offset_top = 10.0
 grow_horizontal = 0
 
-[node name="VBoxContainer" type="GridContainer" parent="HUD/ScoreBar/TimingStats"]
+[node name="VBoxContainer" type="GridContainer" parent="HUD/ScoreBar/TimingStats" unique_id=1366070357]
 layout_mode = 2
 columns = 2
 
-[node name="HiSpeedTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="HiSpeedTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1283699970]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Hi-Speed"
 uppercase = true
 
-[node name="HiSpeedLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="HiSpeedLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=716774652]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(75, 0)
@@ -1331,14 +1331,14 @@ layout_mode = 2
 text = "0.00"
 horizontal_alignment = 2
 
-[node name="TimingTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="TimingTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1067792939]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Timing"
 uppercase = true
 
-[node name="TimingLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="TimingLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1153018183]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(75, 0)
@@ -1347,13 +1347,13 @@ text = "Normal"
 horizontal_alignment = 2
 uppercase = true
 
-[node name="NotesHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="NotesHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1458312977]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Notes hit"
 uppercase = true
 
-[node name="NotesHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="NotesHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=695455633]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -1361,13 +1361,13 @@ text = "0"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="EarlyHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="EarlyHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1354764883]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Early"
 uppercase = true
 
-[node name="EarlyHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="EarlyHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=93037641]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -1375,13 +1375,13 @@ text = "0"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="LateHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="LateHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=182923840]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Late"
 uppercase = true
 
-[node name="LateHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="LateHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=946900410]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -1389,13 +1389,13 @@ text = "0"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="AvgHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="AvgHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1128220023]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "Average"
 uppercase = true
 
-[node name="AvgHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer"]
+[node name="AvgHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=60762336]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -1403,7 +1403,7 @@ text = "0 ms"
 label_settings = SubResource("LabelSettings_gkj2n")
 horizontal_alignment = 2
 
-[node name="AutoblastLabel" type="Label" parent="HUD"]
+[node name="AutoblastLabel" type="Label" parent="HUD" unique_id=640411824]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -1416,7 +1416,7 @@ text = "Autoblast ON"
 label_settings = SubResource("LabelSettings_0mt4k")
 horizontal_alignment = 1
 
-[node name="SongClearedLabel" type="Label" parent="HUD"]
+[node name="SongClearedLabel" type="Label" parent="HUD" unique_id=482899624]
 visible = false
 modulate = Color(1, 1, 1, 0)
 clip_children = 2
@@ -1440,7 +1440,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 uppercase = true
 
-[node name="MarginContainer" type="MarginContainer" parent="HUD/SongClearedLabel"]
+[node name="MarginContainer" type="MarginContainer" parent="HUD/SongClearedLabel" unique_id=248246980]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -1448,12 +1448,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="HUD/SongClearedLabel/MarginContainer"]
+[node name="TextureRect" type="TextureRect" parent="HUD/SongClearedLabel/MarginContainer" unique_id=233002363]
 material = SubResource("CanvasItemMaterial_scy1h")
 layout_mode = 2
 texture = SubResource("GradientTexture2D_q2dmg")
 
-[node name="FastSlowLabel" type="Label" parent="HUD"]
+[node name="FastSlowLabel" type="Label" parent="HUD" unique_id=58537322]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -1472,11 +1472,11 @@ theme_override_constants/outline_size = 5
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FastSlowTimer" type="Timer" parent="HUD/FastSlowLabel"]
+[node name="FastSlowTimer" type="Timer" parent="HUD/FastSlowLabel" unique_id=402313849]
 wait_time = 0.5
 one_shot = true
 
-[node name="SongProgress" type="TextureProgressBar" parent="HUD"]
+[node name="SongProgress" type="TextureProgressBar" parent="HUD" unique_id=784598843]
 unique_name_in_owner = true
 process_thread_group = 2
 process_thread_group_order = 0
@@ -1497,18 +1497,16 @@ stretch_margin_bottom = 11
 texture_under = ExtResource("11_a22vp")
 texture_progress = ExtResource("12_36g15")
 
-[node name="HUDAnimations" type="AnimationPlayer" parent="HUD"]
+[node name="HUDAnimations" type="AnimationPlayer" parent="HUD" unique_id=1470305178]
 unique_name_in_owner = true
-libraries = {
-&"": SubResource("AnimationLibrary_82rk8")
-}
+libraries/ = SubResource("AnimationLibrary_82rk8")
 
-[node name="actualplayhead" type="MeshInstance3D" parent="."]
+[node name="actualplayhead" type="MeshInstance3D" parent="." unique_id=100685933]
 unique_name_in_owner = true
 visible = false
 mesh = SubResource("BoxMesh_0mt4k")
 
-[node name="FadeOut" type="ColorRect" parent="."]
+[node name="FadeOut" type="ColorRect" parent="." unique_id=1606961647]
 unique_name_in_owner = true
 visible = false
 z_index = 10
@@ -1520,7 +1518,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="Conductor" type="Node" parent="."]
+[node name="Conductor" type="Node" parent="." unique_id=616228240]
 unique_name_in_owner = true
 process_priority = -100
 script = ExtResource("11_jycet")

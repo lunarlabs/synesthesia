@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://d0ooj6aih13in"]
+[gd_scene format=3 uid="uid://d0ooj6aih13in"]
 
 [ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/trackshader.res" id="1_lkcd8"]
 [ext_resource type="PackedScene" uid="uid://b5rou2au557hc" path="res://entities/trackgeom.tscn" id="3_aeq1i"]
@@ -13,12 +13,12 @@ size = Vector2(2.5, 16)
 subdivide_width = 1
 subdivide_depth = 31
 
-[node name="measure" type="Node3D"]
+[node name="measure" type="Node3D" unique_id=2015255214]
 
-[node name="track_geometry_old" type="MeshInstance3D" parent="."]
+[node name="track_geometry_old" type="MeshInstance3D" parent="." unique_id=369038850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
 visible = false
 mesh = SubResource("PlaneMesh_ri2lq")
 
-[node name="track_geometry" parent="." instance=ExtResource("3_aeq1i")]
+[node name="track_geometry" parent="." unique_id=1135575059 instance=ExtResource("3_aeq1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00073444843, 0, -9.346008e-05)

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpchno0oyio6o"]
+[gd_scene format=3 uid="uid://cpchno0oyio6o"]
 
 [ext_resource type="Script" uid="uid://e1kcn5jekptv" path="res://menu/carousel/carousel.gd" id="1_8h0xm"]
 
-[node name="Carousel" type="Container"]
+[node name="Carousel" type="Container" unique_id=1760491205]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cj5qbqo5phlu1"]
+[gd_scene format=3 uid="uid://cj5qbqo5phlu1"]
 
 [ext_resource type="Theme" uid="uid://cm4v2e2f0im5p" path="res://menu/theme/MenuTheme.tres" id="1_0tx4y"]
 [ext_resource type="Script" uid="uid://bwqk5wogs7fgg" path="res://menu/song_select.gd" id="1_etro7"]
@@ -255,7 +255,7 @@ _data = {
 &"SongSelected": SubResource("Animation_mbci5")
 }
 
-[node name="SongSelect" type="Control"]
+[node name="SongSelect" type="Control" unique_id=1474968882]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -265,7 +265,7 @@ grow_vertical = 2
 theme = ExtResource("1_0tx4y")
 script = ExtResource("1_etro7")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1882285385]
 material = SubResource("ShaderMaterial_hjgwb")
 layout_mode = 1
 anchors_preset = 15
@@ -274,7 +274,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="RightSide" type="VBoxContainer" parent="."]
+[node name="RightSide" type="VBoxContainer" parent="." unique_id=246917605]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.66
@@ -284,18 +284,18 @@ offset_left = 40.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="SongList" type="ItemList" parent="RightSide"]
+[node name="SongList" type="ItemList" parent="RightSide" unique_id=1271603346]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PlayButton" type="Button" parent="RightSide"]
+[node name="PlayButton" type="Button" parent="RightSide" unique_id=1443998541]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "PLAY"
 
-[node name="LeftSide" type="VBoxContainer" parent="."]
+[node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -305,15 +305,15 @@ anchor_bottom = 1.0
 offset_left = 40.0
 offset_bottom = -40.0
 
-[node name="PanelContainer" type="PanelContainer" parent="LeftSide"]
+[node name="PanelContainer" type="PanelContainer" parent="LeftSide" unique_id=625013252]
 layout_mode = 2
 
-[node name="Difficulties" type="HBoxContainer" parent="LeftSide/PanelContainer"]
+[node name="Difficulties" type="HBoxContainer" parent="LeftSide/PanelContainer" unique_id=1690811599]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = -3
 
-[node name="BeginnerDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+[node name="BeginnerDifficulty" parent="LeftSide/PanelContainer/Difficulties" unique_id=23204936 instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -321,7 +321,7 @@ base_color = Color(0.125, 0.2, 0.1, 1)
 selected_color = Color(0.4, 1, 0.2, 1)
 difficulty_name = "DIFF_96"
 
-[node name="IntermediateDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+[node name="IntermediateDifficulty" parent="LeftSide/PanelContainer/Difficulties" unique_id=1557077641 instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -329,7 +329,7 @@ base_color = Color(0.029599994, 0.18845335, 0.37, 1)
 selected_color = Color(0.07999998, 0.5093334, 1, 1)
 difficulty_name = "DIFF_102"
 
-[node name="AdvancedDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+[node name="AdvancedDifficulty" parent="LeftSide/PanelContainer/Difficulties" unique_id=451917965 instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -337,7 +337,7 @@ base_color = Color(0.4, 0.25626668, 0.007999993, 1)
 selected_color = Color(1, 0.64066666, 0.01999998, 1)
 difficulty_name = "DIFF_108"
 
-[node name="ExpertDifficulty" parent="LeftSide/PanelContainer/Difficulties" instance=ExtResource("1_w051a")]
+[node name="ExpertDifficulty" parent="LeftSide/PanelContainer/Difficulties" unique_id=250952300 instance=ExtResource("1_w051a")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -345,33 +345,33 @@ base_color = Color(0.31, 0.062000014, 0, 1)
 selected_color = Color(0.81, 0.16200005, 0, 1)
 difficulty_name = "DIFF_114"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide"]
+[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide" unique_id=914794567]
 layout_mode = 2
 size_flags_vertical = 10
 alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="LeftSide/HBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="LeftSide/HBoxContainer" unique_id=902190860]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer" unique_id=1517526259]
 layout_mode = 2
 
-[node name="PreviousBestsTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
+[node name="PreviousBestsTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer" unique_id=1035332137]
 layout_mode = 2
 text = "MENU_PREV_BESTS"
 uppercase = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer" unique_id=1517977663]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=390384257]
 layout_mode = 2
 size_flags_vertical = 4
 columns = 2
 
-[node name="PrevScoreTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevScoreTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1734628777]
 custom_minimum_size = Vector2(175, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -379,27 +379,27 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_SCORETITLE"
 uppercase = true
 
-[node name="PrevScoreLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevScoreLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=608072588]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="PrevStreakTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevStreakTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1271765169]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_LONGESTSTREAKTITLE"
 uppercase = true
 
-[node name="PrevStreakLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevStreakLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=374834575]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="PrevAccTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevAccTitle" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1049128356]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -408,20 +408,20 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_PHRASEACCURACYTITLE"
 uppercase = true
 
-[node name="PrevAccLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer"]
+[node name="PrevAccLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1351353979]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="VSeparator" type="VSeparator" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=173165377]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=923841904]
 layout_mode = 2
 
-[node name="PrevClearLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="PrevClearLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1068678874]
 unique_name_in_owner = true
 layout_mode = 2
 text = "NOT PLAYED"
@@ -430,7 +430,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="PrevRankLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="PrevRankLabel" type="Label" parent="LeftSide/HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=264344989]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
@@ -442,31 +442,31 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer"]
+[node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer" unique_id=1468517052]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ModifiersGrid" type="GridContainer" parent="LeftSide/HBoxContainer/Modifiers"]
+[node name="ModifiersGrid" type="GridContainer" parent="LeftSide/HBoxContainer/Modifiers" unique_id=2022355742]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 8
 columns = 2
 
-[node name="EnergyOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="EnergyOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=189364351 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOD_ENERGY_NORMAL"
 
-[node name="CheckpointOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="CheckpointOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=1293782143 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOD_CHECKPOINTS_NORMAL"
 
-[node name="NoStreakHintButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="NoStreakHintButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=594833595 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
@@ -474,21 +474,21 @@ size_flags_horizontal = 3
 toggle_mode = true
 text = "MOD_NO_STREAK_MARKER"
 
-[node name="TimingOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="TimingOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=705452335 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOD_TIMING_NORMAL"
 
-[node name="ResetOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="ResetOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=228782468 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOD_RESET_NORMAL"
 
-[node name="AutoblastButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="AutoblastButton" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=656216791 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
@@ -496,14 +496,14 @@ size_flags_horizontal = 3
 toggle_mode = true
 text = "MOD_AUTOBLAST"
 
-[node name="HiSpeedOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" groups=["ModButtons"]]
+[node name="HiSpeedOption" type="Button" parent="LeftSide/HBoxContainer/Modifiers/ModifiersGrid" unique_id=1944144 groups=["ModButtons"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "MOD_HISPEED"
 
-[node name="LoadingContainer" type="CenterContainer" parent="."]
+[node name="LoadingContainer" type="CenterContainer" parent="." unique_id=1542685177]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -511,17 +511,17 @@ anchor_right = 0.66
 anchor_bottom = 0.47000003
 offset_left = 40.0
 
-[node name="LoadingPanel" type="PanelContainer" parent="LoadingContainer"]
+[node name="LoadingPanel" type="PanelContainer" parent="LoadingContainer" unique_id=1386295410]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="LoadingContainer/LoadingPanel"]
+[node name="Label" type="Label" parent="LoadingContainer/LoadingPanel" unique_id=1862968087]
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 text = "MENU_SONG_CATALOG_LOADING"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TopBox" type="HBoxContainer" parent="."]
+[node name="TopBox" type="HBoxContainer" parent="." unique_id=178165679]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.425
@@ -531,23 +531,23 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/separation = 30
 
-[node name="TextureRect" type="TextureRect" parent="TopBox"]
+[node name="TextureRect" type="TextureRect" parent="TopBox" unique_id=728567514]
 layout_mode = 2
 texture = ExtResource("5_hjgwb")
 expand_mode = 3
 
-[node name="SongInfo" type="VBoxContainer" parent="TopBox"]
+[node name="SongInfo" type="VBoxContainer" parent="TopBox" unique_id=1960575753]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 1
 alignment = 2
 
-[node name="Control" type="Control" parent="TopBox/SongInfo"]
+[node name="Control" type="Control" parent="TopBox/SongInfo" unique_id=772810254]
 clip_contents = true
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="TopBox/SongInfo/Control"]
+[node name="TitleLabel" type="Label" parent="TopBox/SongInfo/Control" unique_id=1687754643]
 unique_name_in_owner = true
 clip_children = 2
 layout_mode = 1
@@ -563,7 +563,7 @@ text_overrun_behavior = 3
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="TopBox/SongInfo/Control/TitleLabel"]
+[node name="MarginContainer" type="MarginContainer" parent="TopBox/SongInfo/Control/TitleLabel" unique_id=1611523767]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -571,53 +571,51 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="TopBox/SongInfo/Control/TitleLabel/MarginContainer"]
+[node name="TextureRect" type="TextureRect" parent="TopBox/SongInfo/Control/TitleLabel/MarginContainer" unique_id=1710834378]
 material = SubResource("CanvasItemMaterial_mbci5")
 layout_mode = 2
 texture = SubResource("GradientTexture2D_hjgwb")
 
-[node name="ArtistLabel" type="Label" parent="TopBox/SongInfo"]
+[node name="ArtistLabel" type="Label" parent="TopBox/SongInfo" unique_id=2118599333]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Artist Name"
 label_settings = SubResource("LabelSettings_hjgwb")
 text_overrun_behavior = 3
 
-[node name="HSeparator" type="HSeparator" parent="TopBox/SongInfo"]
+[node name="HSeparator" type="HSeparator" parent="TopBox/SongInfo" unique_id=1140443554]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopBox/SongInfo"]
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBox/SongInfo" unique_id=313845030]
 layout_mode = 2
 
-[node name="GenreLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer"]
+[node name="GenreLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer" unique_id=1606282299]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Song Genre"
 label_settings = SubResource("LabelSettings_pjj6u")
 
-[node name="VSeparator" type="VSeparator" parent="TopBox/SongInfo/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="TopBox/SongInfo/HBoxContainer" unique_id=1546997866]
 layout_mode = 2
 
-[node name="TempoLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer"]
+[node name="TempoLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer" unique_id=500289050]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 2
 text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
-[node name="MenuMusic" type="AudioStreamPlayer" parent="."]
+[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
 stream = ExtResource("8_hjgwb")
 volume_db = -2.0
 autoplay = true
 bus = &"Song"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628454593]
 root_node = NodePath("../TopBox/SongInfo")
-libraries = {
-&"": SubResource("AnimationLibrary_hjgwb")
-}
+libraries/ = SubResource("AnimationLibrary_hjgwb")
 
-[node name="Carousel" parent="." instance=ExtResource("9_ctryq")]
+[node name="Carousel" parent="." unique_id=2030868766 instance=ExtResource("9_ctryq")]
 visible = false
 layout_mode = 1
 anchors_preset = -1

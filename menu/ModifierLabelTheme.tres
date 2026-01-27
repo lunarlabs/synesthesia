@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=7 format=3 uid="uid://c7c1rqmsxlumn"]
+[gd_resource type="Theme" format=3 uid="uid://c7c1rqmsxlumn"]
 
 [ext_resource type="StyleBox" uid="uid://bowjolfrqf7nv" path="res://menu/ModifierBoxOff.tres" id="1_nckg7"]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dm4hcmhaewyp6"]
+[gd_scene format=3 uid="uid://dm4hcmhaewyp6"]
 
 [ext_resource type="Script" uid="uid://cijh26pewr7t7" path="res://menu/song_result.gd" id="1_cnqnt"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
@@ -1042,7 +1042,7 @@ _data = {
 &"RESET": SubResource("Animation_xsivx")
 }
 
-[node name="SongResult" type="HBoxContainer"]
+[node name="SongResult" type="HBoxContainer" unique_id=45677348]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -1054,16 +1054,16 @@ theme_type_variation = &"PanelBox"
 alignment = 1
 script = ExtResource("1_cnqnt")
 
-[node name="LeftSide" type="PanelContainer" parent="."]
+[node name="LeftSide" type="PanelContainer" parent="." unique_id=247791465]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 550)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="LeftSide" type="VBoxContainer" parent="LeftSide"]
+[node name="LeftSide" type="VBoxContainer" parent="LeftSide" unique_id=1540759225]
 layout_mode = 2
 
-[node name="SongTitleLabel" type="Label" parent="LeftSide/LeftSide"]
+[node name="SongTitleLabel" type="Label" parent="LeftSide/LeftSide" unique_id=1316637136]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -1073,7 +1073,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 visible_characters_behavior = 1
 
-[node name="ArtistLabel" type="Label" parent="LeftSide/LeftSide"]
+[node name="ArtistLabel" type="Label" parent="LeftSide/LeftSide" unique_id=327481245]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -1082,10 +1082,10 @@ horizontal_alignment = 1
 autowrap_mode = 3
 visible_characters_behavior = 1
 
-[node name="HSeparator" type="HSeparator" parent="LeftSide/LeftSide"]
+[node name="HSeparator" type="HSeparator" parent="LeftSide/LeftSide" unique_id=225327611]
 layout_mode = 2
 
-[node name="DifficultyLabel" type="Label" parent="LeftSide/LeftSide"]
+[node name="DifficultyLabel" type="Label" parent="LeftSide/LeftSide" unique_id=1365665704]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -1093,10 +1093,10 @@ text = "Difficulty"
 horizontal_alignment = 1
 visible_characters_behavior = 1
 
-[node name="HSeparator2" type="HSeparator" parent="LeftSide/LeftSide"]
+[node name="HSeparator2" type="HSeparator" parent="LeftSide/LeftSide" unique_id=374922]
 layout_mode = 2
 
-[node name="AlbumCover" type="TextureRect" parent="LeftSide/LeftSide"]
+[node name="AlbumCover" type="TextureRect" parent="LeftSide/LeftSide" unique_id=1574718694]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
@@ -1104,32 +1104,32 @@ size_flags_vertical = 3
 texture = ExtResource("1_eskt4")
 stretch_mode = 5
 
-[node name="ExitButton" type="Button" parent="LeftSide/LeftSide"]
+[node name="ExitButton" type="Button" parent="LeftSide/LeftSide" unique_id=99120299]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "MENU_EXIT_TO_SONG_SELECT"
 
-[node name="RestartButton" type="Button" parent="LeftSide/LeftSide"]
+[node name="RestartButton" type="Button" parent="LeftSide/LeftSide" unique_id=278846085]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "MENU_RESTART_SONG"
 
-[node name="RightSide" type="VBoxContainer" parent="."]
+[node name="RightSide" type="VBoxContainer" parent="." unique_id=1016579006]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 theme_type_variation = &"PanelBox"
 alignment = 1
 
-[node name="RankPanel" type="PanelContainer" parent="RightSide"]
+[node name="RankPanel" type="PanelContainer" parent="RightSide" unique_id=72926606]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="RankLabel" type="Label" parent="RightSide/RankPanel"]
+[node name="RankLabel" type="Label" parent="RightSide/RankPanel" unique_id=415164987]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
@@ -1137,32 +1137,32 @@ text = "???"
 label_settings = SubResource("LabelSettings_dn0fs")
 horizontal_alignment = 1
 
-[node name="ClearPanel" type="PanelContainer" parent="RightSide"]
+[node name="ClearPanel" type="PanelContainer" parent="RightSide" unique_id=564247159]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/ClearPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="RightSide/ClearPanel" unique_id=1668284666]
 layout_mode = 2
 
-[node name="ClearTypeBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
+[node name="ClearTypeBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer" unique_id=219160453]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox" unique_id=1241765579]
 layout_mode = 2
 text = "MENU_CLEARTYPETITLE"
 vertical_alignment = 1
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox" unique_id=1161534796]
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox" unique_id=970433278]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_cnqnt")
@@ -1173,13 +1173,13 @@ uppercase = true
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox" unique_id=1187666402]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "→"
 horizontal_alignment = 1
 
-[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox"]
+[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/ClearTypeBox" unique_id=850080493]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_xsivx")
@@ -1191,22 +1191,22 @@ uppercase = true
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="RankBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
+[node name="RankBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer" unique_id=1908016296]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox" unique_id=1615556807]
 layout_mode = 2
 text = "MENU_RANKTITLE"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/RankBox" unique_id=1955226061]
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+[node name="Previous" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox" unique_id=1731351830]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "RANK_F"
@@ -1215,13 +1215,13 @@ vertical_alignment = 1
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+[node name="Arrow" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox" unique_id=2102956465]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "→"
 horizontal_alignment = 1
 
-[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox"]
+[node name="New" type="Label" parent="RightSide/ClearPanel/VBoxContainer/RankBox" unique_id=2024683925]
 custom_minimum_size = Vector2(140, 45)
 layout_mode = 2
 text = "RANK_AAA"
@@ -1230,22 +1230,22 @@ vertical_alignment = 1
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="CompletionBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer"]
+[node name="CompletionBox" type="HBoxContainer" parent="RightSide/ClearPanel/VBoxContainer" unique_id=2010446298]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 
-[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
+[node name="Title" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox" unique_id=802128004]
 layout_mode = 2
 text = "MENU_SONGCOMPLETION"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
+[node name="VSeparator" type="VSeparator" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox" unique_id=1730436339]
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="Value" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox"]
+[node name="Value" type="Label" parent="RightSide/ClearPanel/VBoxContainer/CompletionBox" unique_id=1226766706]
 custom_minimum_size = Vector2(280, 45)
 layout_mode = 2
 text = "100.00%"
@@ -1254,48 +1254,48 @@ vertical_alignment = 1
 max_lines_visible = 1
 visible_characters_behavior = 1
 
-[node name="ScorePanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+[node name="ScorePanel" parent="RightSide" unique_id=2032410994 instance=ExtResource("3_eskt4")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
-[node name="Title" parent="RightSide/ScorePanel/ScorePanel/VBoxContainer" index="0"]
+[node name="Title" parent="RightSide/ScorePanel/ScorePanel/VBoxContainer" parent_id_path=PackedInt32Array(2032410994, 945208844) index="0" unique_id=1107323224]
 text = "MENU_SCORETITLE"
 
-[node name="StreakPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+[node name="StreakPanel" parent="RightSide" unique_id=441338016 instance=ExtResource("3_eskt4")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
-[node name="Title" parent="RightSide/StreakPanel/ScorePanel/VBoxContainer" index="0"]
+[node name="Title" parent="RightSide/StreakPanel/ScorePanel/VBoxContainer" parent_id_path=PackedInt32Array(441338016, 945208844) index="0" unique_id=1107323224]
 text = "MENU_LONGESTSTREAKTITLE"
 
-[node name="AccuracyPanel" parent="RightSide" instance=ExtResource("3_eskt4")]
+[node name="AccuracyPanel" parent="RightSide" unique_id=43044213 instance=ExtResource("3_eskt4")]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 
-[node name="Title" parent="RightSide/AccuracyPanel/ScorePanel/VBoxContainer" index="0"]
+[node name="Title" parent="RightSide/AccuracyPanel/ScorePanel/VBoxContainer" parent_id_path=PackedInt32Array(43044213, 945208844) index="0" unique_id=1107323224]
 text = "MENU_PHRASEACCURACYTITLE"
 
-[node name="TimingStats" type="PanelContainer" parent="RightSide"]
+[node name="TimingStats" type="PanelContainer" parent="RightSide" unique_id=1896294614]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="VBoxContainer" type="GridContainer" parent="RightSide/TimingStats"]
+[node name="VBoxContainer" type="GridContainer" parent="RightSide/TimingStats" unique_id=2130675055]
 layout_mode = 2
 size_flags_horizontal = 0
 columns = 2
 
-[node name="StreakBreaksTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="StreakBreaksTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=1534943116]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
 text = "MENU_STREAKBREAKSTITLE"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="StreakBreaksLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="StreakBreaksLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=2018290762]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
@@ -1303,7 +1303,7 @@ text = "0"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="NotesHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="NotesHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=599182906]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
@@ -1311,7 +1311,7 @@ text = "HUD_NOTES_HIT"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="NotesHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="NotesHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=1163857222]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(90, 0)
@@ -1320,7 +1320,7 @@ text = "0"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="EarlyHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="EarlyHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=213029187]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
@@ -1328,7 +1328,7 @@ text = "HUD_FAST_HITS"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="EarlyHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="EarlyHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=23090223]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(90, 0)
@@ -1337,7 +1337,7 @@ text = "0"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="LateHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="LateHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=1452068138]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
@@ -1345,7 +1345,7 @@ text = "HUD_SLOW_HITS"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="LateHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="LateHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=119942092]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(90, 0)
@@ -1354,7 +1354,7 @@ text = "0"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="AvgHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="AvgHitTitle" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=2002764290]
 visible = false
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
@@ -1362,7 +1362,7 @@ text = "HUD_AVG_OFFSET"
 uppercase = true
 visible_characters_behavior = 1
 
-[node name="AvgHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer"]
+[node name="AvgHitLabel" type="Label" parent="RightSide/TimingStats/VBoxContainer" unique_id=304055038]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(90, 0)
@@ -1371,10 +1371,8 @@ text = "0 ms"
 horizontal_alignment = 2
 visible_characters_behavior = 1
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_xsivx")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=700306449]
+libraries/ = SubResource("AnimationLibrary_xsivx")
 
 [editable path="RightSide/ScorePanel"]
 [editable path="RightSide/StreakPanel"]

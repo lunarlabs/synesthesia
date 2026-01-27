@@ -1,4 +1,4 @@
-[gd_resource type="LabelSettings" load_steps=3 format=3 uid="uid://byf65v26sdt0p"]
+[gd_resource type="LabelSettings" format=3 uid="uid://byf65v26sdt0p"]
 
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_mc348"]
 

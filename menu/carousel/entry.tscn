@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b0og1uiro0k5c"]
+[gd_scene format=3 uid="uid://b0og1uiro0k5c"]
 
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_jqa2a"]
 [ext_resource type="LabelSettings" uid="uid://dv77xww5lwkf4" path="res://menu/carousel/title.tres" id="2_0hw33"]
@@ -37,13 +37,13 @@ font_size = 14
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
-[node name="Entry" type="ColorRect"]
+[node name="Entry" type="ColorRect" unique_id=200714640]
 custom_minimum_size = Vector2(395.2, 0)
 offset_right = 395.2
 offset_bottom = 75.0
 color = Color(0.36282945, 0.36282945, 0.36282945, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=102360974]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -54,10 +54,10 @@ theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer2" type="HBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer2" type="HBoxContainer" parent="MarginContainer" unique_id=244579046]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer2" unique_id=915899193]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 size_flags_vertical = 1
@@ -66,23 +66,23 @@ label_settings = SubResource("LabelSettings_55ab4")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer2" unique_id=11763185]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = -6
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer" unique_id=1881657179]
 layout_mode = 2
 text = "Uptown Saturday Night"
 label_settings = ExtResource("2_0hw33")
 
-[node name="SubTitleLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer"]
+[node name="SubTitleLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer" unique_id=1815236760]
 layout_mode = 2
 text = "(Dieselboy + Kaos Rock Remix)"
 label_settings = ExtResource("3_fu0w3")
 
-[node name="DifficultyNameLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer"]
+[node name="DifficultyNameLabel" type="Label" parent="MarginContainer/VBoxContainer2/VBoxContainer" unique_id=1833837207]
 visible = false
 layout_mode = 2
 text = "Difficulty"

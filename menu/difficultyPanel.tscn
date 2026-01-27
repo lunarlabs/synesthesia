@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://br0ofs7o2a64t"]
+[gd_scene format=3 uid="uid://br0ofs7o2a64t"]
 
 [ext_resource type="Texture2D" uid="uid://bowkaba7c5ewv" path="res://assets/textures/DifficultyButton.svg" id="1_e44yp"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_xcwxj"]
@@ -51,7 +51,7 @@ gradient = SubResource("Gradient_e44yp")
 fill_from = Vector2(0, 0.83760685)
 fill_to = Vector2(0, 0.115384616)
 
-[node name="Difficulty" type="Control"]
+[node name="Difficulty" type="Control" unique_id=227097391]
 self_modulate = Color(1, 1, 1, 0.6)
 custom_minimum_size = Vector2(190, 85)
 layout_mode = 3
@@ -60,20 +60,20 @@ offset_right = 190.0
 offset_bottom = 85.0
 script = ExtResource("2_gmsny")
 
-[node name="ButtonTexture" type="TextureRect" parent="."]
+[node name="ButtonTexture" type="TextureRect" parent="." unique_id=230335615]
 layout_mode = 0
 offset_right = 190.0
 offset_bottom = 85.0
 texture = ExtResource("1_e44yp")
 
-[node name="SelectedTexture" type="TextureRect" parent="."]
+[node name="SelectedTexture" type="TextureRect" parent="." unique_id=406709371]
 visible = false
 layout_mode = 0
 offset_right = 190.0
 offset_bottom = 85.0
 texture = ExtResource("3_3wmxv")
 
-[node name="DifficultyNameLabel" type="Label" parent="."]
+[node name="DifficultyNameLabel" type="Label" parent="." unique_id=1571801051]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -84,7 +84,7 @@ text = "Difficulty"
 label_settings = SubResource("LabelSettings_gmsny")
 horizontal_alignment = 1
 
-[node name="DifficultyValueLabel" type="Label" parent="."]
+[node name="DifficultyValueLabel" type="Label" parent="." unique_id=394152125]
 clip_children = 2
 layout_mode = 1
 anchors_preset = 12
@@ -99,7 +99,7 @@ label_settings = SubResource("LabelSettings_b8mxn")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CenterContainer" type="MarginContainer" parent="DifficultyValueLabel"]
+[node name="CenterContainer" type="MarginContainer" parent="DifficultyValueLabel" unique_id=382695143]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -108,7 +108,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="DifficultyValueLabel/CenterContainer"]
+[node name="TextureRect" type="TextureRect" parent="DifficultyValueLabel/CenterContainer" unique_id=748124170]
 material = SubResource("CanvasItemMaterial_xcwxj")
 layout_mode = 2
 texture = SubResource("GradientTexture2D_gmsny")

@@ -1,117 +1,118 @@
 [gd_scene format=3 uid="uid://djwb3hyb47wky"]
 
-[node name="Dock" type="VBoxContainer"]
+[node name="Dock" type="VBoxContainer" unique_id=1748172528]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SongFolderEdit" type="LineEdit" parent="."]
+[node name="SongFolderEdit" type="LineEdit" parent="." unique_id=277256026]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Song Folder"
 emoji_menu_enabled = false
 
-[node name="ButtonBar" type="HBoxContainer" parent="."]
+[node name="ButtonBar" type="HBoxContainer" parent="." unique_id=754185880]
 layout_mode = 2
 alignment = 2
 
-[node name="StatusLine" type="Label" parent="ButtonBar"]
+[node name="StatusLine" type="Label" parent="ButtonBar" unique_id=632079290]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FolderSelectButton" type="Button" parent="ButtonBar"]
+[node name="FolderSelectButton" type="Button" parent="ButtonBar" unique_id=778512906]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Select Folder"
 
-[node name="ImportButton" type="Button" parent="ButtonBar"]
+[node name="ImportButton" type="Button" parent="ButtonBar" unique_id=272813713]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Import"
 
-[node name="SaveButton" type="Button" parent="ButtonBar"]
+[node name="SaveButton" type="Button" parent="ButtonBar" unique_id=2137912240]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Save"
 
-[node name="WarningLabel" type="Label" parent="."]
+[node name="WarningLabel" type="Label" parent="." unique_id=216216169]
 unique_name_in_owner = true
 visible = false
 modulate = Color(1, 0.6, 0.2, 1)
 layout_mode = 2
 
-[node name="Main" type="HSplitContainer" parent="."]
+[node name="Main" type="HSplitContainer" parent="." unique_id=148554575]
 layout_mode = 2
+split_offsets = PackedInt32Array(3)
 split_offset = 3
 
-[node name="VBoxContainer" type="GridContainer" parent="Main"]
+[node name="VBoxContainer" type="GridContainer" parent="Main" unique_id=1734691779]
 layout_mode = 2
 columns = 2
 
-[node name="SongTitleTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="SongTitleTitle" type="Label" parent="Main/VBoxContainer" unique_id=146691121]
 layout_mode = 2
 text = "Title"
 
-[node name="SongTitleEntry" type="LineEdit" parent="Main/VBoxContainer"]
+[node name="SongTitleEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=1931990774]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 editable = false
 
-[node name="LongTitleTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="LongTitleTitle" type="Label" parent="Main/VBoxContainer" unique_id=1921052507]
 layout_mode = 2
 text = "Title (long)"
 
-[node name="LongTitleEntry" type="LineEdit" parent="Main/VBoxContainer"]
+[node name="LongTitleEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=1706104060]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="ArtistTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="ArtistTitle" type="Label" parent="Main/VBoxContainer" unique_id=1289313024]
 layout_mode = 2
 text = "Artist"
 
-[node name="ArtistEntry" type="LineEdit" parent="Main/VBoxContainer"]
+[node name="ArtistEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=1592999354]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="GenreTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="GenreTitle" type="Label" parent="Main/VBoxContainer" unique_id=1739484777]
 layout_mode = 2
 text = "Genre"
 
-[node name="GenreEntry" type="LineEdit" parent="Main/VBoxContainer"]
+[node name="GenreEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=338506969]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="DescTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="DescTitle" type="Label" parent="Main/VBoxContainer" unique_id=2013257309]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Description"
 
-[node name="DescEntry" type="TextEdit" parent="Main/VBoxContainer"]
+[node name="DescEntry" type="TextEdit" parent="Main/VBoxContainer" unique_id=1549461538]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 editable = false
 wrap_mode = 1
 
-[node name="FixedBPMTitle" type="CheckBox" parent="Main/VBoxContainer"]
+[node name="FixedBPMTitle" type="CheckBox" parent="Main/VBoxContainer" unique_id=1505731906]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Fixed BPM"
 
-[node name="FixedBPMEntry" type="SpinBox" parent="Main/VBoxContainer"]
+[node name="FixedBPMEntry" type="SpinBox" parent="Main/VBoxContainer" unique_id=112698129]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 60.0
@@ -119,21 +120,21 @@ max_value = 400.0
 value = 120.0
 editable = false
 
-[node name="IntroMeasuresTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="IntroMeasuresTitle" type="Label" parent="Main/VBoxContainer" unique_id=536048153]
 layout_mode = 2
 text = "Intro Measures"
 
-[node name="IntroMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer"]
+[node name="IntroMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer" unique_id=228250224]
 unique_name_in_owner = true
 layout_mode = 2
 value = 4.0
 editable = false
 
-[node name="PlayableMeasuresTitle" type="Label" parent="Main/VBoxContainer"]
+[node name="PlayableMeasuresTitle" type="Label" parent="Main/VBoxContainer" unique_id=1409540803]
 layout_mode = 2
 text = "Playable Measures"
 
-[node name="PlayableMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer"]
+[node name="PlayableMeasuresEntry" type="SpinBox" parent="Main/VBoxContainer" unique_id=1871257278]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = 1.0
@@ -141,98 +142,98 @@ max_value = 300.0
 value = 100.0
 editable = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Main"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Main" unique_id=936865491]
 layout_mode = 2
 
-[node name="InstrumentEditor" type="VBoxContainer" parent="Main/HBoxContainer"]
+[node name="InstrumentEditor" type="VBoxContainer" parent="Main/HBoxContainer" unique_id=1542762436]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="InstrumentHeader" type="HBoxContainer" parent="Main/HBoxContainer/InstrumentEditor"]
+[node name="InstrumentHeader" type="HBoxContainer" parent="Main/HBoxContainer/InstrumentEditor" unique_id=1237373422]
 layout_mode = 2
 
-[node name="InstrumentTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+[node name="InstrumentTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader" unique_id=443057829]
 layout_mode = 2
 text = "Tracks"
 
-[node name="AddTrackButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+[node name="AddTrackButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader" unique_id=581388715]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Add track"
 disabled = true
 text = "+"
 
-[node name="ClickTrackTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+[node name="ClickTrackTitle" type="Label" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader" unique_id=2102972426]
 layout_mode = 2
 text = "Click Track:"
 
-[node name="ClickTrackEntry" type="LineEdit" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+[node name="ClickTrackEntry" type="LineEdit" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader" unique_id=232924505]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
 
-[node name="ClickTrackBrowseButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader"]
+[node name="ClickTrackBrowseButton" type="Button" parent="Main/HBoxContainer/InstrumentEditor/InstrumentHeader" unique_id=1953992062]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Browse..."
 
-[node name="TrackScroll" type="ScrollContainer" parent="Main/HBoxContainer/InstrumentEditor"]
+[node name="TrackScroll" type="ScrollContainer" parent="Main/HBoxContainer/InstrumentEditor" unique_id=1441800318]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TrackList" type="VBoxContainer" parent="Main/HBoxContainer/InstrumentEditor/TrackScroll"]
+[node name="TrackList" type="VBoxContainer" parent="Main/HBoxContainer/InstrumentEditor/TrackScroll" unique_id=10126264]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CheckpointEditor" type="VBoxContainer" parent="Main/HBoxContainer"]
+[node name="CheckpointEditor" type="VBoxContainer" parent="Main/HBoxContainer" unique_id=988080161]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 
-[node name="CheckpointHeader" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor"]
+[node name="CheckpointHeader" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor" unique_id=1781588851]
 layout_mode = 2
 
-[node name="CheckpointTitle" type="Label" parent="Main/HBoxContainer/CheckpointEditor/CheckpointHeader"]
+[node name="CheckpointTitle" type="Label" parent="Main/HBoxContainer/CheckpointEditor/CheckpointHeader" unique_id=611650992]
 layout_mode = 2
 text = "Checkpoints"
 
-[node name="CheckpointAddBox" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor"]
+[node name="CheckpointAddBox" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor" unique_id=1333877877]
 layout_mode = 2
 
-[node name="CheckpointSpin" type="SpinBox" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox"]
+[node name="CheckpointSpin" type="SpinBox" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox" unique_id=1344006476]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 500.0
 value = 4.0
 editable = false
 
-[node name="AddCheckpointButton" type="Button" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox"]
+[node name="AddCheckpointButton" type="Button" parent="Main/HBoxContainer/CheckpointEditor/CheckpointAddBox" unique_id=551868784]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Add"
 
-[node name="CheckpointList" type="ItemList" parent="Main/HBoxContainer/CheckpointEditor"]
+[node name="CheckpointList" type="ItemList" parent="Main/HBoxContainer/CheckpointEditor" unique_id=561123252]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SongDirDialog" type="FileDialog" parent="."]
+[node name="SongDirDialog" type="FileDialog" parent="." unique_id=1619022146]
 unique_name_in_owner = true
 oversampling_override = 1.0
-title = "Select Song Directory"
+title = "Open a Directory"
 initial_position = 2
 size = Vector2i(1000, 500)
 file_mode = 2
 display_mode = 1
 root_subfolder = "song"
 
-[node name="AudioFileDialog" type="FileDialog" parent="."]
+[node name="AudioFileDialog" type="FileDialog" parent="." unique_id=1061102641]
 unique_name_in_owner = true
 oversampling_override = 1.0
 title = "Open a File"

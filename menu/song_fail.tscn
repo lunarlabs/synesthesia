@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://xt6k04euw0of"]
+[gd_scene format=3 uid="uid://xt6k04euw0of"]
 
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_iwvo3"]
 [ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="2_4aqx1"]
@@ -125,7 +125,7 @@ font_size = 36
 [sub_resource type="LabelSettings" id="LabelSettings_dr1j0"]
 font_size = 36
 
-[node name="SongFail" type="Control"]
+[node name="SongFail" type="Control" unique_id=661271327]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -133,7 +133,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=124378052]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -143,7 +143,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.07594267, 0.060513116, 0.0605148, 1)
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=665538065]
 clip_children = 2
 layout_mode = 1
 anchors_preset = 5
@@ -158,7 +158,7 @@ label_settings = SubResource("LabelSettings_q22q5")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="Label"]
+[node name="TextureRect" type="TextureRect" parent="Label" unique_id=2026076041]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -168,12 +168,10 @@ grow_vertical = 2
 texture = SubResource("GradientTexture2D_x8yts")
 expand_mode = 1
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_j8q48")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2060977193]
+libraries/ = SubResource("AnimationLibrary_j8q48")
 
-[node name="FailResult" type="HBoxContainer" parent="."]
+[node name="FailResult" type="HBoxContainer" parent="." unique_id=840241342]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
@@ -187,13 +185,13 @@ offset_bottom = 394.0
 grow_horizontal = 2
 alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="FailResult"]
+[node name="PanelContainer" type="PanelContainer" parent="FailResult" unique_id=781115609]
 layout_mode = 2
 
-[node name="LeftSide" type="VBoxContainer" parent="FailResult/PanelContainer"]
+[node name="LeftSide" type="VBoxContainer" parent="FailResult/PanelContainer" unique_id=150622548]
 layout_mode = 2
 
-[node name="SongTitleLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+[node name="SongTitleLabel" type="Label" parent="FailResult/PanelContainer/LeftSide" unique_id=986049119]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -201,74 +199,74 @@ text = "Song Title (long)"
 label_settings = SubResource("LabelSettings_xsivx")
 horizontal_alignment = 2
 
-[node name="ArtistLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+[node name="ArtistLabel" type="Label" parent="FailResult/PanelContainer/LeftSide" unique_id=2098394010]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Artist"
 horizontal_alignment = 2
 
-[node name="HSeparator" type="HSeparator" parent="FailResult/PanelContainer/LeftSide"]
+[node name="HSeparator" type="HSeparator" parent="FailResult/PanelContainer/LeftSide" unique_id=1860474889]
 layout_mode = 2
 
-[node name="DifficultyLabel" type="Label" parent="FailResult/PanelContainer/LeftSide"]
+[node name="DifficultyLabel" type="Label" parent="FailResult/PanelContainer/LeftSide" unique_id=168211424]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 text = "Intermediate"
 horizontal_alignment = 2
 
-[node name="HSeparator2" type="HSeparator" parent="FailResult/PanelContainer/LeftSide"]
+[node name="HSeparator2" type="HSeparator" parent="FailResult/PanelContainer/LeftSide" unique_id=1646427214]
 layout_mode = 2
 
-[node name="Control" type="Control" parent="FailResult/PanelContainer/LeftSide"]
+[node name="Control" type="Control" parent="FailResult/PanelContainer/LeftSide" unique_id=358793904]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ExitButton" type="Button" parent="FailResult/PanelContainer/LeftSide"]
+[node name="ExitButton" type="Button" parent="FailResult/PanelContainer/LeftSide" unique_id=1792329956]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Exit to Song Select"
 
-[node name="RestartButton" type="Button" parent="FailResult/PanelContainer/LeftSide"]
+[node name="RestartButton" type="Button" parent="FailResult/PanelContainer/LeftSide" unique_id=801731353]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Restart"
 
-[node name="RightSide" type="VBoxContainer" parent="FailResult"]
+[node name="RightSide" type="VBoxContainer" parent="FailResult" unique_id=341929369]
 layout_mode = 2
 alignment = 1
 
-[node name="TipContainer" type="PanelContainer" parent="FailResult/RightSide"]
+[node name="TipContainer" type="PanelContainer" parent="FailResult/RightSide" unique_id=1056228316]
 layout_mode = 2
 
-[node name="TipLabel" type="Label" parent="FailResult/RightSide/TipContainer"]
+[node name="TipLabel" type="Label" parent="FailResult/RightSide/TipContainer" unique_id=1012991638]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
 text = "If you want to practice a song, use the \"NO FAIL\" energy modifier."
 autowrap_mode = 2
 
-[node name="RightTop" type="HBoxContainer" parent="FailResult/RightSide"]
+[node name="RightTop" type="HBoxContainer" parent="FailResult/RightSide" unique_id=873696457]
 layout_mode = 2
 
-[node name="ScorePanel" type="PanelContainer" parent="FailResult/RightSide/RightTop"]
+[node name="ScorePanel" type="PanelContainer" parent="FailResult/RightSide/RightTop" unique_id=2068411002]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel" unique_id=1692533922]
 layout_mode = 2
 alignment = 1
 
-[node name="ScoreTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer"]
+[node name="ScoreTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer" unique_id=1906437800]
 layout_mode = 2
 text = "Score"
 uppercase = true
 
-[node name="ScoreLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer"]
+[node name="ScoreLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel/VBoxContainer" unique_id=2145073400]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -277,41 +275,41 @@ label_settings = SubResource("LabelSettings_h12c4")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="ScorePanel2" type="PanelContainer" parent="FailResult/RightSide/RightTop"]
+[node name="ScorePanel2" type="PanelContainer" parent="FailResult/RightSide/RightTop" unique_id=109610115]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="FailResult/RightSide/RightTop/ScorePanel2" unique_id=1535900634]
 layout_mode = 2
 alignment = 1
 
-[node name="RankTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer"]
+[node name="RankTitle" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer" unique_id=1586875270]
 layout_mode = 2
 text = "RATING"
 uppercase = true
 
-[node name="RankLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer"]
+[node name="RankLabel" type="Label" parent="FailResult/RightSide/RightTop/ScorePanel2/VBoxContainer" unique_id=926010161]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 text = "F"
 label_settings = SubResource("LabelSettings_dn0fs")
 horizontal_alignment = 1
 
-[node name="PrevScore" type="PanelContainer" parent="FailResult/RightSide"]
+[node name="PrevScore" type="PanelContainer" parent="FailResult/RightSide" unique_id=32755045]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore"]
+[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore" unique_id=2137881960]
 layout_mode = 2
 columns = 2
 
-[node name="PercentCompletedTitle" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer"]
+[node name="PercentCompletedTitle" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer" unique_id=680954331]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Song completion"
 uppercase = true
 
-[node name="PercentCompletedLabel" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer"]
+[node name="PercentCompletedLabel" type="Label" parent="FailResult/RightSide/PrevScore/GridContainer" unique_id=1502232401]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -320,20 +318,20 @@ label_settings = SubResource("LabelSettings_qysm3")
 horizontal_alignment = 2
 uppercase = true
 
-[node name="PrevScore2" type="PanelContainer" parent="FailResult/RightSide"]
+[node name="PrevScore2" type="PanelContainer" parent="FailResult/RightSide" unique_id=749165368]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore2"]
+[node name="GridContainer" type="GridContainer" parent="FailResult/RightSide/PrevScore2" unique_id=1168806246]
 layout_mode = 2
 columns = 2
 
-[node name="StreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="StreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=1702213384]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Longest streak:"
 uppercase = true
 
-[node name="StreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="StreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=1171124194]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -342,13 +340,13 @@ label_settings = SubResource("LabelSettings_dr1j0")
 horizontal_alignment = 2
 uppercase = true
 
-[node name="StreakBreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="StreakBreakTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=299158899]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Streak breaks:"
 uppercase = true
 
-[node name="StreakBreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="StreakBreakLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=796321567]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -356,13 +354,13 @@ text = "0"
 horizontal_alignment = 2
 uppercase = true
 
-[node name="AccuracyTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="AccuracyTitle" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=1365129920]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Phrase accuracy:"
 uppercase = true
 
-[node name="AccuracyLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer"]
+[node name="AccuracyLabel" type="Label" parent="FailResult/RightSide/PrevScore2/GridContainer" unique_id=1833037034]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8

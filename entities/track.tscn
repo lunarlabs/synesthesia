@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://l1yr652soejg"]
+[gd_scene format=3 uid="uid://l1yr652soejg"]
 
 [ext_resource type="Script" uid="uid://dmuke66cpgwmx" path="res://entities/track.gd" id="1_q435s"]
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
@@ -54,18 +54,18 @@ subdivide_depth = 16
 transform_format = 1
 mesh = SubResource("BoxMesh_tmkqs")
 
-[node name="Track" type="Node3D"]
+[node name="Track" type="Node3D" unique_id=1756052907]
 script = ExtResource("1_q435s")
 
-[node name="Music" type="AudioStreamPlayer" parent="."]
+[node name="Music" type="AudioStreamPlayer" parent="." unique_id=1524845732]
 bus = &"Tracks"
 
-[node name="MissSound" type="AudioStreamPlayer" parent="."]
+[node name="MissSound" type="AudioStreamPlayer" parent="." unique_id=411987495]
 stream = ExtResource("2_p7e7j")
 volume_db = -5.0
 bus = &"Interface"
 
-[node name="Marker" type="MeshInstance3D" parent="."]
+[node name="Marker" type="MeshInstance3D" parent="." unique_id=231201908]
 transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 1.2, 0)
 visibility_range_begin = 4.0
 visibility_range_begin_margin = 1.0
@@ -74,7 +74,7 @@ visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 mesh = SubResource("PrismMesh_p7e7j")
 
-[node name="Whoosh" type="GPUParticles3D" parent="."]
+[node name="Whoosh" type="GPUParticles3D" parent="." unique_id=1927056625]
 emitting = false
 amount = 5000
 lifetime = 0.5
@@ -85,6 +85,6 @@ visibility_aabb = AABB(-2.393, -1, -128, 4.768, 2, 128)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")
 draw_pass_1 = SubResource("QuadMesh_24ful")
 
-[node name="MultiMesh" type="MultiMeshInstance3D" parent="."]
+[node name="MultiMesh" type="MultiMeshInstance3D" parent="." unique_id=1679081151]
 visible = false
 multimesh = SubResource("MultiMesh_3q0ve")

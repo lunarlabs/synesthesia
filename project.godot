@@ -12,14 +12,14 @@ config_version=5
 
 config/name="Synesthesia Road"
 run/main_scene="uid://cj5qbqo5phlu1"
-config/features=PackedStringArray("4.5", "Mobile")
+config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
 
 SongCatalog="*res://menu/song_catalog.gd"
 ChunkManager="*res://entities/chunk_manager.gd"
-DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
+DebugMenu="*uid://cggqb75a8w8r"
 SessionManager="*res://entities/managers/session_manager.gd"
 
 [display]
