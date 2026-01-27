@@ -2,7 +2,6 @@ extends Node
 
 var _song_catalog: Array = []
 var _difficulty_catalog: Array = []
-var _loaded_data: Array = []
 var additions: Array = []
 
 const CATALOG_JSON_PATH = "user://song_catalog.json"

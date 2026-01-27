@@ -11,22 +11,22 @@ enum FinishMode {
 
 func display(
 	finish_type: FinishMode,
-	result: SessionManager.SongResult, 
+	result: SessionManager.SongResult,
 	prev: SessionManager.SongResult,
 ):
 	var lbl_clear_type_prev = %ClearTypeBox.get_node("Previous")
-	var lbl_clear_type_new  = %ClearTypeBox.get_node("New")
+	var lbl_clear_type_new = %ClearTypeBox.get_node("New")
 	var lbl_rank_prev = %RankBox.get_node("Previous")
-	var lbl_rank_new  = %RankBox.get_node("New")
+	var lbl_rank_new = %RankBox.get_node("New")
 	var lbl_completion = %CompletionBox.get_node("Value")
 	var lbl_score_prev = %ScorePanel.get_node("%Previous")
-	var lbl_score_new  = %ScorePanel.get_node("%New")
+	var lbl_score_new = %ScorePanel.get_node("%New")
 	var lbl_score_diff = %ScorePanel.get_node("%Difference")
 	var lbl_streak_prev = %StreakPanel.get_node("%Previous")
-	var lbl_streak_new  = %StreakPanel.get_node("%New")
+	var lbl_streak_new = %StreakPanel.get_node("%New")
 	var lbl_streak_diff = %StreakPanel.get_node("%Difference")
 	var lbl_acc_prev = %AccuracyPanel.get_node("%Previous")
-	var lbl_acc_new  = %AccuracyPanel.get_node("%New")
+	var lbl_acc_new = %AccuracyPanel.get_node("%New")
 	var lbl_acc_diff = %AccuracyPanel.get_node("%Difference")
 	if not prev:
 		prev = SessionManager.SongResult.new()
@@ -56,13 +56,17 @@ func display(
 	match finish_type:
 		FinishMode.COMPLETE:
 			%CompletionBox.hide()
+			%RankPanel.show()
+			%RankBox.show()
 		FinishMode.FAILED:
+			%CompletionBox.show()
 			%RankPanel.hide()
 			%RankBox.hide()
 		FinishMode.PRACTICE:
 			%RankPanel.hide()
 			%RankBox.hide()
 			%ClearTypeBox.hide()
+			%RestartButton.hide()
 		FinishMode.AUTOBLAST:
 			$RightSide.hide()
 			%RestartButton.hide()

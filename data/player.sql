@@ -79,11 +79,26 @@ INSERT INTO "checkpoint_modifiers" ("checkpoint_name")
 VALUES ('Normal'), ('Disabled'), ('Barrier 2x'), ('Barrier 3x'), ('Barrier 4x');
 
 INSERT INTO "timing_modifiers" ("timing_name")
-VALUES ('Normal'), ('Loose'), ('Strict');
+VALUES ('Loose'), ('Normal'), ('Strict');
 
 INSERT INTO "track_resets" ("reset_len", "reset_name")
 VALUES (12, 'Normal'), (10, 'Fast Reset 1'), (8, 'Fast Reset 2');
 
 CREATE INDEX "idx_player_pb" ON "player_records" ("midi_hash", "difficulty");
+
+DROP VIEW IF EXISTS "v_bests";
+CREATE VIEW "v_bests" AS
+SELECT 
+	"midi_hash",
+	"difficulty",
+	MAX("status") AS "max_status",
+	MAX("timing_modifier") AS "max_timing",
+	MAX("rank") AS "max_rank",
+	MAX("score") AS "best_score",
+	MAX("percent_complete") AS "furthest_complete",
+	MAX("capture_accuracy") AS "best_accuracy",
+	MAX("max_streak") AS "best_streak"
+FROM "player_records"
+GROUP BY midi_hash, difficulty;
 
 COMMIT;

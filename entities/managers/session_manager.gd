@@ -222,6 +222,7 @@ class SongResult:
 		return result
 
 func record_song_result(midi_hash: String, song_stats: SongResult):
+	const TIMING_ORDER = [2, 1, 3]
 	var insert_row := {
 		"midi_hash" = midi_hash,
 		"difficulty" = song_stats.difficulty,
@@ -231,7 +232,7 @@ func record_song_result(midi_hash: String, song_stats: SongResult):
 		"streak_breaks" = song_stats.streak_breaks,
 		"energy_modifier" = song_stats.energy_modifier + 1, # the SQL records are 1-based
 		"checkpoint_modifier" = song_stats.checkpoint_modifier + 1,
-		"timing_modifier" = song_stats.timing_modifier + 1,
+		"timing_modifier" = TIMING_ORDER[song_stats.timing_modifier],
 		"track_reset" = song_stats.fast_track_reset,
 		"max_streak" = song_stats.max_streak,
 	}
@@ -254,6 +255,39 @@ func record_song_result(midi_hash: String, song_stats: SongResult):
 		printerr(SessionManager.player_db.error_message)
 
 @warning_ignore("unused_parameter")
-func get_song_best_record(midi_hash: String, difficulty:int) -> SongResult:
-	return SongResult.new()
+func get_song_best_record(midi_hash: String, difficulty: int) -> SongResult:
+	var result = SongResult.new()
+	var success = SessionManager.player_db.query_with_bindings("SELECT * FROM v_bests WHERE midi_hash = ? AND difficulty = ?", [midi_hash, difficulty])
+	if not success:
+		printerr(SessionManager.player_db.error_message)
+		return result
+	if SessionManager.player_db.query_result.size() == 0:
+		return result
+	result.score = SessionManager.player_db.query_result[0]["best_score"]
+	result.percent_completed = SessionManager.player_db.query_result[0]["furthest_complete"]
+	if player_db.query_result[0]["max_rank"]:
+		result.rank = SessionManager.player_db.query_result[0]["max_rank"]
+	result.max_streak = SessionManager.player_db.query_result[0]["best_streak"]
+	result.accuracy = SessionManager.player_db.query_result[0]["best_accuracy"]
+	
+	match SessionManager.player_db.query_result[0]["max_status"]:
+		1:
+			result.clear_state = SongResult.ClearState.NOT_PLAYED
+		2:
+			result.clear_state = SongResult.ClearState.FAILED
+		3:
+			match SessionManager.player_db.query_result[0]["max_timing"]:
+				1:
+					result.clear_state = SongResult.ClearState.LOOSE_CLEAR
+				2:
+					result.clear_state = SongResult.ClearState.CLEAR
+				3:
+					result.clear_state = SongResult.ClearState.STRICT_CLEAR
+				_:
+					result.clear_state = SongResult.ClearState.NOT_PLAYED
+		4:
+			result.clear_state = SongResult.ClearState.PERFECT_RUN
+		_:
+			result.clear_state = SongResult.ClearState.NOT_PLAYED
+	return result
 #endregion
