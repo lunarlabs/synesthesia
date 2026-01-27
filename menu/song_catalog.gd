@@ -1,18 +1,18 @@
 extends Node
 
-var _song_catalog: Array[SongEntry] = []
-var _loaded_data: Array = []
+var _song_catalog: Array = []
+var _difficulty_catalog: Array = []
 var additions: Array = []
 
 const CATALOG_JSON_PATH = "user://song_catalog.json"
 const DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
 const SONG_DIRECTORY_PATH = "res://song/"
-const DIFFICULTY_LEVELS = [96, 102, 108, 114]  # MIDI note offsets for Easy, Medium, Hard, Expert
+const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 const DIFFICULTY_NAMES = {
-	96: "Easy",
-	102: "Medium",
-	108: "Hard",
-	114: "Expert"
+	96: "Beginner",
+	102: "Basic",
+	108: "Advanced",
+	114: "Expert",
 }
 const INSTRUMENT_NAMES = [
 	"drums",
@@ -28,36 +28,60 @@ const QUANT_FACTOR_EIGHTH = 1.1
 const QUANT_FACTOR_SIXTEENTH = 1.3
 const QUANT_FACTOR_THIRTY_SECOND = 1.5
 const BASE_SPEED_WEIGHT = 1.0
-const JACK_SPEED_THRESHOLD = 0.2  # seconds between notes to consider "jacking"
-const PATTERN_WEIGHT_JACK = 2.5   # Penalty for fast repeated notes
-const PATTERN_WEIGHT_JUMP = 1.5   # Penalty for Lane 0 -> Lane 2
-const PATTERN_WEIGHT_EASY = 0.8   # Bonus for slow repeated notes
-const ARTICLE_LIST = ["a ", "an ", "the "]
+const JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
+const PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
+const PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
+const PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
+
+#region Query Constants
+const BASE_QUERY = """SELECT 
+	folder_id, 
+	title, 
+	sub_title, 
+	artist, 
+	genre, 
+	bpm, 
+	available_difficulties, 
+	source_name, 
+	files_ok, 
+	resource_hash,
+	midi_hash
+FROM v_song_select"""
+
+const DIFFICULTY_QUERY = """SELECT 
+	folder_id, 
+	title, 
+	sub_title, 
+	artist, 
+	genre, 
+	bpm, 
+	difficulty_offset,
+	difficulty_rating, 
+	source_name, 
+	files_ok, 
+	resource_hash,
+	midi_hash
+FROM v_full_library"""
+
+const FILTER_FOLDER = """WHERE folder_id = ?"""
+const FILTER_DIFFICULTY = """WHERE difficulty_offset = ?"""
+const FILTER_FOLDER_DIFFICULTY = """WHERE folder_id = ? AND difficulty_offset = ?"""
+const FILTER_SOURCE = """WHERE source_name = ?"""
+
+const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC"
+const BPM_ORDER_BY = "ORDER BY bpm ASC"
+const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating DESC"
+#endregion
 
 var is_initialized: bool:
 	get:
 		return _song_catalog.size() > 0
-var catalog:
+var song_catalog:
 	get:
 		return _song_catalog
-
-# Represents a single song entry in the catalog.
-class SongEntry:
-	var folder: String
-	var file_path: String
-	var title: String
-	var long_title: String
-	var artist: String
-	var genre: String
-	var bpm: float
-	var available_difficulties: Array
-	var instruments: PackedStringArray
-	var note_counts: Dictionary[int, int]
-	var note_densities: Dictionary[int, float]
-	var difficulty_ratings: Dictionary[int, float]
-	var detailed_difficulty_info: Dictionary[int, DetailedDifficultyInfo]
-	var files_valid: bool
-	var error_message: String = ""
+var difficulty_catalog:
+	get:
+		return _difficulty_catalog
 
 # For each difficulty in each song, detailed info. Array index is instrument track index.
 class DetailedDifficultyInfo:
@@ -67,276 +91,8 @@ class DetailedDifficultyInfo:
 	var track_avg_raw_difficulties: PackedFloat32Array
 	var avg_raw_difficulty: float
 
-static func _entry_to_json(entry: SongEntry) -> Dictionary:
-	var dict := {
-		"folder": entry.folder,
-		"file_path": entry.file_path,
-		"title": entry.title,
-		"long_title": entry.long_title,
-		"artist": entry.artist,
-		"genre": entry.genre,
-		"bpm": entry.bpm,
-		"instruments": Array(entry.instruments),
-		"available_difficulties": entry.available_difficulties,
-		"note_counts": {},
-		"note_densities": {},
-		"difficulty_ratings": {},
-		"files_valid": entry.files_valid,
-		"error_message": entry.error_message
-	}
-
-	for diff in entry.note_counts.keys():
-		dict["note_counts"][str(diff)] = entry.note_counts[diff]
-
-	for diff in entry.note_densities.keys():
-		dict["note_densities"][str(diff)] = entry.note_densities[diff]
-
-	for diff in entry.difficulty_ratings.keys():
-		dict["difficulty_ratings"][str(diff)] = entry.difficulty_ratings[diff]
-
-	return dict
-
-static func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
-	assert(ddi.track_note_counts.size() > 0)
-	assert(ddi.track_avg_raw_difficulties.size() == ddi.track_note_counts.size())
-
-	var dict := {
-		"track_note_counts": Array(ddi.track_note_counts),
-		"measure_note_counts": [],
-		"phrase_raw_difficulties": [],
-		"track_avg_raw_difficulties": Array(ddi.track_avg_raw_difficulties),
-		"avg_raw_difficulty": ddi.avg_raw_difficulty
-	}
-
-	for i in range(ddi.measure_note_counts.size()):
-		dict["measure_note_counts"].append(
-			Array(ddi.measure_note_counts[i])
-		)
-
-	for i in range(ddi.phrase_raw_difficulties.size()):
-		dict["phrase_raw_difficulties"].append(
-			Array(ddi.phrase_raw_difficulties[i])
-		)
-
-	return dict
-
-static func _entry_from_json(dict: Dictionary) -> SongEntry:
-	var entry := SongEntry.new()
-
-	entry.folder = dict.get("folder", "")
-	entry.file_path = dict.get("file_path", "")
-	entry.title = dict.get("title", "")
-	entry.long_title = dict.get("long_title", "")
-	entry.artist = dict.get("artist", "")
-	entry.genre = dict.get("genre", "")
-	entry.bpm = dict.get("bpm", 0.0)
-	entry.instruments = dict.get("instruments", [])
-	entry.available_difficulties = []
-
-	entry.note_counts = {}
-	entry.note_densities = {}
-	entry.difficulty_ratings = {}
-
-	entry.files_valid = dict.get("files_valid", false)
-	entry.error_message = dict.get("error_message", "")
-
-	var ad = dict.get("available_difficulties", [])
-	for diff in ad:
-		entry.available_difficulties.append(int(diff))
-
-	var nc = dict.get("note_counts", {})
-	for diff_str in nc.keys():
-		entry.note_counts[int(diff_str)] = int(nc[diff_str])
-
-	var nd = dict.get("note_densities", {})
-	for diff_str in nd.keys():
-		entry.note_densities[int(diff_str)] = float(nd[diff_str])
-
-	var dr = dict.get("difficulty_ratings", {})
-	for diff_str in dr.keys():
-		entry.difficulty_ratings[int(diff_str)] = dr[diff_str]
-
-	return entry
-
-static func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
-	var ddi := DetailedDifficultyInfo.new()
-
-	# Track note counts
-	var tnc := PackedInt32Array()
-	for v in dict.get("track_note_counts", []):
-		tnc.append(int(v))
-	ddi.track_note_counts = tnc
-
-	# Measure note counts
-	ddi.measure_note_counts = []
-	for measure_array in dict.get("measure_note_counts", []):
-		var packed := PackedInt32Array()
-		for v in measure_array:
-			packed.append(int(v))
-		ddi.measure_note_counts.append(packed)
-
-	# Phrase raw difficulties
-	ddi.phrase_raw_difficulties = []
-	for phrase_array in dict.get("phrase_raw_difficulties", []):
-		var packed := PackedFloat32Array()
-		for v in phrase_array:
-			packed.append(float(v))
-		ddi.phrase_raw_difficulties.append(packed)
-
-	# Track average raw difficulties
-	var tard := PackedFloat32Array()
-	for v in dict.get("track_avg_raw_difficulties", []):
-		tard.append(float(v))
-	ddi.track_avg_raw_difficulties = tard
-
-	# Overall average
-	ddi.avg_raw_difficulty = float(dict.get("avg_raw_difficulty", 0.0))
-
-	return ddi
-
-func save_entries_to_json() -> Error:
-	var file := FileAccess.open(CATALOG_JSON_PATH, FileAccess.WRITE)
-	if file == null:
-		var err := FileAccess.get_open_error()
-		push_error("Failed to open file for writing: %s (err %d)" % [CATALOG_JSON_PATH, err])
-		return err
-
-	var entries_array: Array = []
-
-	# Explicitly handle catalog type
-	for entry in _song_catalog:
-		entries_array.append(_entry_to_json(entry))
-
-	var json_dict := {
-		"song_catalog": entries_array
-	}
-
-	var json_text := JSON.stringify(json_dict, "\t")
-	file.store_string(json_text)
-	file.close()
-
-	return OK
-
-func save_difficulty_details_to_json() -> Error:
-	var file := FileAccess.open(DIFFICULTY_DETAILS_JSON_PATH, FileAccess.WRITE)
-	if file == null:
-		var err := FileAccess.get_open_error()
-		push_error("Failed to open file for writing: %s (err %d)" % [DIFFICULTY_DETAILS_JSON_PATH, err])
-		return err
-
-	var details_dict: Dictionary = {}
-
-	for entry in _song_catalog:
-		var diff_details: Dictionary = {}
-
-		for diff in entry.detailed_difficulty_info.keys():
-			diff_details[str(diff)] = _difficulty_info_to_json(
-				entry.detailed_difficulty_info[diff]
-			)
-
-		# file_path used as stable song identifier
-		details_dict[entry.file_path] = diff_details
-
-	var json_text := JSON.stringify(details_dict, "\t")
-	file.store_string(json_text)
-	file.close()
-
-	return OK
-
-func load_entries_from_json() -> Error:
-	if not FileAccess.file_exists(CATALOG_JSON_PATH):
-		push_error("Song catalog JSON not found: %s" % CATALOG_JSON_PATH)
-		return ERR_FILE_NOT_FOUND
-
-	var file := FileAccess.open(CATALOG_JSON_PATH, FileAccess.READ)
-	if file == null:
-		var err := FileAccess.get_open_error()
-		push_error("Failed to open song catalog JSON: %s (err %d)" % [CATALOG_JSON_PATH, err])
-		return err
-
-	var json_text := file.get_as_text()
-	file.close()
-
-	var parsed = JSON.parse_string(json_text)
-	if typeof(parsed) != TYPE_DICTIONARY:
-		push_error("Invalid song catalog JSON format")
-		return ERR_PARSE_ERROR
-
-	var catalog_array = parsed.get("song_catalog", [])
-	if typeof(catalog_array) != TYPE_ARRAY:
-		push_error("song_catalog is not an array")
-		return ERR_PARSE_ERROR
-
-	_song_catalog.clear()
-
-	for entry_dict in catalog_array:
-		if typeof(entry_dict) != TYPE_DICTIONARY:
-			continue
-
-		var entry := _entry_from_json(entry_dict)
-		_song_catalog.append(entry)
-
-	return OK
-
-func load_difficulty_details_from_json() -> Error:
-	if not FileAccess.file_exists(DIFFICULTY_DETAILS_JSON_PATH):
-		push_error("Difficulty details JSON not found: %s" % DIFFICULTY_DETAILS_JSON_PATH)
-		return ERR_FILE_NOT_FOUND
-
-	var file := FileAccess.open(DIFFICULTY_DETAILS_JSON_PATH, FileAccess.READ)
-	if file == null:
-		var err := FileAccess.get_open_error()
-		push_error("Failed to open difficulty details JSON: %s (err %d)" % [DIFFICULTY_DETAILS_JSON_PATH, err])
-		return err
-
-	var json_text := file.get_as_text()
-	file.close()
-
-	var parsed = JSON.parse_string(json_text)
-	if typeof(parsed) != TYPE_DICTIONARY:
-		push_error("Invalid difficulty details JSON format")
-		return ERR_PARSE_ERROR
-
-	# Build lookup table by file_path
-	var entry_by_path: Dictionary = {}
-	for entry in _song_catalog:
-		entry_by_path[entry.file_path] = entry
-		entry.detailed_difficulty_info.clear()
-
-	# Attach difficulty info
-	for file_path in parsed.keys():
-		if not entry_by_path.has(file_path):
-			push_warning("Difficulty data for unknown song: %s" % file_path)
-			continue
-
-		var entry: SongEntry = entry_by_path[file_path]
-		var diff_dict = parsed[file_path]
-
-		if typeof(diff_dict) != TYPE_DICTIONARY:
-			continue
-
-		for diff_str in diff_dict.keys():
-			var diff := int(diff_str)
-			var ddi_dict = diff_dict[diff_str]
-
-			if typeof(ddi_dict) != TYPE_DICTIONARY:
-				continue
-
-			var ddi := _difficulty_info_from_json(ddi_dict)
-			entry.detailed_difficulty_info[diff] = ddi
-
-	return OK
-
+#region Ingest
 func scan_for_songs(rescan := false):
-	var _known_folders = []
-	if not rescan:
-		load_entries_from_json()
-		for i in _song_catalog.size():
-			var entry = _song_catalog[i] as SongEntry
-			_known_folders.append(entry.folder)
-	else:
-		_song_catalog.clear()
-	_loaded_data = []
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
 		push_error("Failed to open song directory.")
@@ -344,152 +100,156 @@ func scan_for_songs(rescan := false):
 
 	dir.list_dir_begin()
 	var folder_name = dir.get_next()
-
 	while folder_name != "":
 		if dir.current_is_dir() and not folder_name.begins_with("."):
 			print("Found song folder: %s" % folder_name)
-			var song_resource_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".tres"
-			if FileAccess.file_exists(song_resource_path):
-				print("Loading SongData from: %s" % song_resource_path)
-				var song_data = ResourceLoader.load(song_resource_path) as SongData
-				if song_data:
-					var midi_path
-					if not song_data.midi_file:
-						print("Null value in MIDI file field. Trying fallback...")
-						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
-					else:
-						midi_path = ResourceUID.ensure_path(song_data.midi_file)
-					if not FileAccess.file_exists(midi_path):
-						print("MIDI file doesn't exist: %s\nTrying fallback..." % midi_path)
-						midi_path = SONG_DIRECTORY_PATH + folder_name + "/" + folder_name + ".mid"
-					if FileAccess.file_exists(midi_path):
-						song_data.midi_file = midi_path
-						ResourceSaver.save(song_data)
-					else:
-						print("Fallback MIDI file doesn't exist, giving up on this one.")
-						folder_name = dir.get_next()
-						continue
-					if _known_folders.find(folder_name) == -1:
-						print("Loading MIDI data for song: %s" % song_resource_path)
-						var err = song_data.midi_error # this has the benefit of preloading the MIDI data before we go into the threads
-						if err:
-							print("Failed to load MIDI data for song: %s" % song_resource_path)
-							folder_name = dir.get_next()
-							continue
-						_loaded_data.append([folder_name, song_data])
-						print("Queued song for preprocessing: %s" % song_resource_path)
-					else:
-						print("Skipping known song: %s" % song_resource_path)
-				else:
-					print("Failed to load SongData resource at: %s" % song_resource_path)
-			else:
-				print("No resource file found at expected path: %s" % song_resource_path)
-				push_warning("Missing resource file for song in folder: %s" % folder_name)
+			process_song(folder_name, rescan)
 		folder_name = dir.get_next()
-
 	dir.list_dir_end()
-	if not _loaded_data.is_empty():
-		additions = []
-		additions.resize(_loaded_data.size())
-		var task_id = WorkerThreadPool.add_group_task(_process_song_data, _loaded_data.size())
-		print("Waiting for %d song processing tasks to complete..." % _loaded_data.size())
-		WorkerThreadPool.wait_for_group_task_completion(task_id)
-		_song_catalog.append_array(additions)
-		_song_catalog.sort_custom(_compare_song_titles)
-		save_difficulty_details_to_json()
-		save_entries_to_json()
-		print("additions done.")
-	return
+	if not SessionManager.library_db.query("%s %s;" % [BASE_QUERY, DEFAULT_ORDER_BY]):
+		printerr(SessionManager.library_db.error_message)
+	_song_catalog = SessionManager.library_db.query_result
 
-func _process_song_data(entry_idx: int):
-	var result := SongEntry.new()
-	var loaded = _loaded_data[entry_idx]
-	var folder_name: String = loaded[0]
-	var song_data: SongData = loaded[1]
-	print("Processing song: %s" % folder_name)
+func process_song(folder_name: String, force_rescan := false):
+	const SONGS_TABLE = "songs"
+	const DIFFICULTIES_TABLE = "difficulties"
+	const SONG_INSERT_VIEW = "v_song_upsert"
+	var db = SessionManager.library_db
 
-	result.folder = folder_name
-	result.file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
-	result.title = song_data.title
-	result.long_title = song_data.long_title
-	result.artist = song_data.artist
-	result.genre = song_data.genre
-	result.bpm = song_data.bpm
-	var instruments: Array[String]
-	var track_count = song_data.tracks.size()
-	for i in track_count:
-		instruments.append(INSTRUMENT_NAMES[song_data.tracks[i].instrument])
-	result.instruments = PackedStringArray(instruments)
-	var midi_track_indices = song_data.song_track_locations.values()
-	var difficulty_maps := {}
-	for i in DIFFICULTY_LEVELS:
-		var track_map: Array[Dictionary] = []
-		var total_note_count := 0
-		for track_idx in midi_track_indices:
-			var note_map = song_data.get_note_map_from_track(track_idx, i)
-			total_note_count += note_map.size()
-			track_map.append(note_map)
-		if total_note_count > 0:
-			difficulty_maps[i] = track_map
-			result.note_counts[i] = total_note_count
-			result.note_densities[i] = float(total_note_count) / float(song_data.total_measures)
-	result.available_difficulties = difficulty_maps.keys()
-
-	var detailed_diffs_info: Dictionary[int, DetailedDifficultyInfo] = {}
-	for diff in difficulty_maps.keys():
-		var ddi := DetailedDifficultyInfo.new()
-		ddi.track_note_counts.resize(track_count)
-		ddi.measure_note_counts.resize(track_count)
-		ddi.phrase_raw_difficulties.resize(track_count)
-		ddi.track_avg_raw_difficulties.resize(track_count)
-		for i in range(track_count):
-			var note_map = difficulty_maps[diff][i]
-			ddi.track_note_counts[i] = note_map.size()
-			var sorted_keys = note_map.keys()
-			sorted_keys.sort()
-			var measure_counts: PackedInt32Array = PackedInt32Array()
-			measure_counts.resize(song_data.total_measures)
-			for beat_pos in sorted_keys:
-				var measure_idx = int(floor(beat_pos / 4.0))
-				if measure_idx >= 0 and measure_idx < song_data.total_measures:
-					measure_counts[measure_idx] += 1
-			ddi.measure_note_counts[i] = measure_counts
-			var phrase_difficulties: PackedFloat32Array = PackedFloat32Array()
-			phrase_difficulties.resize(song_data.total_measures)
-			var track_raw_difficulty := 0.0
-			var phrase_map = _build_phrase_map_single_pass(note_map.keys())
-			for start_measure in phrase_map.keys():
-				if start_measure >= phrase_difficulties.size():
-					break
-				var note_indices = phrase_map[start_measure]
-				var raw_difficulty = _calculate_phrase_difficulty(
-					note_map,
-					sorted_keys,
-					note_indices,
-					song_data.seconds_per_beat)
-				phrase_difficulties[start_measure] = raw_difficulty
-				track_raw_difficulty += raw_difficulty
-			ddi.phrase_raw_difficulties[i] = phrase_difficulties
-			ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
-		# Average across all tracks
-		var total_avg := 0.0
-		for i in range(track_count):
-			total_avg += ddi.track_avg_raw_difficulties[i]
-		ddi.avg_raw_difficulty = total_avg / float(track_count)
-		result.difficulty_ratings[diff] = ddi.avg_raw_difficulty
-		detailed_diffs_info[diff] = ddi
+	# Handle song metadata first
+	var song_data = null
+	var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+	var resource_hash = null
+	var file_exists = FileAccess.file_exists(file_path)
+	if file_exists:
+		resource_hash = FileAccess.get_md5(file_path)
+	var condition_string = "folder_id = '%s'" % folder_name
+	var select_array: Array = db.select_rows(SONGS_TABLE, condition_string, ["resource_hash", "midi_hash"])
+	var result_is_empty := select_array.size() == 0
+	if force_rescan or result_is_empty or select_array[0]["resource_hash"] != resource_hash:
+		print("Processing song: %s" % folder_name)
+		var upsert_dict = {
+			"folder_id": folder_name,
+			"resource_hash": resource_hash,
+		}
+		if file_exists:
+			song_data = ResourceLoader.load(file_path) as SongData
+			upsert_dict.merge(_extract_songdata_meta(song_data))
+			db.insert_row(SONG_INSERT_VIEW, upsert_dict) # if the row exists, this will update it
+		else:
+			upsert_dict["files_ok"] = 0
+			upsert_dict["midi_hash"] = null
+			db.insert_row(SONGS_TABLE, upsert_dict)
 	
-	result.detailed_difficulty_info = detailed_diffs_info
-	result.files_valid = true
-	print("Finished processing song: %s" % folder_name)
-	additions[entry_idx] = result
+	if song_data:
+		var midi_hash = null
+		if song_data.midi_file:
+			midi_hash = FileAccess.get_md5(ResourceUID.ensure_path(song_data.midi_file))
+			if result_is_empty or midi_hash != select_array[0]["midi_hash"]:
+				var difficulty_rows = []
+				var midi_track_indices = song_data.song_track_locations.values()
+				for i in DIFFICULTY_LEVELS:
+					var track_map: Array[Dictionary] = []
+					var total_note_count := 0
+					for track_idx in midi_track_indices:
+						var note_map = song_data.get_note_map_from_track(track_idx, i)
+						total_note_count += note_map.size()
+						track_map.append(note_map)
+					if total_note_count > 0:
+						print("Processing difficulty: %s" % i)
+						var ddi: DetailedDifficultyInfo = _calculate_detailed_difficulty(track_map, song_data)
+						var row = {
+							"song_folder": folder_name,
+							"difficulty_offset": i,
+							"difficulty_rating": ddi.avg_raw_difficulty,
+							"details_json": JSON.stringify(_difficulty_info_to_json(ddi))
+						}
+						difficulty_rows.append(row)
+				if not difficulty_rows.is_empty():
+					db.insert_rows(DIFFICULTIES_TABLE, difficulty_rows)
+
+
+## Creates a dictionary of song metadata for INSERT or UPDATE statements.
+## Does not create difficulty entries.
+func _extract_songdata_meta(song_data: SongData) -> Dictionary:
+	var files_ok := false
+	var result := {
+		"title": song_data.title,
+		"sub_title": song_data.sub_title,
+		"artist": song_data.artist,
+		"genre": song_data.genre,
+		"bpm": song_data.bpm,
+		"desc": song_data.description,
+		"source_name": song_data.source,
+		}
+	var midi_path = ResourceUID.ensure_path(song_data.midi_file)
+	if not FileAccess.file_exists(midi_path):
+		result["files_ok"] = 0
+		result["midi_hash"] = null
+		return result
+	result["midi_hash"] = FileAccess.get_md5(midi_path)
+	if song_data.tracks.size() == 0:
+		result["files_ok"] = 0
+		return result
+	files_ok = FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track))
+	var track_count := song_data.tracks.size()
+	var inst_layout := ""
+	for i in track_count:
+		var track = song_data.tracks[i]
+		inst_layout += INSTRUMENT_NAMES[track.instrument][0]
+		files_ok = files_ok and FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file))
+	result["inst_layout"] = inst_layout
+	result["files_ok"] = files_ok
+	return result
+
+func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> DetailedDifficultyInfo:
+	var ddi := DetailedDifficultyInfo.new()
+	var track_count = track_maps.size()
+	ddi.track_note_counts.resize(track_count)
+	ddi.measure_note_counts.resize(track_count)
+	ddi.phrase_raw_difficulties.resize(track_count)
+	ddi.track_avg_raw_difficulties.resize(track_count)
+	for i in range(track_count):
+		var note_map = track_maps[i]
+		ddi.track_note_counts[i] = note_map.size()
+		var sorted_keys = note_map.keys()
+		sorted_keys.sort()
+		var measure_counts: PackedInt32Array = PackedInt32Array()
+		measure_counts.resize(song_data.total_measures)
+		for beat_pos in sorted_keys:
+			var measure_idx = int(floor(beat_pos / 4.0))
+			if measure_idx >= 0 and measure_idx < song_data.total_measures:
+				measure_counts[measure_idx] += 1
+		ddi.measure_note_counts[i] = measure_counts
+		var phrase_difficulties: PackedFloat32Array = PackedFloat32Array()
+		phrase_difficulties.resize(song_data.total_measures)
+		var track_raw_difficulty := 0.0
+		var phrase_map = _build_phrase_map_single_pass(note_map.keys())
+		for start_measure in phrase_map.keys():
+			if start_measure >= phrase_difficulties.size():
+				break
+			var note_indices = phrase_map[start_measure]
+			var raw_difficulty = _calculate_phrase_difficulty(
+				note_map,
+				sorted_keys,
+				note_indices,
+				song_data.seconds_per_beat)
+			phrase_difficulties[start_measure] = raw_difficulty
+			track_raw_difficulty += raw_difficulty
+		ddi.phrase_raw_difficulties[i] = phrase_difficulties
+		ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
+	# Average across all tracks
+	var total_avg := 0.0
+	for i in range(track_count):
+		total_avg += ddi.track_avg_raw_difficulties[i]
+	ddi.avg_raw_difficulty = total_avg / float(track_count)
+	return ddi
 
 func _calculate_phrase_difficulty(
 	note_map: Dictionary, # Kept for looking up lanes
-	sorted_beats: Array,  # NEW: The sorted time keys
+	sorted_beats: Array, # NEW: The sorted time keys
 	note_indices: PackedInt32Array,
 	seconds_per_beat: float) -> float:
-	
 	var total_strain := 0.0
 	
 	if note_indices.size() > 1:
@@ -502,13 +262,13 @@ func _calculate_phrase_difficulty(
 			var beat_b = sorted_beats[idx_current]
 			
 			var interval = beat_b - beat_a
-			if interval <= 0.001: 
+			if interval <= 0.001:
 				interval = 0.001 # Clamp to avoid division by zero
 			
 			var time_interval = interval * seconds_per_beat
 			
 			# 1. Speed Strain: Penalize density
-			var speed_strain = 1.0 / max(time_interval, 0.05) 
+			var speed_strain = 1.0 / max(time_interval, 0.05)
 
 			# 2. Quantization: Check the beat timestamp (beat_b), not the interval
 			var quant_modifier = _get_beat_quantization_factor(beat_b)
@@ -574,21 +334,85 @@ func _get_pattern_weight(
 			else:
 				return PATTERN_WEIGHT_EASY
 		1:
-			return 1.0  # Neutral weight for single lane changes
+			return 1.0 # Neutral weight for single lane changes
 		2:
 			return PATTERN_WEIGHT_JUMP
 		_:
-			return 1.0  # Fallback neutral weight
+			return 1.0 # Fallback neutral weight
+#endregion
+# TODO: function to get song details from database
+# as well as sorting and filtering
 
-func _compare_song_titles(a: SongEntry, b: SongEntry) -> bool:
-	var title_a = _strip_leading_articles(a.title)
-	var title_b = _strip_leading_articles(b.title)
-	return title_a < title_b
+#region Difficulty Info Helpers
+func _difficulty_info_to_json(ddi: DetailedDifficultyInfo) -> Dictionary:
+	assert(ddi.track_note_counts.size() > 0)
+	assert(ddi.track_avg_raw_difficulties.size() == ddi.track_note_counts.size())
 
-func _strip_leading_articles(text: String) -> String:
-	text = text.strip_edges()
-	var lower_name = text.to_lower()
-	for article in ARTICLE_LIST:
-		if lower_name.begins_with(article):
-			return text.substr(article.length(), text.length() - article.length())
-	return text
+	var dict := {
+		"track_note_counts": Array(ddi.track_note_counts),
+		"measure_note_counts": [],
+		"phrase_raw_difficulties": [],
+		"track_avg_raw_difficulties": Array(ddi.track_avg_raw_difficulties),
+		"avg_raw_difficulty": ddi.avg_raw_difficulty
+	}
+
+	for i in range(ddi.measure_note_counts.size()):
+		dict["measure_note_counts"].append(
+			Array(ddi.measure_note_counts[i])
+		)
+
+	for i in range(ddi.phrase_raw_difficulties.size()):
+		dict["phrase_raw_difficulties"].append(
+			Array(ddi.phrase_raw_difficulties[i])
+		)
+
+	return dict
+
+func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
+	var ddi := DetailedDifficultyInfo.new()
+
+	# Track note counts
+	var tnc := PackedInt32Array()
+	for v in dict.get("track_note_counts", []):
+		tnc.append(int(v))
+	ddi.track_note_counts = tnc
+
+	# Measure note counts
+	ddi.measure_note_counts = []
+	for measure_array in dict.get("measure_note_counts", []):
+		var packed := PackedInt32Array()
+		for v in measure_array:
+			packed.append(int(v))
+		ddi.measure_note_counts.append(packed)
+
+	# Phrase raw difficulties
+	ddi.phrase_raw_difficulties = []
+	for phrase_array in dict.get("phrase_raw_difficulties", []):
+		var packed := PackedFloat32Array()
+		for v in phrase_array:
+			packed.append(float(v))
+		ddi.phrase_raw_difficulties.append(packed)
+
+	# Track average raw difficulties
+	var tard := PackedFloat32Array()
+	for v in dict.get("track_avg_raw_difficulties", []):
+		tard.append(float(v))
+	ddi.track_avg_raw_difficulties = tard
+
+	# Overall average
+	ddi.avg_raw_difficulty = float(dict.get("avg_raw_difficulty", 0.0))
+
+	return ddi
+#endregion
+
+func get_resource_path(folder_id: String) -> String:
+	return "res://song/%s/%s.tres" % [folder_id, folder_id]
+
+func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
+	var db = SessionManager.library_db
+	var success = db.query_with_bindings("%s %s;" % [DIFFICULTY_QUERY, FILTER_FOLDER_DIFFICULTY], [folder_id, difficulty_offset])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return 0.0
+	return result[0]["difficulty_rating"]

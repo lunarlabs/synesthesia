@@ -1,21 +1,21 @@
-[gd_scene load_steps=4 format=3 uid="uid://rehe4hobdmbl"]
+[gd_scene format=3 uid="uid://rehe4hobdmbl"]
 
 [ext_resource type="Script" uid="uid://dnco7owat03n4" path="res://menu/song_manager.gd" id="1_o7bha"]
 [ext_resource type="PackedScene" uid="uid://bshtgri8guqec" path="res://menu/load_screen.tscn" id="2_tr38k"]
 [ext_resource type="PackedScene" uid="uid://dm4hcmhaewyp6" path="res://menu/song_result.tscn" id="4_hvuvw"]
 
-[node name="SongManager" type="Node"]
+[node name="SongManager" type="Node" unique_id=1145367271]
 script = ExtResource("1_o7bha")
 song_file = "uid://dh1lpldjfaa2x"
 difficulty = 114
 checkpoint_modifier = 1
 
-[node name="LoadScreen" parent="." instance=ExtResource("2_tr38k")]
+[node name="LoadScreen" parent="." unique_id=1381759080 instance=ExtResource("2_tr38k")]
 process_mode = 3
 visible = false
 mouse_filter = 2
 
-[node name="PausePanel" type="PanelContainer" parent="."]
+[node name="PausePanel" type="PanelContainer" parent="." unique_id=245645394]
 process_mode = 3
 visible = false
 z_index = 100
@@ -32,23 +32,23 @@ offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel" unique_id=2091107272]
 layout_mode = 2
 
-[node name="ContinueButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="ContinueButton" type="Button" parent="PausePanel/VBoxContainer" unique_id=1331065599]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Continue"
 
-[node name="RestartButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="RestartButton" type="Button" parent="PausePanel/VBoxContainer" unique_id=1427051969]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Restart"
 
-[node name="QuitButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="QuitButton" type="Button" parent="PausePanel/VBoxContainer" unique_id=1949463379]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Exit to Song Select"
 
-[node name="SongResult" parent="." instance=ExtResource("4_hvuvw")]
+[node name="SongResult" parent="." unique_id=1413825687 instance=ExtResource("4_hvuvw")]
 visible = false

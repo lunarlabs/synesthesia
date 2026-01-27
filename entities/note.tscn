@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c3akhdjxmhauy"]
+[gd_scene format=3 uid="uid://c3akhdjxmhauy"]
 
 [ext_resource type="Script" uid="uid://crcfv5n2s8qsr" path="res://entities/note.gd" id="1_w5if1"]
 [ext_resource type="Material" uid="uid://5nmgyh2a4s76" path="res://assets/note_Phrase_mat.tres" id="2_g4cjv"]
@@ -33,10 +33,10 @@ scale_curve = SubResource("CurveTexture_g4cjv")
 material = ExtResource("2_g4cjv")
 size = Vector3(0.1, 0.01, 0.1)
 
-[node name="note" type="Node3D"]
+[node name="note" type="Node3D" unique_id=525899921]
 script = ExtResource("1_w5if1")
 
-[node name="capsule" type="MeshInstance3D" parent="."]
+[node name="capsule" type="MeshInstance3D" parent="." unique_id=1804549539]
 transform = Transform3D(-3.1035086e-08, -1, 0, 0.71, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 layers = 2
 gi_mode = 0
@@ -45,7 +45,7 @@ visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 mesh = SubResource("CapsuleMesh_sh8nu")
 
-[node name="ghost" type="MeshInstance3D" parent="."]
+[node name="ghost" type="MeshInstance3D" parent="." unique_id=695687394]
 visible = false
 layers = 2
 cast_shadow = 0
@@ -55,7 +55,7 @@ visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 mesh = SubResource("BoxMesh_g4cjv")
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=164426826]
 emitting = false
 amount = 16
 lifetime = 0.5

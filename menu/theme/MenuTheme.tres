@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://cm4v2e2f0im5p"]
+[gd_resource type="Theme" format=3 uid="uid://cm4v2e2f0im5p"]
 
 [ext_resource type="Texture2D" uid="uid://de63t6lg3thbg" path="res://assets/textures/panel.svg" id="1_b4i3g"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_xtqma"]

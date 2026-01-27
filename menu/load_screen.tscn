@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bshtgri8guqec"]
+[gd_scene format=3 uid="uid://bshtgri8guqec"]
 
 [ext_resource type="Theme" uid="uid://c7c1rqmsxlumn" path="res://menu/ModifierLabelTheme.tres" id="1_o0fmc"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_mbwvg"]
@@ -433,7 +433,7 @@ font_size = 24
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
-[node name="LoadScreen" type="ColorRect"]
+[node name="LoadScreen" type="ColorRect" unique_id=346072966]
 z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -442,7 +442,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0.07877567, 0.23894912, 1)
 
-[node name="StageData" type="MarginContainer" parent="."]
+[node name="StageData" type="MarginContainer" parent="." unique_id=1237712757]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -455,37 +455,37 @@ theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="VBoxContainer" type="VBoxContainer" parent="StageData"]
+[node name="VBoxContainer" type="VBoxContainer" parent="StageData" unique_id=1719100255]
 layout_mode = 2
 
-[node name="TopArea" type="HBoxContainer" parent="StageData/VBoxContainer"]
+[node name="TopArea" type="HBoxContainer" parent="StageData/VBoxContainer" unique_id=2048682197]
 layout_mode = 2
 
-[node name="DifficultyLabel" type="Label" parent="StageData/VBoxContainer/TopArea"]
+[node name="DifficultyLabel" type="Label" parent="StageData/VBoxContainer/TopArea" unique_id=1421256100]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 1
 text = "Difficulty"
 label_settings = SubResource("LabelSettings_4pkhu")
 
-[node name="BottomArea" type="PanelContainer" parent="StageData/VBoxContainer"]
+[node name="BottomArea" type="PanelContainer" parent="StageData/VBoxContainer" unique_id=920202491]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
 
-[node name="BottomContainer" type="VBoxContainer" parent="StageData/VBoxContainer/BottomArea"]
+[node name="BottomContainer" type="VBoxContainer" parent="StageData/VBoxContainer/BottomArea" unique_id=506152645]
 layout_mode = 2
 
-[node name="ModifiersTitle" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer"]
+[node name="ModifiersTitle" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer" unique_id=1479057154]
 layout_mode = 2
 text = "Modifiers"
 horizontal_alignment = 1
 
-[node name="ModifiersGrid" type="HBoxContainer" parent="StageData/VBoxContainer/BottomArea/BottomContainer"]
+[node name="ModifiersGrid" type="HBoxContainer" parent="StageData/VBoxContainer/BottomArea/BottomContainer" unique_id=1384684502]
 layout_direction = 1
 layout_mode = 2
 
-[node name="EnergyModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="EnergyModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=1174089350]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -494,7 +494,7 @@ text = "Energy"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CheckpointModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="CheckpointModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=1026750571]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -503,7 +503,7 @@ text = "Checkpoint"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HintsModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="HintsModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=1016657645]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -512,7 +512,7 @@ text = "Streak Hints Off"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimingModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="TimingModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=90373083]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -521,7 +521,7 @@ text = "Timing"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TrackResetModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="TrackResetModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=902274616]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -530,7 +530,7 @@ text = "Fast Reset"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AutoblastModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid"]
+[node name="AutoblastModLabel" type="Label" parent="StageData/VBoxContainer/BottomArea/BottomContainer/ModifiersGrid" unique_id=983441748]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme = ExtResource("1_o0fmc")
@@ -539,12 +539,10 @@ text = "Autoblaster"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_e0d3t")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=937314203]
+libraries/ = SubResource("AnimationLibrary_e0d3t")
 
-[node name="SongInfo" type="VBoxContainer" parent="."]
+[node name="SongInfo" type="VBoxContainer" parent="." unique_id=2004629711]
 custom_minimum_size = Vector2(1088, 475)
 layout_mode = 1
 anchors_preset = 8
@@ -562,14 +560,14 @@ pivot_offset = Vector2(544, 237.5)
 size_flags_vertical = 3
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="SongInfo"]
+[node name="TitleLabel" type="Label" parent="SongInfo" unique_id=590172409]
 layout_mode = 2
 text = "Two Lines"
 label_settings = ExtResource("3_yfifq")
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="ArtistLabel" type="Label" parent="SongInfo"]
+[node name="ArtistLabel" type="Label" parent="SongInfo" unique_id=1248667771]
 custom_minimum_size = Vector2(1000, 0)
 layout_mode = 2
 text = "Artist Name"
@@ -577,7 +575,7 @@ label_settings = SubResource("LabelSettings_yfifq")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="GenreLabel" type="Label" parent="SongInfo"]
+[node name="GenreLabel" type="Label" parent="SongInfo" unique_id=1734050190]
 layout_mode = 2
 text = "Genre"
 label_settings = SubResource("LabelSettings_hj2m3")

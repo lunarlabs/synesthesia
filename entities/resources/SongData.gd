@@ -13,11 +13,13 @@ const MIDI_META_TEMPO_EVENT = 0x51
 ##Path to the MIDI file for this song
 @export_file("*.mid") var midi_file
 
+@export_category("Song Info")
+
 ##Short title of the song
 @export var title: String = "Unknown Track"
 
-## Full/extended title of the song
-@export var long_title: String
+## Subtitle of the song
+@export var sub_title: String = ""
 
 ## Name of the artist or composer
 @export var artist: String = "Unknown Artist"
@@ -25,11 +27,21 @@ const MIDI_META_TEMPO_EVENT = 0x51
 ##  Musical genre classification
 @export var genre: String = "Unknown Genre"
 
+## The game the song is from
+@export var source: String = ""
+
 ## Description or background information about the song
 @export_multiline var description: String
 
+@export_category("Tracks and Audio")
+
 ## Array of SongTrackData resources representing each track in the song
 @export var tracks: Array[SongTrackData]
+
+## Path to the audio file for the song's main track
+@export_file("*.wav") var click_track = ""
+
+@export_category("Gameplay")
 
 @export_range(0.5, 2.0, 0.1) var scale_fudge_factor: float = 1.0
 
@@ -42,9 +54,6 @@ const MIDI_META_TEMPO_EVENT = 0x51
 ## Array of measure indices where checkpoints occur
 @export var checkpoints: Array[int]
 
-## Path to the audio file for the song's main track
-@export_file("*.wav") var click_track = ""
-
 ## Whether to use a fixed BPM value instead of reading from the MIDI file
 @export var bpm_fix: bool = false
 
@@ -53,6 +62,10 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 var _bpm = NAN
 var _err = Error.ERR_INVALID_DATA
+
+var long_title: String:
+	get:
+		return "%s %s" % [title, sub_title]
 
 var midi_error: Error:
 	get:
