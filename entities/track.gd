@@ -3,25 +3,19 @@ extends Node3D
 
 #TODO: fix the color assignments, don't make them fullbright (keep ps4/CroCru or use ps2 theme??)
 static var INSTRUMENTS = [
-	["Drums", Color(0.8,0,1), "uid://bx04vawou1p2o", "uid://w401c706l7dq"],
-	["Bass", Color(0.129,0.25,1), "uid://dmfgawpqalfv3", "uid://b7mxrnn681i7t"],
-	["Guitar", Color(1,0,0), "uid://bihm6tbkft235", "uid://5qhhjlqiksto"],
-	["Synth", Color(1,.8,0), "uid://d01i5nlpc34dy", "uid://dtebx5wg367bw"],
-	["Vocals", Color(0,1,0.2), "uid://bdeui16xuol6", "uid://5vj1puwyti0d"],
-	["FX", Color(0,.9,1), "uid://dym0vwrypvoco", "uid://bpjy82igjyw2q"],
+	["Drums", Color(0.8, 0, 1), "uid://bx04vawou1p2o", "uid://w401c706l7dq"],
+	["Bass", Color(0.129, 0.25, 1), "uid://dmfgawpqalfv3", "uid://b7mxrnn681i7t"],
+	["Guitar", Color(1, 0, 0), "uid://bihm6tbkft235", "uid://5qhhjlqiksto"],
+	["Synth", Color(1, .8, 0), "uid://d01i5nlpc34dy", "uid://dtebx5wg367bw"],
+	["Vocals", Color(0, 1, 0.2), "uid://bdeui16xuol6", "uid://5vj1puwyti0d"],
+	["FX", Color(0, .9, 1), "uid://dym0vwrypvoco", "uid://bpjy82igjyw2q"],
 ]
-const MEASURE_SCENE = preload("res://entities/measure.tscn")
-const NOTE_SCENE = preload("res://entities/note.tscn")
-const MISBLAST_SCENE:PackedScene = preload("res://entities/misblast.tscn")
-const RAIL_SCENE = preload("res://entities/rails.tscn")
+const MISBLAST_SCENE: PackedScene = preload("res://entities/misblast.tscn")
 const BLASTING_VOLUME = -3.0
 const UNFOCUSED_VOLUME = -7.0
 const MUTED_VOLUME = -80.0
-const AUTOBLAST_TIMING_MULTIPLIER = 0.67
-const CHUNK_SIZE_MEASURES = 8
 const CHUNK_LOAD_RANGE_FORWARD = 3
 const CHUNK_UNLOAD_RANGE_BEHIND = 2
-const NOTE_VISIBILITY_RANGE_BEATS = 64.0
 const STANDARD_LENGTH_PER_BEAT = 4.0
 const BEATS_PER_MEASURE = 4.0
 var song_node: SynRoadSong
@@ -33,30 +27,22 @@ var audio_file: String
 var instrument: int
 var instrument_note_material: StandardMaterial3D
 var instrument_ghost_material: StandardMaterial3D
-var length_multiplier: float = 1.0
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var note_nodes: Array[SynRoadNote] = []
 var measure_nodes: Array[Node3D]
-var measure_count: int = 0
 var chunks: Array[Node3D] = []
 var furthest_chunk_loaded := -1
 var reset_measure: int = 0
 var marker_measure_index: int = 0
 var current_phrase_index: int = 0
 var phrase_notes_blasted: int = 0
-var phrase_notes_count: int = 0  # Track count separately to avoid .size() calls. Synced in _process_phrase_at_index(), decremented when notes removed.
 var phrase_beats: Array[float]
-var phrase_beat_index: int = 0  # Track which beat we're processing next in autoblast
-var phrase_score_value:int = 0
-var phrase_first_note_time: float = 0.0
-var beats_in_measure: Dictionary  # Cache beats per measure: int -> Array[float]
+var phrase_beat_index: int = 0 # Track which beat we're processing next in autoblast
 var blasting_phrase: bool = false
-var next_note_index: int = 0
-var next_note_idx_per_lane: Array[int] = [0,0,0,]
+var next_note_idx_per_lane: Array[int] = [0, 0, 0, ]
 var _active_track := false
 var is_active: bool:
 	get: return _active_track
-var just_activated: bool = false
 
 @onready var asp = $Music as AudioStreamPlayer
 @onready var miss_sound = $MissSound as AudioStreamPlayer
@@ -67,12 +53,12 @@ var vol_dB: float:
 	get:
 		return asp.volume_db
 
-signal started_phrase(phrase_score_value:int, start_measure:int, measure_count:int)
-signal track_activated(phrase_score_value:int, start_measure:int)
+signal started_phrase(phrase_score_value: int, start_measure: int, measure_count: int)
+signal track_activated(phrase_score_value: int, start_measure: int)
 signal streak_broken
 signal inactive_phrase_missed()
 signal active_phrase_missed
-signal note_hit(timing:float)
+signal note_hit(timing: float)
 
 func _enter_tree():
 	rails = get_node("MultiMesh") as MultiMeshInstance3D
@@ -91,7 +77,7 @@ func _enter_tree():
 	for i in range(song_node.total_measures * 2):
 		var rail_transform = Transform3D.IDENTITY
 		@warning_ignore("integer_division")
-		var z_pos = -(BEATS_PER_MEASURE * length_per_beat) * (int(i / 2) + 0.5)
+		var z_pos = - (BEATS_PER_MEASURE * length_per_beat) * (int(i / 2) + 0.5)
 		var x_pos = 1.17 if i % 2 == 0 else -1.17
 		rail_transform.origin = Vector3(x_pos, -0.25, z_pos)
 		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
@@ -118,9 +104,7 @@ func _process(delta: float):
 	marker.position.y = lerp(1.2, 1.7, fmod(conductor.current_beat, 1))
 	if song_node.lead_in_measures >= 0 or song_node.finished:
 		return
-#	if song_node.manager_node.autoblast:
-#		pass
-	else:
+	if not song_node.manager_node.autoblast:
 		for lane_index in range(3):
 			var lane_notes = track_data.lane_notes[lane_index]
 			var next_lane_note_idx = next_note_idx_per_lane[lane_index]
@@ -152,7 +136,7 @@ func _process(delta: float):
 					continue
 				if asp.volume_db != MUTED_VOLUME:
 					asp.volume_db = MUTED_VOLUME
-				if current_phrase_index < track_data.phrase_note_indices.size()\
+				if current_phrase_index < track_data.phrase_note_indices.size() \
 				and note_idx in track_data.phrase_note_indices[current_phrase_index]:
 					active_phrase_missed.emit()
 					streak_broken.emit()
@@ -164,7 +148,7 @@ func _process(delta: float):
 #			# Optimized: only process beats from current index until we find one that hasn't been reached
 #			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
 #			var notes_blasted = 0
-#			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= current_beat:
+#			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= conductor.current_beat:
 #				var beat = phrase_beats[phrase_beat_index]
 #				asp.volume_db = BLASTING_VOLUME
 #				if !note_nodes[beat].blasted:
@@ -173,13 +157,13 @@ func _process(delta: float):
 #					note_hit.emit(0.0)
 #				# Check if this is the first note of the phrase
 #				if !blasting_phrase:
-#					var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
-#					started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-#					print("  Track %s: Starting autoblast phrase at measure %d" % [midi_name, phrase_start_measure])
+#					started_phrase.emit(
+#						track_data.phrase_note_counts[current_phrase_index],
+#						track_data.phrase_starts[current_phrase_index],
+#						track_data.phrase_lengths[current_phrase_index]
+#					)
 #					blasting_phrase = true
 #					marker.hide()
-#					#print("    Blasted beat %.2f" % beat)
-#					#print("    Remaining phrase beats: %s" % str(phrase_beats))
 #				phrase_beat_index += 1
 #				notes_blasted += 1
 #			
@@ -190,16 +174,15 @@ func _process(delta: float):
 #				blasting_phrase = false
 #		else:
 #			# Inactive track in autoblast mode: check if we've passed the phrase start
-#			if reset_countdown == 0:
-#				current_beat = song_node.current_beat()
-#				var phrase_start_beat = (phrase_start_measure - 1) * length_per_beat
+#			if conductor.current_measure >= reset_measure and current_phrase_index < track_data.phrase_starts.size():
+#				var phrase_start_beat = (track_data.phrase_starts[current_phrase_index] - 1) * length_per_beat
 #				
 #				# If we've passed the phrase start, we missed it - mute the track
-#				if current_beat > phrase_start_beat + MISS_BEAT_WINDOW / song_node.seconds_per_beat:
+#				if conductor.current_beat > phrase_start_beat + song_node.manager_node.miss_window / song_node.seconds_per_beat:
 #					if asp.volume_db != MUTED_VOLUME:
 #						asp.volume_db = MUTED_VOLUME
 
-func try_blast(lane_index:int, specific_time: float = -1.0):
+func try_blast(lane_index: int, specific_time: float = -1.0):
 	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
 	var lane_note_index = next_note_idx_per_lane[lane_index]
 	if conductor.current_measure >= reset_measure - 1:
@@ -251,7 +234,6 @@ func try_blast(lane_index:int, specific_time: float = -1.0):
 				streak_broken.emit()
 				_advance_phrase()
 			
-		
 		
 	# # Allow a slight early hit on the first post-reset note (reset_countdown == 1) if within window and early (time_offset > 0)
 	# if abs(time_offset) <= song_node.manager_node.hit_window and (reset_countdown == 0 or (reset_countdown == 1 and time_offset > 0)):
@@ -327,7 +309,7 @@ func _advance_phrase():
 		move_marker(-1)
 		return
 
-	phrase_notes_count = track_data.phrase_note_counts[current_phrase_index]
+
 	if marker_measure_index != -1 and marker_measure_index < current_phrase_index:
 		marker_measure_index = current_phrase_index
 		move_marker(marker_measure_index)
@@ -411,7 +393,7 @@ func request_chunks(furthest: int):
 		furthest_chunk_loaded += 1
 		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
 
-func activate(phrase_idx:int):
+func activate(phrase_idx: int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
@@ -437,7 +419,7 @@ func activate(phrase_idx:int):
 	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 
 func _play_pfx(start_measure: int):
-	pfx.position.z = start_measure * -(BEATS_PER_MEASURE * length_per_beat)
+	pfx.position.z = start_measure * - (BEATS_PER_MEASURE * length_per_beat)
 	pfx.emitting = true
 
 func current_measure_is_unactivated() -> bool:
@@ -453,15 +435,15 @@ func _misblast(beat_position: float, lane_index: int):
 
 class GameplayTrackData:
 	## A map of the notes on the track. The key is its beat, the value is its lane.
-	var note_map: Dictionary[float,int] = {}
+	var note_map: Dictionary[float, int] = {}
 	## An array of the note's times, in seconds.
 	var note_times: PackedFloat32Array = []
 	## An array of the note node positions in 3D space. The Y-value corresponds to Z-position in world-space
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
-	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
+	var lane_notes: Array = [PackedInt32Array(), PackedInt32Array(), PackedInt32Array()]
 	var measures_with_notes: PackedInt32Array = []
 	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
-	var measure_note_counts: Dictionary[int,int] = {}
+	var measure_note_counts: Dictionary[int, int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
 	# For phrases, keys will be the starting measure number
 	## An index of phrase starting measures.
