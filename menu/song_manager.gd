@@ -266,7 +266,7 @@ func _on_song_failed(stats) -> void:
 	song_stats.timing_modifier = timing_modifier
 	song_stats.score = stats["score"]
 	song_stats.max_streak = stats["max_streak"]
-	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * 100.0
+	var accuracy = (float(stats.phrases_completed) / (stats.phrases_completed + stats.phrases_missed)) * percent_completed
 	song_stats.accuracy = accuracy
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = percent_completed
@@ -276,7 +276,6 @@ func _on_song_failed(stats) -> void:
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,
 		SessionManager.get_song_best_record(midi_hash, difficulty))
-	song_stats.accuracy = 0.0
 	SessionManager.record_song_result(midi_hash, song_stats)
 	#SessionManager.save_song_records()
 

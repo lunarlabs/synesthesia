@@ -1,21 +1,20 @@
 class_name SynRoadSong
 extends Node3D
 
+@export var energy_gradient: Gradient
+
 const TRACK_SCENE: PackedScene = preload("res://entities/track.tscn")
 const CHECKPOINT_SCENE: PackedScene = preload("res://entities/checkpoint.tscn")
 const TRACK_WIDTH := 2.5
-const AUTOBLAST_LOOKAHEAD_MEASURES = 2
 const PLAYHEAD_LEAD_DIST := 0.305
   # Tuned to minimize player hit offset
 const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
-const DESYNC_LIMIT := 0.03
 var energy: int = MAX_ENERGY
 var manager_node: SynRoadSongManager
 var bpm: float = 120.0
 var seconds_per_beat: float = 0.5
-var ticks_per_beat: int = -1
 var tracks: Array[Node]
 var length_per_beat: float = STANDARD_LENGTH_PER_BEAT
 var length_multiplier: float = 1.0
@@ -23,7 +22,6 @@ var _playhead_speed: float
 var active_track := 0
 var lead_in_measures := 999_999
 var total_measures := 0
-var phrase_start_measure := 0
 var finished := false
 var input_enabled := true
 var song_data_ok: bool = false
@@ -49,7 +47,6 @@ var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
 var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak penalty per measure for inactive phrase misses
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
-var _track_reset_measures: PackedInt32Array # Cache of reset measures for each track, updated by track.activate()
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
@@ -71,13 +68,8 @@ var _last_streak_break_measure: int = -1
 signal song_failed(stats)
 signal song_finished(stats)
 
-var max_drift: float = 0.0
-var drift_samples: int = 0
-var total_drift: float = 0.0
-var frame_drops: int = 0
-var playhead_target_z: float = 0.0
-var playhead_velocity: float = 0.0
 var lead_distance: float = 0.0
+var energy_tween: Tween
 
 func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
@@ -101,7 +93,6 @@ func _ready():
 	lead_distance = PLAYHEAD_LEAD_DIST * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	_track_marker_measures.resize(6) # Initialize cache for 6 instrument tracks
-	_track_reset_measures.resize(6) # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
 		print("instantiating track %d" % i)
 		var newTrack = TRACK_SCENE.instantiate() as SynRoadTrack
@@ -164,6 +155,7 @@ func _ready():
 		_:
 			%EnergyBar.show()
 			%EnergyBar.value = energy
+	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
 	print("Precompiling shaders...")
 	for i in range(3):
 		await get_tree().process_frame
@@ -195,7 +187,6 @@ func _song_start():
 	get_tree().call_group("AudioPlayers", "play")
 	%Conductor.is_playing = true
 	playhead.position.z = - length_per_beat * %Conductor.current_beat
-	playhead_velocity = - length_per_beat * (bpm / 60.0)
 	manager_node.can_pause = true
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
 	_intro_tween = get_tree().create_tween()
@@ -266,7 +257,6 @@ func debug_info() -> String:
 		lines.append("Elapsed Audio Time: %.3f" % %Conductor.time_elapsed)
 		lines.append("Beat: %.4f" % %Conductor.current_beat)
 		lines.append("Measure: %d : %.1f" % [%Conductor.current_measure, fmod(%Conductor.current_beat, BEATS_PER_MEASURE)])
-		lines.append("Phrase start position: %d\n" % phrase_start_measure)
 	lines.append("Tracks:")
 	for i in tracks.size():
 		lines.append("%02d: %s" % [i, tracks[i].debug_info()])
@@ -292,6 +282,7 @@ func _on_track_activated(note_count: int, start_measure: int):
 		max_streak = streak
 	_phrases_completed += 1
 	lbl_phrase_value.hide()
+	%HUDAnimations.play("phrase_completed")
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak, 4)
 	match manager_node.energy_modifier:
@@ -332,6 +323,7 @@ func _on_streak_broken():
 	streak = 0
 	if had_streak:
 #		print("Stat updated for proper streak break.")
+		%HUDAnimations.play("phrase_fail")
 		_streak_breaks += 1
 	lbl_streak.text = "x%d" % streak
 
@@ -451,9 +443,8 @@ func _update_track_marker_cache(track_idx: int, marker_measure: int) -> void:
 	if track_idx >= 0 and track_idx < _track_marker_measures.size():
 		_track_marker_measures[track_idx] = marker_measure
 
-func _update_track_reset_cache(track_idx: int, reset_measure: int) -> void:
-	if track_idx >= 0 and track_idx < _track_reset_measures.size():
-		_track_reset_measures[track_idx] = reset_measure
+func _update_track_reset_cache(_track_idx: int, _reset_measure: int) -> void:
+	pass
 
 func energy_change(amount: int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
@@ -463,6 +454,23 @@ func energy_change(amount: int) -> void:
 	elif energy >= 3:
 		RenderingServer.global_shader_parameter_set("danger", false)
 	%EnergyBar.value = energy
+	if energy_tween:
+		energy_tween.kill()
+	energy_tween = create_tween()
+	match sign(amount):
+		1:
+			%EnergyBar.tint_progress = Color.WHITE
+			energy_tween.tween_property(%EnergyBar, "tint_progress", energy_gradient.sample(float(energy) / MAX_ENERGY), 0.5)
+		-1:
+			if manager_node.energy_modifier == 1:
+				energy_tween.tween_property(%EnergyBar, "tint_progress", energy_gradient.sample(float(energy) / MAX_ENERGY), 0.5)
+			else:
+				%EnergyBar.tint_under = Color(3.0, 1.5, 0.0)
+				energy_tween.tween_property(%EnergyBar, "tint_under", Color.WHITE, 0.5)
+				%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
+		_:
+			print("Zero provided to energy_change()")
+	
 
 func _hide_fast_slow_label():
 	lbl_fast_slow.remove_theme_color_override("font_color")
