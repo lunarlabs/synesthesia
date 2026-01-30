@@ -71,18 +71,42 @@ func _prepare_player_db():
 			printerr("Problem opening player database!")
 			return
 		_player_db.query("PRAGMA user_version;")
-		if _player_db.query_result[0]["user_version"] == 0:
+		var current_version = int(_player_db.query_result[0]["user_version"])
+		print("Player database version: %d" % current_version)
+		
+		if current_version == 0:
 			print("Initializing player database...")
 			var ddl = FileAccess.get_file_as_string(PLAYER_DDL_PATH)
 			if _player_db.query(ddl):
 				print("Player database initialized OK.")
 			else:
 				printerr("Problem initializing player database!")
-		elif _player_db.query_result[0]["user_version"] == PLAYER_DB_VERSION:
+		elif current_version < PLAYER_DB_VERSION:
+			print("Updating player database from version %d to %d..." % [current_version, PLAYER_DB_VERSION])
+			if _update_player_db(current_version):
+				print("Player database updated OK.")
+			else:
+				printerr("Problem updating player database!")
+		elif current_version == PLAYER_DB_VERSION:
 			print("Player database is up to date.")
 		else:
-			printerr("Player database version mismatch!")
+			printerr("Player database version mismatch! (DB: %d, App: %d)" % [current_version, PLAYER_DB_VERSION])
 			return
+
+func _update_player_db(current_version: int) -> bool:
+	# Iterate through versions to apply updates sequentially
+	for v in range(current_version + 1, PLAYER_DB_VERSION + 1):
+		print("Applying migration to version %d..." % v)
+		match v:
+			# Example:
+			# 2:
+			# 	if not _player_db.query("ALTER TABLE..."): return false
+			_:
+				printerr("No migration defined for version %d" % v)
+				return false
+				
+	# Update the user_version pragma after successful migration
+	return _player_db.query("PRAGMA user_version = %d;" % PLAYER_DB_VERSION)
 #endregion
 
 #region Player Data
