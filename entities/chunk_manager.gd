@@ -26,11 +26,11 @@ func _process(delta: float) -> void:
 
 func generate_chunk(track_idx: int, chunk_idx: int):
 	var time_start = Time.get_ticks_usec()
-	print("generating chunk %d at track %d" % [track_idx, chunk_idx])
+#	print("generating chunk %d at track %d" % [track_idx, chunk_idx])
 	var track_node = manager_node.song_instance.tracks[track_idx] as SynRoadTrack
 
 	if track_node.chunks[chunk_idx] != null:
-		print("already loaded")
+#		print("already loaded")
 		# The chunk is already loaded
 		return
 	var track_data = track_node.track_data
@@ -92,7 +92,7 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 			new_note_nodes[j] = new_note
 			chunk.add_child(new_note)
 	var time_end = Time.get_ticks_usec()
-	print("generated chunk %d at track %d in %d microseconds" % [track_idx, chunk_idx, time_end - time_start])
+#	print("generated chunk %d at track %d in %d microseconds" % [track_idx, chunk_idx, time_end - time_start])
 	call_deferred("_apply_chunk_data", track_idx, chunk_idx, chunk, new_measure_nodes, new_note_nodes)
 
 func _apply_chunk_data(track_idx: int, chunk_idx: int, chunk: Node3D, measures: Dictionary[int, Node3D], notes: Dictionary[int, SynRoadNote]):
@@ -133,4 +133,4 @@ func recycle_chunk(chunk: Node3D):
 			_mutex.unlock()
 	chunk.queue_free()
 	var time_end = Time.get_ticks_usec()
-	print("recycled chunk in %d microseconds" % [time_end - time_start])
+#	print("recycled chunk in %d microseconds" % [time_end - time_start])

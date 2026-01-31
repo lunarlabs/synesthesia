@@ -292,11 +292,14 @@ func _on_track_activated(note_count: int, start_measure: int):
 		1:
 			# Gain 3 energy per successful phrase
 			energy_change(3)
-#	if manager_node.autoblast and current_measure < total_measures:
-		# Queue up the next track to switch to on the next measure boundary
-#		_autoblast_next_track = _find_best_track_for_autoblast()
-#		_autoblast_track_distance = _get_phrase_distances()[_autoblast_next_track] if _autoblast_next_track != active_track else 999
-#		print("Autoblast: Current track %d, queued next track %d (distance=%d)" % [active_track, _autoblast_next_track, _autoblast_track_distance])
+	if manager_node.autoblast and %Conductor.current_measure < total_measures:
+		# Switch immediately to the next best track
+		var next_track = _find_best_track_for_autoblast()
+		if next_track != active_track:
+			print("Autoblast: Phrase complete. Switching from %d to %d" % [active_track, next_track])
+			_switch_active_track(next_track)
+		else:
+			print("Autoblast: Phrase complete. Staying on track %d" % active_track)
 
 
 func _on_streak_broken():
@@ -358,18 +361,19 @@ func _switch_active_track(new_active_track: int, use_tween: bool = true):
 	if playhead.position.x <= 0:
 		print("Playhead x position is probably uninitialized (%.2f), not moving anything." % playhead.position.x)
 		return
-	if _track_transition_tween:
-		_track_transition_tween.kill()
-	_track_transition_tween = get_tree().create_tween()
-	_track_transition_tween.set_parallel(true)
 	(tracks[active_track] as SynRoadTrack).set_active(false)
 	active_track = new_active_track
 	(tracks[active_track] as SynRoadTrack).set_active(true)
+	RenderingServer.global_shader_parameter_set("current_track", active_track)
 	_set_instrument_label()
 	var new_x_pos = (active_track * TRACK_WIDTH) - playhead.position.x
 	if lead_in_measures >= 0:
 		count_in.position.x = (active_track * TRACK_WIDTH)
 	if use_tween:
+		if _track_transition_tween:
+			_track_transition_tween.kill()
+		_track_transition_tween = get_tree().create_tween()
+		_track_transition_tween.set_parallel(true)
 #		print("Tweening camera.position.x to %f (active_track=%d, playhead.x=%f)" % [new_x_pos, active_track, playhead.position.x])
 		_track_transition_tween.tween_property(current_track, "position:x", new_x_pos, 0.1).set_trans(Tween.TRANS_QUAD)
 		_track_transition_tween.tween_property(camera, "position:x", new_x_pos, 0.15).set_trans(Tween.TRANS_SINE)
@@ -611,16 +615,5 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			# Cache active track node reference for this frame
 			_cached_active_track_node = tracks[active_track] as SynRoadTrack
 			
-			# Check for autoblast track switching every frame
-			if manager_node.autoblast and _autoblast_next_track != active_track:
-				if !_cached_active_track_node.blasting_phrase:
-					var next_track_node = tracks[_autoblast_next_track] as SynRoadTrack
-					var switch_measure = next_track_node.phrase_start_measure
-					var switch_beat = float(switch_measure - 1) * BEATS_PER_MEASURE - 0.5
-					if %Conductor.current_beat >= switch_beat:
-						_switch_active_track(_autoblast_next_track)
-						# Update cached reference after switch
-						_cached_active_track_node = tracks[active_track] as SynRoadTrack
-#					print("Switching active track from %d to %d at beat %.2f" % [active_track, _autoblast_next_track, current_beat()])
-	
+
 	#lblDebugInfo.text = debug_info()
