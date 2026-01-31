@@ -142,45 +142,52 @@ func _process(delta: float):
 					streak_broken.emit()
 					_advance_phrase()
 
-#	else:
-#		if is_active:
-#			# TIME TO FAKE IT BABY!
-#			# Optimized: only process beats from current index until we find one that hasn't been reached
-#			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
-#			var notes_blasted = 0
-#			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= conductor.current_beat:
-#				var beat = phrase_beats[phrase_beat_index]
-#				asp.volume_db = BLASTING_VOLUME
-#				if !note_nodes[beat].blasted:
-#					note_nodes[beat].blast(true)
-#					# Emit note_hit signal with perfect timing (0.0 offset)
-#					note_hit.emit(0.0)
-#				# Check if this is the first note of the phrase
-#				if !blasting_phrase:
-#					started_phrase.emit(
-#						track_data.phrase_note_counts[current_phrase_index],
-#						track_data.phrase_starts[current_phrase_index],
-#						track_data.phrase_lengths[current_phrase_index]
-#					)
-#					blasting_phrase = true
-#					marker.hide()
-#				phrase_beat_index += 1
-#				notes_blasted += 1
-#			
-#			# Check if phrase is complete
-#			if phrase_beat_index >= phrase_beats.size() and notes_blasted > 0:
-#				#print("  Track %s: Phrase complete, activating" % midi_name)
-#				activate(song_node.current_measure())
-#				blasting_phrase = false
-#		else:
-#			# Inactive track in autoblast mode: check if we've passed the phrase start
-#			if conductor.current_measure >= reset_measure and current_phrase_index < track_data.phrase_starts.size():
-#				var phrase_start_beat = (track_data.phrase_starts[current_phrase_index] - 1) * length_per_beat
-#				
-#				# If we've passed the phrase start, we missed it - mute the track
-#				if conductor.current_beat > phrase_start_beat + song_node.manager_node.miss_window / song_node.seconds_per_beat:
-#					if asp.volume_db != MUTED_VOLUME:
-#						asp.volume_db = MUTED_VOLUME
+	else:
+		# Autoblast is on
+		# For this, instead of checking each individual lane, we'll be looking at the note map
+		if is_active:
+			var next_note_idx := 0
+			while next_note_idx < track_data.note_times.size() and track_data.note_times[next_note_idx] < current_time:
+				next_note_idx += 1
+			
+
+			# TIME TO FAKE IT BABY!
+			# Optimized: only process beats from current index until we find one that hasn't been reached
+			# Since phrase_beats is sorted, we can stop early. Use index instead of removing elements.
+			var notes_blasted = 0
+			while phrase_beat_index < phrase_beats.size() and phrase_beats[phrase_beat_index] <= conductor.current_beat:
+				var beat = phrase_beats[phrase_beat_index]
+				asp.volume_db = BLASTING_VOLUME
+				if !note_nodes[beat].blasted:
+					note_nodes[beat].blast(true)
+					# Emit note_hit signal with perfect timing (0.0 offset)
+					note_hit.emit(0.0)
+				# Check if this is the first note of the phrase
+				if !blasting_phrase:
+					started_phrase.emit(
+						track_data.phrase_note_counts[current_phrase_index],
+						track_data.phrase_starts[current_phrase_index],
+						track_data.phrase_lengths[current_phrase_index]
+					)
+					blasting_phrase = true
+					marker.hide()
+				phrase_beat_index += 1
+				notes_blasted += 1
+			
+			# Check if phrase is complete
+			if phrase_beat_index >= phrase_beats.size() and notes_blasted > 0:
+				#print("  Track %s: Phrase complete, activating" % midi_name)
+				activate(song_node.current_measure())
+				blasting_phrase = false
+		else:
+			# Inactive track in autoblast mode: check if we've passed the phrase start
+			if conductor.current_measure >= reset_measure and current_phrase_index < track_data.phrase_starts.size():
+				var phrase_start_beat = (track_data.phrase_starts[current_phrase_index] - 1) * length_per_beat
+				
+				# If we've passed the phrase start, we missed it - mute the track
+				if conductor.current_beat > phrase_start_beat + song_node.manager_node.miss_window / song_node.seconds_per_beat:
+					if asp.volume_db != MUTED_VOLUME:
+						asp.volume_db = MUTED_VOLUME
 
 func try_blast(lane_index: int, specific_time: float = -1.0):
 	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
@@ -441,7 +448,6 @@ class GameplayTrackData:
 	## An array of the note node positions in 3D space. The Y-value corresponds to Z-position in world-space
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
 	var lane_notes: Array = [PackedInt32Array(), PackedInt32Array(), PackedInt32Array()]
-	var measures_with_notes: PackedInt32Array = []
 	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
 	var measure_note_counts: Dictionary[int, int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
