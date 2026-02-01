@@ -18,7 +18,7 @@ mesh = SubResource("PlaneMesh_jv32a")
 script = ExtResource("2_vwvyh")
 
 [node name="Timer" type="Timer" parent="." unique_id=1899131416]
-wait_time = 0.1
+wait_time = 0.05
 one_shot = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
