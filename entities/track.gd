@@ -205,14 +205,33 @@ func _process_autoblast(current_time: float):
 				phrase_notes_blasted = 0
 				blasting_phrase = false
 	else:
-		# Inactive track in autoblast mode: check if we've passed the phrase start
-		if conductor.current_measure >= reset_measure and current_phrase_index < track_data.phrase_starts.size():
-			var phrase_start_beat = (track_data.phrase_starts[current_phrase_index] - 1) * length_per_beat
+		# Inactive track in autoblast mode
+		while next_note_idx < track_data.note_times.size():
+			var note_time = track_data.note_times[next_note_idx]
 			
-			# If we've passed the phrase start, we missed it - mute the track
-			if conductor.current_beat > phrase_start_beat + song_node.manager_node.miss_window / song_node.seconds_per_beat:
+			# If the note is in the future, we're done for now
+			if note_time > current_time:
+				break
+
+			var note_idx = next_note_idx
+			
+			if conductor.current_measure < reset_measure:
+				# Track hasn't been reset yet, but we've passed the note. Just advance the index.
+				next_note_idx += 1
+			else:
+				# Track is not active, but we've passed the note. Mute the track.
 				if asp.volume_db != MUTED_VOLUME:
 					asp.volume_db = MUTED_VOLUME
+				
+				# See if the passed note was the first note in the phrase
+				# and signal inactive_phrase_missed if it was
+				if current_phrase_index < track_data.phrase_starts.size() \
+				and not track_data.phrase_note_indices[current_phrase_index].is_empty() \
+				and note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
+					_advance_phrase()
+					inactive_phrase_missed.emit()
+				
+				next_note_idx += 1
 
 func try_blast(lane_index: int, specific_time: float = -1.0):
 	var current_time = specific_time if specific_time >= 0.0 else conductor.time_elapsed
