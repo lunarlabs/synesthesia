@@ -83,6 +83,13 @@ const ACCURACY_THRESHOLDS = {
 	"F": 0.00,
 }
 
+enum FinishMode {
+	COMPLETE,
+	FAILED,
+	PRACTICE,
+	AUTOBLAST,
+}
+
 const STANDARD_LENGTH_PER_BEAT = -4.0
 const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
@@ -248,8 +255,9 @@ func _apply_preprocessor_results(results: Array) -> void:
 			track_data[result.track_index]["track_data"] = result.result
 			track_data[result.track_index]["track_info"] = track_info
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
+		get_viewport().set_input_as_handled()
 		_toggle_pause()
 
 func _on_song_failed(stats) -> void:
@@ -271,7 +279,7 @@ func _on_song_failed(stats) -> void:
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = percent_completed
 	song_stats.clear_state = SessionManager.SongResult.ClearState.FAILED
-	var finish_state = 1
+	var finish_state = FinishMode.FAILED
 
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,
@@ -297,9 +305,10 @@ func _on_song_finished(stats) -> void:
 	song_stats.streak_breaks = stats["streak_breaks"]
 	song_stats.percent_completed = 100.0
 	song_stats.calculate_rank()
-	var finish_state = 2 if song_stats.energy_modifier == 4 else 0
+	var finish_state = FinishMode.PRACTICE if song_stats.energy_modifier == 4 else FinishMode.COMPLETE
 	var valid_record := false
 	if autoblast:
+		finish_state = FinishMode.AUTOBLAST
 		song_stats.clear_state = SessionManager.SongResult.ClearState.AUTOBLASTED
 	elif song_stats.energy_modifier == 4:
 		song_stats.clear_state = SessionManager.SongResult.ClearState.NOT_PLAYED
