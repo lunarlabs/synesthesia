@@ -49,40 +49,41 @@ patch_margin_left = 232
 metadata/_edit_vertical_guides_ = [90.0, 15.0, 95.0]
 metadata/_edit_horizontal_guides_ = [7.0, 78.0]
 
-[node name="SongMarkers" type="Control" parent="." unique_id=819393028]
-visible = false
+[node name="Song" type="Control" parent="." unique_id=819393028]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="DifficultyBG" type="TextureRect" parent="SongMarkers" unique_id=385476751]
+[node name="DifficultyBG" type="TextureRect" parent="Song" unique_id=385476751]
 layout_mode = 0
 offset_right = 400.0
 offset_bottom = 85.0
 texture = ExtResource("2_sx17s")
 
-[node name="Carouselplaymarker" type="TextureRect" parent="SongMarkers" unique_id=112757303]
+[node name="Carouselplaymarker" type="TextureRect" parent="Song" unique_id=112757303]
 layout_mode = 0
 offset_right = 400.0
 offset_bottom = 85.0
 texture = ExtResource("3_341lh")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=102360974]
+[node name="MarginContainer" type="MarginContainer" parent="Song" unique_id=102360974]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 339.0
+offset_bottom = 41.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Hbox" type="HBoxContainer" parent="MarginContainer" unique_id=244579046]
+[node name="Hbox" type="HBoxContainer" parent="Song/MarginContainer" unique_id=244579046]
 layout_mode = 2
 theme_override_constants/separation = 9
 
-[node name="DifficultyValueLabel" type="Label" parent="MarginContainer/Hbox" unique_id=915899193]
+[node name="DifficultyValueLabel" type="Label" parent="Song/MarginContainer/Hbox" unique_id=915899193]
 custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 text = "88.8"
@@ -90,23 +91,23 @@ label_settings = SubResource("LabelSettings_55ab4")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Hbox" unique_id=11763185]
+[node name="VBoxContainer" type="VBoxContainer" parent="Song/MarginContainer/Hbox" unique_id=11763185]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = -8
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/Hbox/VBoxContainer" unique_id=1881657179]
+[node name="TitleLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1881657179]
 layout_mode = 2
 text = "Uptown Saturday Night"
 label_settings = ExtResource("2_0hw33")
 
-[node name="SubTitleLabel" type="Label" parent="MarginContainer/Hbox/VBoxContainer" unique_id=1815236760]
+[node name="SubTitleLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1815236760]
 layout_mode = 2
 text = "(Dieselboy + Kaos Rock Remix)"
 label_settings = ExtResource("3_fu0w3")
 
-[node name="DifficultyNameLabel" type="Label" parent="MarginContainer/Hbox/VBoxContainer" unique_id=1833837207]
+[node name="DifficultyNameLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1833837207]
 layout_mode = 2
 text = "Difficulty"
 label_settings = SubResource("LabelSettings_sx17s")
