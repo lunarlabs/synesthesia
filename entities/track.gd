@@ -323,7 +323,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 	# 			_process_phrase_at_measure(song_node.current_measure() + 1)
 
 func _advance_phrase():
-	if current_phrase_index >= 0:
+	if current_phrase_index >= 0 and current_phrase_index < track_data.phrase_lengths.size():
 		# unmark previous phrase
 		for i in range(track_data.phrase_lengths[current_phrase_index]):
 			var measure = track_data.phrase_starts[current_phrase_index] + i
