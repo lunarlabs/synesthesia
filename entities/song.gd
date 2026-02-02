@@ -47,6 +47,7 @@ var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
 var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak penalty per measure for inactive phrase misses
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
+var _closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
@@ -446,6 +447,14 @@ func _minimum_positive_integer_in_array(arr: Array[int]) -> int:
 func _update_track_marker_cache(track_idx: int, marker_measure: int) -> void:
 	if track_idx >= 0 and track_idx < _track_marker_measures.size():
 		_track_marker_measures[track_idx] = marker_measure
+		_update_closest_track_marker_cache()
+
+func _update_closest_track_marker_cache() -> void:
+	var filtered_measures = Array(_track_marker_measures).filter(func(measure: int) -> bool: return measure >= %Conductor.current_measure)
+	if filtered_measures.size() > 0:
+		_closest_track_marker_measure = filtered_measures.min()
+	else:
+		_closest_track_marker_measure = -1
 
 func _update_track_reset_cache(_track_idx: int, _reset_measure: int) -> void:
 	pass
@@ -579,6 +588,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
 	elif not finished:
+		_update_closest_track_marker_cache()
 		if _next_checkpoint < manager_node.checkpoint_measures.size():
 			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
 			if measure == checkpoint_measure:
