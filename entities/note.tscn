@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c3akhdjxmhauy"]
 
 [ext_resource type="Script" uid="uid://crcfv5n2s8qsr" path="res://entities/note.gd" id="1_w5if1"]
+[ext_resource type="Texture2D" uid="uid://c7hsct3gbqln2" path="res://addons/kenney_particle_pack/star_08.png" id="2_g4cjv"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_sh8nu"]
 radius = 0.1
@@ -11,11 +12,33 @@ rings = 1
 [sub_resource type="BoxMesh" id="BoxMesh_g4cjv"]
 size = Vector3(0.3, 0.03, 0.03)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gb8vh"]
+transparency = 1
+blend_mode = 1
+no_depth_test = true
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("2_g4cjv")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_4dkrx"]
+material = SubResource("StandardMaterial3D_gb8vh")
+size = Vector2(2, 2)
+
+[sub_resource type="Curve" id="Curve_g4cjv"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [sub_resource type="Curve" id="Curve_w5if1"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_g4cjv"]
+width = 32
 curve = SubResource("Curve_w5if1")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_w5if1"]
@@ -52,6 +75,18 @@ visibility_range_end = 100.0
 visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 mesh = SubResource("BoxMesh_g4cjv")
+
+[node name="Star" type="CPUParticles3D" parent="." unique_id=1110267289]
+emitting = false
+amount = 1
+lifetime = 0.09999999999999999
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("QuadMesh_4dkrx")
+gravity = Vector3(0, 0, 0)
+scale_amount_min = 2.0
+scale_amount_max = 2.0
+scale_amount_curve = SubResource("Curve_g4cjv")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=164426826]
 emitting = false

@@ -5,6 +5,7 @@ const PHRASE_MATERIAL:StandardMaterial3D = preload("uid://5nmgyh2a4s76")
 @onready var capsule = $capsule
 @onready var ghost = $ghost
 @onready var particles = $GPUParticles3D
+@onready var star = $Star
 
 var suppressed: bool = false
 var _blasted: bool = false
@@ -31,6 +32,7 @@ func blast(emit:bool = false):
 	_blasted = true
 	if emit:
 		particles.emitting = true
+		star.emitting = true
 	capsule.hide()
 	ghost.show()
 
