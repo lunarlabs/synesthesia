@@ -11,6 +11,14 @@ const PLAYHEAD_LEAD_DIST := 0.305
 const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
+const ENERGY_BAR_TEXT: Dictionary = {
+	0: "MOD_ENERGY_NORMAL",
+	1: "MOD_ENERGY_DRAIN",
+	2: "MOD_ENERGY_NORECOVER",
+	3: "MOD_ENERGY_SUDDENDEATH",
+	4: "MOD_ENERGY_NOFAIL",
+}
+
 var energy: int = MAX_ENERGY
 var manager_node: SynRoadSongManager
 var bpm: float = 120.0
@@ -146,16 +154,25 @@ func _ready():
 		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
 		add_child(checkpoint)
-	match manager_node.energy_modifier:
-		1:
-			energy = 5
-			%EnergyBar.value = energy
-		3, 4:
-			#energy system disabled
-			%EnergyBar.hide()
-		_:
-			%EnergyBar.show()
-			%EnergyBar.value = energy
+	if manager_node.autoblast:
+		%EnergyBar.hide()
+		%EnergyTitle.hide()
+		%EnergyMod.show()
+		%EnergyMod.text = "HUD_AUTOBLAST_ON"
+	else:
+		match manager_node.energy_modifier:
+			1:
+				energy = 5
+				%EnergyBar.value = energy
+			3, 4:
+				#energy system disabled
+				%EnergyBar.hide()
+				%EnergyTitle.hide()
+				%EnergyMod.show()
+				%EnergyMod.text = ENERGY_BAR_TEXT[manager_node.energy_modifier]
+			_:
+				%EnergyBar.show()
+				%EnergyBar.value = energy
 	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
 	print("Precompiling shaders...")
 	for i in range(3):

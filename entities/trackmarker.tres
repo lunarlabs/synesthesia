@@ -1,0 +1,13 @@
+[gd_resource type="VisualShader" format=3 uid="uid://bv346rfeg10c5"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_w2ixa"]
+input_name = "uv"
+
+[resource]
+modes/cull = 1
+modes/specular = 2
+flags/unshaded = true
+flags/shadows_disabled = true
+nodes/fragment/2/node = SubResource("VisualShaderNodeInput_w2ixa")
+nodes/fragment/2/position = Vector2(100, 220)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0)
