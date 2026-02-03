@@ -4,8 +4,15 @@
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
 [ext_resource type="Texture2D" uid="uid://q4h65rpug2ae" path="res://addons/kenney_particle_pack/star_01.png" id="3_tmkqs"]
 
-[sub_resource type="PrismMesh" id="PrismMesh_p7e7j"]
-size = Vector3(0.5, 2, 0.035)
+[sub_resource type="CylinderMesh" id="CylinderMesh_tmkqs"]
+flip_faces = true
+top_radius = 0.35
+bottom_radius = 0.27
+height = 5.0
+radial_segments = 16
+rings = 0
+cap_top = false
+cap_bottom = false
 
 [sub_resource type="Curve" id="Curve_3q0ve"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.3872232, 0.0, 0, 0]
@@ -66,13 +73,11 @@ volume_db = -5.0
 bus = &"Interface"
 
 [node name="Marker" type="MeshInstance3D" parent="." unique_id=231201908]
-transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 1.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
 visibility_range_begin = 4.0
-visibility_range_begin_margin = 1.0
-visibility_range_end = 32.0
-visibility_range_end_margin = 8.0
+visibility_range_begin_margin = 2.0
 visibility_range_fade_mode = 1
-mesh = SubResource("PrismMesh_p7e7j")
+mesh = SubResource("CylinderMesh_tmkqs")
 
 [node name="Whoosh" type="GPUParticles3D" parent="." unique_id=1927056625]
 emitting = false

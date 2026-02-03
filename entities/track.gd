@@ -112,7 +112,7 @@ func _ready():
 @warning_ignore("unused_parameter")
 func _process(delta: float):
 	var current_time = conductor.time_elapsed
-	marker.position.y = lerp(1.2, 1.7, fmod(conductor.current_beat, 1))
+#	marker.position.y = lerp(1.2, 1.7, fmod(conductor.current_beat, 1))
 
 	if song_node.lead_in_measures >= 0 or song_node.finished:
 		return
