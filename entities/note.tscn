@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://c3akhdjxmhauy"]
 
 [ext_resource type="Script" uid="uid://crcfv5n2s8qsr" path="res://entities/note.gd" id="1_w5if1"]
-[ext_resource type="Material" uid="uid://5nmgyh2a4s76" path="res://assets/note_Phrase_mat.tres" id="2_g4cjv"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_sh8nu"]
 radius = 0.1
@@ -30,7 +29,6 @@ initial_velocity_max = 5.0
 scale_curve = SubResource("CurveTexture_g4cjv")
 
 [sub_resource type="BoxMesh" id="BoxMesh_4dkrx"]
-material = ExtResource("2_g4cjv")
 size = Vector3(0.1, 0.01, 0.1)
 
 [node name="note" type="Node3D" unique_id=525899921]

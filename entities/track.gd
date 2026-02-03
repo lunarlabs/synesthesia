@@ -269,6 +269,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 						track_data.phrase_lengths[current_phrase_index]
 					)
 					blasting_phrase = true
+					song_node._update_track_marker_cache(track_index, -1)
 					marker.hide()
 				if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
 					activate(current_phrase_index)
@@ -396,6 +397,7 @@ func move_marker(measure_index: int):
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
 	# tell the song node to update its marker cache with the actual measure number
+	marker.visible = song_node.manager_node.hide_streak_hints == false
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[marker_measure_index])
 
 func set_active(active: bool):
