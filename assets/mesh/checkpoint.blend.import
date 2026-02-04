@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b3f3ytkxxv0lr"
-path="res://.godot/imported/trackgeom.blend-98851997549961870ae21fd1677bbc08.scn"
+uid="uid://dmwb2wxd5gn4v"
+path="res://.godot/imported/checkpoint.blend-c857dae9a4de2dcae42dac077a91a439.scn"
 
 [deps]
 
-source_file="res://assets/trackgeom.blend"
-dest_files=["res://.godot/imported/trackgeom.blend-98851997549961870ae21fd1677bbc08.scn"]
+source_file="res://assets/mesh/checkpoint.blend"
+dest_files=["res://.godot/imported/checkpoint.blend-c857dae9a4de2dcae42dac077a91a439.scn"]
 
 [params]
 
