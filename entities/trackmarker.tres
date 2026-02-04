@@ -72,7 +72,7 @@ operator = 1
 constant = 50.0
 
 [sub_resource type="VisualShaderNodeRemap" id="VisualShaderNodeRemap_w2ixa"]
-default_input_values = [1, 8.0, 2, 40.0, 3, 0.0, 4, 2.0]
+default_input_values = [1, 4.0, 2, 20.0, 3, 0.0, 4, 2.0]
 
 [sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_jag31"]
 default_input_values = [0, 0.0, 1, 0.0, 2, 2.0]
@@ -129,4 +129,4 @@ nodes/fragment/34/node = SubResource("VisualShaderNodeClamp_jag31")
 nodes/fragment/34/position = Vector2(1400, -40)
 nodes/fragment/39/node = SubResource("VisualShaderNodeFloatOp_sxsnm")
 nodes/fragment/39/position = Vector2(2240, 140)
-nodes/fragment/connections = PackedInt32Array(2, 0, 10, 0, 15, 0, 11, 0, 16, 0, 15, 0, 18, 0, 17, 0, 17, 0, 16, 0, 20, 0, 16, 1, 19, 0, 21, 0, 21, 0, 20, 0, 10, 1, 22, 0, 22, 0, 11, 1, 25, 0, 26, 1, 24, 0, 26, 0, 26, 0, 27, 0, 27, 2, 33, 0, 33, 0, 34, 0, 39, 0, 0, 0, 11, 0, 39, 1, 34, 0, 39, 0)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0, 2, 0, 10, 0, 15, 0, 11, 0, 16, 0, 15, 0, 18, 0, 17, 0, 17, 0, 16, 0, 20, 0, 16, 1, 19, 0, 21, 0, 21, 0, 20, 0, 10, 1, 22, 0, 22, 0, 11, 1, 25, 0, 26, 1, 24, 0, 26, 0, 26, 0, 27, 0, 27, 2, 33, 0, 33, 0, 34, 0, 39, 0, 0, 0, 11, 0, 39, 1, 34, 0, 39, 0)

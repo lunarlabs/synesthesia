@@ -107,7 +107,6 @@ func _ready():
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[0])
 	song_node._update_track_reset_cache(track_index, track_data.phrase_starts[0])
 	reset_measure = track_data.phrase_starts[0]
-	marker.visible = song_node.manager_node.hide_streak_hints == false
 
 @warning_ignore("unused_parameter")
 func _process(delta: float):
@@ -192,6 +191,7 @@ func _process_autoblast(current_time: float):
 								track_data.phrase_lengths[current_phrase_index]
 							)
 							blasting_phrase = true
+							song_node._update_closest_track_marker_cache()
 							print("Track %d started phrase %d (blasted note idx %d)" % [track_index, current_phrase_index, note_idx])
 							marker.hide()
 			
@@ -269,7 +269,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 						track_data.phrase_lengths[current_phrase_index]
 					)
 					blasting_phrase = true
-					song_node._update_track_marker_cache(track_index, -1)
+					song_node._update_closest_track_marker_cache()
 					marker.hide()
 				if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
 					activate(current_phrase_index)
@@ -285,43 +285,6 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 				active_phrase_missed.emit()
 				streak_broken.emit()
 				_advance_phrase()
-			
-		
-	# # Allow a slight early hit on the first post-reset note (reset_countdown == 1) if within window and early (time_offset > 0)
-	# if abs(time_offset) <= song_node.manager_node.hit_window and (reset_countdown == 0 or (reset_countdown == 1 and time_offset > 0)):
-	# 	var note_node = note_nodes[target_note] as SynRoadNote
-	# 	if note_node.blasted:
-	# 		return # Don't double-blast
-	# 	note_node.blast(true)
-	# 	note_hit.emit(time_offset)
-	# 	#print("  Track %s: Blasted note at beat %.2f (offset %.3f)" % [midi_name, target_note, time_offset])
-	# 	if phrase_notes_dict.has(note_node):
-	# 		if !blasting_phrase:
-	# 			# preprocessed phrase measure count
-	# 			var phrase_measure_count = preprocessed_phrases[current_phrase_index].measure_count
-	# 			started_phrase.emit(phrase_score_value, phrase_start_measure, phrase_measure_count)
-	# 			blasting_phrase = true
-	# 			marker.hide()
-	# 		phrase_notes.erase(note_node)
-	# 		phrase_notes_count -= 1  # Keep in sync with phrase_notes array
-	# 		phrase_notes_dict.erase(note_node)
-	# 		if phrase_notes_count == 0:
-	# 			activate(floori(target_note / BEATS_PER_MEASURE) + 1)
-	# 			blasting_phrase = false
-	# 	asp.volume_db = BLASTING_VOLUME
-	# 	next_note_idx_per_lane[lane_index] += 1
-	# else:
-	# 	miss_sound.play()
-	# 	_spawn_misblast_effect(current_beat, lane_index)
-	# 	if blasting_phrase:
-	# 		asp.volume_db = MUTED_VOLUME
-	# 		blasting_phrase = false
-	# 		active_phrase_missed.emit()
-	# 		print("Track %s breaking streak for misblast at beat %.2f (measure %d)" % 
-	# 			[midi_name, current_beat, song_node.current_measure()])
-	# 		streak_broken.emit()
-	# 		if reset_countdown == 0:
-	# 			_process_phrase_at_measure(song_node.current_measure() + 1)
 
 func _advance_phrase():
 	if current_phrase_index >= 0 and current_phrase_index < track_data.phrase_lengths.size():
@@ -397,8 +360,13 @@ func move_marker(measure_index: int):
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
 	# tell the song node to update its marker cache with the actual measure number
-	marker.visible = song_node.manager_node.hide_streak_hints == false
+	# tell the song node to update its marker cache with the actual measure number
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[marker_measure_index])
+
+func marker_measure() -> int:
+	if marker_measure_index < 0 or marker_measure_index >= track_data.phrase_starts.size():
+		return -1
+	return track_data.phrase_starts[marker_measure_index]
 
 func set_active(active: bool):
 	_active_track = active
@@ -409,7 +377,6 @@ func set_active(active: bool):
 			if note:
 				note.set_phrase_note(active)
 	if !active:
-		marker.visible = song_node.manager_node.hide_streak_hints == false
 		if blasting_phrase:
 			blasting_phrase = false
 			phrase_notes_blasted = 0
@@ -478,7 +445,6 @@ func activate(phrase_idx: int):
 	phrase_notes_blasted = 0
 	song_node._update_track_reset_cache(track_index, reset_measure)
 	_advance_phrase()
-	marker.visible = (song_node.manager_node.hide_streak_hints == false) and reset_measure != -1
 
 func _play_pfx(start_measure: int):
 	pfx.position.z = start_measure * - (BEATS_PER_MEASURE * length_per_beat)

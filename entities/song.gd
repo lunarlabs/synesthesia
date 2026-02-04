@@ -55,7 +55,7 @@ var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
 var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak penalty per measure for inactive phrase misses
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
-var _closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
+var closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
@@ -467,11 +467,37 @@ func _update_track_marker_cache(track_idx: int, marker_measure: int) -> void:
 		_update_closest_track_marker_cache()
 
 func _update_closest_track_marker_cache() -> void:
-	var filtered_measures = Array(_track_marker_measures).filter(func(measure: int) -> bool: return measure >= %Conductor.current_measure)
-	if filtered_measures.size() > 0:
-		_closest_track_marker_measure = filtered_measures.min()
+	var candidates: Array[int] = []
+	var curr_measure = %Conductor.current_measure
+	
+	for i in tracks.size():
+		var m = _track_marker_measures[i]
+		if m < 0:
+			continue
+
+		var t = tracks[i]
+		# Criteria:
+		# If NOT blasting: visible on Current or Ahead (>= curr)
+		# If blasting: visible only on Ahead (> curr)
+		if (not t.blasting_phrase and m >= curr_measure) \
+		or (t.blasting_phrase and m > curr_measure):
+			candidates.append(m)
+
+	if candidates.size() > 0:
+		closest_track_marker_measure = candidates.min()
 	else:
-		_closest_track_marker_measure = -1
+		closest_track_marker_measure = -1
+		
+	for track in tracks:
+		var should_be_visible = (manager_node.hide_streak_hints == false) \
+			and (closest_track_marker_measure != -1) \
+			and (track.marker_measure() == closest_track_marker_measure)
+			
+		# Enforce Ahead-only rule for blasting tracks
+		if track.blasting_phrase and track.marker_measure() <= curr_measure:
+			should_be_visible = false
+			
+		track.marker.visible = should_be_visible
 
 func _update_track_reset_cache(_track_idx: int, _reset_measure: int) -> void:
 	pass
