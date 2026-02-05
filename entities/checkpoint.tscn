@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://che0tg4hwisbv" path="res://entities/checkpoint.gd" id="1_hjeaj"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_l3rob"]
 [ext_resource type="Texture2D" uid="uid://pu8tsidf1snv" path="res://addons/kenney_particle_pack/star_02.png" id="3_l3rob"]
-[ext_resource type="PackedScene" uid="uid://dmwb2wxd5gn4v" path="res://assets/mesh/checkpoint.blend" id="4_6wqo1"]
+[ext_resource type="Shader" uid="uid://bt0wv8w2tjngg" path="res://assets/checkpointline.tres" id="5_8w72o"]
+[ext_resource type="PackedScene" uid="uid://c2fkbvpiurqex" path="res://entities/checkpointgate.tscn" id="5_nos5s"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_0bd8t"]
 left_to_right = 1.0
@@ -64,50 +65,14 @@ particles_anim_loop = false
 material = SubResource("StandardMaterial3D_6wqo1")
 size = Vector2(4, 4)
 
-[sub_resource type="Gradient" id="Gradient_6wqo1"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nos5s"]
+render_priority = 0
+shader = ExtResource("5_8w72o")
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_8w72o"]
-gradient = SubResource("Gradient_6wqo1")
-
-[sub_resource type="Curve" id="Curve_4abvr"]
-_data = [Vector2(1e-05, 1), 0.0, 0.0, 0, 0, Vector2(0.603125, 1), 0.0, 0.0, 0, 0, Vector2(0.79999995, 0), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CurveTexture_p3toe"]
-curve = SubResource("Curve_4abvr")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_byq8c"]
-particle_flag_align_y = true
-emission_shape = 6
-emission_ring_axis = Vector3(0, 0, 1)
-emission_ring_height = 1.0
-emission_ring_radius = 11.0
-emission_ring_inner_radius = 9.0
-emission_ring_cone_angle = 90.0
-direction = Vector3(0, 0, -1)
-spread = 0.0
-initial_velocity_min = 40.0
-initial_velocity_max = 60.0
-gravity = Vector3(0, 0, 10)
-linear_accel_min = 5.299998
-linear_accel_max = 5.299998
-tangential_accel_min = -20.000002
-tangential_accel_max = 19.999998
-scale_curve = SubResource("CurveTexture_p3toe")
-color_ramp = SubResource("GradientTexture1D_8w72o")
-
-[sub_resource type="Curve" id="Curve_nos5s"]
-_data = [Vector2(0, 1), 0.0, -1.0, 0, 1, Vector2(1, 0), -1.0, 0.0, 1, 0]
-point_count = 2
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g8myr"]
-shading_mode = 0
-vertex_color_use_as_albedo = true
-use_particle_trails = true
-
-[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_1e67b"]
-material = SubResource("StandardMaterial3D_g8myr")
-curve = SubResource("Curve_nos5s")
+[sub_resource type="PlaneMesh" id="PlaneMesh_1e67b"]
+material = SubResource("ShaderMaterial_nos5s")
+size = Vector2(2.5, 6)
+center_offset = Vector3(1.25, 0, -3)
 
 [node name="Checkpoint" type="Node3D" unique_id=1251994640]
 script = ExtResource("1_hjeaj")
@@ -129,7 +94,7 @@ visibility_range_fade_mode = 1
 mesh = SubResource("PrismMesh_0bd8t")
 
 [node name="Text" type="Label3D" parent="." unique_id=1941177942]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 5.5, 0.839)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 5.5, 1.174)
 visibility_range_end = 96.0
 visibility_range_end_margin = 16.0
 visibility_range_fade_mode = 1
@@ -147,8 +112,8 @@ width = 4000.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1935396468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, -0.2, 0.2)
-visibility_range_end = 96.0
-visibility_range_end_margin = 16.0
+visibility_range_end = 100.0
+visibility_range_end_margin = 100.0
 visibility_range_fade_mode = 1
 amount = 500
 preprocess = 1.0
@@ -158,19 +123,20 @@ trail_lifetime = 0.66
 process_material = SubResource("ParticleProcessMaterial_hjeaj")
 draw_pass_1 = SubResource("QuadMesh_hjeaj")
 
-[node name="checkpoint" parent="." unique_id=448327120 instance=ExtResource("4_6wqo1")]
+[node name="BoundaryLine" type="MeshInstance3D" parent="." unique_id=1272142734]
+transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, 0)
+mesh = SubResource("PlaneMesh_1e67b")
 
-[node name="ParticleOrigin" parent="checkpoint" index="1" unique_id=761898474]
-visible = false
+[node name="checkpointLeft" parent="." unique_id=671257145 instance=ExtResource("5_nos5s")]
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="checkpoint" unique_id=2091135887]
-transform = Transform3D(1, 0, 0, 0, 1.0000001, 0, 0, 0, 1.0000001, 6.25, 2.6, -0.7)
-amount = 200
-lifetime = 4.0
-explosiveness = 1.0
-trail_enabled = true
-trail_lifetime = 1.0
-process_material = SubResource("ParticleProcessMaterial_byq8c")
-draw_pass_1 = SubResource("RibbonTrailMesh_1e67b")
+[node name="GateSide" parent="checkpointLeft" index="0" unique_id=746509953]
+visibility_range_end = 100.0
 
-[editable path="checkpoint"]
+[node name="checkpointRight" parent="." unique_id=1859079486 instance=ExtResource("5_nos5s")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
+
+[node name="GateSide" parent="checkpointRight" index="0" unique_id=746509953]
+visibility_range_end = 100.0
+
+[editable path="checkpointLeft"]
+[editable path="checkpointRight"]

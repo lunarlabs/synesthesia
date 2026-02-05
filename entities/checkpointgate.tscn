@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c2fkbvpiurqex"]
+
+[ext_resource type="PackedScene" uid="uid://dmwb2wxd5gn4v" path="res://assets/mesh/checkpoint.blend" id="1_c7id0"]
+
+[node name="checkpoint" unique_id=671257145 instance=ExtResource("1_c7id0")]
+
+[node name="GateSide" parent="." index="0" unique_id=746509953]
+visibility_range_end = 200.0
+visibility_range_end_margin = 100.0
+visibility_range_fade_mode = 1

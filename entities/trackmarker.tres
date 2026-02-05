@@ -9,7 +9,9 @@ operator = 2
 constant = Color(2.454227, 2.454227, 2.454227, 1)
 
 [sub_resource type="Gradient" id="Gradient_w2ixa"]
-offsets = PackedFloat32Array(0.17253521, 1)
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.28611112, 0.9583333)
+colors = PackedColorArray(0, 0, 0, 1, 1.353256, 1.353256, 1.353256, 1)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_jag31"]
 

@@ -134,6 +134,7 @@ func _ready():
 	start_gate.fadeout_time = checkpoint_fade_time
 	start_gate.gate_location = lead_in_measures
 	start_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
+	start_gate.get_node("BoundaryLine").visible = false
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
@@ -142,6 +143,7 @@ func _ready():
 	end_gate.fadeout_time = checkpoint_fade_time
 	end_gate.gate_location = total_measures
 	end_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
+	end_gate.get_node("BoundaryLine").scale.z = 1.5
 	add_child(end_gate)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
@@ -153,6 +155,7 @@ func _ready():
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
+		checkpoint.get_node("BoundaryLine").visible = manager_node.checkpoint_modifier == 0
 		add_child(checkpoint)
 	if manager_node.autoblast:
 		%EnergyBar.hide()
@@ -622,7 +625,14 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				%HUDAnimations.play("SongClear")
 		var tween = get_tree().create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(camera, "position", Vector3(0, 3, 1), 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(camera, "position:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(camera, "position:y", 3.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		var stop_duration = seconds_per_beat * BEATS_PER_MEASURE * 2
+		# To match initial velocity (play speed) with a Quad EaseOut, Distance must be V0 * T / 2
+		# V0 = length/sec. T = 2 * measures_sec.
+		# D = (len/sec) * (2 * beats * sec) / 2 = len * beats = 1 measure length
+		var stop_distance = length_per_beat * BEATS_PER_MEASURE
+		tween.tween_property(camera, "position:z", camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
 		for track in tracks:

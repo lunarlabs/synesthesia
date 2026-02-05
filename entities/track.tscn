@@ -11,9 +11,8 @@ shader = ExtResource("3_3q0ve")
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_tmkqs"]
 material = SubResource("ShaderMaterial_7l36f")
-top_radius = 0.35
 bottom_radius = 0.27
-height = 10.0
+height = 3.0
 radial_segments = 16
 rings = 0
 cap_top = false
@@ -78,8 +77,7 @@ volume_db = -5.0
 bus = &"Interface"
 
 [node name="Marker" type="MeshInstance3D" parent="." unique_id=231201908]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
-visibility_range_fade_mode = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 mesh = SubResource("CylinderMesh_tmkqs")
 
 [node name="Whoosh" type="GPUParticles3D" parent="." unique_id=1927056625]
