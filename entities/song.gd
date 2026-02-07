@@ -227,7 +227,9 @@ func _process(delta: float):
 		var mn = manager_node
 		var trs = tracks
 
+		# WARN: Direct position assignment coupled to Conductor.current_beat can cause visual jitter if current_beat is not perfectly interpolated or if it updates at a different frequency (e.g. physics/audio) than the frame rate.
 		playhead.position.z = %Conductor.current_beat * -length_per_beat
+		# WARN: Engaging the RenderingServer via global_shader_parameter_set every frame introduces a synchronization point that can cause CPU-GPU stalls or micro-stutters, especially if the driver queue is full.
 		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
 
 		var new_active_track = active_track

@@ -18,6 +18,15 @@ shader_parameter/torus_size = Vector2(1.5, 0.2)
 shader_parameter/object_color = Color(0.1, 0.6, 0.9, 1)
 shader_parameter/fog_color = Color(0.05, 0.05, 0.1, 1)
 
+[sub_resource type="FontVariation" id="FontVariation_pjj6u"]
+base_font = ExtResource("3_mbci5")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 60,
+2003265652: 350
+}
+
 [sub_resource type="FontVariation" id="FontVariation_ctryq"]
 variation_opentype = {
 1129599571: 0,
@@ -265,7 +274,7 @@ grow_vertical = 2
 theme = ExtResource("1_0tx4y")
 script = ExtResource("1_etro7")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1882285385]
+[node name="Background" type="ColorRect" parent="." unique_id=1882285385]
 material = SubResource("ShaderMaterial_hjgwb")
 layout_mode = 1
 anchors_preset = 15
@@ -273,6 +282,45 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="SubScreenContainer" type="PanelContainer" parent="." unique_id=1420619351]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_right = 70.0
+offset_bottom = 20.0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
+layout_mode = 2
+
+[node name="ModifierButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=1261412322]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pjj6u")
+text = "MODS"
+
+[node name="SystemButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=353088189]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pjj6u")
+text = "SYS"
+
+[node name="SongsButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=881269748]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pjj6u")
+text = "SONGS"
+
+[node name="EffectsButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=977080346]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pjj6u")
+text = "EQ/FX"
+
+[node name="PlayerButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=2132771351]
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_pjj6u")
+text = "STATS"
 
 [node name="RightSide" type="VBoxContainer" parent="." unique_id=246917605]
 layout_mode = 1
@@ -302,7 +350,7 @@ anchors_preset = -1
 anchor_top = 0.5
 anchor_right = 0.66
 anchor_bottom = 1.0
-offset_left = 40.0
+offset_left = 100.0
 offset_bottom = -40.0
 
 [node name="PanelContainer" type="PanelContainer" parent="LeftSide" unique_id=625013252]
@@ -526,7 +574,7 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.425
 anchor_bottom = 0.425
-offset_left = 40.0
+offset_left = 100.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/separation = 30

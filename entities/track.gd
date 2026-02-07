@@ -138,6 +138,7 @@ func _process_manual(current_time: float):
 				asp.volume_db = MUTED_VOLUME
 			# TODO: See if the passed note was the first note in the phrase
 			# and signal inactive_phrase_missed if it was
+			# WARN: The 'in' operator performs a linear search (O(N)) on the PackedInt32Array. Execution time scales linearly with phrase size. In a hot loop or every frame, this causes variable CPU load.
 			if current_phrase_index < track_data.phrase_starts.size() \
 			and note_idx >= track_data.phrase_note_indices[current_phrase_index][0]:
 				_advance_phrase()
@@ -152,6 +153,7 @@ func _process_manual(current_time: float):
 				continue
 			if asp.volume_db != MUTED_VOLUME:
 				asp.volume_db = MUTED_VOLUME
+			# WARN: The 'in' operator performs a linear search (O(N)) on the PackedInt32Array. Execution time scales linearly with phrase size. In a hot loop or every frame, this causes variable CPU load.
 			if current_phrase_index < track_data.phrase_note_indices.size() \
 			and note_idx in track_data.phrase_note_indices[current_phrase_index]:
 				active_phrase_missed.emit()
@@ -173,12 +175,14 @@ func _process_autoblast(current_time: float):
 			
 			# Check if note is part of current active phrase and blast if so
 			if current_phrase_index < track_data.phrase_note_indices.size():
+				# WARN: Linear search O(N) inside a while loop. This compounds the cost significantly if multiple notes are processed in one frame.
 				if note_idx in track_data.phrase_note_indices[current_phrase_index]:
 					var note_node = note_nodes[note_idx] as SynRoadNote
 					if !note_node.blasted:
 						var lane = track_data.note_map.values()[note_idx]
 						song_node._targets[lane].flash()
 						note_node.blast(true)
+						# WARN: Emitting this signal triggers UI text updates in song.gd (_on_note_hit). Updating text meshes is expensive. Doing this inside a loop for multiple notes in the same frame will cause significant frame time spikes (stutter).
 						note_hit.emit(0.0) # perfect timing
 						asp.volume_db = BLASTING_VOLUME
 						phrase_notes_blasted += 1
