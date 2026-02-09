@@ -7,7 +7,7 @@
 [ext_resource type="Shader" uid="uid://b4tbx2xcdsxcy" path="res://menu/theme/SongSelectBG.gdshader" id="3_vojec"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="5_hjgwb"]
 [ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
-[ext_resource type="AudioStream" uid="uid://rpnnp1hrsh8d" path="res://assets/songsel2.mp3" id="8_hjgwb"]
+[ext_resource type="AudioStream" uid="uid://b4h8ap5v4lyh7" path="res://assets/songselsynch.tres" id="8_ctryq"]
 [ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
@@ -284,6 +284,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SubScreenContainer" type="PanelContainer" parent="." unique_id=1420619351]
+z_index = 10
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 1
 anchors_preset = 4
@@ -654,7 +655,7 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
-stream = ExtResource("8_hjgwb")
+stream = ExtResource("8_ctryq")
 volume_db = -2.0
 autoplay = true
 bus = &"Song"

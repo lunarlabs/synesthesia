@@ -80,6 +80,8 @@ signal song_finished(stats)
 var lead_distance: float = 0.0
 var energy_tween: Tween
 
+# FIXME: AudioStreamSynchronized is a thing?! HOLY FREAKING CRAP WE HAVE TO REFACTOR FOR THIS
+
 func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
 

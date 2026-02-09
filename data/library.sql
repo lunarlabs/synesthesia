@@ -17,38 +17,43 @@ CREATE TABLE "difficulty_levels" (
 
 DROP TABLE IF EXISTS "songs";
 CREATE TABLE "songs" (
-    "folder_id"     TEXT NOT NULL CHECK("folder_id" = TRIM("folder_id")),
-    "title"         TEXT NOT NULL DEFAULT 'Unknown Song',
-    "sub_title"     TEXT,
-    "artist"        TEXT NOT NULL DEFAULT 'Unknown Artist',
-    "genre"         TEXT NOT NULL DEFAULT 'Unknown Genre',
-    "bpm"           REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
-    "source"        INTEGER,
-    "desc"          TEXT,
-    "cover_art"     BLOB,
-    "inst_layout"   TEXT CHECK("inst_layout" = TRIM("inst_layout")
-                    AND LENGTH("inst_layout") > 0
-                    AND UPPER("inst_layout") GLOB '[DBGSVF]*'),
-    "files_ok"      INTEGER NOT NULL DEFAULT 0 CHECK("files_ok" = 0 
-                    OR ("resource_hash" IS NOT NULL AND "midi_hash" IS NOT NULL)),
+    "folder_id"         TEXT NOT NULL CHECK("folder_id" = TRIM("folder_id")),
+    "title"             TEXT NOT NULL DEFAULT 'Unknown Song',
+    "sub_title"         TEXT,
+    "artist"            TEXT NOT NULL DEFAULT 'Unknown Artist',
+    "genre"             TEXT NOT NULL DEFAULT 'Unknown Genre',
+    "bpm"               REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
+    "source"            INTEGER,
+    "desc"              TEXT,
+    "cover_art"         BLOB,
+    "cover_art_width"   INTEGER CHECK("cover_art_width" BETWEEN 1 AND 16777216),
+    "cover_art_height"  INTEGER CHECK("cover_art_height" BETWEEN 1 AND 16777216),
+    -- see https://docs.godotengine.org/en/stable/classes/class_image.html#enumerations
+    -- not gonna waste time w/ a foreign key table for this
+    "cover_art_fmt"     INTEGER CHECK("cover_art_fmt" BETWEEN 0 AND 46),
+    "inst_layout"       TEXT CHECK("inst_layout" = TRIM("inst_layout")
+                        AND LENGTH("inst_layout") > 0
+                        AND UPPER("inst_layout") GLOB '[DBGSVF]*'),
+    "files_ok"          INTEGER NOT NULL DEFAULT 0 CHECK("files_ok" = 0
+                        OR ("resource_hash" IS NOT NULL AND "midi_hash" IS NOT NULL)),
     -- if hashes are null the files don't exist
-    "resource_hash" TEXT CHECK("resource_hash" = TRIM("resource_hash") 
-                    AND LENGTH("resource_hash") = 32
-                    AND resource_hash GLOB '[0-9A-Fa-f]*'),
-    "midi_hash"     TEXT CHECK("midi_hash" = TRIM("midi_hash") 
-                    AND LENGTH("midi_hash") = 32
-                    AND midi_hash GLOB '[0-9A-Fa-f]*'),
-    "sort_key" TEXT GENERATED ALWAYS AS (
+    "resource_hash"     TEXT CHECK("resource_hash" = TRIM("resource_hash")
+                        AND LENGTH("resource_hash") = 32
+                        AND resource_hash GLOB '[0-9A-Fa-f]*'),
+    "midi_hash"         TEXT CHECK("midi_hash" = TRIM("midi_hash")
+                        AND LENGTH("midi_hash") = 32
+                        AND midi_hash GLOB '[0-9A-Fa-f]*'),
+    "sort_key"          TEXT GENERATED ALWAYS AS (
         CASE
-            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'the %'
-                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 5)
-            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'an %'
-                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 4)
-            WHEN lower(concat_ws(' ', title, nullif(sub_title, ''))) LIKE 'a %'
-                THEN substr(concat_ws(' ', title, nullif(sub_title, '')), 3)
-            ELSE concat_ws(' ', title, nullif(sub_title, ''))
-        END
+            WHEN LOWER(title) LIKE 'the %' THEN SUBSTR(title, 5)
+            WHEN LOWER(title) LIKE 'an %'  THEN SUBSTR(title, 4)
+            WHEN LOWER(title) LIKE 'a %'   THEN SUBSTR(title, 3)
+            ELSE title
+        END || COALESCE(' ' || NULLIF(TRIM(sub_title), ''), '')
     ) STORED,
+    CHECK (("cover_art_height" IS NULL) = ("cover_art" IS NULL)
+    AND ("cover_art_width" IS NULL) = ("cover_art" IS NULL)
+    AND ("cover_art_fmt" IS NULL) = ("cover_art" IS NULL)),
     PRIMARY KEY("folder_id"),
     FOREIGN KEY("source") REFERENCES "sources"("source_id") ON DELETE SET NULL
 );
@@ -94,7 +99,11 @@ SELECT
     src."name" AS "source_name",
     s."files_ok",
     s."resource_hash",
-    s."midi_hash"
+    s."midi_hash",
+    s."cover_art",
+    s."cover_art_fmt",
+    s."cover_art_height",
+    s."cover_art_width"
 FROM "songs" s
 LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
 LEFT JOIN "sources" src ON s."source" = src."source_id"
@@ -135,6 +144,10 @@ SELECT
     s."genre",
     s."bpm",
     s."desc",
+    s."cover_art",
+    s."cover_art_fmt",
+    s."cover_art_height",
+    s."cover_art_width",
     s."inst_layout",
     s."files_ok",
     s."resource_hash",
@@ -159,6 +172,10 @@ BEGIN
         "genre",
         "bpm",
         "desc",
+        "cover_art",
+        "cover_art_fmt",
+        "cover_art_height",
+        "cover_art_width",
         "inst_layout",
         "files_ok",
         "resource_hash",
@@ -172,6 +189,10 @@ BEGIN
         NEW."genre",
         NEW."bpm",
         NEW."desc",
+        NEW."cover_art",
+        NEW."cover_art_fmt",
+        NEW."cover_art_height",
+        NEW."cover_art_width",
         NEW."inst_layout",
         NEW."files_ok",
         NEW."resource_hash",
@@ -185,6 +206,10 @@ BEGIN
         genre = excluded.genre,
         bpm = excluded.bpm,
         desc = excluded.desc,
+        cover_art = excluded.cover_art,
+        cover_art_fmt = excluded.cover_art_fmt,
+        cover_art_height = excluded.cover_art_height,
+        cover_art_width = excluded.cover_art_width,
         inst_layout = excluded.inst_layout,
         files_ok = excluded.files_ok,
         resource_hash = excluded.resource_hash,
