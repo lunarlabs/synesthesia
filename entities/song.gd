@@ -63,7 +63,8 @@ var _last_streak_break_measure: int = -1
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
 @onready var current_track = $Playhead/CurrentTrack
-@onready var instrument_label = $Playhead/CurrentTrack/InstrumentLabel
+@onready var instrument_container = $HUD/InstrumentContainer
+@onready var instrument_label = $HUD/InstrumentContainer/InstrumentLabel
 @onready var camera: Camera3D = $Playhead/Camera3D
 @onready var count_in = $CountIn
 @onready var hud = $HUD
@@ -207,6 +208,7 @@ func _song_start():
 	%Conductor.new_measure.emit(0)
 	_cached_active_track_node = tracks[active_track]
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	# TODO: Replace w/ single call to synchronized audio player
 	get_tree().call_group("AudioPlayers", "play")
 	%Conductor.is_playing = true
 	playhead.position.z = - length_per_beat * %Conductor.current_beat
@@ -586,11 +588,12 @@ func fail_song():
 	%HUDAnimations.play("SongFailed")
 	var slow_tween = get_tree().create_tween().set_parallel(true)
 	var asps = get_tree().get_nodes_in_group("AudioPlayers")
-	slow_tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
+	slow_tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.5)
 	for asp in asps:
 		slow_tween.tween_property(asp, "pitch_scale", 0.01, 3.0)
 	await %HUDAnimations.animation_finished
 	finished = true
+	# TODO: Replace w/ single call to synchronized audio player
 	get_tree().call_group("AudioPlayers", "stop")
 	%Conductor.is_playing = false
 	song_failed.emit(stats)
@@ -604,6 +607,10 @@ func _print_new_measure_connections() -> void:
 		var method = callable.get_method()
 		print(" -> %s.%s" % [target.name, method])
 
+func change_track_volume(track_idx: int, volume: float) -> void:
+	# TODO: Get the AudioStreamSynchronized from the AudioStreamPlayer, change volume
+	# of stream track_idx + 1 (click track is stream 0)
+	pass
 
 func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
@@ -638,7 +645,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		var stop_distance = length_per_beat * BEATS_PER_MEASURE
 		tween.tween_property(camera, "position:z", camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(instrument_label, "scale", Vector3.ZERO, 0.2)
+		tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.2)
 		for track in tracks:
 			track.asp.volume_db = -6.0
 		playhead.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
@@ -671,6 +678,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			count_in.position.z = - (BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
 			if lead_in_measures == 2:
+				var tween = create_tween()
+				tween.tween_property(instrument_container, "scale", Vector2.ONE, 0.2)
 				%TargetPfx.emitting = true
 				for tgt in _targets:
 					tgt.show()

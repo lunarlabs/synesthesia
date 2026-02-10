@@ -55,6 +55,7 @@ var phrase_start_measure: int:
 			return track_data.phrase_starts[current_phrase_index]
 		return 0
 
+# TODO: Replace all calls to asp with calls to song node's synchronized audio player
 @onready var asp = $Music as AudioStreamPlayer
 @onready var miss_sound = $MissSound as AudioStreamPlayer
 @onready var marker = $Marker as Node3D

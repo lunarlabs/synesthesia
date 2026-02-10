@@ -1358,6 +1358,12 @@ _data = {
 &"phrase_fail": SubResource("Animation_qk6wt")
 }
 
+[sub_resource type="LabelSettings" id="LabelSettings_bn0wb"]
+font = SubResource("FontVariation_q2dmg")
+font_size = 40
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_scy1h"]
 shading_mode = 0
 
@@ -1400,6 +1406,7 @@ visible = false
 
 [node name="InstrumentLabel" type="Label3D" parent="Playhead/CurrentTrack" unique_id=373394203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16338265, 0.83456635)
+visible = false
 pixel_size = 0.006
 billboard = 1
 double_sided = false
@@ -1858,6 +1865,30 @@ texture_progress = ExtResource("12_36g15")
 [node name="HUDAnimations" type="AnimationPlayer" parent="HUD" unique_id=1470305178]
 unique_name_in_owner = true
 libraries/ = SubResource("AnimationLibrary_82rk8")
+
+[node name="InstrumentContainer" type="PanelContainer" parent="HUD" unique_id=2124739846]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.92
+anchor_right = 0.5
+anchor_bottom = 0.92
+offset_left = -4.0
+offset_top = -40.0
+offset_right = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1e-05, 1e-05)
+pivot_offset_ratio = Vector2(0.5, 0.5)
+
+[node name="InstrumentLabel" type="Label" parent="HUD/InstrumentContainer" unique_id=1181745123]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "GUITAR"
+label_settings = SubResource("LabelSettings_bn0wb")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
 
 [node name="actualplayhead" type="MeshInstance3D" parent="." unique_id=100685933]
 unique_name_in_owner = true
