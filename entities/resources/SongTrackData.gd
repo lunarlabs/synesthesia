@@ -10,4 +10,4 @@ class_name SongTrackData
 @export_enum("Drums", "Bass", "Guitar", "Synth", "Vocals", "FX") var instrument = 0
 
 ## The audio file of the track
-@export_file("*.wav") var audio_file: String = ""
+@export_file("*.wav", "*.ogg", "*.mp3") var audio_file: String = ""

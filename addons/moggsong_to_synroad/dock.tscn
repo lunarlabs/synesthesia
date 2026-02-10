@@ -7,12 +7,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SongFolderEdit" type="LineEdit" parent="." unique_id=277256026]
-unique_name_in_owner = true
-layout_mode = 2
-placeholder_text = "Song Folder"
-emoji_menu_enabled = false
-
 [node name="ButtonBar" type="HBoxContainer" parent="." unique_id=754185880]
 layout_mode = 2
 alignment = 2
@@ -22,28 +16,22 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FolderSelectButton" type="Button" parent="ButtonBar" unique_id=778512906]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Select Folder"
-
 [node name="ImportButton" type="Button" parent="ButtonBar" unique_id=272813713]
 unique_name_in_owner = true
 layout_mode = 2
+text = "Import/Open..."
+
+[node name="ExtractAudioButton" type="Button" parent="ButtonBar" unique_id=1892259946]
+unique_name_in_owner = true
+layout_mode = 2
 disabled = true
-text = "Import"
+text = "Extract Audio Files"
 
 [node name="SaveButton" type="Button" parent="ButtonBar" unique_id=2137912240]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Save"
-
-[node name="WarningLabel" type="Label" parent="." unique_id=216216169]
-unique_name_in_owner = true
-visible = false
-modulate = Color(1, 0.6, 0.2, 1)
-layout_mode = 2
 
 [node name="Main" type="HSplitContainer" parent="." unique_id=148554575]
 layout_mode = 2
@@ -64,11 +52,11 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 editable = false
 
-[node name="LongTitleTitle" type="Label" parent="Main/VBoxContainer" unique_id=1921052507]
+[node name="SubTitleTitle" type="Label" parent="Main/VBoxContainer" unique_id=1921052507]
 layout_mode = 2
-text = "Title (long)"
+text = "Subtitle"
 
-[node name="LongTitleEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=1706104060]
+[node name="SubTitleEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=1706104060]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -89,6 +77,16 @@ layout_mode = 2
 text = "Genre"
 
 [node name="GenreEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=338506969]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="SourceTitle" type="Label" parent="Main/VBoxContainer" unique_id=249141647]
+layout_mode = 2
+text = "Source"
+
+[node name="SourceEntry" type="LineEdit" parent="Main/VBoxContainer" unique_id=158324999]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -192,7 +190,7 @@ size_flags_vertical = 3
 
 [node name="CheckpointEditor" type="VBoxContainer" parent="Main/HBoxContainer" unique_id=988080161]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
 [node name="CheckpointHeader" type="HBoxContainer" parent="Main/HBoxContainer/CheckpointEditor" unique_id=1781588851]
@@ -216,22 +214,31 @@ editable = false
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
-text = "Add"
+text = "+"
 
 [node name="CheckpointList" type="ItemList" parent="Main/HBoxContainer/CheckpointEditor" unique_id=561123252]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SongDirDialog" type="FileDialog" parent="." unique_id=1619022146]
+[node name="WarningLabel" type="Label" parent="." unique_id=216216169]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 0.6, 0.2, 1)
+layout_mode = 2
+
+[node name="MoggsongDialog" type="FileDialog" parent="." unique_id=1619022146]
 unique_name_in_owner = true
 oversampling_override = 1.0
-title = "Open a Directory"
+title = "Open a File"
 initial_position = 2
 size = Vector2i(1000, 500)
-file_mode = 2
+file_mode = 0
 display_mode = 1
 root_subfolder = "song"
+filters = PackedStringArray("*.moggsong;Moggsong Files;application/x-moggsong")
+option_count = 1
+option_0/name = "Overwrite Metadata"
 
 [node name="AudioFileDialog" type="FileDialog" parent="." unique_id=1061102641]
 unique_name_in_owner = true
@@ -244,7 +251,6 @@ display_mode = 1
 root_subfolder = "song"
 filters = PackedStringArray("*.wav; Audio Stems")
 
-[connection signal="pressed" from="ButtonBar/FolderSelectButton" to="." method="_on_folder_select_button_pressed"]
 [connection signal="pressed" from="ButtonBar/ImportButton" to="." method="_on_import_button_pressed"]
 [connection signal="pressed" from="ButtonBar/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="Main/HBoxContainer/InstrumentEditor/InstrumentHeader/AddTrackButton" to="." method="_on_add_track_button_pressed"]
