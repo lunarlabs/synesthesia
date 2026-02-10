@@ -15,6 +15,10 @@ run/main_scene="uid://cj5qbqo5phlu1"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
+[audio]
+
+buses/default_bus_layout="uid://dgtf2ermp4iqc"
+
 [autoload]
 
 SongCatalog="*res://menu/song_catalog.gd"
