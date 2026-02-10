@@ -41,9 +41,9 @@ const MIDI_META_TEMPO_EVENT = 0x51
 @export var tracks: Array[SongTrackData]
 
 ## Path to the audio file for the song's main track
-@export_file("*.wav") var click_track = ""
+@export_file("*.wav","*.mp3","*.ogg") var click_track = ""
 
-@export_file("*.wav") var preview_audio = ""
+@export_file("*.wav","*.mp3","*.ogg") var preview_audio = ""
 
 @export_file("*.wav","*.mp3","*.ogg") var selection_audio = "res://assets/transition.mp3"
 
@@ -192,3 +192,11 @@ func _get_song_track_locations() -> Dictionary[String, int]:
 		else:
 			push_error("Track name %s not found in MIDI data." % tracks[i].midi_track_name)
 	return locations
+
+func get_audio_stream_synchronized() -> AudioStreamSynchronized:
+	var result: AudioStreamSynchronized = AudioStreamSynchronized.new()
+	result.stream_count = tracks.size() + 1
+	result.set_sync_stream(0, load(click_track))
+	for i in tracks.size():
+		result.set_sync_stream(i + 1, load(tracks[i].audio_file))
+	return result
