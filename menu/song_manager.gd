@@ -131,6 +131,7 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	get_window().focus_exited.connect(_on_lose_focus)
 	print("Loading %s" % song_file)
 	song_data = load(song_file) as SongData
@@ -282,6 +283,7 @@ func _on_song_failed(stats) -> void:
 	var finish_state = FinishMode.FAILED
 
 	song_instance.hud.hide()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	result_screen.display(finish_state, song_stats,
 		SessionManager.get_song_best_record(midi_hash, difficulty))
 	SessionManager.record_song_result(midi_hash, song_stats)
@@ -326,6 +328,7 @@ func _on_song_finished(stats) -> void:
 					song_stats.clear_state = SessionManager.SongResult.ClearState.CLEAR
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
 	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,
 		SessionManager.get_song_best_record(midi_hash, difficulty))
@@ -344,6 +347,7 @@ func _toggle_pause() -> void:
 	
 	get_tree().paused = not get_tree().paused
 	pause_panel.visible = get_tree().paused
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if get_tree().paused else Input.MOUSE_MODE_HIDDEN
 
 func _on_continue_pressed() -> void:
 	_toggle_pause()
