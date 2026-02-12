@@ -59,7 +59,7 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
-@onready var click_track_asp = $ClickTrack
+@onready var asp = $ClickTrack
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
 @onready var current_track = $Playhead/CurrentTrack
@@ -98,7 +98,7 @@ func _ready():
 	length_multiplier = manager_node.length_multiplier
 	total_measures = manager_node.song_data.playable_measures + lead_in_measures
 	bpm = manager_node.song_data.bpm
-	%Conductor.setup(click_track_asp, bpm)
+	%Conductor.setup(asp, bpm)
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_playhead_speed = - (length_per_beat / seconds_per_beat)
@@ -126,7 +126,7 @@ func _ready():
 		ChunkManager.request_chunk(i, 0)
 		await ChunkManager.queue_empty
 	print("tracks added")
-	click_track_asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
+	asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
@@ -587,10 +587,8 @@ func fail_song():
 	}
 	%HUDAnimations.play("SongFailed")
 	var slow_tween = get_tree().create_tween().set_parallel(true)
-	var asps = get_tree().get_nodes_in_group("AudioPlayers")
 	slow_tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.5)
-	for asp in asps:
-		slow_tween.tween_property(asp, "pitch_scale", 0.01, 3.0)
+	slow_tween.tween_property(asp, "pitch_scale", 0.01, 3.0)
 	await %HUDAnimations.animation_finished
 	finished = true
 	# TODO: Replace w/ single call to synchronized audio player
