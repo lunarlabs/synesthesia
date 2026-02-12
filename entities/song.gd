@@ -59,7 +59,7 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
-@onready var asp = $ClickTrack
+@onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
 @onready var current_track = $Playhead/CurrentTrack
@@ -555,7 +555,7 @@ func _on_note_hit(offset: float):
 	%EarlyHitLabel.text = str(_early_note_hits)
 	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * -1000)
 	%LateHitLabel.text = str(_late_note_hits)
-	if abs(offset) > 0.025:
+	if abs(offset) > 0.015:
 		lbl_fast_slow.show()
 		if offset > 0:
 			lbl_fast_slow.add_theme_color_override("font_color", Color.LIGHT_CORAL)
