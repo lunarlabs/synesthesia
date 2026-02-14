@@ -114,3 +114,7 @@ current_track={
 "type": "int",
 "value": 0
 }
+viz={
+"type": "sampler2D",
+"value": ""
+}

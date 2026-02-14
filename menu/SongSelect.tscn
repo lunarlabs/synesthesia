@@ -3,18 +3,15 @@
 [ext_resource type="Theme" uid="uid://cm4v2e2f0im5p" path="res://menu/theme/MenuTheme.tres" id="1_0tx4y"]
 [ext_resource type="Script" uid="uid://bwqk5wogs7fgg" path="res://menu/song_select.gd" id="1_etro7"]
 [ext_resource type="PackedScene" uid="uid://br0ofs7o2a64t" path="res://menu/difficultyPanel.tscn" id="1_w051a"]
+[ext_resource type="Shader" uid="uid://be3jqj5q6rr03" path="res://assets/SongSelectBG.gdshader" id="3_ctryq"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="3_mbci5"]
-[ext_resource type="Shader" uid="uid://b4tbx2xcdsxcy" path="res://menu/theme/SongSelectBG.gdshader" id="3_vojec"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="5_hjgwb"]
 [ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
 [ext_resource type="AudioStream" uid="uid://b4h8ap5v4lyh7" path="res://assets/songselsynch.tres" id="8_ctryq"]
 [ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
-shader = ExtResource("3_vojec")
-shader_parameter/speed = 4.00000018674012
-shader_parameter/spacing = 4.0
-shader_parameter/torus_size = Vector2(1.5, 0.2)
+shader = ExtResource("3_ctryq")
 shader_parameter/object_color = Color(0.1, 0.6, 0.9, 1)
 shader_parameter/fog_color = Color(0.05, 0.05, 0.1, 1)
 
@@ -656,9 +653,8 @@ label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
 stream = ExtResource("8_ctryq")
-volume_db = -2.0
 autoplay = true
-bus = &"Song"
+bus = &"Menu"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628454593]
 root_node = NodePath("../TopBox/SongInfo")

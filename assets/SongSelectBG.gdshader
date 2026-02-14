@@ -1,16 +1,8 @@
 shader_type canvas_item;
 
 // --- Uniforms ---
-// Speed of the camera movement
-uniform float speed : hint_range(0.1, 5.0) = 1.0;
 
-// Spacing between each torus in the tunnel
-uniform float spacing : hint_range(2.0, 10.0) = 4.0;
-
-// Torus dimensions: x = major radius (ring size), y = minor radius (thickness)
-uniform vec2 torus_size = vec2(1.5, 0.2);
-
-// Color of the torus
+// Color of the objects
 uniform vec3 object_color : source_color = vec3(0.1, 0.6, 0.9);
 
 // Background/Fog color
@@ -25,37 +17,56 @@ const float MAX_DIST = 50.0;
 // Surface hit threshold (how close we need to get to consider it a hit)
 const float SURF_DIST = 0.001;
 
+vec2 opRevolution(in vec3 p, float w){
+	return vec2(length(p.xz) - w, p.y);
+}
+
 // --- Signed Distance Functions (SDF) ---
 
-// Torus SDF (Oriented in XY plane for Z-axis flythrough)
-// p: current point in 3D space
-// t: dimensions (x = radius, y = thickness)
-float sdTorus(vec3 p, vec2 t) {
-    vec2 q = vec2(length(p.xy) - t.x, p.z);
-    return length(q) - t.y;
+float sdOctahedron( vec3 p, float s )
+{
+  p = abs(p);
+  float m = p.x+p.y+p.z-s;
+  vec3 q;
+       if( 3.0*p.x < m ) q = p.xyz;
+  else if( 3.0*p.y < m ) q = p.yzx;
+  else if( 3.0*p.z < m ) q = p.zxy;
+  else return m*0.57735027;
+    
+  float k = clamp(0.5*(q.z-q.y+s),0.0,s); 
+  return length(vec3(q.x,q.y-s+k,q.z-k)); 
+}
+
+float sdParallelogram( in vec2 p, float wi, float he, float sk ) {
+    vec2 e = vec2(sk,he);
+    p = (p.y<0.0)?-p:p;
+    vec2  w = p - e; w.x -= clamp(w.x,-wi,wi);
+    vec2  d = vec2(dot(w,w), -w.y);
+    float s = p.x*e.y - p.y*e.x;
+    p = (s<0.0)?-p:p;
+    vec2  v = p - vec2(wi,0); v -= e*clamp(dot(v,e)/dot(e,e),-1.0,1.0);
+    d = min( d, vec2(dot(v,v), wi*he-abs(s)));
+    return sqrt(d.x)*sign(-d.y);
 }
 
 // Scene Map Function
 // Calculates the closest distance to any object in the scene
 float map(vec3 p) {
-    // 1. Infinite Repetition (Domain Warping)
-    // We wrap the Z coordinate using mod to create infinite copies.
-    // The '- 0.5 * spacing' centers the domain so the torus sits in the middle of the cell.
-    float z = mod(p.z, spacing) - 0.5 * spacing;
-
-    // Create a new position vector with the wrapped Z
-    vec3 p_rep = vec3(p.x, p.y, z);
-
-    // 2. Optional: Rotation (Spinning effect)
-    // Rotate around Z axis based on absolute Z position to make the tunnel twist
-    float angle = p.z * 0.1;
-    float s = sin(angle);
-    float c = cos(angle);
-    mat2 rot = mat2(vec2(c, -s), vec2(s, c));
-    p_rep.xy = p_rep.xy * rot;
-
-    // 3. Return distance to the torus
-    return sdTorus(p_rep, torus_size);
+	float d = 1e10;
+	
+	{
+	vec3 q = p - vec3(0., 5., 0.);
+	d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., -.8));
+	}
+	{
+	vec3 q = p - vec3(0., -5., 0.);
+	d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8));
+	}
+	{
+	d = min(d, sdOctahedron(p, 4));
+	}
+	
+	return d;
 }
 
 // --- Raymarcher ---
@@ -119,8 +130,7 @@ void fragment() {
 
     // 2. Camera Setup
     // Ray Origin (Camera Position)
-    // Move camera along Z axis based on time
-    vec3 ro = vec3(0.0, 0.0, speed*TIME);
+    vec3 ro = vec3(3.0, 0.0, -10.);
 
     // Ray Direction
     // The UV becomes the XY direction, Z is forward (1.0)
