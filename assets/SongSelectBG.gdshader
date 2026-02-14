@@ -2,11 +2,7 @@ shader_type canvas_item;
 
 // --- Uniforms ---
 
-// Color of the objects
-uniform vec3 object_color : source_color = vec3(0.1, 0.6, 0.9);
-
-// Background/Fog color
-uniform vec3 fog_color : source_color = vec3(0.05, 0.05, 0.1);
+global uniform sampler2D viz;
 
 // Maximum number of raymarching steps (higher = better quality but slower)
 const int MAX_STEPS = 100;
@@ -49,6 +45,12 @@ float sdParallelogram( in vec2 p, float wi, float he, float sk ) {
     return sqrt(d.x)*sign(-d.y);
 }
 
+float sdVerticalCapsule( vec3 p, float h, float r )
+{
+  p.y -= clamp( p.y, 0.0, h );
+  return length( p ) - r;
+}
+
 // Scene Map Function
 // Calculates the closest distance to any object in the scene
 float map(vec3 p) {
@@ -65,6 +67,17 @@ float map(vec3 p) {
 	{
 	d = min(d, sdOctahedron(p, 4));
 	}
+    for(int i = 0; i < 64; i++) {
+        int j = i % 16;
+		float h = texelFetch(viz, ivec2(j,0), 0).x; 
+        float angle = (TAU / 64.) * float(i) + (TIME * .25);
+		vec2 pol = vec2(sin(angle), cos(angle)) * 11.;
+        vec3 q = p - vec3(pol.x, .75, pol.y);
+        d = min(d, sdVerticalCapsule(q, h*2.5, .25));
+		pol = vec2(sin(-angle), cos(-angle)) * 11.;
+		q = p - vec3(pol.x, -.75 - (h * 2.5), pol.y);
+        d = min(d, sdVerticalCapsule(q, h*2.5, .25));
+    }
 	
 	return d;
 }
@@ -108,8 +121,7 @@ vec3 get_normal(vec3 p) {
 // Calculates simple lighting based on normal
 float get_light(vec3 p) {
     // Light position (relative to camera or fixed in world)
-    // Here we place a light slightly ahead of the point to illuminate the tunnel
-    vec3 light_pos = vec3(0.0, 0.0, p.z - 2.0);
+    vec3 light_pos = vec3(0.5, -3.0, p.z - 4.0);
 
     vec3 l = normalize(light_pos - p);
     vec3 n = get_normal(p);
@@ -140,26 +152,12 @@ void fragment() {
     float d = ray_march(ro, rd);
 
     // 4. Coloring
-    vec3 col = vec3(0.0);
-
-    if(d < MAX_DIST) {
+    vec3 col = vec3(0.);
+	if(d < MAX_DIST) {
         // We hit something
         vec3 p = ro + rd * d;
-        float dif = get_light(p);
-
-        // Base color * light intensity
-        col = object_color * dif;
-
-        // Add simple Fresnel rim lighting for a "glowing" edge look
-        // (optional, makes it look sci-fi)
-        // float fresnel = pow(1.0 + dot(rd, get_normal(p)), 2.0);
-        // col += vec3(0.5, 0.8, 1.0) * fresnel;
-    }
-
-    // 5. Fog / Fade to background
-    // Mix the object color with the fog color based on distance
-    // This hides the artifacts where the raymarcher hits MAX_DIST
-    col = mix(col, fog_color, 1.0 - exp(-d * 0.08));
+		col = vec3(get_light(p)); 
+	}
 
     // Output final color
     COLOR = vec4(col, 1.0);

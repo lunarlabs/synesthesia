@@ -12,8 +12,6 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
 shader = ExtResource("3_ctryq")
-shader_parameter/object_color = Color(0.1, 0.6, 0.9, 1)
-shader_parameter/fog_color = Color(0.05, 0.05, 0.1, 1)
 
 [sub_resource type="FontVariation" id="FontVariation_pjj6u"]
 base_font = ExtResource("3_mbci5")
