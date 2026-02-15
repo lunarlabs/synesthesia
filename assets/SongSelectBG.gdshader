@@ -170,6 +170,23 @@ float get_light(vec3 p) {
     return dif;
 }
 
+// Convert HSL to RGB
+vec3 hsl_to_rgb(float h, float s, float l) {
+    float c = (1.0 - abs(2.0 * l - 1.0)) * s;
+    float x = c * (1.0 - abs(mod(h * 6.0, 2.0) - 1.0));
+    float m = l - c / 2.0;
+    
+    vec3 rgb;
+    if (h < 1.0/6.0) rgb = vec3(c, x, 0.0);
+    else if (h < 2.0/6.0) rgb = vec3(x, c, 0.0);
+    else if (h < 3.0/6.0) rgb = vec3(0.0, c, x);
+    else if (h < 4.0/6.0) rgb = vec3(0.0, x, c);
+    else if (h < 5.0/6.0) rgb = vec3(x, 0.0, c);
+    else rgb = vec3(c, 0.0, x);
+    
+    return rgb + m;
+}
+
 void fragment() {
     // 1. Aspect Ratio Correction
     // SCREEN_PIXEL_SIZE is vec2(1.0/width, 1.0/height)
@@ -190,12 +207,31 @@ void fragment() {
     // 3. Perform Raymarching
     float d = ray_march(ro, rd);
 
-    // 4. Coloring
-    vec3 col = vec3(0.);
+    // 4. Coloring with Blue-Cyan Palette and Depth Fog
+    // Background color (deep blue)
+    vec3 bg_color = hsl_to_rgb(0.58, 0.4, 0.08);
+    
+    vec3 col = bg_color;
 	if(d < MAX_DIST) {
         // We hit something
         vec3 p = ro + rd * d;
-		col = vec3(get_light(p)); 
+        float light = get_light(p);
+        
+        // Color based on lighting and depth
+        // Hue: Blue (0.55) to Cyan (0.52) based on height
+        float hue = mix(0.55, 0.52, (p.y + 5.0) / 10.0);
+        
+        // Saturation: Low for subtlety (0.3-0.5)
+        float sat = mix(0.3, 0.5, light);
+        
+        // Lightness: Based on diffuse lighting
+        float lightness = mix(0.15, 0.45, light);
+        
+        vec3 surface_color = hsl_to_rgb(hue, sat, lightness);
+        
+        // Depth fog: Mix surface color with background based on distance
+        float fog_factor = smoothstep(0.0, MAX_DIST * 0.7, d);
+        col = mix(surface_color, bg_color, fog_factor);
 	}
 
     // Output final color
