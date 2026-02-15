@@ -8,6 +8,7 @@ const RESYNC_INTERVAL_SECONDS := 0.25
 
 var time_elapsed: float
 var current_beat: float
+var beat_int: int
 var current_measure: int
 var is_playing: bool = false
 
@@ -44,6 +45,9 @@ func _process(delta: float):
 			time_elapsed = lerp(time_elapsed, audio_time, 0.1)
 
 	current_beat = time_elapsed / _seconds_per_beat
+	if floori(current_beat) > beat_int:
+		Input.start_joy_vibration(0, 1.0, 0.0, 0.1)
+		beat_int = floori(current_beat)
 
 	var this_measure = floori(current_beat / 4.0)
 	if this_measure > current_measure:
@@ -51,5 +55,5 @@ func _process(delta: float):
 		new_measure.emit(current_measure)
 
 func get_audio_time() -> float:
-	return _audio_player.get_playback_position() + AudioServer.get_time_since_last_mix()\
+	return _audio_player.get_playback_position() + AudioServer.get_time_since_last_mix() \
 	- AudioServer.get_output_latency()
