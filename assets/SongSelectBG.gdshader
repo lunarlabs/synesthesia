@@ -51,35 +51,74 @@ float sdVerticalCapsule( vec3 p, float h, float r )
   return length( p ) - r;
 }
 
-// Scene Map Function
-// Calculates the closest distance to any object in the scene
+// --- Optimized Helper Function ---
+// Calculates distance to a ring of capsules using domain repetition
+float opRing(vec3 p, float y_offset, float rot_dir, bool is_top) {
+    // 1. Convert to Polar Coordinates
+    float r = length(p.xz);
+    float a = atan(p.x, p.z); // Aligned with your sin(a)/cos(a) logic
+    
+    // 2. Apply Rotation
+    a -= rot_dir * (TIME * 0.25);
+    
+    // 3. Domain Repetition (Fold Space)
+    float sector_size = TAU / 64.0;
+    
+    // Calculate which "wedge" of the circle we are in
+    float id = floor(a / sector_size + 0.5);
+    
+    // Remap angle to be local to that wedge (-0.5 to 0.5 of sector)
+    float local_a = a - id * sector_size;
+    
+    // 4. Recover the Index (0 to 47)
+    // We use modulo to wrap the ID back to 0-47 range
+    int i = int(mod(id, 64.0)); 
+    int j = i % 16; 
+    
+    // Fetch the height for THIS specific wedge
+    float h = texelFetch(viz, ivec2(j, 0), 0).x;
+    
+    // 5. Reconstruct Position
+    // In this folded space, the object is always at angle 0, distance 11.
+    // We calculate p's position relative to that single object.
+    vec2 local_pos = vec2(sin(local_a), cos(local_a)) * r;
+    vec2 obj_pos = vec2(0.0, 11.0); // Object is at 0 rads, radius 11
+    vec2 d_xz = local_pos - obj_pos;
+    
+    // 6. Handle Vertical Offset
+    float y_pos = is_top ? y_offset : y_offset - (h * 2.5);
+    
+    // Construct the query point relative to the capsule center
+    vec3 q = vec3(d_xz.x, p.y - y_pos, d_xz.y);
+    
+    return sdVerticalCapsule(q, h * 2.5, 0.25);
+}
+
+// --- Scene Map Function ---
 float map(vec3 p) {
-	float d = 1e10;
-	
-	{
-	vec3 q = p - vec3(0., 5., 0.);
-	d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., -.8));
-	}
-	{
-	vec3 q = p - vec3(0., -5., 0.);
-	d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8));
-	}
-	{
-	d = min(d, sdOctahedron(p, 4));
-	}
-    for(int i = 0; i < 64; i++) {
-        int j = i % 16;
-		float h = texelFetch(viz, ivec2(j,0), 0).x; 
-        float angle = (TAU / 64.) * float(i) + (TIME * .25);
-		vec2 pol = vec2(sin(angle), cos(angle)) * 11.;
-        vec3 q = p - vec3(pol.x, .75, pol.y);
-        d = min(d, sdVerticalCapsule(q, h*2.5, .25));
-		pol = vec2(sin(-angle), cos(-angle)) * 11.;
-		q = p - vec3(pol.x, -.75 - (h * 2.5), pol.y);
-        d = min(d, sdVerticalCapsule(q, h*2.5, .25));
+    float d = 1e10;
+    
+    // 1. Central Geometry (Unchanged)
+    {
+        vec3 q = p - vec3(0., 5., 0.);
+        d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., -.8));
     }
-	
-	return d;
+    {
+        vec3 q = p - vec3(0., -5., 0.);
+        d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8));
+    }
+    {
+        d = min(d, sdOctahedron(p, 4.0));
+    }
+    
+    // 2. Optimized Rings (Replaces the loop)
+    // Top Ring (Rotates Positive, Offset 0.75)
+    d = min(d, opRing(p, 0.75, 1.0, true));
+    
+    // Bottom Ring (Rotates Negative, Offset -0.75)
+    d = min(d, opRing(p, -0.75, -1.0, false));
+    
+    return d;
 }
 
 // --- Raymarcher ---
