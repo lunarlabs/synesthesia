@@ -59,6 +59,7 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
+var _synchronized_stream: AudioStreamSynchronized
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -126,7 +127,7 @@ func _ready():
 		ChunkManager.request_chunk(i, 0)
 		await ChunkManager.queue_empty
 	print("tracks added")
-	asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
+	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
@@ -608,6 +609,10 @@ func _print_new_measure_connections() -> void:
 func change_track_volume(track_idx: int, volume: float) -> void:
 	# TODO: Get the AudioStreamSynchronized from the AudioStreamPlayer, change volume
 	# of stream track_idx + 1 (click track is stream 0)
+	var stream = asp.stream as AudioStreamSynchronized
+	var channel := track_idx + 1
+	clampf(volume, -60., 0.)
+	stream.set_sync_stream_volume(channel, volume)
 	pass
 
 func _on_conductor_new_measure(measure: Variant) -> void:
