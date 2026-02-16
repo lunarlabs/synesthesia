@@ -56,14 +56,13 @@ var phrase_start_measure: int:
 		return 0
 
 # TODO: Replace all calls to asp with calls to song node's synchronized audio player
-@onready var asp = $Music as AudioStreamPlayer
 @onready var miss_sound = $MissSound as AudioStreamPlayer
 @onready var marker = $Marker as Node3D
 @onready var pfx = $Whoosh as GPUParticles3D
 var rails: MultiMeshInstance3D
 var vol_dB: float:
 	get:
-		return asp.volume_db
+		return song_node.get_track_volume(track_index)
 
 signal started_phrase(phrase_score_value: int, start_measure: int, measure_count: int)
 signal track_activated(phrase_score_value: int, start_measure: int)
@@ -97,11 +96,7 @@ func _enter_tree():
 		rails.multimesh.set_instance_transform(i, rail_transform)
 
 func _ready():
-	asp.stream = load(audio_file) as AudioStream
 	# Cache materials once at track level instead of loading in each chunk
-	asp.volume_db = UNFOCUSED_VOLUME
-	asp.add_to_group("AudioPlayers")
-	asp.add_to_group("TrackAudio")
 	pfx.process_material.color = lane_tint
 	marker.position.x = track_data.phrase_marker_positions[0].x
 	marker.position.z = track_data.phrase_marker_positions[0].y
@@ -135,8 +130,8 @@ func _process_manual(current_time: float):
 		elif (!is_active) and current_time > note_time:
 			# Track is not active, but we've passed the note. Mark as missed and mute the track.
 			next_note_idx_per_lane[lane_index] += 1
-			if asp.volume_db != MUTED_VOLUME:
-				asp.volume_db = MUTED_VOLUME
+			if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+				song_node.change_track_volume(track_index, MUTED_VOLUME)
 			# TODO: See if the passed note was the first note in the phrase
 			# and signal inactive_phrase_missed if it was
 			# WARN: The 'in' operator performs a linear search (O(N)) on the PackedInt32Array. Execution time scales linearly with phrase size. In a hot loop or every frame, this causes variable CPU load.
@@ -152,8 +147,8 @@ func _process_manual(current_time: float):
 			if note_node and note_node.blasted:
 				# Blasted but the index didn't advance. We're done.
 				continue
-			if asp.volume_db != MUTED_VOLUME:
-				asp.volume_db = MUTED_VOLUME
+			if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+				song_node.change_track_volume(track_index, MUTED_VOLUME)
 			# WARN: The 'in' operator performs a linear search (O(N)) on the PackedInt32Array. Execution time scales linearly with phrase size. In a hot loop or every frame, this causes variable CPU load.
 			if current_phrase_index < track_data.phrase_note_indices.size() \
 			and note_idx in track_data.phrase_note_indices[current_phrase_index]:
@@ -185,7 +180,7 @@ func _process_autoblast(current_time: float):
 						note_node.blast(true)
 						# WARN: Emitting this signal triggers UI text updates in song.gd (_on_note_hit). Updating text meshes is expensive. Doing this inside a loop for multiple notes in the same frame will cause significant frame time spikes (stutter).
 						note_hit.emit(0.0) # perfect timing
-						asp.volume_db = BLASTING_VOLUME
+						song_node.change_track_volume(track_index, BLASTING_VOLUME)
 						phrase_notes_blasted += 1
 						
 						# Start phrase logic
@@ -225,8 +220,8 @@ func _process_autoblast(current_time: float):
 				next_note_idx += 1
 			else:
 				# Track is not active, but we've passed the note. Mute the track.
-				if asp.volume_db != MUTED_VOLUME:
-					asp.volume_db = MUTED_VOLUME
+				if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+					song_node.change_track_volume(track_index, MUTED_VOLUME)
 				
 				# See if the passed note was the first note in the phrase
 				# and signal inactive_phrase_missed if it was
@@ -246,7 +241,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 			_misblast(conductor.current_beat, lane_index)
 			if blasting_phrase:
 				phrase_notes_blasted = 0
-				asp.volume_db = MUTED_VOLUME
+				song_node.change_track_volume(track_index, MUTED_VOLUME)
 				blasting_phrase = false
 				active_phrase_missed.emit()
 				streak_broken.emit()
@@ -262,7 +257,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 			next_note_idx_per_lane[lane_index] += 1
 			note_node.blast(true)
 			note_hit.emit(time_offset)
-			asp.volume_db = BLASTING_VOLUME
+			song_node.change_track_volume(track_index, BLASTING_VOLUME)
 			if current_phrase_index >= track_data.phrase_note_indices.size():
 				return
 			if target_note_index == track_data.phrase_note_indices[current_phrase_index][phrase_notes_blasted]:
@@ -285,7 +280,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 			_misblast(conductor.current_beat, lane_index)
 			if blasting_phrase:
 				phrase_notes_blasted = 0
-				asp.volume_db = MUTED_VOLUME
+				song_node.change_track_volume(track_index, MUTED_VOLUME)
 				blasting_phrase = false
 				active_phrase_missed.emit()
 				streak_broken.emit()
@@ -389,8 +384,8 @@ func set_active(active: bool):
 			active_phrase_missed.emit()
 			streak_broken.emit()
 			_advance_phrase()
-	if not active and asp.volume_db != MUTED_VOLUME:
-		asp.volume_db = UNFOCUSED_VOLUME
+	if not active and song_node.get_track_volume(track_index) != MUTED_VOLUME:
+		song_node.change_track_volume(track_index, UNFOCUSED_VOLUME)
 	# When becoming active, update to the current phrase if not in reset countdown
 	if active:
 		_advance_phrase()
@@ -432,7 +427,7 @@ func activate(phrase_idx: int):
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
-	asp.volume_db = UNFOCUSED_VOLUME
+	song_node.change_track_volume(track_index, UNFOCUSED_VOLUME)
 	track_activated.emit(
 		track_data.phrase_note_counts[phrase_idx],
 		phrase_end_measure
@@ -460,7 +455,7 @@ func current_measure_is_unactivated() -> bool:
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
-	asp.volume_db = MUTED_VOLUME
+	song_node.change_track_volume(track_index, MUTED_VOLUME)
 	var misblast = MISBLAST_SCENE.instantiate() as Node3D
 	misblast.position.z = - (beat_position * length_per_beat)
 	misblast.position.x = (lane_index - 1) * 0.6

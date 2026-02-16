@@ -68,9 +68,6 @@ mesh = SubResource("BoxMesh_tmkqs")
 [node name="Track" type="Node3D" unique_id=1756052907]
 script = ExtResource("1_q435s")
 
-[node name="Music" type="AudioStreamPlayer" parent="." unique_id=1524845732]
-bus = &"Tracks"
-
 [node name="MissSound" type="AudioStreamPlayer" parent="." unique_id=411987495]
 stream = ExtResource("2_p7e7j")
 volume_db = -5.0
