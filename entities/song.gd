@@ -59,6 +59,7 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
+var _synchronized_stream: AudioStreamSynchronized
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -112,7 +113,6 @@ func _ready():
 		newTrack.position.x = (TRACK_WIDTH * tracks.size())
 		newTrack.instrument = manager_node.track_data[i].track_info.instrument
 		newTrack.name = "Track%d" % i
-		newTrack.audio_file = ResourceUID.path_to_uid(manager_node.track_data[i].track_info.audio_file)
 		newTrack.track_data = manager_node.track_data[i].track_data
 		tracks.append(newTrack)
 		%Conductor.new_measure.connect(newTrack._on_song_new_measure)
@@ -126,7 +126,7 @@ func _ready():
 		ChunkManager.request_chunk(i, 0)
 		await ChunkManager.queue_empty
 	print("tracks added")
-	asp.stream = load(ResourceUID.path_to_uid(manager_node.song_data.click_track))
+	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
@@ -209,7 +209,7 @@ func _song_start():
 	_cached_active_track_node = tracks[active_track]
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	# TODO: Replace w/ single call to synchronized audio player
-	get_tree().call_group("AudioPlayers", "play")
+	asp.play()
 	%Conductor.is_playing = true
 	playhead.position.z = - length_per_beat * %Conductor.current_beat
 	manager_node.can_pause = true
@@ -592,7 +592,6 @@ func fail_song():
 	await %HUDAnimations.animation_finished
 	finished = true
 	# TODO: Replace w/ single call to synchronized audio player
-	get_tree().call_group("AudioPlayers", "stop")
 	%Conductor.is_playing = false
 	song_failed.emit(stats)
 
@@ -606,9 +605,15 @@ func _print_new_measure_connections() -> void:
 		print(" -> %s.%s" % [target.name, method])
 
 func change_track_volume(track_idx: int, volume: float) -> void:
-	# TODO: Get the AudioStreamSynchronized from the AudioStreamPlayer, change volume
-	# of stream track_idx + 1 (click track is stream 0)
-	pass
+	var stream = asp.stream as AudioStreamSynchronized
+	var channel := track_idx + 1
+	clampf(volume, -60., 0.)
+	stream.set_sync_stream_volume(channel, volume)
+
+func get_track_volume(track_idx: int) -> float:
+	var stream = asp.stream as AudioStreamSynchronized
+	var channel := track_idx + 1
+	return stream.get_sync_stream_volume(channel)
 
 func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
@@ -644,8 +649,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		tween.tween_property(camera, "position:z", camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.2)
-		for track in tracks:
-			track.asp.volume_db = -6.0
+		for i in tracks.size():
+			asp.stream.set_sync_stream_volume(i + 1, -6.0)
 		playhead.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
