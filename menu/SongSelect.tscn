@@ -666,6 +666,10 @@ anchor_left = 0.66
 offset_left = 40.0
 grow_horizontal = 1
 
+[node name="PreviewPlayer" type="AudioStreamPlayer" parent="." unique_id=1646222971]
+volume_db = -6.0
+bus = &"Tracks"
+
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/EnergyOption" to="." method="_on_energy_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/CheckpointOption" to="." method="_on_checkpoint_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/TimingOption" to="." method="_on_timing_option_pressed"]
