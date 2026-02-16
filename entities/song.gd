@@ -59,7 +59,6 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
-var _synchronized_stream: AudioStreamSynchronized
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -591,7 +590,7 @@ func fail_song():
 	slow_tween.tween_property(asp, "pitch_scale", 0.01, 3.0)
 	await %HUDAnimations.animation_finished
 	finished = true
-	# TODO: Replace w/ single call to synchronized audio player
+	asp.stop()
 	%Conductor.is_playing = false
 	song_failed.emit(stats)
 
@@ -619,6 +618,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 	%SongProgress.value = measure
 	if measure >= total_measures and !finished:
 		finished = true
+		%Conductor.vibration = false
 		%TargetPfx.emitting = true
 		for tgt in _targets:
 			tgt.hide()

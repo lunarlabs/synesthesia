@@ -11,6 +11,7 @@ var current_beat: float
 var beat_int: int
 var current_measure: int
 var is_playing: bool = false
+var vibration: bool = true
 
 var _audio_player: AudioStreamPlayer
 var _seconds_per_beat: float = 0.5
@@ -46,7 +47,8 @@ func _process(delta: float):
 
 	current_beat = time_elapsed / _seconds_per_beat
 	if floori(current_beat) > beat_int:
-		Input.start_joy_vibration(0, 1.0, 0.0, 0.1)
+		if vibration:
+			Input.start_joy_vibration(0, 1.0, 0.0, 0.1)
 		beat_int = floori(current_beat)
 
 	var this_measure = floori(current_beat / 4.0)
