@@ -42,10 +42,10 @@ func _worker(_userdata = null):
 	running = false
 	return
 
-func _process_job(job:Dictionary):
+func _process_job(job: Dictionary):
 	var result: SynRoadTrack.GameplayTrackData = SynRoadTrack.GameplayTrackData.new()
 	## map of beat (float) to lane (int)
-	var note_map: Dictionary[float,int] = job.note_map
+	var note_map: Dictionary[float, int] = job.note_map
 
 	note_map.sort()
 	var sorted_beats: Array[float] = note_map.keys()
@@ -54,7 +54,7 @@ func _process_job(job:Dictionary):
 
 	var note_times: PackedFloat32Array = []
 	var note_positions: PackedVector2Array = [] # Y-value here is Z-position in world space
-	var lane_notes: Array = [PackedInt32Array(),PackedInt32Array(),PackedInt32Array()]
+	var lane_notes: Array = [PackedInt32Array(), PackedInt32Array(), PackedInt32Array()]
 	var notes_in_measure: Dictionary[int, PackedInt32Array] = {}
 
 	for i in range(sorted_beats.size()):
@@ -83,16 +83,16 @@ func _process_job(job:Dictionary):
 
 	result["lane_notes"] = lane_notes
 
-	var measure_note_counts: Dictionary[int,int] = {}
+	var measure_note_counts: Dictionary[int, int] = {}
 	var measures_in_chunks: Array[PackedInt32Array] = []
 	measures_in_chunks.resize(job.chunk_count)
 	# For phrases, keys will be the starting measure number
-	var phrase_lengths: Dictionary[int,int] = {}
-	var phrase_note_indices: Dictionary[int,PackedInt32Array] = {}
-	var phrase_note_counts: Dictionary[int,int] = {}
-	var phrase_marker_positions: Dictionary[int,Vector2] = {}
-	var phrase_activation_lengths: Dictionary[int,int] = {}
-	var phrase_next_measures: Dictionary[int,int] = {}
+	var phrase_lengths: Dictionary[int, int] = {}
+	var phrase_note_indices: Dictionary[int, PackedInt32Array] = {}
+	var phrase_note_counts: Dictionary[int, int] = {}
+	var phrase_marker_positions: Dictionary[int, Vector2] = {}
+	var phrase_activation_lengths: Dictionary[int, int] = {}
+	var phrase_next_measures: Dictionary[int, int] = {}
 
 	# First pass: gather measure note counts and chunk info
 	for m in notes_in_measure.keys():
@@ -147,7 +147,18 @@ func _process_job(job:Dictionary):
 				next_measure += 1
 			if next_measure >= job.total_measures:
 				phrase_next_measures[m] = job.total_measures
-		
+	
+	# Third pass: establish first and last note indices for each phrase
+	var phrase_first_note_indices := []
+	var phrase_last_note_indices := []
+	for i in phrase_note_indices.keys():
+		if phrase_note_indices[i].size() > 0:
+			phrase_first_note_indices.append(phrase_note_indices[i][0])
+			phrase_last_note_indices.append(phrase_note_indices[i][-1])
+		else:
+			phrase_first_note_indices.append(-1)
+			phrase_last_note_indices.append(-1)
+			
 	result.phrase_starts = PackedInt32Array(phrase_lengths.keys())
 	result.phrase_lengths = PackedInt32Array(phrase_lengths.values())
 	result.phrase_note_indices = phrase_note_indices.values()
@@ -155,7 +166,8 @@ func _process_job(job:Dictionary):
 	result.phrase_marker_positions = PackedVector2Array(phrase_marker_positions.values())
 	result.phrase_activation_lengths = PackedInt32Array(phrase_activation_lengths.values())
 	result.phrase_next_measures = PackedInt32Array(phrase_next_measures.values())
-
+	result.phrase_first_note_indices = PackedInt32Array(phrase_first_note_indices)
+	result.phrase_last_note_indices = PackedInt32Array(phrase_last_note_indices)
 	return result
 		
 func take_completed():

@@ -130,7 +130,7 @@ func _process_manual(current_time: float):
 		elif (!is_active) and current_time > note_time:
 			# Track is not active, but we've passed the note. Mark as missed and mute the track.
 			next_note_idx_per_lane[lane_index] += 1
-			if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+			if song_node.get_track_volume(track_index) != MUTED_VOLUME:
 				song_node.change_track_volume(track_index, MUTED_VOLUME)
 			# TODO: See if the passed note was the first note in the phrase
 			# and signal inactive_phrase_missed if it was
@@ -147,11 +147,12 @@ func _process_manual(current_time: float):
 			if note_node and note_node.blasted:
 				# Blasted but the index didn't advance. We're done.
 				continue
-			if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+			if song_node.get_track_volume(track_index) != MUTED_VOLUME:
 				song_node.change_track_volume(track_index, MUTED_VOLUME)
 			# WARN: The 'in' operator performs a linear search (O(N)) on the PackedInt32Array. Execution time scales linearly with phrase size. In a hot loop or every frame, this causes variable CPU load.
 			if current_phrase_index < track_data.phrase_note_indices.size() \
-			and note_idx in track_data.phrase_note_indices[current_phrase_index]:
+			and note_idx >= track_data.phrase_first_note_indices[current_phrase_index] \
+			and note_idx <= track_data.phrase_last_note_indices[current_phrase_index]:
 				active_phrase_missed.emit()
 				streak_broken.emit()
 				_advance_phrase()
@@ -172,7 +173,8 @@ func _process_autoblast(current_time: float):
 			# Check if note is part of current active phrase and blast if so
 			if current_phrase_index < track_data.phrase_note_indices.size():
 				# WARN: Linear search O(N) inside a while loop. This compounds the cost significantly if multiple notes are processed in one frame.
-				if note_idx in track_data.phrase_note_indices[current_phrase_index]:
+				if note_idx >= track_data.phrase_first_note_indices[current_phrase_index] \
+				and note_idx <= track_data.phrase_last_note_indices[current_phrase_index]:
 					var note_node = note_nodes[note_idx] as SynRoadNote
 					if !note_node.blasted:
 						var lane = track_data.note_map.values()[note_idx]
@@ -220,7 +222,7 @@ func _process_autoblast(current_time: float):
 				next_note_idx += 1
 			else:
 				# Track is not active, but we've passed the note. Mute the track.
-				if song_node.get_track_volume(track_index)!= MUTED_VOLUME:
+				if song_node.get_track_volume(track_index) != MUTED_VOLUME:
 					song_node.change_track_volume(track_index, MUTED_VOLUME)
 				
 				# See if the passed note was the first note in the phrase
@@ -483,3 +485,5 @@ class GameplayTrackData:
 	var phrase_marker_positions: PackedVector2Array = []
 	var phrase_activation_lengths: PackedInt32Array = []
 	var phrase_next_measures: PackedInt32Array = []
+	var phrase_first_note_indices: PackedInt32Array = []
+	var phrase_last_note_indices: PackedInt32Array = []
