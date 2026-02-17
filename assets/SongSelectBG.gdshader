@@ -94,6 +94,27 @@ float opRing(vec3 p, float y_offset, float rot_dir, bool is_top) {
     return sdVerticalCapsule(q, h * 2.5, 0.25);
 }
 
+// --- Rotation Matrices ---
+mat3 rotateY(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat3(
+        vec3(c, 0.0, s),
+        vec3(0.0, 1.0, 0.0),
+        vec3(-s, 0.0, c)
+    );
+}
+
+mat3 rotateX(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat3(
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0, c, -s),
+        vec3(0.0, s, c)
+    );
+}
+
 // --- Scene Map Function ---
 float map(vec3 p) {
     float d = 1e10;
@@ -108,7 +129,11 @@ float map(vec3 p) {
         d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8));
     }
     {
-        d = min(d, sdOctahedron(p, 4.0));
+        // Slowly rotating octahedron
+        vec3 q = p;
+        q *= rotateY(TIME * 0.15); // Rotate around Y axis
+        q *= rotateX(TIME * 0.1);  // Rotate around X axis for more interesting motion
+        d = min(d, sdOctahedron(q, 3.0));
     }
     
     // 2. Optimized Rings (Replaces the loop)
@@ -157,17 +182,22 @@ vec3 get_normal(vec3 p) {
     return normalize(n);
 }
 
-// Calculates simple lighting based on normal
-float get_light(vec3 p) {
+// Calculates lighting with specular highlights for shininess
+vec2 get_light(vec3 p, vec3 view_dir) {
     // Light position (relative to camera or fixed in world)
     vec3 light_pos = vec3(0.5, -3.0, p.z - 4.0);
 
     vec3 l = normalize(light_pos - p);
     vec3 n = get_normal(p);
 
-    // Dot product gives diffuse intensity (0 to 1)
+    // Diffuse component (Lambertian)
     float dif = clamp(dot(n, l), 0.0, 1.0);
-    return dif;
+    
+    // Specular component (Blinn-Phong for shininess)
+    vec3 h = normalize(l + view_dir); // Half vector
+    float spec = pow(clamp(dot(n, h), 0.0, 1.0), 64.0); // Shininess = 64
+    
+    return vec2(dif, spec);
 }
 
 // Convert HSL to RGB
@@ -198,7 +228,7 @@ void fragment() {
 
     // 2. Camera Setup
     // Ray Origin (Camera Position)
-    vec3 ro = vec3(3.0, 0.0, -10.);
+    vec3 ro = vec3(3.0, 1.0, -10.);
 
     // Ray Direction
     // The UV becomes the XY direction, Z is forward (1.0)
@@ -215,19 +245,25 @@ void fragment() {
 	if(d < MAX_DIST) {
         // We hit something
         vec3 p = ro + rd * d;
-        float light = get_light(p);
+        vec2 lighting = get_light(p, -rd); // Pass view direction for specular
+        float diffuse = lighting.x;
+        float specular = lighting.y;
         
         // Color based on lighting and depth
         // Hue: Blue (0.55) to Cyan (0.52) based on height
         float hue = mix(0.55, 0.52, (p.y + 5.0) / 10.0);
         
         // Saturation: Low for subtlety (0.3-0.5)
-        float sat = mix(0.3, 0.5, light);
+        float sat = mix(0.3, 0.5, diffuse);
         
         // Lightness: Based on diffuse lighting
-        float lightness = mix(0.15, 0.45, light);
+        float lightness = mix(0.15, 0.45, diffuse);
         
         vec3 surface_color = hsl_to_rgb(hue, sat, lightness);
+        
+        // Add specular highlights (bright white/cyan for shininess)
+        vec3 specular_color = hsl_to_rgb(0.52, 0.8, 0.9); // Bright cyan
+        surface_color += specular_color * specular * 0.8;
         
         // Depth fog: Mix surface color with background based on distance
         float fog_factor = smoothstep(0.0, MAX_DIST * 0.7, d);
