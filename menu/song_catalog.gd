@@ -416,3 +416,9 @@ func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
 	if result_is_empty or not success:
 		return 0.0
 	return result[0]["difficulty_rating"]
+
+#region Sorting, Filtering, and Queries
+
+# TODO: func to make menu structure for carousel menu
+
+#endregion
