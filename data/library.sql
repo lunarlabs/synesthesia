@@ -127,7 +127,7 @@ SELECT
     s."cover_art",
     s."cover_art_fmt",
     s."cover_art_height",
-    s."cover_art_width"
+    s."cover_art_width",
     d."difficulty_offset",
     d."difficulty_rating",
     d."details_json",
