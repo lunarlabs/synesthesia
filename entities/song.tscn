@@ -1260,7 +1260,7 @@ tracks/3/keys = {
 }
 tracks/4/type = "value"
 tracks/4/imported = false
-tracks/4/enabled = true
+tracks/4/enabled = false
 tracks/4/path = NodePath("%ScoreLabel:scale")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
@@ -1429,7 +1429,7 @@ process_material = SubResource("ParticleProcessMaterial_u2oep")
 draw_pass_1 = SubResource("QuadMesh_e81dl")
 
 [node name="Camera3D" type="Camera3D" parent="Playhead" unique_id=340278828]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.5, 2)
+transform = Transform3D(0.9396926, 0.34202012, 0, -0.21984631, 0.6040228, 0.76604444, 0.26200262, -0.7198463, 0.64278764, 0, 15, 3)
 fov = 80.0
 far = 200.0
 

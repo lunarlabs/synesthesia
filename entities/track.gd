@@ -12,7 +12,7 @@ static var INSTRUMENTS = [
 ]
 const MISBLAST_SCENE: PackedScene = preload("res://entities/misblast.tscn")
 const BLASTING_VOLUME = -3.0
-const UNFOCUSED_VOLUME = -7.0
+const UNFOCUSED_VOLUME = -6.0
 const MUTED_VOLUME = -80.0
 const CHUNK_LOAD_RANGE_FORWARD = 3
 const CHUNK_UNLOAD_RANGE_BEHIND = 2

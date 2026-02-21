@@ -200,4 +200,5 @@ func get_audio_stream_synchronized() -> AudioStreamSynchronized:
 	result.set_sync_stream_volume(0, -10.)
 	for i in tracks.size():
 		result.set_sync_stream(i + 1, load(tracks[i].audio_file))
+		result.set_sync_stream_volume(i + 1, -6.0)
 	return result

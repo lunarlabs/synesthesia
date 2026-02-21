@@ -18,6 +18,8 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
+const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
+const GAME_ROTATION := Vector3(-30.0, 0.0, 0.0)
 
 var energy: int = MAX_ENERGY
 var manager_node: SynRoadSongManager
@@ -44,7 +46,6 @@ var _phrases_missed: int = 0
 var _streak_breaks: int = 0
 var _autoblast_next_track: int
 var _track_transition_tween: Tween
-var _intro_tween: Tween
 var _note_hit_tween: Tween
 var _max_hit_offset: float = - INF
 var _min_hit_offset: float = INF
@@ -213,11 +214,22 @@ func _song_start():
 	playhead.position.z = - length_per_beat * %Conductor.current_beat
 	manager_node.can_pause = true
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
-	_intro_tween = get_tree().create_tween()
-	_intro_tween.tween_property(%FadeOut, "modulate", Color(1, 1, 1, 0),
+	var fade_tween = create_tween()
+	fade_tween.tween_property(%FadeOut, "modulate", Color(1, 1, 1, 0),
 	 (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
 	.set_ease(Tween.EASE_IN)
-	_intro_tween.tween_callback(_intro_anim_call)
+	fade_tween.tween_callback(_intro_anim_call)
+	var intro_tween = create_tween().set_parallel()
+	intro_tween.tween_subtween(fade_tween)
+	intro_tween.tween_property(camera, "position:y", GAME_POSITION.y,\
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_QUAD)\
+	.set_ease(Tween.EASE_OUT)
+	intro_tween.tween_property(camera, "position:z", GAME_POSITION.z,\
+	3 * (seconds_per_beat * BEATS_PER_MEASURE))\
+	.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	intro_tween.tween_property(camera, "rotation_degrees", GAME_ROTATION,\
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_QUAD)\
+	.set_ease(Tween.EASE_OUT)
 
 @warning_ignore("unused_parameter")
 func _process(delta: float):

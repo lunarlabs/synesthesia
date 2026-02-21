@@ -30,7 +30,7 @@ material = SubResource("StandardMaterial3D_gb8vh")
 size = Vector2(2, 2)
 
 [sub_resource type="Curve" id="Curve_g4cjv"]
-_data = [Vector2(0, 0), 0.0, 11.52806, 0, 0, Vector2(0.094444446, 1), 10.588235, -1.1042944, 1, 1, Vector2(1, 0), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, 11.52806, 0, 0, Vector2(0.03333333, 1), 30.000002, -1.0344827, 1, 1, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="Curve" id="Curve_w5if1"]
