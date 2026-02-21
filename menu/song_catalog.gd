@@ -190,8 +190,8 @@ func _extract_songdata_meta(song_data: SongData) -> Dictionary:
 		"desc": song_data.description,
 		"source_name": song_data.source,
 		}
-	var cover_art_img = song_data.cover_art.get_image()
-	if cover_art_img:
+	if song_data.cover_art:
+		var cover_art_img = song_data.cover_art.get_image()
 		result["cover_art"] = cover_art_img.get_data()
 		result["cover_art_width"] = cover_art_img.get_width()
 		result["cover_art_height"] = cover_art_img.get_height()
