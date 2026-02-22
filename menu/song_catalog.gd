@@ -2,6 +2,7 @@ extends Node
 
 var _song_catalog: Array = []
 var _difficulty_catalog: Array = []
+var _menu_structure: Array = []
 var additions: Array = []
 
 const CATALOG_JSON_PATH = "user://song_catalog.json"
@@ -74,11 +75,16 @@ FROM v_full_library"""
 const FILTER_FOLDER = """WHERE folder_id = ?"""
 const FILTER_DIFFICULTY = """WHERE difficulty_offset = ?"""
 const FILTER_FOLDER_DIFFICULTY = """WHERE folder_id = ? AND difficulty_offset = ?"""
+const FILTER_BETWEEN_BPM = """WHERE bpm BETWEEN ? AND ?"""
+const FILTER_BETWEEN_RATING = """WHERE difficulty_rating >= ? AND difficulty_rating < ?"""
 const FILTER_SOURCE = """WHERE source_name = ?"""
 
 const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC"
 const BPM_ORDER_BY = "ORDER BY bpm ASC"
 const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating DESC"
+
+#const MENU_ITEM_TYPES = ["submenu", "category", "song_single_difficulty", "song_all_difficulties"]
+const BPM_BUCKET_SIZE = 20
 #endregion
 
 var is_initialized: bool:
@@ -434,5 +440,109 @@ func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
 #region Sorting, Filtering, and Queries
 
 # TODO: func to make menu structure for carousel menu
+func make_menu_structure():
+	_menu_structure.clear()
+	var db = SessionManager.library_db
+	# first determine bucket ranges
+	var success = db.query("SELECT MIN(bpm), MAX(bpm) FROM songs")
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return
+	var min_bpm = result[0]["MIN(bpm)"]
+	var max_bpm = result[0]["MAX(bpm)"]
+	var bpm_range = max_bpm - min_bpm
+	var num_buckets = int(ceil(bpm_range / float(BPM_BUCKET_SIZE)))
+	var buckets = []
+	for i in range(num_buckets):
+		var bucket_min = min_bpm + i * BPM_BUCKET_SIZE
+		var bucket_max = bucket_min + BPM_BUCKET_SIZE
+		buckets.append({
+			"min": bucket_min,
+			"max": bucket_max
+		})
+	
+	success = db.query("SELECT MAX(difficulty_rating) FROM difficulties")
+	result = db.query_result
+	result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return
+	var difficulty_ceil = int(ceil(result[0]["MAX(difficulty_rating)"]))
+
+	success = db.query("SELECT * FROM sources ORDER BY name ASC")
+	result = db.query_result
+	result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return
+	var sources = result
+	
+	var title_menu_entry = {
+		"name": "All Songs",
+		"type": "submenu",
+		"children": []
+	}
+
+	for i in _song_catalog.size():
+		var info = song_catalog[i]
+		var entry = {
+			"name": info.title,
+			"sub_title": info.sub_title,
+			"artist": info.artist,
+			"folder_id": info.folder_id,
+			"type": "song_all_difficulties",
+		}
+		title_menu_entry.children.append(entry)
+	_menu_structure.append(title_menu_entry)
+
+	var source_menu_entry = {
+		"name": "Sources",
+		"type": "submenu",
+		"children": []
+	}
+
+	for i in sources.size():
+		var source = sources[i]
+		var entry = {
+			"name": source.name,
+			"type": "category",
+			"children": []
+		}
+		# TODO: Populate children with songs from this source
+		source_menu_entry.children.append(entry)
+	_menu_structure.append(source_menu_entry)
+
+	var bpm_menu_entry = {
+		"name": "BPM",
+		"type": "submenu",
+		"children": []
+	}
+
+	for i in buckets.size():
+		var bucket = buckets[i]
+		var entry = {
+			"name": "%d-%d" % [bucket.min, bucket.max],
+			"type": "category",
+			"children": []
+		}
+		# TODO: Populate children with songs in this BPM range
+		bpm_menu_entry.children.append(entry)
+	_menu_structure.append(bpm_menu_entry)
+
+	var difficulty_menu_entry = {
+		"name": "Difficulty",
+		"type": "submenu",
+		"children": []
+	}
+
+	for i in range(1, difficulty_ceil + 1):
+		var entry = {
+			"name": "%d" % i,
+			"type": "category",
+			"children": []
+		}
+		# TODO: Populate children with songs of this difficulty
+		difficulty_menu_entry.children.append(entry)
+	_menu_structure.append(difficulty_menu_entry)
+
 
 #endregion
