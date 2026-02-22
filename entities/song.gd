@@ -222,13 +222,13 @@ func _song_start():
 	var intro_tween = create_tween().set_parallel()
 	intro_tween.tween_subtween(fade_tween)
 	intro_tween.tween_property(camera, "position:y", GAME_POSITION.y,\
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_QUAD)\
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE)\
 	.set_ease(Tween.EASE_OUT)
 	intro_tween.tween_property(camera, "position:z", GAME_POSITION.z,\
 	3 * (seconds_per_beat * BEATS_PER_MEASURE))\
 	.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	intro_tween.tween_property(camera, "rotation_degrees", GAME_ROTATION,\
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_QUAD)\
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK)\
 	.set_ease(Tween.EASE_OUT)
 
 @warning_ignore("unused_parameter")
