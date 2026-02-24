@@ -78,6 +78,7 @@ const FILTER_FOLDER_DIFFICULTY = """WHERE folder_id = ? AND difficulty_offset = 
 const FILTER_BETWEEN_BPM = """WHERE bpm BETWEEN ? AND ?"""
 const FILTER_BETWEEN_RATING = """WHERE difficulty_rating >= ? AND difficulty_rating < ?"""
 const FILTER_SOURCE = """WHERE source_name = ?"""
+const FILTER_GENRE = """WHERE genre = ?"""
 
 const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC"
 const BPM_ORDER_BY = "ORDER BY bpm ASC"
@@ -105,7 +106,6 @@ class DetailedDifficultyInfo:
 	var track_avg_raw_difficulties: PackedFloat32Array
 	var avg_raw_difficulty: float
 
-#region Ingest
 func scan_for_songs(rescan := false):
 	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
 	if not dir:
@@ -124,6 +124,7 @@ func scan_for_songs(rescan := false):
 		printerr(SessionManager.library_db.error_message)
 	_song_catalog = SessionManager.library_db.query_result
 
+#region Ingest
 func process_song(folder_name: String, force_rescan := false):
 	const SONGS_TABLE = "songs"
 	const DIFFICULTIES_TABLE = "difficulties"
@@ -477,70 +478,148 @@ func make_menu_structure():
 	var sources = result
 	
 	var title_menu_entry = {
-		"name": "All Songs",
-		"type": "submenu",
-		"children": []
+		&"name": "All Songs",
+		&"type": &"submenu",
+		&"children": []
 	}
 
 	for i in _song_catalog.size():
 		var info = song_catalog[i]
 		var entry = {
-			"name": info.title,
-			"sub_title": info.sub_title,
-			"artist": info.artist,
-			"folder_id": info.folder_id,
-			"type": "song_all_difficulties",
+			&"name": info.title,
+			&"sub_title": info.sub_title,
+			&"folder_id": info.folder_id,
+			&"type": &"song_all_difficulties",
 		}
 		title_menu_entry.children.append(entry)
 	_menu_structure.append(title_menu_entry)
 
 	var source_menu_entry = {
-		"name": "Sources",
-		"type": "submenu",
-		"children": []
+		&"name": "Sources",
+		&"type": &"submenu",
+		&"children": []
 	}
 
 	for i in sources.size():
 		var source = sources[i]
 		var entry = {
-			"name": source.name,
-			"type": "category",
-			"children": []
+			&"name": source.name,
+			&"type": &"category",
+			&"open": false,
+			&"children": []
 		}
-		# TODO: Populate children with songs from this source
+		success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_SOURCE, DEFAULT_ORDER_BY], [source.name])
+		result = db.query_result
+		result_is_empty = result.size() == 0
+		if result_is_empty or not success:
+			printerr("Failed to query songs for source: %s" % source.name)
+			continue
+		for j in result.size():
+			var info = result[j]
+			var song_entry = {
+				&"name": info.title,
+				&"sub_title": info.sub_title,
+				&"folder_id": info.folder_id,
+				&"type": &"song_all_difficulties",
+			}
+			entry.children.append(song_entry)
 		source_menu_entry.children.append(entry)
 	_menu_structure.append(source_menu_entry)
 
+	var genre_menu_entry = {
+		&"name": "Genre",
+		&"type": &"submenu",
+		&"children": []
+	}
+
+	success = db.query("SELECT DISTINCT genre FROM songs ORDER BY genre ASC")
+	result = db.query_result
+	result_is_empty = result.size() == 0
+	if not result_is_empty and success:
+		for i in result.size():
+			var genre_name = result[i]["genre"]
+			var entry = {
+				&"name": genre_name,
+				&"type": &"category",
+				&"open": false,
+				&"children": []
+			}
+			success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_GENRE, DEFAULT_ORDER_BY], [genre_name])
+			var genre_results = db.query_result
+			if not genre_results.is_empty() and success:
+				for j in genre_results.size():
+					var info = genre_results[j]
+					var song_entry = {
+						&"name": info.title,
+						&"sub_title": info.sub_title,
+						&"folder_id": info.folder_id,
+						&"type": &"song_all_difficulties",
+					}
+					entry.children.append(song_entry)
+			genre_menu_entry.children.append(entry)
+	_menu_structure.append(genre_menu_entry)
+
 	var bpm_menu_entry = {
-		"name": "BPM",
-		"type": "submenu",
-		"children": []
+		&"name": "BPM",
+		&"type": &"submenu",
+		&"children": []
 	}
 
 	for i in buckets.size():
 		var bucket = buckets[i]
 		var entry = {
-			"name": "%d-%d" % [bucket.min, bucket.max],
-			"type": "category",
-			"children": []
+			&"name": "%d-%d" % [bucket.min, bucket.max],
+			&"type": &"category",
+			&"open": false,
+			&"children": []
 		}
-		# TODO: Populate children with songs in this BPM range
+		success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_BETWEEN_BPM, BPM_ORDER_BY], [bucket.min, bucket.max])
+		result = db.query_result
+		result_is_empty = result.size() == 0
+		if result_is_empty or not success:
+			printerr("Failed to query songs for BPM range: %d-%d" % [bucket.min, bucket.max])
+			continue
+		for j in result.size():
+			var info = result[j]
+			var song_entry = {
+				&"name": info.title,
+				&"sub_title": info.sub_title,
+				&"folder_id": info.folder_id,
+				&"type": &"song_all_difficulties",
+			}
+			entry.children.append(song_entry)
 		bpm_menu_entry.children.append(entry)
 	_menu_structure.append(bpm_menu_entry)
 
 	var difficulty_menu_entry = {
-		"name": "Difficulty",
-		"type": "submenu",
-		"children": []
+		&"name": "Difficulty",
+		&"type": &"submenu",
+		&"children": []
 	}
 
 	for i in range(1, difficulty_ceil + 1):
 		var entry = {
-			"name": "%d" % i,
-			"type": "category",
-			"children": []
+			&"name": "%d" % i,
+			&"type": &"category",
+			&"open": false,
+			&"children": []
 		}
-		# TODO: Populate children with songs of this difficulty
+		success = db.query_with_bindings("%s %s %s;" % [DIFFICULTY_QUERY, FILTER_BETWEEN_RATING, DIFF_RATING_ORDER_BY], [i, i + 1])
+		result = db.query_result
+		result_is_empty = result.size() == 0
+		if result_is_empty or not success:
+			printerr("Failed to query songs for difficulty: %d" % i)
+			continue
+		for j in result.size():
+			var info = result[j]
+			var song_entry = {
+				&"name": info.title,
+				&"sub_title": info.sub_title,
+				&"difficulty_offset": info.difficulty_offset,
+				&"folder_id": info.folder_id,
+				&"type": &"song_single_difficulty",
+			}
+			entry.children.append(song_entry)
 		difficulty_menu_entry.children.append(entry)
 	_menu_structure.append(difficulty_menu_entry)
 
