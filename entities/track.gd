@@ -194,7 +194,7 @@ func _process_autoblast(current_time: float):
 							)
 							blasting_phrase = true
 							song_node._update_closest_track_marker_cache()
-							print("Track %d started phrase %d (blasted note idx %d)" % [track_index, current_phrase_index, note_idx])
+#							print("Track %d started phrase %d (blasted note idx %d)" % [track_index, current_phrase_index, note_idx])
 							marker.hide()
 			
 			next_note_idx += 1
@@ -202,7 +202,7 @@ func _process_autoblast(current_time: float):
 		# Check for phrase completion
 		if blasting_phrase and current_phrase_index < track_data.phrase_note_counts.size():
 			if phrase_notes_blasted >= track_data.phrase_note_counts[current_phrase_index]:
-				print("Track %d completed phrase %d (notes: %d/%d)" % [track_index, current_phrase_index, phrase_notes_blasted, track_data.phrase_note_counts[current_phrase_index]])
+#				print("Track %d completed phrase %d (notes: %d/%d)" % [track_index, current_phrase_index, phrase_notes_blasted, track_data.phrase_note_counts[current_phrase_index]])
 				activate(current_phrase_index)
 				phrase_notes_blasted = 0
 				blasting_phrase = false
@@ -382,7 +382,7 @@ func set_active(active: bool):
 		if blasting_phrase:
 			blasting_phrase = false
 			phrase_notes_blasted = 0
-			print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
+#			print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
 			active_phrase_missed.emit()
 			streak_broken.emit()
 			_advance_phrase()
@@ -415,7 +415,7 @@ func _on_song_new_measure(_measure_num: int):
 		if furthest_chunk_loaded < target_ahead and target_ahead < song_node.manager_node.chunk_count:
 			request_chunks(target_ahead)
 		if target_behind >= 0 and chunks[target_behind]:
-			print("Track %d recycling chunk %d" % [track_index, target_behind])
+#			print("Track %d recycling chunk %d" % [track_index, target_behind])
 			ChunkManager.recycle_chunk(chunks[target_behind])
 			chunks[target_behind] = null
 
@@ -425,7 +425,7 @@ func request_chunks(furthest: int):
 		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
 
 func activate(phrase_idx: int):
-	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+#	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
