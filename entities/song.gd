@@ -20,6 +20,7 @@ const ENERGY_BAR_TEXT: Dictionary = {
 }
 const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
 const GAME_ROTATION := Vector3(-30.0, 0.0, 0.0)
+const MAX_COMBO_MULTIPLIER := 4
 
 var energy: int = MAX_ENERGY
 var manager_node: SynRoadSongManager
@@ -221,14 +222,14 @@ func _song_start():
 	fade_tween.tween_callback(_intro_anim_call)
 	var intro_tween = create_tween().set_parallel()
 	intro_tween.tween_subtween(fade_tween)
-	intro_tween.tween_property(camera, "position:y", GAME_POSITION.y,\
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE)\
+	intro_tween.tween_property(camera, "position:y", GAME_POSITION.y, \
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
 	.set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(camera, "position:z", GAME_POSITION.z,\
-	3 * (seconds_per_beat * BEATS_PER_MEASURE))\
+	intro_tween.tween_property(camera, "position:z", GAME_POSITION.z, \
+	3 * (seconds_per_beat * BEATS_PER_MEASURE)) \
 	.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(camera, "rotation_degrees", GAME_ROTATION,\
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK)\
+	intro_tween.tween_property(camera, "rotation_degrees", GAME_ROTATION, \
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK) \
 	.set_ease(Tween.EASE_OUT)
 
 @warning_ignore("unused_parameter")
@@ -242,8 +243,9 @@ func _process(delta: float):
 		var mn = manager_node
 		var trs = tracks
 
-		# WARN: Direct position assignment coupled to Conductor.current_beat can cause visual jitter if current_beat is not perfectly interpolated or if it updates at a different frequency (e.g. physics/audio) than the frame rate.
-		playhead.position.z = %Conductor.current_beat * -length_per_beat
+		# Smooth playhead movement to absorb conductor timing corrections
+		var target_z = %Conductor.current_beat * -length_per_beat
+		playhead.position.z = lerpf(playhead.position.z, target_z, 0.5)
 		# WARN: Engaging the RenderingServer via global_shader_parameter_set every frame introduces a synchronization point that can cause CPU-GPU stalls or micro-stutters, especially if the driver queue is full.
 		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
 
@@ -302,8 +304,8 @@ func debug_info() -> String:
 
 func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_count: int):
 	streak += 1
-	lbl_streak.text = "x%d" % min(streak, 4)
-	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, 4))
+	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
+	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
 	lbl_phrase_value.show()
 	# Tell inactive tracks to position their markers after this phrase
 	var next_phrase_measure = start_measure + measure_count
@@ -315,14 +317,14 @@ func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_cou
 
 func _on_track_activated(note_count: int, start_measure: int):
 	_inactive_safeguard_measure = start_measure # Prevents another phrase on the same measure from breaking streak
-	score += note_count * min(streak, 4)
+	score += note_count * min(streak, MAX_COMBO_MULTIPLIER)
 	if streak > max_streak:
 		max_streak = streak
 	_phrases_completed += 1
 	lbl_phrase_value.hide()
 	%HUDAnimations.play("phrase_completed")
 	lbl_score.text = "%d" % score
-	lbl_streak.text = "x%d" % min(streak, 4)
+	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	match manager_node.energy_modifier:
 		0:
 			# Gain 1 energy per successful phrase

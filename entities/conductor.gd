@@ -40,10 +40,15 @@ func _process(delta: float):
 		var audio_time = get_audio_time()
 		var drift = time_elapsed - audio_time
 		
-		if abs(drift) > 0.05:
+		if abs(drift) > 0.1:
+			# Catastrophic drift (>100ms) — snap immediately
 			time_elapsed = audio_time
+		elif abs(drift) > 0.03:
+			# Large drift (30-100ms) — aggressive correction
+			time_elapsed = lerp(time_elapsed, audio_time, 0.5)
 		else:
-			time_elapsed = lerp(time_elapsed, audio_time, 0.1)
+			# Normal drift (<30ms) — gentle correction
+			time_elapsed = lerp(time_elapsed, audio_time, 0.3)
 
 	current_beat = time_elapsed / _seconds_per_beat
 	if floori(current_beat) > beat_int:
