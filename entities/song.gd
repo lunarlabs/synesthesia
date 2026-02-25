@@ -18,8 +18,8 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
-const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
-const GAME_ROTATION := Vector3(-30.0, 0.0, 0.0)
+const GAME_POSITION := Vector3(0.0, 2.5, 2.25)
+const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
 
 var energy: int = MAX_ENERGY
