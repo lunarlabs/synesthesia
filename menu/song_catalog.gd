@@ -97,6 +97,11 @@ var song_catalog:
 var difficulty_catalog:
 	get:
 		return _difficulty_catalog
+var menu_structure:
+	get:
+		if _menu_structure.is_empty():
+			make_menu_structure()
+		return _menu_structure
 
 # For each difficulty in each song, detailed info. Array index is instrument track index.
 class DetailedDifficultyInfo:

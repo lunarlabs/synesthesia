@@ -97,7 +97,6 @@ func _ready():
 #	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
 #		SessionManager.load_session()
-	SongCatalog.make_menu_structure()
 	_populate_song_list()
 	_connect_signals()
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)

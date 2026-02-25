@@ -16,6 +16,7 @@ var vibration: bool = true
 var _audio_player: AudioStreamPlayer
 var _seconds_per_beat: float = 0.5
 var _resync_time: float = 0.0
+var _has_synced_startup: bool = false
 
 signal new_measure(measure: int)
 
@@ -31,13 +32,22 @@ func setup(audio_player: AudioStreamPlayer, song_bpm: float):
 func _process(delta: float):
 	if not is_playing or not _audio_player:
 		return
+		
+	var audio_time = get_audio_time()
+	
+	# Wait until the audio thread actually starts pumping data to the speakers
+	if not _has_synced_startup:
+		if audio_time > 0.0:
+			time_elapsed = audio_time # Snap perfectly once
+			_has_synced_startup = true
+		else:
+			return # Do nothing until the audio catches up
 	
 	time_elapsed += delta * _audio_player.pitch_scale
 	_resync_time += delta
 	
 	if _resync_time >= RESYNC_INTERVAL_SECONDS:
 		_resync_time = 0.0
-		var audio_time = get_audio_time()
 		var drift = time_elapsed - audio_time
 		
 		if abs(drift) > 0.1:
