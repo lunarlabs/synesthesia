@@ -1,6 +1,7 @@
 extends Node
 
 var _song_catalog: Array = []
+var song_indices: Dictionary[String, int] = {}
 var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
 var additions: Array = []
@@ -128,6 +129,8 @@ func scan_for_songs(rescan := false):
 	if not SessionManager.library_db.query("%s %s;" % [BASE_QUERY, DEFAULT_ORDER_BY]):
 		printerr(SessionManager.library_db.error_message)
 	_song_catalog = SessionManager.library_db.query_result
+	for i in range(_song_catalog.size()):
+		song_indices[_song_catalog[i]["folder_id"]] = i
 
 #region Ingest
 func process_song(folder_name: String, force_rescan := false):
@@ -488,15 +491,25 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	for i in _song_catalog.size():
-		var info = song_catalog[i]
-		var entry = {
-			&"name": info.title,
-			&"sub_title": info.sub_title,
-			&"folder_id": info.folder_id,
-			&"type": &"song_all_difficulties",
-		}
-		title_menu_entry.children.append(entry)
+	success = db.query("%s %s;" % [BASE_QUERY, DEFAULT_ORDER_BY])
+	result = db.query_result
+	result_is_empty = result.size() == 0
+	if not result_is_empty and success:
+		for i in result.size():
+			var info = result[i]
+			var entry = {
+				&"name": info.title,
+				&"sub_title": info.sub_title,
+				&"folder_id": info.folder_id,
+				&"type": &"song_all_difficulties",
+				&"difficulties": {}
+			}
+			for difficulty_offset in DIFFICULTY_LEVELS:
+				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
+				if difficulty_rating > 0:
+					entry[&"difficulties"][difficulty_offset] = difficulty_rating
+				
+			title_menu_entry.children.append(entry)
 	_menu_structure.append(title_menu_entry)
 
 	var source_menu_entry = {
@@ -526,7 +539,12 @@ func make_menu_structure():
 				&"sub_title": info.sub_title,
 				&"folder_id": info.folder_id,
 				&"type": &"song_all_difficulties",
+				&"difficulties": {}
 			}
+			for difficulty_offset in DIFFICULTY_LEVELS:
+				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
+				if difficulty_rating > 0:
+					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
 			entry.children.append(song_entry)
 		source_menu_entry.children.append(entry)
 	_menu_structure.append(source_menu_entry)
@@ -559,7 +577,12 @@ func make_menu_structure():
 						&"sub_title": info.sub_title,
 						&"folder_id": info.folder_id,
 						&"type": &"song_all_difficulties",
+						&"difficulties": {}
 					}
+					for difficulty_offset in DIFFICULTY_LEVELS:
+						var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
+						if difficulty_rating > 0:
+							song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
 					entry.children.append(song_entry)
 			genre_menu_entry.children.append(entry)
 	_menu_structure.append(genre_menu_entry)
@@ -591,7 +614,12 @@ func make_menu_structure():
 				&"sub_title": info.sub_title,
 				&"folder_id": info.folder_id,
 				&"type": &"song_all_difficulties",
+				&"difficulties": {}
 			}
+			for difficulty_offset in DIFFICULTY_LEVELS:
+				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
+				if difficulty_rating > 0:
+					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
 			entry.children.append(song_entry)
 		bpm_menu_entry.children.append(entry)
 	_menu_structure.append(bpm_menu_entry)
@@ -621,6 +649,7 @@ func make_menu_structure():
 				&"name": info.title,
 				&"sub_title": info.sub_title,
 				&"difficulty_offset": info.difficulty_offset,
+				&"difficulty_rating": get_difficulty_rating(info.folder_id, info.difficulty_offset),
 				&"folder_id": info.folder_id,
 				&"type": &"song_single_difficulty",
 			}

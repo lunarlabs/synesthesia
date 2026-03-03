@@ -251,16 +251,16 @@ func _on_play_pressed():
 	get_tree().current_scene = manager
 	queue_free()
 
-func _input(event: InputEvent):
-	if event.is_action_pressed("ui_up"):
-		var new_index = max(selected_song_index - 1, 0)
-		_select_song(new_index)
-	elif event.is_action_pressed("ui_down"):
-		var new_index = min(selected_song_index + 1, SongCatalog.catalog.size() - 1)
-		_select_song(new_index)
-	elif event.is_action_pressed("ui_accept"):
-		if not %PlayButton.disabled:
-			_on_play_pressed()
+#func _input(event: InputEvent):
+	#if event.is_action_pressed("ui_up"):
+		#var new_index = max(selected_song_index - 1, 0)
+		#_select_song(new_index)
+	#elif event.is_action_pressed("ui_down"):
+		#var new_index = min(selected_song_index + 1, SongCatalog.catalog.size() - 1)
+		#_select_song(new_index)
+	#elif event.is_action_pressed("ui_accept"):
+		#if not %PlayButton.disabled:
+			#_on_play_pressed()
 
 
 # TODO: Theming when values aren't the default

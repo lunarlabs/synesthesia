@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://ci4blnwqqoyc8" path="res://assets/textures/carouselentry.svg" id="1_55ab4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="1_jqa2a"]
 [ext_resource type="LabelSettings" uid="uid://dv77xww5lwkf4" path="res://menu/carousel/title.tres" id="2_0hw33"]
+[ext_resource type="Script" uid="uid://dgi78ynxv5vvu" path="res://menu/carousel/entry.gd" id="2_341lh"]
 [ext_resource type="Texture2D" uid="uid://dhg3wg0pgcr7w" path="res://assets/textures/carouseldifficulty.svg" id="2_sx17s"]
 [ext_resource type="Texture2D" uid="uid://c4gkjkci7oq2x" path="res://assets/textures/carouselplaymarker.svg" id="3_341lh"]
 [ext_resource type="LabelSettings" uid="uid://byf65v26sdt0p" path="res://menu/carousel/subtitle.tres" id="3_fu0w3"]
@@ -39,13 +40,44 @@ font = SubResource("FontVariation_55ab4")
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="FontVariation" id="FontVariation_341lh"]
+base_font = ExtResource("1_jqa2a")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 125,
+2003265652: 500
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_t6q3t"]
+font = SubResource("FontVariation_341lh")
+font_size = 20
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="FontVariation" id="FontVariation_sx17s"]
+base_font = ExtResource("1_jqa2a")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 125,
+2003265652: 500
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_341lh"]
+font = SubResource("FontVariation_sx17s")
+font_size = 32
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
 [node name="Entry" type="NinePatchRect" unique_id=671378758]
 custom_minimum_size = Vector2(395.2, 85)
-offset_right = 395.2
+anchors_preset = -1
 offset_bottom = 85.0
 texture = ExtResource("1_55ab4")
 region_rect = Rect2(0, 0, 400, 85)
 patch_margin_left = 232
+script = ExtResource("2_341lh")
 metadata/_edit_vertical_guides_ = [90.0, 15.0, 95.0]
 metadata/_edit_horizontal_guides_ = [7.0, 78.0]
 
@@ -61,7 +93,7 @@ offset_right = 400.0
 offset_bottom = 85.0
 texture = ExtResource("2_sx17s")
 
-[node name="Carouselplaymarker" type="TextureRect" parent="Song" unique_id=112757303]
+[node name="PlayMarker" type="TextureRect" parent="Song" unique_id=112757303]
 layout_mode = 0
 offset_right = 400.0
 offset_bottom = 85.0
@@ -114,6 +146,34 @@ text = "Difficulty"
 label_settings = SubResource("LabelSettings_sx17s")
 
 [node name="Submenu" type="Control" parent="." unique_id=1524135444]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TypeLabel" type="Label" parent="Submenu" unique_id=1221497290]
+modulate = Color(1, 1, 1, 0.50980395)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -30.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "CATEGORY"
+label_settings = SubResource("LabelSettings_t6q3t")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Submenu" unique_id=775734423]
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_left = 12.0
+text = "1st STYLE"
+label_settings = SubResource("LabelSettings_341lh")
+vertical_alignment = 1

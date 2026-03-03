@@ -6,7 +6,11 @@ var _current_menu_structure: Array = []
 var _back_stack: Array = []
 var _displayed_menu_structure: Array = []
 
+var _current_item_index: int = 0
+var _current_difficulty: int = 102
+
 const ITEM_SPACING_PX := 10
+const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
 
 # NOTE: use posmod(x,y) instead of % for relative indexing of menu items because it wraps
 # equally in the positive and negative directions.
@@ -18,7 +22,7 @@ func fetch_menu_structure(force := false):
 	_root_menu_structure = SongCatalog.menu_structure
 	_current_menu_structure = _root_menu_structure
 	_back_stack = []
-	_displayed_menu_structure = []
+	_update_displayed_menu_structure()
 
 func _update_displayed_menu_structure():
 	_displayed_menu_structure = []
@@ -46,6 +50,13 @@ func toggle_category(category_item: Dictionary):
 	category_item[&"open"] = not category_item[&"open"]
 	_update_displayed_menu_structure()
 
+func switch_category(category_item: Dictionary):
+	for i in _current_menu_structure.size():
+		if _current_menu_structure[i][&"type"] == &"category":
+			_current_menu_structure[i][&"open"] = false
+	category_item[&"open"] = true
+	_update_displayed_menu_structure()
+		
 func navigate_back() -> bool:
 	if _back_stack.is_empty():
 		return false
@@ -53,3 +64,47 @@ func navigate_back() -> bool:
 	_update_displayed_menu_structure()
 	return true
 #endregion
+
+func _ready():
+	# Find out how many entry instances will be needed
+	# We need enough to fill the viewport, plus a few extra for scrolling
+	var instance = ENTRY_SCENE.instantiate()
+	var total_height = instance.get_size().y + ITEM_SPACING_PX
+	var viewport_height = get_viewport().get_visible_rect().size.y
+	var num_entries = int(viewport_height / total_height) + 1
+	if num_entries % 2 == 0:
+		num_entries += 1
+	var entry_y_pos = ((viewport_height - num_entries * total_height) + ITEM_SPACING_PX) / 2
+	for i in range(num_entries):
+		if i != 0:
+			instance = ENTRY_SCENE.instantiate()
+		instance.position.y = entry_y_pos
+		instance.anchor_right = 1.0
+		instance.offset_right = 0.0
+		@warning_ignore("integer_division")
+		instance.carousel_index = - num_entries / 2 + i
+		entry_y_pos += total_height
+		add_child(instance)
+	fetch_menu_structure(true)
+	update_carousel()
+
+func update_carousel():
+	for i in range(get_child_count()):
+		var entry = get_child(i)
+		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
+		entry.update_entry(_displayed_menu_structure[item_index])
+
+func _unhandled_input(event: InputEvent):
+	if event.is_action_pressed("ui_up"):
+		_current_item_index = posmod(_current_item_index - 1, _displayed_menu_structure.size())
+		update_carousel()
+	elif event.is_action_pressed("ui_down"):
+		_current_item_index = posmod(_current_item_index + 1, _displayed_menu_structure.size())
+		update_carousel()
+	elif event.is_action_pressed("ui_accept"):
+		var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
+		select_item(item)
+		update_carousel()
+	elif event.is_action_pressed("ui_cancel"):
+		navigate_back()
+		update_carousel()
