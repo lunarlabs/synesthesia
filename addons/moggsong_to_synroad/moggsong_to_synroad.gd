@@ -249,6 +249,10 @@ func _try_load_songdata(folder_path: String) -> SongData:
 	return null
 
 func _populate_gui_from_songdata(songdata: SongData) -> void:
+	if not songdata:
+		_warning_label.text = "ERROR: Failed to load SongData."
+		push_error("_populate_gui_from_songdata called with null SongData.")
+		return
 	_title_edit.text = songdata.title
 	_title_edit.editable = true
 	_long_title_edit.text = songdata.long_title

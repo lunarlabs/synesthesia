@@ -22,7 +22,8 @@ static func create_songdata_from_moggsong(moggsong_file: String) -> SongData:
 	songdata.sub_title = moggsong_data.get("title", "")
 	songdata.artist = moggsong_data.get("artist", "Unknown Artist")
 	songdata.genre = moggsong_data.get("genre", "Unknown Genre")
-	songdata.description = moggsong_data.get("desc", "")
+	var desc_value = moggsong_data.get("desc", "")
+	songdata.description = desc_value if typeof(desc_value) == TYPE_STRING else str(desc_value)
 	songdata.fixed_bpm = float(moggsong_data.get("bpm", 120.0))
 	if abs(songdata.fixed_bpm - songdata.bpm) > 0.01:
 		songdata.bpm_fix = true
