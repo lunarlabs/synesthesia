@@ -71,6 +71,8 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 
 @onready var anim = $AnimationPlayer
 
+var subscreen_buttons: Array = []
+
 var selected_song_index: int = 0
 var selected_difficulty: int = 102 # Default to Intermediate
 
@@ -80,9 +82,13 @@ var timing_modifier_index: int = 0
 var reset_modifier_index: int = 0
 var hi_speed_index: int = 0 # Default to 1.0x
 
+signal difficulty_changed(difficulty: int)
+
+
 # UI References
 
 func _ready():
+	subscreen_buttons = $SubScreenContainer/SubScreenButtons.get_children()
 	await get_tree().process_frame # Wait a frame for UI to initialize
 	SongCatalog.scan_for_songs()
 	%LoadingContainer.visible = false

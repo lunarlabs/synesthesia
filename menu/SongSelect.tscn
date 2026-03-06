@@ -290,30 +290,30 @@ offset_right = 70.0
 offset_bottom = 20.0
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
+[node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
 layout_mode = 2
 
-[node name="ModifierButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=1261412322]
+[node name="ModifierButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=1261412322]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "MODS"
 
-[node name="SystemButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=353088189]
+[node name="SystemButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=353088189]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SYS"
 
-[node name="SongsButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=881269748]
+[node name="SongsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=881269748]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SONGS"
 
-[node name="EffectsButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=977080346]
+[node name="EffectsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=977080346]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "EQ/FX"
 
-[node name="PlayerButton" type="Button" parent="SubScreenContainer/VBoxContainer" unique_id=2132771351]
+[node name="PlayerButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=2132771351]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "STATS"
@@ -488,6 +488,7 @@ vertical_alignment = 1
 uppercase = true
 
 [node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer" unique_id=1468517052]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 

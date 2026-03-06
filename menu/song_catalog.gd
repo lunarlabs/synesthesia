@@ -456,10 +456,10 @@ func make_menu_structure():
 	var success = db.query("SELECT MIN(bpm), MAX(bpm) FROM songs")
 	var result = db.query_result
 	var result_is_empty = result.size() == 0
-	if result_is_empty or not success:
+	var min_bpm = result[0]["MIN(bpm)"] if not result_is_empty else null
+	var max_bpm = result[0]["MAX(bpm)"] if not result_is_empty else null
+	if result_is_empty or not success or min_bpm == null or max_bpm == null:
 		return
-	var min_bpm = result[0]["MIN(bpm)"]
-	var max_bpm = result[0]["MAX(bpm)"]
 	var bpm_range = max_bpm - min_bpm
 	var num_buckets = int(ceil(bpm_range / float(BPM_BUCKET_SIZE)))
 	var buckets = []
@@ -474,9 +474,10 @@ func make_menu_structure():
 	success = db.query("SELECT MAX(difficulty_rating) FROM difficulties")
 	result = db.query_result
 	result_is_empty = result.size() == 0
-	if result_is_empty or not success:
+	var max_difficulty_rating = result[0]["MAX(difficulty_rating)"] if not result_is_empty else null
+	if result_is_empty or not success or max_difficulty_rating == null:
 		return
-	var difficulty_ceil = int(ceil(result[0]["MAX(difficulty_rating)"]))
+	var difficulty_ceil = int(ceil(max_difficulty_rating))
 
 	success = db.query("SELECT * FROM sources ORDER BY name ASC")
 	result = db.query_result
@@ -508,8 +509,9 @@ func make_menu_structure():
 				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
 				if difficulty_rating > 0:
 					entry[&"difficulties"][difficulty_offset] = difficulty_rating
-				
-			title_menu_entry.children.append(entry)
+
+			if not entry.difficulties.is_empty():
+				title_menu_entry.children.append(entry)
 	_menu_structure.append(title_menu_entry)
 
 	var source_menu_entry = {
@@ -545,7 +547,8 @@ func make_menu_structure():
 				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
 				if difficulty_rating > 0:
 					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
-			entry.children.append(song_entry)
+			if not song_entry.difficulties.is_empty():
+				entry.children.append(song_entry)
 		source_menu_entry.children.append(entry)
 	_menu_structure.append(source_menu_entry)
 
@@ -583,8 +586,10 @@ func make_menu_structure():
 						var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
 						if difficulty_rating > 0:
 							song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
-					entry.children.append(song_entry)
-			genre_menu_entry.children.append(entry)
+					if not song_entry.difficulties.is_empty():
+						entry.children.append(song_entry)
+			if not entry.children.is_empty():
+				genre_menu_entry.children.append(entry)
 	_menu_structure.append(genre_menu_entry)
 
 	var bpm_menu_entry = {
@@ -620,7 +625,8 @@ func make_menu_structure():
 				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
 				if difficulty_rating > 0:
 					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
-			entry.children.append(song_entry)
+			if not song_entry.difficulties.is_empty():
+				entry.children.append(song_entry)
 		bpm_menu_entry.children.append(entry)
 	_menu_structure.append(bpm_menu_entry)
 

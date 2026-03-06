@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 var _root_menu_structure: Array = []
@@ -9,8 +8,12 @@ var _displayed_menu_structure: Array = []
 var _current_item_index: int = 0
 var _current_difficulty: int = 102
 
-const ITEM_SPACING_PX := 10
+const ITEM_SPACING_PX := 6
+const COL_OFFSET_PX := 20
 const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
+
+signal selection_changed(type: String, reference: String)
+signal song_selected(song_data: SongData, difficulty: int)
 
 # NOTE: use posmod(x,y) instead of % for relative indexing of menu items because it wraps
 # equally in the positive and negative directions.
@@ -44,6 +47,7 @@ func select_item(item: Dictionary):
 func navigate_into_submenu(submenu_item: Dictionary):
 	_back_stack.push_back(_current_menu_structure)
 	_current_menu_structure = submenu_item[&"children"]
+	_current_item_index = 0
 	_update_displayed_menu_structure()
 
 func toggle_category(category_item: Dictionary):
@@ -83,8 +87,10 @@ func _ready():
 		instance.offset_right = 0.0
 		@warning_ignore("integer_division")
 		instance.carousel_index = - num_entries / 2 + i
-		entry_y_pos += total_height
+		instance.offset_left = abs(instance.carousel_index) * COL_OFFSET_PX
+		instance.gui_input.connect(_on_entry_gui_input.bind(instance))
 		add_child(instance)
+		entry_y_pos += total_height
 	fetch_menu_structure(true)
 	update_carousel()
 
@@ -95,16 +101,25 @@ func update_carousel():
 		entry.update_entry(_displayed_menu_structure[item_index])
 
 func _unhandled_input(event: InputEvent):
+	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons:
+		return
 	if event.is_action_pressed("ui_up"):
+		get_viewport().set_input_as_handled()
 		_current_item_index = posmod(_current_item_index - 1, _displayed_menu_structure.size())
 		update_carousel()
 	elif event.is_action_pressed("ui_down"):
+		get_viewport().set_input_as_handled()
 		_current_item_index = posmod(_current_item_index + 1, _displayed_menu_structure.size())
 		update_carousel()
 	elif event.is_action_pressed("ui_accept"):
+		get_viewport().set_input_as_handled()
 		var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
 		select_item(item)
 		update_carousel()
 	elif event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
 		navigate_back()
 		update_carousel()
+
+func _on_entry_gui_input(event: InputEvent, entry: Control):
+	pass

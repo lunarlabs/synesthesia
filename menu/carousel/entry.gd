@@ -89,4 +89,4 @@ func update_entry(item: Dictionary):
 			song_container.hide()
 			submenu_container.show()
 			submenu_title.text = item[&"name"]
-			submenu_type.text = item[&"type"]
+			submenu_type.text = "%d songs" % item[&"children"].size() if item[&"children"].size() != 1 else "1 song"
