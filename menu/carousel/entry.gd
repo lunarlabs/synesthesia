@@ -15,7 +15,7 @@ const DIFFICULTY_COLORS = {
 	108: Color(1.0, 1.0, 0.157),
 	114: Color(1.0, 0.1, 0.1)
 }
-const SONG_ENTRY_BG_COLOR = Color(0.5, 0.5, 0.5, 1.0)
+const SONG_ENTRY_BG_COLOR = Color(0.75, 0.75, 0.75, 0.8)
 const FOLDER_ENTRY_BG_COLOR = Color(0.149, 0.444, 0.592, 1.0)
 const MENU_ENTRY_BG_COLOR = Color(0.311, 0.536, 0.269, 1.0)
 
@@ -32,7 +32,7 @@ const MENU_ENTRY_BG_COLOR = Color(0.311, 0.536, 0.269, 1.0)
 
 func _ready():
 	if carousel_index != 0:
-		modulate = Color(1, 1, 1, 0.5)
+		modulate = Color(0.5, 0.5, 0.5, 1.0)
 
 func update_difficulty(difficulty_offset: int, item: Dictionary):
 	current_difficulty = difficulty_offset

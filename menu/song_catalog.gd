@@ -83,7 +83,7 @@ const FILTER_GENRE = """WHERE genre = ?"""
 
 const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC"
 const BPM_ORDER_BY = "ORDER BY bpm ASC"
-const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating DESC"
+const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating ASC"
 
 #const MENU_ITEM_TYPES = ["submenu", "category", "song_single_difficulty", "song_all_difficulties"]
 const BPM_BUCKET_SIZE = 20
@@ -492,7 +492,7 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	success = db.query("%s %s;" % [BASE_QUERY, DEFAULT_ORDER_BY])
+	success = db.query("%s WHERE files_ok = 1 %s;" % [BASE_QUERY, DEFAULT_ORDER_BY])
 	result = db.query_result
 	result_is_empty = result.size() == 0
 	if not result_is_empty and success:
@@ -636,7 +636,7 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	for i in range(1, difficulty_ceil + 1):
+	for i in range(1, difficulty_ceil):
 		var entry = {
 			&"name": "Level %d" % i,
 			&"type": &"category",
@@ -655,7 +655,7 @@ func make_menu_structure():
 				&"name": info.title,
 				&"sub_title": info.sub_title,
 				&"difficulty_offset": info.difficulty_offset,
-				&"difficulty_rating": get_difficulty_rating(info.folder_id, info.difficulty_offset),
+				&"difficulty_rating": info.difficulty_rating,
 				&"folder_id": info.folder_id,
 				&"type": &"song_single_difficulty",
 			}

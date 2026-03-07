@@ -129,7 +129,8 @@ SELECT
     s."cover_art_height",
     s."cover_art_width",
     d."difficulty_offset",
-    d."difficulty_rating",
+    ROUND(d."difficulty_rating", 1) AS "difficulty_rating",
+    d."difficulty_rating" AS "real_rating",
     d."details_json",
     dl."name" AS "difficulty_name",
     src."name" AS "source_name"

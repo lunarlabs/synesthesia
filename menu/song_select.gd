@@ -103,7 +103,6 @@ func _ready():
 #	if SessionManager.song_records.is_empty():
 		# temporary until we have a splash screen proper
 #		SessionManager.load_session()
-	_populate_song_list()
 	_connect_signals()
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
 	energy_modifier_index = SessionManager.previous_select_options.get("energy_modifier_index", 0)
@@ -126,21 +125,7 @@ func _load_async():
 	SongCatalog.start_reload_async()
 	await SongCatalog.await_catalog_ready()
 
-func _populate_song_list():
-	%SongList.clear()
-	for entry in SongCatalog.song_catalog:
-		var display_text = entry.title
-		if not entry.files_ok:
-			display_text = "[INVALID] " + display_text
-		
-		%SongList.add_item(display_text)
-		
-		if not entry.files_ok:
-			%SongList.set_item_custom_fg_color(%SongList.item_count - 1, Color.RED)
-
 func _connect_signals():
-	%SongList.item_selected.connect(_on_song_selected)
-	%PlayButton.pressed.connect(_on_play_pressed)
 	
 	# Connect difficulty panels
 	%BeginnerDifficulty.gui_input.connect(_on_difficulty_clicked.bind(96))
@@ -152,9 +137,6 @@ func _select_song(index: int):
 	if index < 0 or index >= SongCatalog.song_catalog.size():
 		return
 	
-	selected_song_index = index
-	%SongList.select(index)
-	
 	var entry = SongCatalog.song_catalog[index]
 	
 	# Update song info
@@ -165,11 +147,6 @@ func _select_song(index: int):
 	
 	# Update difficulty panels
 	_update_difficulty_panels(entry)
-	
-	# Enable/disable play button
-	%PlayButton.disabled = not entry.files_ok
-
-	anim.play("SongSelected")
 
 func _update_difficulty_panels(entry):
 	var available_difficulties_str
@@ -317,3 +294,11 @@ func _update_previous_bests():
 		else:
 			%PrevAccTitle.text = "MENU_PHRASEACCURACYTITLE"
 			%PrevAccLabel.text = "%.2f%%" % (record.accuracy)
+
+
+func _on_carousel_selection_changed(type: String, reference: String) -> void:
+	pass # Replace with function body.
+
+
+func _on_carousel_song_selected(song_data: SongData, difficulty: int) -> void:
+	pass # Replace with function body.

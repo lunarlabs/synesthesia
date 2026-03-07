@@ -124,3 +124,7 @@ func _unhandled_input(event: InputEvent):
 
 func _on_entry_gui_input(event: InputEvent, entry: Control):
 	pass
+
+
+func _on_song_select_difficulty_changed(difficulty: int) -> void:
+	pass # Replace with function body.
