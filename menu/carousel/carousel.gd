@@ -6,6 +6,7 @@ var _back_stack: Array = []
 var _displayed_menu_structure: Array = []
 
 var _current_item_index: int = 0
+var _current_open_folder: int = -1
 var _current_difficulty: int = 102
 
 const ITEM_SPACING_PX := 6
@@ -41,7 +42,7 @@ func select_item(item: Dictionary):
 		&"submenu":
 			navigate_into_submenu(item)
 		&"category":
-			toggle_category(item)
+			switch_category(item)
 		# song_all_difficulties, song_single_difficulty — handled elsewhere
 
 func navigate_into_submenu(submenu_item: Dictionary):
@@ -56,8 +57,13 @@ func toggle_category(category_item: Dictionary):
 
 func switch_category(category_item: Dictionary):
 	for i in _current_menu_structure.size():
-		if _current_menu_structure[i][&"type"] == &"category":
-			_current_menu_structure[i][&"open"] = false
+		var item = _current_menu_structure[i]
+		if item[&"type"] == &"category" and item[&"open"]:
+			item[&"open"] = false
+			if _current_item_index > i:
+				_current_item_index -= item[&"children"].size()
+			_update_displayed_menu_structure()
+	_current_open_folder = _current_item_index
 	category_item[&"open"] = true
 	_update_displayed_menu_structure()
 		
