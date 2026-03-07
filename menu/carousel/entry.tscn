@@ -12,16 +12,16 @@
 base_font = ExtResource("1_jqa2a")
 variation_opentype = {
 1129599571: 0,
-1936486004: -10,
+1936486004: 0,
 2003072104: 50,
-2003265652: 400
+2003265652: 450
 }
 
 [sub_resource type="LabelSettings" id="LabelSettings_55ab4"]
 font = SubResource("FontVariation_f5151")
 font_size = 45
+font_color = Color(0, 0, 0, 1)
 outline_size = 7
-outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="FontVariation" id="FontVariation_55ab4"]
 base_font = ExtResource("1_jqa2a")
@@ -63,6 +63,9 @@ variation_opentype = {
 2003072104: 125,
 2003265652: 500
 }
+opentype_features = {
+1936548720: 1
+}
 
 [sub_resource type="LabelSettings" id="LabelSettings_341lh"]
 font = SubResource("FontVariation_sx17s")
@@ -72,7 +75,6 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="Entry" type="NinePatchRect" unique_id=671378758]
 custom_minimum_size = Vector2(395.2, 85)
-anchors_preset = -1
 offset_bottom = 85.0
 texture = ExtResource("1_55ab4")
 region_rect = Rect2(0, 0, 400, 85)
@@ -83,9 +85,11 @@ metadata/_edit_horizontal_guides_ = [7.0, 78.0]
 
 [node name="Song" type="Control" parent="." unique_id=819393028]
 layout_mode = 1
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="DifficultyBG" type="TextureRect" parent="Song" unique_id=385476751]
 layout_mode = 0
@@ -99,48 +103,40 @@ offset_right = 400.0
 offset_bottom = 85.0
 texture = ExtResource("3_341lh")
 
-[node name="MarginContainer" type="MarginContainer" parent="Song" unique_id=102360974]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 339.0
-offset_bottom = 41.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="Hbox" type="HBoxContainer" parent="Song/MarginContainer" unique_id=244579046]
-layout_mode = 2
-theme_override_constants/separation = 9
-
-[node name="DifficultyValueLabel" type="Label" parent="Song/MarginContainer/Hbox" unique_id=915899193]
+[node name="DifficultyValueLabel" type="Label" parent="Song" unique_id=915899193]
 custom_minimum_size = Vector2(75, 0)
-layout_mode = 2
+layout_mode = 0
+offset_left = 15.0
+offset_top = 11.0
+offset_right = 90.0
+offset_bottom = 78.0
 text = "88.8"
 label_settings = SubResource("LabelSettings_55ab4")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Song/MarginContainer/Hbox" unique_id=11763185]
-layout_mode = 2
+[node name="VBoxContainer" type="VBoxContainer" parent="Song" unique_id=11763185]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 95.0
+offset_bottom = -5.0
 size_flags_vertical = 4
 theme_override_constants/separation = -8
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1881657179]
+[node name="TitleLabel" type="Label" parent="Song/VBoxContainer" unique_id=1881657179]
 layout_mode = 2
 text = "Uptown Saturday Night"
 label_settings = ExtResource("2_0hw33")
 
-[node name="SubTitleLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1815236760]
+[node name="SubTitleLabel" type="Label" parent="Song/VBoxContainer" unique_id=1815236760]
 layout_mode = 2
 text = "(Dieselboy + Kaos Rock Remix)"
 label_settings = ExtResource("3_fu0w3")
 
-[node name="DifficultyNameLabel" type="Label" parent="Song/MarginContainer/Hbox/VBoxContainer" unique_id=1833837207]
+[node name="DifficultyNameLabel" type="Label" parent="Song/VBoxContainer" unique_id=1833837207]
 layout_mode = 2
 text = "Difficulty"
 label_settings = SubResource("LabelSettings_sx17s")
@@ -168,12 +164,13 @@ text = "CATEGORY"
 label_settings = SubResource("LabelSettings_t6q3t")
 horizontal_alignment = 2
 vertical_alignment = 1
+uppercase = true
 
 [node name="TitleLabel" type="Label" parent="Submenu" unique_id=775734423]
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0
-offset_left = 12.0
+offset_left = 20.0
 text = "1st STYLE"
 label_settings = SubResource("LabelSettings_341lh")
 vertical_alignment = 1

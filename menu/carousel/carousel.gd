@@ -98,6 +98,7 @@ func update_carousel():
 	for i in range(get_child_count()):
 		var entry = get_child(i)
 		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
+		entry.current_difficulty = _current_difficulty
 		entry.update_entry(_displayed_menu_structure[item_index])
 
 func _unhandled_input(event: InputEvent):

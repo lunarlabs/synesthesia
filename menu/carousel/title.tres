@@ -8,11 +8,11 @@ variation_opentype = {
 1129599571: 0,
 1936486004: 0,
 2003072104: 85,
-2003265652: 500
+2003265652: 400
 }
 
 [resource]
 font = SubResource("FontVariation_etny0")
-font_size = 24
-outline_size = 4
+font_size = 26
+outline_size = 5
 outline_color = Color(0, 0, 0, 1)

@@ -22,11 +22,11 @@ const MENU_ENTRY_BG_COLOR = Color(0.311, 0.536, 0.269, 1.0)
 @onready var song_container = $Song
 @onready var submenu_container = $Submenu
 @onready var difficulty_bg = $Song/DifficultyBG
-@onready var difficulty_value_label = $Song/MarginContainer/Hbox/DifficultyValueLabel
+@onready var difficulty_value_label = $Song/DifficultyValueLabel
 @onready var play_marker = $Song/PlayMarker
-@onready var song_title = $Song/MarginContainer/Hbox/VBoxContainer/TitleLabel
-@onready var song_subtitle = $Song/MarginContainer/Hbox/VBoxContainer/SubTitleLabel
-@onready var song_difficulty_name = $Song/MarginContainer/Hbox/VBoxContainer/DifficultyNameLabel
+@onready var song_title = $Song/VBoxContainer/TitleLabel
+@onready var song_subtitle = $Song/VBoxContainer/SubTitleLabel
+@onready var song_difficulty_name = $Song/VBoxContainer/DifficultyNameLabel
 @onready var submenu_title = $Submenu/TitleLabel
 @onready var submenu_type = $Submenu/TypeLabel
 

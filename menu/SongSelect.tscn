@@ -318,28 +318,6 @@ layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "STATS"
 
-[node name="RightSide" type="VBoxContainer" parent="." unique_id=246917605]
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.66
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 40.0
-grow_horizontal = 0
-grow_vertical = 2
-
-[node name="SongList" type="ItemList" parent="RightSide" unique_id=1271603346]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PlayButton" type="Button" parent="RightSide" unique_id=1443998541]
-unique_name_in_owner = true
-layout_mode = 2
-disabled = true
-text = "PLAY"
-
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1

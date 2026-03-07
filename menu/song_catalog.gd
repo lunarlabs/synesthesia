@@ -601,7 +601,7 @@ func make_menu_structure():
 	for i in buckets.size():
 		var bucket = buckets[i]
 		var entry = {
-			&"name": "%d-%d" % [bucket.min, bucket.max],
+			&"name": "%d-%d bpm" % [bucket.min, bucket.max],
 			&"type": &"category",
 			&"open": false,
 			&"children": []
@@ -638,7 +638,7 @@ func make_menu_structure():
 
 	for i in range(1, difficulty_ceil + 1):
 		var entry = {
-			&"name": "%d" % i,
+			&"name": "Level %d" % i,
 			&"type": &"category",
 			&"open": false,
 			&"children": []
