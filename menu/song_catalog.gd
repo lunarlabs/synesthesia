@@ -36,7 +36,7 @@ const PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
 const PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
 
 #region Query Constants
-const BASE_QUERY = """SELECT 
+const QUERY_BASE = """SELECT 
 	folder_id, 
 	title, 
 	sub_title, 
@@ -54,7 +54,7 @@ const BASE_QUERY = """SELECT
 	cover_art_fmt
 FROM v_song_select"""
 
-const DIFFICULTY_QUERY = """SELECT 
+const QUERY_DIFFICULTY = """SELECT 
 	folder_id, 
 	title, 
 	sub_title, 
@@ -73,17 +73,19 @@ const DIFFICULTY_QUERY = """SELECT
 	cover_art_fmt
 FROM v_full_library"""
 
-const FILTER_FOLDER = """WHERE folder_id = ?"""
-const FILTER_DIFFICULTY = """WHERE difficulty_offset = ?"""
-const FILTER_FOLDER_DIFFICULTY = """WHERE folder_id = ? AND difficulty_offset = ?"""
-const FILTER_BETWEEN_BPM = """WHERE bpm BETWEEN ? AND ?"""
-const FILTER_BETWEEN_RATING = """WHERE difficulty_rating >= ? AND difficulty_rating < ?"""
-const FILTER_SOURCE = """WHERE source_name = ?"""
-const FILTER_GENRE = """WHERE genre = ?"""
+const QUERY_COVER_ART = """SELECT cover_art, cover_art_width, cover_art_height, cover_art_fmt FROM songs WHERE folder_id = ?"""
 
-const DEFAULT_ORDER_BY = "ORDER BY sort_key ASC"
-const BPM_ORDER_BY = "ORDER BY bpm ASC"
-const DIFF_RATING_ORDER_BY = "ORDER BY difficulty_rating ASC"
+const FILTER_FOLDER = """folder_id = ?"""
+const FILTER_DIFFICULTY = """difficulty_offset = ?"""
+const FILTER_FOLDER_DIFFICULTY = """folder_id = ? AND difficulty_offset = ?"""
+const FILTER_BETWEEN_BPM = """bpm BETWEEN ? AND ?"""
+const FILTER_BETWEEN_RATING = """difficulty_rating >= ? AND difficulty_rating < ?"""
+const FILTER_SOURCE = """source_name = ?"""
+const FILTER_GENRE = """genre = ?"""
+
+const ORDER_DEFAULT = "ORDER BY sort_key ASC"
+const ORDER_BPM = "ORDER BY bpm ASC"
+const ORDER_DIFF_RATING = "ORDER BY difficulty_rating ASC"
 
 #const MENU_ITEM_TYPES = ["submenu", "category", "song_single_difficulty", "song_all_difficulties"]
 const BPM_BUCKET_SIZE = 20
@@ -126,7 +128,7 @@ func scan_for_songs(rescan := false):
 			process_song(folder_name, rescan)
 		folder_name = dir.get_next()
 	dir.list_dir_end()
-	if not SessionManager.library_db.query("%s %s;" % [BASE_QUERY, DEFAULT_ORDER_BY]):
+	if not SessionManager.library_db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
 		printerr(SessionManager.library_db.error_message)
 	_song_catalog = SessionManager.library_db.query_result
 	for i in range(_song_catalog.size()):
@@ -230,7 +232,9 @@ func _extract_songdata_meta(song_data: SongData) -> Dictionary:
 	result["inst_layout"] = inst_layout
 	result["files_ok"] = files_ok
 	return result
+#endregion
 
+#region Difficulty Calculation
 func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> DetailedDifficultyInfo:
 	var ddi := DetailedDifficultyInfo.new()
 	var track_count = track_maps.size()
@@ -439,7 +443,7 @@ func get_resource_path(folder_id: String) -> String:
 
 func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
 	var db = SessionManager.library_db
-	var success = db.query_with_bindings("%s %s;" % [DIFFICULTY_QUERY, FILTER_FOLDER_DIFFICULTY], [folder_id, difficulty_offset])
+	var success = db.query_with_bindings("%s WHERE %s;" % [QUERY_DIFFICULTY, FILTER_FOLDER_DIFFICULTY], [folder_id, difficulty_offset])
 	var result = db.query_result
 	var result_is_empty = result.size() == 0
 	if result_is_empty or not success:
@@ -448,6 +452,56 @@ func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
 
 #region Sorting, Filtering, and Queries
 
+func get_folder_ids() -> Array:
+	var db = SessionManager.library_db
+	var success = db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return []
+	var folder_ids = []
+	for i in range(result.size()):
+		folder_ids.append(result[i]["folder_id"])
+	return folder_ids
+
+func get_song_info(folder_id: String) -> Dictionary:
+	var db = SessionManager.library_db
+	var success = db.query_with_bindings("%s WHERE %s;" % [QUERY_BASE, FILTER_FOLDER], [folder_id])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return {}
+	return result[0]
+
+func get_difficulties(folder_id: String) -> Array:
+	var db = SessionManager.library_db
+	var success = db.query_with_bindings("%s WHERE %s;" % [QUERY_DIFFICULTY, FILTER_FOLDER], [folder_id])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return []
+	return result
+
+func get_cover_art(folder_id: String) -> ImageTexture:
+	var db = SessionManager.library_db
+	var success = db.query_with_bindings("%s WHERE %s;" % [QUERY_COVER_ART, FILTER_FOLDER], [folder_id])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return null
+	var cover_art = result[0]["cover_art"]
+	if cover_art == null:
+		return null
+	var cover_art_width = result[0]["cover_art_width"]
+	var cover_art_height = result[0]["cover_art_height"]
+	var cover_art_fmt = result[0]["cover_art_fmt"]
+	var image = Image.create_from_data(cover_art_width, cover_art_height, false, cover_art_fmt, cover_art)
+	var image_texture = ImageTexture.create_from_image(image)
+	return image_texture
+
+#endregion
+
+#region Menu Structure
 # TODO: func to make menu structure for carousel menu
 func make_menu_structure():
 	_menu_structure.clear()
@@ -492,7 +546,7 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	success = db.query("%s WHERE files_ok = 1 %s;" % [BASE_QUERY, DEFAULT_ORDER_BY])
+	success = db.query("%s WHERE files_ok = 1 %s;" % [QUERY_BASE, ORDER_DEFAULT])
 	result = db.query_result
 	result_is_empty = result.size() == 0
 	if not result_is_empty and success:
@@ -528,7 +582,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_SOURCE, DEFAULT_ORDER_BY], [source.name])
+		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_SOURCE, ORDER_DEFAULT], [source.name])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
@@ -570,7 +624,7 @@ func make_menu_structure():
 				&"open": false,
 				&"children": []
 			}
-			success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_GENRE, DEFAULT_ORDER_BY], [genre_name])
+			success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_GENRE, ORDER_DEFAULT], [genre_name])
 			var genre_results = db.query_result
 			if not genre_results.is_empty() and success:
 				for j in genre_results.size():
@@ -606,7 +660,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s %s %s;" % [BASE_QUERY, FILTER_BETWEEN_BPM, BPM_ORDER_BY], [bucket.min, bucket.max])
+		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_BETWEEN_BPM, ORDER_BPM], [bucket.min, bucket.max])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
@@ -643,7 +697,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s %s %s;" % [DIFFICULTY_QUERY, FILTER_BETWEEN_RATING, DIFF_RATING_ORDER_BY], [i, i + 1])
+		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_DIFFICULTY, FILTER_BETWEEN_RATING, ORDER_DIFF_RATING], [i, i + 1])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
