@@ -12,6 +12,7 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
 shader = ExtResource("3_ctryq")
+shader_parameter/camera_location = Vector3(3, 0.28, -10)
 
 [sub_resource type="FontVariation" id="FontVariation_ctryq"]
 variation_opentype = {
@@ -120,6 +121,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_0tx4y")
 script = ExtResource("1_etro7")
+metadata/_edit_horizontal_guides_ = [360.0]
 
 [node name="Background" type="ColorRect" parent="." unique_id=1882285385]
 material = SubResource("ShaderMaterial_hjgwb")
@@ -131,12 +133,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Prev_Best_Container" type="PanelContainer" parent="." unique_id=902190860]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 100.0
-offset_bottom = -40.0
+offset_left = 120.0
+offset_bottom = -150.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
@@ -235,9 +238,9 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -20.0
-offset_right = 70.0
-offset_bottom = 20.0
+offset_top = -97.5
+offset_right = 80.0
+offset_bottom = 97.5
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
@@ -271,15 +274,17 @@ text = "STATS"
 [node name="TopBox" type="HBoxContainer" parent="." unique_id=178165679]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.525
+anchor_top = 0.5
 anchor_right = 0.6
-anchor_bottom = 0.525
+anchor_bottom = 0.5
 offset_left = 120.0
+offset_bottom = 39.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/separation = 30
 
-[node name="TextureRect" type="TextureRect" parent="TopBox" unique_id=728567514]
+[node name="CoverArt" type="TextureRect" parent="TopBox" unique_id=728567514]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("5_hjgwb")
 expand_mode = 3
@@ -291,7 +296,6 @@ theme_override_constants/separation = 1
 alignment = 2
 
 [node name="Control" type="Control" parent="TopBox/SongInfo" unique_id=772810254]
-clip_contents = true
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
@@ -330,6 +334,7 @@ layout_mode = 2
 text = "Artist Name"
 label_settings = SubResource("LabelSettings_hjgwb")
 text_overrun_behavior = 3
+visible_characters_behavior = 1
 
 [node name="HSeparator" type="HSeparator" parent="TopBox/SongInfo" unique_id=1140443554]
 layout_mode = 2
@@ -342,6 +347,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Song Genre"
 label_settings = SubResource("LabelSettings_pjj6u")
+visible_characters_behavior = 1
 
 [node name="VSeparator" type="VSeparator" parent="TopBox/SongInfo/HBoxContainer" unique_id=1546997866]
 layout_mode = 2
@@ -354,6 +360,7 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
+visible = false
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -431,6 +438,8 @@ size_flags_horizontal = 3
 text = "MOD_HISPEED"
 
 [node name="DifficultyContainer" type="PanelContainer" parent="." unique_id=625013252]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.575
@@ -473,6 +482,7 @@ difficulty_name = "DIFF_114"
 
 [node name="LoadingContainer" type="CenterContainer" parent="." unique_id=1542685177]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 0.66

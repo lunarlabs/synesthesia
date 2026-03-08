@@ -3,6 +3,7 @@ shader_type canvas_item;
 // --- Uniforms ---
 
 global uniform sampler2D viz;
+uniform vec3 camera_location = vec3(3.0, 0.28, -10.);
 
 // Maximum number of raymarching steps (higher = better quality but slower)
 const int MAX_STEPS = 100;
@@ -131,8 +132,8 @@ float map(vec3 p) {
     {
         // Slowly rotating octahedron
         vec3 q = p;
-        q *= rotateY(TIME * 0.15); // Rotate around Y axis
-        q *= rotateX(TIME * 0.1);  // Rotate around X axis for more interesting motion
+        q *= rotateY(TIME * 0.3); // Rotate around Y axis
+        q *= rotateX(TIME * 0.2);  // Rotate around X axis for more interesting motion
         d = min(d, sdOctahedron(q, 3.0));
     }
     
@@ -228,7 +229,7 @@ void fragment() {
 
     // 2. Camera Setup
     // Ray Origin (Camera Position)
-    vec3 ro = vec3(3.0, 1.0, -10.);
+    vec3 ro = camera_location;
 
     // Ray Direction
     // The UV becomes the XY direction, Z is forward (1.0)
