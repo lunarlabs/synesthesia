@@ -75,6 +75,13 @@ func navigate_back() -> bool:
 	return true
 #endregion
 
+func update_carousel():
+	for i in range(get_child_count()):
+		var entry = get_child(i)
+		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
+		entry.current_difficulty = _current_difficulty
+		entry.update_entry(_displayed_menu_structure[item_index])
+
 func _ready():
 	# Find out how many entry instances will be needed
 	# We need enough to fill the viewport, plus a few extra for scrolling
@@ -100,12 +107,7 @@ func _ready():
 	fetch_menu_structure(true)
 	update_carousel()
 
-func update_carousel():
-	for i in range(get_child_count()):
-		var entry = get_child(i)
-		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
-		entry.current_difficulty = _current_difficulty
-		entry.update_entry(_displayed_menu_structure[item_index])
+
 
 func _unhandled_input(event: InputEvent):
 	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons:
