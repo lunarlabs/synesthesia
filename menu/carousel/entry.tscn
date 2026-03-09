@@ -84,6 +84,7 @@ metadata/_edit_vertical_guides_ = [90.0, 15.0, 95.0]
 metadata/_edit_horizontal_guides_ = [7.0, 78.0]
 
 [node name="Song" type="Control" parent="." unique_id=819393028]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -142,7 +143,6 @@ text = "Difficulty"
 label_settings = SubResource("LabelSettings_sx17s")
 
 [node name="Submenu" type="Control" parent="." unique_id=1524135444]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -170,7 +170,7 @@ uppercase = true
 layout_mode = 1
 anchors_preset = -1
 anchor_bottom = 1.0
-offset_left = 20.0
+offset_left = 25.0
 text = "1st STYLE"
 label_settings = SubResource("LabelSettings_341lh")
 vertical_alignment = 1

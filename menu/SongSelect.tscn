@@ -104,12 +104,136 @@ outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="Animation" id="Animation_ctryq"]
-resource_name = "SongSelected"
-length = 0.2
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("%TitleLabel:offset_bottom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-64.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%TitleLabel:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%CoverArt:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%ArtistLabel:visible_ratio")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%GenreLabel:visible_ratio")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.001),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_pjj6u"]
+resource_name = "select_item"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("%TitleLabel:offset_bottom")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.23333333),
+"transitions": PackedFloat32Array(0.6, 1),
+"update": 0,
+"values": [-30.0, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%TitleLabel:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.23333333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("%CoverArt:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("%ArtistLabel:visible_ratio")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("%GenreLabel:visible_ratio")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hjgwb"]
 _data = {
-&"SongSelected": SubResource("Animation_ctryq")
+&"RESET": SubResource("Animation_ctryq"),
+&"select_item": SubResource("Animation_pjj6u")
 }
 
 [node name="SongSelect" type="Control" unique_id=1474968882]
@@ -285,6 +409,7 @@ theme_override_constants/separation = 30
 
 [node name="CoverArt" type="TextureRect" parent="TopBox" unique_id=728567514]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 texture = ExtResource("5_hjgwb")
 expand_mode = 3
@@ -301,12 +426,15 @@ layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="TopBox/SongInfo/Control" unique_id=1687754643]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
 clip_children = 2
 layout_mode = 1
 anchors_preset = -1
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_vertical = 2
+offset_bottom = -64.0
+grow_vertical = 0
 text = "Song Name"
 label_settings = ExtResource("5_mbci5")
 vertical_alignment = 2
@@ -334,7 +462,9 @@ layout_mode = 2
 text = "Artist Name"
 label_settings = SubResource("LabelSettings_hjgwb")
 text_overrun_behavior = 3
+visible_characters = 0
 visible_characters_behavior = 1
+visible_ratio = 0.0
 
 [node name="HSeparator" type="HSeparator" parent="TopBox/SongInfo" unique_id=1140443554]
 layout_mode = 2
@@ -439,7 +569,6 @@ text = "MOD_HISPEED"
 
 [node name="DifficultyContainer" type="PanelContainer" parent="." unique_id=625013252]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.575

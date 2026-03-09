@@ -72,9 +72,14 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 @onready var anim = $AnimationPlayer
 
 var subscreen_buttons: Array = []
+var bpm_tween: Tween
+var prev_bpm: float
+
+var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
 var selected_song_index: int = 0
 var selected_difficulty: int = 102 # Default to Intermediate
+var held_difficulty: int = 102
 
 var energy_modifier_index: int = 0
 var checkpoint_modifier_index: int = 0
@@ -118,7 +123,6 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
-	_select_song(SessionManager.previous_select_options.get("song_index", 0))
 
 func _load_async():
 	print("Loading song catalog (async)...")
@@ -148,20 +152,19 @@ func _select_song(index: int):
 	# Update difficulty panels
 	_update_difficulty_panels(entry)
 
-func _update_difficulty_panels(entry):
-	var available_difficulties_str
-	var available_difficulties = []
-	if entry.available_difficulties:
-		available_difficulties_str = entry.available_difficulties.split(",")
-		available_difficulties.resize(available_difficulties_str.size())
-		for i in available_difficulties_str.size():
-			available_difficulties[i] = int(available_difficulties_str[i])
+func _update_tempo_level(value: float):
+	%TempoLabel.text = "%.0f BPM" % value
+	prev_bpm = value
+
+
+func _update_difficulty_panels(difficulties: Dictionary):
 	var panels = {
 		96: %BeginnerDifficulty,
 		102: %IntermediateDifficulty,
 		108: %AdvancedDifficulty,
 		114: %ExpertDifficulty
 	}
+	var available_difficulties = difficulties.keys()
 	# Auto-select first available difficulty if current not available
 	if not available_difficulties.has(selected_difficulty):
 		if available_difficulties.size() > 0:
@@ -169,10 +172,12 @@ func _update_difficulty_panels(entry):
 	
 	for diff in [96, 102, 108, 114]:
 		var panel = panels[diff]
-		var rating = SongCatalog.get_difficulty_rating(entry.folder_id, diff)
-		panel.difficulty_value = rating
-		panel.selected = (diff == selected_difficulty)
-		panel.update()
+		if difficulties.has(diff):
+			var rating = difficulties[diff]
+			panel.update(rating)
+			panel.selected = (diff == selected_difficulty)
+		else:
+			panel.update()
 	
 	_update_previous_bests()
 		
@@ -296,9 +301,31 @@ func _update_previous_bests():
 			%PrevAccLabel.text = "%.2f%%" % (record.accuracy)
 
 
-func _on_carousel_selection_changed(type: String, reference: String) -> void:
-	pass # Replace with function body.
+func _on_carousel_selection_changed(reference: Dictionary) -> void:
+	if bpm_tween:
+		bpm_tween.kill()
+	anim.stop()
+	var song_info
+	var diff_info
+	match reference[&"type"]:
+		&"song_all_difficulties":
+			song_info = SongCatalog.get_song_info(reference[&"folder_id"])
+			%ArtistLabel.text = song_info.artist
+			%TitleLabel.text = "%s %s" % [song_info.title, song_info.sub_title] if song_info.sub_title else song_info.title
+			%GenreLabel.text = song_info.genre
+			bpm_tween = create_tween()
+			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+			%DifficultyContainer.show()
+			_update_difficulty_panels(reference[&"difficulties"])
 
+		&"song_single_difficulty":
+			pass
+
+		&"submenu":
+			pass
+
+		&"category":
+			pass
 
 func _on_carousel_song_selected(song_data: SongData, difficulty: int) -> void:
 	pass # Replace with function body.

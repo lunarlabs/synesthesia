@@ -13,8 +13,8 @@ const ITEM_SPACING_PX := 6
 const COL_OFFSET_PX := 20
 const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
 
-signal selection_changed(type: String, reference: String)
-signal song_selected(song_data: SongData, difficulty: int)
+signal selection_changed(reference: Dictionary)
+signal song_selected(song_folder: String, difficulty: int)
 
 # NOTE: use posmod(x,y) instead of % for relative indexing of menu items because it wraps
 # equally in the positive and negative directions.
@@ -82,6 +82,10 @@ func update_carousel():
 		entry.current_difficulty = _current_difficulty
 		entry.update_entry(_displayed_menu_structure[item_index])
 
+func emit_currently_selected():
+	var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
+	selection_changed.emit(item)
+
 func _ready():
 	# Find out how many entry instances will be needed
 	# We need enough to fill the viewport, plus a few extra for scrolling
@@ -102,12 +106,11 @@ func _ready():
 		instance.carousel_index = - num_entries / 2 + i
 		instance.offset_left = abs(instance.carousel_index) * COL_OFFSET_PX
 		instance.gui_input.connect(_on_entry_gui_input.bind(instance))
+		instance.name = "Entry%d" % instance.carousel_index
 		add_child(instance)
 		entry_y_pos += total_height
 	fetch_menu_structure(true)
 	update_carousel()
-
-
 
 func _unhandled_input(event: InputEvent):
 	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons:
