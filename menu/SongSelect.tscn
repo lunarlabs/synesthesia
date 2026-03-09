@@ -256,7 +256,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Prev_Best_Container" type="PanelContainer" parent="." unique_id=902190860]
+[node name="PrevBestContainer" type="PanelContainer" parent="." unique_id=902190860]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -268,23 +268,23 @@ grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Prev_Best_Container" unique_id=1517526259]
+[node name="VBoxContainer" type="VBoxContainer" parent="PrevBestContainer" unique_id=1517526259]
 layout_mode = 2
 
-[node name="PreviousBestsTitle" type="Label" parent="Prev_Best_Container/VBoxContainer" unique_id=1035332137]
+[node name="PreviousBestsTitle" type="Label" parent="PrevBestContainer/VBoxContainer" unique_id=1035332137]
 layout_mode = 2
 text = "MENU_PREV_BESTS"
 uppercase = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Prev_Best_Container/VBoxContainer" unique_id=1517977663]
+[node name="HBoxContainer" type="HBoxContainer" parent="PrevBestContainer/VBoxContainer" unique_id=1517977663]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="Prev_Best_Container/VBoxContainer/HBoxContainer" unique_id=390384257]
+[node name="GridContainer" type="GridContainer" parent="PrevBestContainer/VBoxContainer/HBoxContainer" unique_id=390384257]
 layout_mode = 2
 size_flags_vertical = 4
 columns = 2
 
-[node name="PrevScoreTitle" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=1734628777]
+[node name="PrevScoreTitle" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1734628777]
 custom_minimum_size = Vector2(175, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -292,27 +292,27 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_SCORETITLE"
 uppercase = true
 
-[node name="PrevScoreLabel" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=608072588]
+[node name="PrevScoreLabel" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=608072588]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="PrevStreakTitle" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=1271765169]
+[node name="PrevStreakTitle" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1271765169]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_LONGESTSTREAKTITLE"
 uppercase = true
 
-[node name="PrevStreakLabel" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=374834575]
+[node name="PrevStreakLabel" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=374834575]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="PrevAccTitle" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=1049128356]
+[node name="PrevAccTitle" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1049128356]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -321,20 +321,20 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 text = "MENU_PHRASEACCURACYTITLE"
 uppercase = true
 
-[node name="PrevAccLabel" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/GridContainer" unique_id=1351353979]
+[node name="PrevAccLabel" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/GridContainer" unique_id=1351353979]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="VSeparator" type="VSeparator" parent="Prev_Best_Container/VBoxContainer/HBoxContainer" unique_id=173165377]
+[node name="VSeparator" type="VSeparator" parent="PrevBestContainer/VBoxContainer/HBoxContainer" unique_id=173165377]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Prev_Best_Container/VBoxContainer/HBoxContainer" unique_id=923841904]
+[node name="VBoxContainer" type="VBoxContainer" parent="PrevBestContainer/VBoxContainer/HBoxContainer" unique_id=923841904]
 layout_mode = 2
 
-[node name="PrevClearLabel" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1068678874]
+[node name="PrevClearLabel" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=1068678874]
 unique_name_in_owner = true
 layout_mode = 2
 text = "NOT PLAYED"
@@ -343,7 +343,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="PrevRankLabel" type="Label" parent="Prev_Best_Container/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=264344989]
+[node name="PrevRankLabel" type="Label" parent="PrevBestContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=264344989]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
@@ -475,22 +475,24 @@ layout_mode = 2
 [node name="GenreLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer" unique_id=1606282299]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Song Genre"
 label_settings = SubResource("LabelSettings_pjj6u")
 visible_characters_behavior = 1
 
 [node name="VSeparator" type="VSeparator" parent="TopBox/SongInfo/HBoxContainer" unique_id=1546997866]
+visible = false
 layout_mode = 2
+size_flags_horizontal = 8
 
 [node name="TempoLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer" unique_id=500289050]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 8
 text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
-visible = false
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -506,7 +508,6 @@ size_flags_vertical = 10
 alignment = 1
 
 [node name="Modifiers" type="VBoxContainer" parent="LeftSide/HBoxContainer" unique_id=1468517052]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -634,8 +635,10 @@ autoplay = true
 bus = &"Menu"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628454593]
+unique_name_in_owner = true
 root_node = NodePath("../TopBox/SongInfo")
 libraries/ = SubResource("AnimationLibrary_hjgwb")
+autoplay = &"RESET"
 
 [node name="Carousel" parent="." unique_id=2030868766 instance=ExtResource("9_ctryq")]
 layout_mode = 1

@@ -78,6 +78,7 @@ var prev_bpm: float
 var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
 var selected_song_index: int = 0
+var available_difficulties := []
 var selected_difficulty: int = 102 # Default to Intermediate
 var held_difficulty: int = 102
 
@@ -156,21 +157,26 @@ func _update_tempo_level(value: float):
 	%TempoLabel.text = "%.0f BPM" % value
 	prev_bpm = value
 
+func _slide_difficulty(offset: int):
+	var index = available_difficulties.find(selected_difficulty)
+	if index >= 0:
+		_select_difficulty(available_difficulties[clampi(index + offset,
+		 0, available_difficulties.size() - 1)])
 
 func _update_difficulty_panels(difficulties: Dictionary):
-	var panels = {
-		96: %BeginnerDifficulty,
-		102: %IntermediateDifficulty,
-		108: %AdvancedDifficulty,
-		114: %ExpertDifficulty
-	}
-	var available_difficulties = difficulties.keys()
+	available_difficulties = difficulties.keys()
 	# Auto-select first available difficulty if current not available
 	if not available_difficulties.has(selected_difficulty):
 		if available_difficulties.size() > 0:
 			selected_difficulty = available_difficulties[0]
-	
+
 	for diff in [96, 102, 108, 114]:
+		var panels = {
+			96: %BeginnerDifficulty,
+			102: %IntermediateDifficulty,
+			108: %AdvancedDifficulty,
+			114: %ExpertDifficulty
+		}
 		var panel = panels[diff]
 		if difficulties.has(diff):
 			var rating = difficulties[diff]
@@ -178,25 +184,30 @@ func _update_difficulty_panels(difficulties: Dictionary):
 			panel.selected = (diff == selected_difficulty)
 		else:
 			panel.update()
-	
+	if selected_difficulty == held_difficulty:
+		difficulty_changed.emit(selected_difficulty)
 	_update_previous_bests()
-		
+
+func _select_difficulty(value: int):
+	var panels = {
+		96: %BeginnerDifficulty,
+		102: %IntermediateDifficulty,
+		108: %AdvancedDifficulty,
+		114: %ExpertDifficulty
+	}
+	if available_difficulties.has(value) and value != selected_difficulty:
+		selected_difficulty = value
+		held_difficulty = value
+		difficulty_changed.emit(value)
+		for diff in [96, 102, 108, 114]:
+			panels[diff].selected = (diff == selected_difficulty)
+
 func _on_song_selected(index: int):
 	_select_song(index)
 
 func _on_difficulty_clicked(event: InputEvent, difficulty: int):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var entry = SongCatalog.song_catalog[selected_song_index]
-		var available_difficulties_str
-		var available_difficulties = []
-		if entry.available_difficulties:
-			available_difficulties_str = entry.available_difficulties.split(",")
-			available_difficulties.resize(available_difficulties_str.size())
-			for i in available_difficulties_str.size():
-				available_difficulties[i] = int(available_difficulties_str[i])
-		if available_difficulties.has(difficulty):
-			selected_difficulty = difficulty
-			_update_difficulty_panels(entry)
+		_select_difficulty(difficulty)
 
 func _on_play_pressed():
 	var entry = SongCatalog.song_catalog[selected_song_index]
@@ -249,7 +260,15 @@ func _on_play_pressed():
 	#elif event.is_action_pressed("ui_accept"):
 		#if not %PlayButton.disabled:
 			#_on_play_pressed()
-
+func _unhandled_input(event: InputEvent):
+	if get_viewport().gui_get_focus_owner() in subscreen_buttons:
+		return
+	if event.is_action_pressed("ui_left"):
+		get_viewport().set_input_as_handled()
+		_slide_difficulty(-1)
+	elif event.is_action_pressed("ui_right"):
+		get_viewport().set_input_as_handled()
+		_slide_difficulty(1)
 
 # TODO: Theming when values aren't the default
 
@@ -304,28 +323,125 @@ func _update_previous_bests():
 func _on_carousel_selection_changed(reference: Dictionary) -> void:
 	if bpm_tween:
 		bpm_tween.kill()
-	anim.stop()
+	%AnimationPlayer.stop()
 	var song_info
-	var diff_info
 	match reference[&"type"]:
 		&"song_all_difficulties":
+			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			song_info = SongCatalog.get_song_info(reference[&"folder_id"])
+			if song_info[&"cover_art"]:
+				var img = Image.create_from_data(
+					song_info[&"cover_art_width"], 
+					song_info[&"cover_art_height"],
+					false,
+					song_info[&"cover_art_fmt"],
+					song_info[&"cover_art"])
+				%CoverArt.texture = ImageTexture.create_from_image(img)
+			else:
+				%CoverArt.texture = default_cover_art
+			%CoverArt.show()
+			%ArtistLabel.show()
 			%ArtistLabel.text = song_info.artist
 			%TitleLabel.text = "%s %s" % [song_info.title, song_info.sub_title] if song_info.sub_title else song_info.title
 			%GenreLabel.text = song_info.genre
+			%TempoLabel.show()
 			bpm_tween = create_tween()
-			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 			%DifficultyContainer.show()
+			%PrevBestContainer.show()
+			selected_difficulty = held_difficulty
 			_update_difficulty_panels(reference[&"difficulties"])
+			%AnimationPlayer.play("select_item")
 
 		&"song_single_difficulty":
-			pass
+			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			song_info = SongCatalog.get_song_info(reference[&"folder_id"])
+			if song_info[&"cover_art"]:
+				var img = Image.create_from_data(
+					song_info[&"cover_art_width"], 
+					song_info[&"cover_art_height"],
+					false,
+					song_info[&"cover_art_fmt"],
+					song_info[&"cover_art"])
+				%CoverArt.texture = ImageTexture.create_from_image(img)
+			else:
+				%CoverArt.texture = default_cover_art
+			%CoverArt.show()
+			%ArtistLabel.show()
+			%ArtistLabel.text = song_info.artist
+			%TitleLabel.text = "%s %s" % [song_info.title, song_info.sub_title] if song_info.sub_title else song_info.title
+			%GenreLabel.text = song_info.genre
+			%TempoLabel.show()
+			bpm_tween = create_tween()
+			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+			%DifficultyContainer.show()
+			%PrevBestContainer.show()
+			_update_difficulty_panels({reference[&"difficulty_offset"]: reference[&"difficulty_rating"]})
+			%AnimationPlayer.play("select_item")
 
 		&"submenu":
-			pass
+			available_difficulties.clear()
+			prev_bpm = 0
+			%ArtistLabel.hide()
+			%TempoLabel.hide()
+			%DifficultyContainer.hide()
+			%PrevBestContainer.hide()
+			%CoverArt.hide()
+			%TitleLabel.text = reference[&"name"].to_upper()
+			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			%GenreLabel.text = "Category Select"
+			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			%AnimationPlayer.play("select_item")
 
 		&"category":
-			pass
+			available_difficulties.clear()
+			prev_bpm = 0
+			%ArtistLabel.hide()
+			%TempoLabel.hide()
+			%DifficultyContainer.hide()
+			%PrevBestContainer.hide()
+			%CoverArt.hide()
+			%TitleLabel.text = reference[&"name"].to_upper()
+			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			%GenreLabel.text = "Folder"
+			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			%AnimationPlayer.play("select_item")
 
-func _on_carousel_song_selected(song_data: SongData, difficulty: int) -> void:
-	pass # Replace with function body.
+func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> void:
+	var manager = SONG_MANAGER_SCENE.instantiate()
+	var entry = SongCatalog.get_song_info(song_folder)
+	manager.song_file = SongCatalog.get_resource_path(entry.folder_id)
+	manager.difficulty = selected_difficulty if difficulty == -1 else difficulty
+	manager.resource_hash = entry.resource_hash
+	manager.midi_hash = entry.midi_hash
+
+	# Apply modifiers
+	# TODO: Button cycling and values not implemented yet
+
+	manager.energy_modifier = energy_modifier_index
+	manager.hi_speed = HI_SPEED_MULTS_VAL[hi_speed_index]
+	manager.checkpoint_modifier = checkpoint_modifier_index
+	manager.hide_streak_hints = %NoStreakHintButton.button_pressed
+	manager.timing_modifier = timing_modifier_index
+	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
+	manager.autoblast = %AutoblastButton.button_pressed
+
+	#save current session options
+	SessionManager.previous_select_options = {
+		"song_index": selected_song_index,
+		"difficulty": selected_difficulty,
+		"energy_modifier_index": energy_modifier_index,
+		"checkpoint_modifier_index": checkpoint_modifier_index,
+		"timing_modifier_index": timing_modifier_index,
+		"reset_modifier_index": reset_modifier_index,
+		"hi_speed_index": hi_speed_index,
+		"hide_streak_hints": %NoStreakHintButton.button_pressed,
+		"autoblast": %AutoblastButton.button_pressed
+		}
+
+	# Load the song
+	get_tree().root.add_child(manager)
+	get_tree().current_scene = manager
+	queue_free()

@@ -9,6 +9,10 @@ var _current_item_index: int = 0
 var _current_open_folder: int = -1
 var _current_difficulty: int = 102
 
+var current_item: Dictionary:
+	get:
+		return _displayed_menu_structure[_get_index_at_offset()]
+
 const ITEM_SPACING_PX := 6
 const COL_OFFSET_PX := 20
 const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
@@ -43,17 +47,22 @@ func select_item(item: Dictionary):
 			navigate_into_submenu(item)
 		&"category":
 			switch_category(item)
-		# song_all_difficulties, song_single_difficulty — handled elsewhere
+		&"song_all_difficulties":
+			song_selected.emit(item[&"folder_id"], -1)
+		&"song_single_difficulty":
+			song_selected.emit(item[&"folder_id"], item[&"difficulty_offset"])
 
 func navigate_into_submenu(submenu_item: Dictionary):
 	_back_stack.push_back(_current_menu_structure)
 	_current_menu_structure = submenu_item[&"children"]
 	_current_item_index = 0
 	_update_displayed_menu_structure()
+	update_carousel()
 
 func toggle_category(category_item: Dictionary):
 	category_item[&"open"] = not category_item[&"open"]
 	_update_displayed_menu_structure()
+	update_carousel(false)
 
 func switch_category(category_item: Dictionary):
 	for i in _current_menu_structure.size():
@@ -66,25 +75,31 @@ func switch_category(category_item: Dictionary):
 	_current_open_folder = _current_item_index
 	category_item[&"open"] = true
 	_update_displayed_menu_structure()
+	update_carousel(false)
 		
 func navigate_back() -> bool:
 	if _back_stack.is_empty():
 		return false
 	_current_menu_structure = _back_stack.pop_back()
 	_update_displayed_menu_structure()
+	update_carousel()
 	return true
 #endregion
 
-func update_carousel():
+func update_carousel(emit := true):
 	for i in range(get_child_count()):
 		var entry = get_child(i)
 		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
 		entry.current_difficulty = _current_difficulty
 		entry.update_entry(_displayed_menu_structure[item_index])
+	if emit:
+		emit_currently_selected()
 
 func emit_currently_selected():
-	var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
-	selection_changed.emit(item)
+	selection_changed.emit(current_item)
+
+func _get_index_at_offset(value: int = 0):
+	return posmod(_current_item_index + value, _displayed_menu_structure.size())
 
 func _ready():
 	# Find out how many entry instances will be needed
@@ -103,9 +118,10 @@ func _ready():
 		instance.anchor_right = 1.0
 		instance.offset_right = 0.0
 		@warning_ignore("integer_division")
-		instance.carousel_index = - num_entries / 2 + i
+		var index = - num_entries / 2 + i
+		instance.carousel_index = index
 		instance.offset_left = abs(instance.carousel_index) * COL_OFFSET_PX
-		instance.gui_input.connect(_on_entry_gui_input.bind(instance))
+		instance.gui_input.connect(_on_entry_gui_input.bind(index))
 		instance.name = "Entry%d" % instance.carousel_index
 		add_child(instance)
 		entry_y_pos += total_height
@@ -117,25 +133,31 @@ func _unhandled_input(event: InputEvent):
 		return
 	if event.is_action_pressed("ui_up"):
 		get_viewport().set_input_as_handled()
-		_current_item_index = posmod(_current_item_index - 1, _displayed_menu_structure.size())
+		_current_item_index = _get_index_at_offset(-1)
 		update_carousel()
 	elif event.is_action_pressed("ui_down"):
 		get_viewport().set_input_as_handled()
-		_current_item_index = posmod(_current_item_index + 1, _displayed_menu_structure.size())
+		_current_item_index = _get_index_at_offset(1)
 		update_carousel()
 	elif event.is_action_pressed("ui_accept"):
-		get_viewport().set_input_as_handled()
-		var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
-		select_item(item)
-		update_carousel()
+		select_item(current_item)
 	elif event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		navigate_back()
 		update_carousel()
 
-func _on_entry_gui_input(event: InputEvent, entry: Control):
-	pass
-
+func _on_entry_gui_input(event: InputEvent, index: int):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons:
+			get_viewport().gui_get_focus_owner().release_focus()
+		if index == 0:
+			var item = _displayed_menu_structure[posmod(_current_item_index, _displayed_menu_structure.size())]
+			select_item(item)
+			update_carousel()
+		else:
+			_current_item_index = _get_index_at_offset(index)
+			update_carousel()
 
 func _on_song_select_difficulty_changed(difficulty: int) -> void:
-	pass # Replace with function body.
+	_current_difficulty = difficulty
+	update_carousel(false)

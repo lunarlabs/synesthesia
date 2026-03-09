@@ -30,19 +30,19 @@ func update(value: float = 0.0):
 	if _rating_tween:
 		_rating_tween.kill()
 	name_lbl.text = difficulty_name
-	if value <= 0:
+	if value <= 0.0:
+		selected = false
 		value_lbl.text = "--"
 		_prev_rating = 0.0
 		unselected_tex.modulate = Color(0.25, 0.25, 0.25)
 		name_lbl.modulate = Color(0.5,0.5,0.5)
 		value_lbl.modulate = Color(0.5,0.5,0.5)
 	else:
+		value_lbl.text = "%.1f" % value
 		unselected_tex.modulate = base_color
 		selected_tex.modulate = selected_color
 		name_lbl.modulate = Color.WHITE if _selected else selected_color
 		value_lbl.modulate = selected_color
-		_rating_tween = create_tween()
-		_rating_tween.tween_method(_update_value, _prev_rating, value, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
 	unselected_tex.modulate.a = 0.5
 
 func _update_value(value: float):

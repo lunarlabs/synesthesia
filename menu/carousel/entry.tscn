@@ -76,6 +76,7 @@ outline_color = Color(0, 0, 0, 1)
 [node name="Entry" type="NinePatchRect" unique_id=671378758]
 custom_minimum_size = Vector2(395.2, 85)
 offset_bottom = 85.0
+mouse_filter = 0
 texture = ExtResource("1_55ab4")
 region_rect = Rect2(0, 0, 400, 85)
 patch_margin_left = 232
@@ -91,6 +92,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="DifficultyBG" type="TextureRect" parent="Song" unique_id=385476751]
 layout_mode = 0
@@ -149,6 +151,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="TypeLabel" type="Label" parent="Submenu" unique_id=1221497290]
 modulate = Color(1, 1, 1, 0.50980395)
