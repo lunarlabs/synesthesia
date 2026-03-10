@@ -125,7 +125,8 @@ func _ready():
 		instance.name = "Entry%d" % instance.carousel_index
 		add_child(instance)
 		entry_y_pos += total_height
-	fetch_menu_structure(true)
+	# TODO: Store previous menu state in SessionManager
+	fetch_menu_structure(false)
 	update_carousel()
 
 func _unhandled_input(event: InputEvent):
