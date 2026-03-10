@@ -28,18 +28,18 @@ curve = SubResource("Curve_3q0ve")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dgpj8"]
 resource_local_to_scene = true
 lifetime_randomness = 1.0
-emission_shape_offset = Vector3(0, 0, -64)
+emission_shape_offset = Vector3(0, -0.2, -64)
 emission_shape = 3
-emission_box_extents = Vector3(1.25, 0.1, -64)
+emission_box_extents = Vector3(1.25, 0.2, -64)
 angle_min = -89.99999
 angle_max = 90.000015
 direction = Vector3(0, 1, 0)
 spread = 0.0
-initial_velocity_max = 1.0
-gravity = Vector3(0, 0, 0)
 scale_min = 0.39999998
 scale_max = 2.0
 scale_curve = SubResource("CurveTexture_3q0ve")
+turbulence_enabled = true
+turbulence_noise_speed = Vector3(0, -1, 0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cidh0"]
 transparency = 1
@@ -80,9 +80,8 @@ mesh = SubResource("CylinderMesh_tmkqs")
 [node name="Whoosh" type="GPUParticles3D" parent="." unique_id=1927056625]
 emitting = false
 amount = 5000
-lifetime = 0.5
+lifetime = 1.5
 one_shot = true
-preprocess = 0.1
 explosiveness = 1.0
 visibility_aabb = AABB(-2.393, -1, -128, 4.768, 2, 128)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")

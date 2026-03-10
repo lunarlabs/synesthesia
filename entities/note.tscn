@@ -30,11 +30,11 @@ material = SubResource("StandardMaterial3D_gb8vh")
 size = Vector2(2, 2)
 
 [sub_resource type="Curve" id="Curve_g4cjv"]
-_data = [Vector2(0, 0), 0.0, 11.52806, 0, 0, Vector2(0.03333333, 1), 30.000002, -1.0344827, 1, 1, Vector2(1, 0), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, 11.52806, 0, 0, Vector2(0.01, 1), 100.0, -1.010101, 1, 1, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="Curve" id="Curve_w5if1"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 0, 0]
+_data = [Vector2(0.25, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_g4cjv"]
@@ -47,12 +47,13 @@ emission_shape_offset = Vector3(0, 0.025, 0)
 emission_shape = 3
 emission_box_extents = Vector3(0.25, 0.025, 0.1)
 direction = Vector3(0, 1, 0)
-initial_velocity_min = 4.0
-initial_velocity_max = 5.0
+spread = 80.0
+initial_velocity_min = 3.0
+initial_velocity_max = 4.0
 scale_curve = SubResource("CurveTexture_g4cjv")
 
-[sub_resource type="BoxMesh" id="BoxMesh_4dkrx"]
-size = Vector3(0.1, 0.01, 0.1)
+[sub_resource type="PlaneMesh" id="PlaneMesh_g4cjv"]
+size = Vector2(0.1, 0.1)
 
 [node name="note" type="Node3D" unique_id=525899921]
 script = ExtResource("1_w5if1")
@@ -94,6 +95,6 @@ amount = 16
 lifetime = 0.5
 one_shot = true
 explosiveness = 1.0
-visibility_aabb = AABB(-1.4136629, -0.1, -1.5147378, 2.5938828, 2.006944, 2.9840052)
+visibility_aabb = AABB(-3, -2.298, -2.692, 6, 2.976, 4.367)
 process_material = SubResource("ParticleProcessMaterial_w5if1")
-draw_pass_1 = SubResource("BoxMesh_4dkrx")
+draw_pass_1 = SubResource("PlaneMesh_g4cjv")

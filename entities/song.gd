@@ -18,6 +18,8 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
+const START_POSITION := Vector3(0.0, 15.0, 5.0)
+const START_ROTATION := Vector3(-50.0, 0.0, -20.0)
 const GAME_POSITION := Vector3(0.0, 2.5, 2.25)
 const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
@@ -67,7 +69,7 @@ var _last_streak_break_measure: int = -1
 @onready var current_track = $Playhead/CurrentTrack
 @onready var instrument_container = $HUD/InstrumentContainer
 @onready var instrument_label = $HUD/InstrumentContainer/InstrumentLabel
-@onready var camera: Camera3D = $Playhead/Camera3D
+@onready var camera_parent: Node3D = $Playhead/CameraParent
 @onready var count_in = $CountIn
 @onready var hud = $HUD
 @onready var lbl_score = %ScoreLabel
@@ -90,6 +92,8 @@ func _enter_tree() -> void:
 
 func _ready():
 	%FadeOut.show()
+	%Camera.position = START_POSITION
+	%Camera.rotation_degrees = START_ROTATION
 	RenderingServer.global_shader_parameter_set("danger", false)
 	RenderingServer.global_shader_parameter_set("current_track", 0)
 	if not manager_node.song_data:
@@ -193,8 +197,8 @@ func _song_start():
 	print("Playhead starting at x=%.2f" % playhead.position.x)
 	current_track.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Current track starting at x=%.2f" % current_track.position.x)
-	camera.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
-	print("Camera starting at x=%.2f" % camera.position.x)
+	camera_parent.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
+	print("Camera starting at x=%.2f" % camera_parent.position.x)
 	%SongProgress.max_value = total_measures
 	%SongProgress.min_value = lead_in_measures - 1
 	if manager_node.autoblast:
@@ -222,13 +226,13 @@ func _song_start():
 	fade_tween.tween_callback(_intro_anim_call)
 	var intro_tween = create_tween().set_parallel()
 	intro_tween.tween_subtween(fade_tween)
-	intro_tween.tween_property(camera, "position:y", GAME_POSITION.y, \
+	intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
 	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
 	.set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(camera, "position:z", GAME_POSITION.z, \
+	intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
 	3 * (seconds_per_beat * BEATS_PER_MEASURE)) \
 	.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(camera, "rotation_degrees", GAME_ROTATION, \
+	intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
 	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK) \
 	.set_ease(Tween.EASE_OUT)
 
@@ -416,11 +420,11 @@ func _switch_active_track(new_active_track: int, use_tween: bool = true):
 		_track_transition_tween.set_parallel(true)
 #		print("Tweening camera.position.x to %f (active_track=%d, playhead.x=%f)" % [new_x_pos, active_track, playhead.position.x])
 		_track_transition_tween.tween_property(current_track, "position:x", new_x_pos, 0.1).set_trans(Tween.TRANS_QUAD)
-		_track_transition_tween.tween_property(camera, "position:x", new_x_pos, 0.15).set_trans(Tween.TRANS_SINE)
+		_track_transition_tween.tween_property(camera_parent, "position:x", new_x_pos, 0.15).set_trans(Tween.TRANS_SINE)
 	else:
 #		print("Setting camera.position.x to %f (active_track=%d, playhead.x=%f)" % [new_x_pos, active_track, playhead.position.x])
 		current_track.position.x = new_x_pos
-		camera.position.x = new_x_pos
+		camera_parent.position.x = new_x_pos
 
 
 func _find_best_track_for_autoblast() -> int:
@@ -653,15 +657,15 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				%HUDAnimations.play("SongClear")
 		var tween = get_tree().create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(camera, "position:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(camera, "position:y", 3.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(camera_parent, "position:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(%Camera, "position:y", 3.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		var stop_duration = seconds_per_beat * BEATS_PER_MEASURE * 2
 		# To match initial velocity (play speed) with a Quad EaseOut, Distance must be V0 * T / 2
 		# V0 = length/sec. T = 2 * measures_sec.
 		# D = (len/sec) * (2 * beats * sec) / 2 = len * beats = 1 measure length
 		var stop_distance = length_per_beat * BEATS_PER_MEASURE
-		tween.tween_property(camera, "position:z", camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(%Camera, "position:z", %Camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(%Camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.2)
 		for i in tracks.size():
 			asp.stream.set_sync_stream_volume(i + 1, -6.0)
