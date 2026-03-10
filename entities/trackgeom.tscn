@@ -9,7 +9,7 @@ shader = ExtResource("2_plo11")
 
 [node name="trackgeom" unique_id=702242862 instance=ExtResource("1_oblog")]
 
-[node name="Cube" parent="." index="0"]
+[node name="Cube" parent="." index="0" unique_id=178433247]
 visibility_range_end = 200.0
 visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1

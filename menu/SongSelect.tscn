@@ -87,7 +87,8 @@ variation_opentype = {
 2003265652: 450
 }
 opentype_features = {
-1936548720: 1
+1936548720: 1,
+1953396077: 1
 }
 
 [sub_resource type="LabelSettings" id="LabelSettings_pjj6u"]
@@ -493,6 +494,7 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
+visible = false
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
