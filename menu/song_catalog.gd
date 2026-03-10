@@ -93,7 +93,7 @@ const BPM_BUCKET_SIZE = 20
 
 var is_initialized: bool:
 	get:
-		return _song_catalog.size() > 0
+		return not _song_catalog.is_empty()
 var song_catalog:
 	get:
 		return _song_catalog

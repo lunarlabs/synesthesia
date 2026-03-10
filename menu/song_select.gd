@@ -77,6 +77,8 @@ var prev_bpm: float
 
 var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
+var song_info: Dictionary = {}
+var selected_song_folder_id: String
 var selected_song_index: int = 0
 var available_difficulties := []
 var selected_difficulty: int = 102 # Default to Intermediate
@@ -201,6 +203,7 @@ func _select_difficulty(value: int):
 		difficulty_changed.emit(value)
 		for diff in [96, 102, 108, 114]:
 			panels[diff].selected = (diff == selected_difficulty)
+	_update_previous_bests()
 
 func _on_song_selected(index: int):
 	_select_song(index)
@@ -298,8 +301,7 @@ func _on_timing_option_pressed() -> void:
 	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])
 
 func _update_previous_bests():
-	var entry = SongCatalog.song_catalog[selected_song_index]
-	var record = SessionManager.get_song_best_record(entry.midi_hash, selected_difficulty)
+	var record = SessionManager.get_song_best_record(song_info.midi_hash, selected_difficulty)
 	if not record or record.clear_state == SessionManager.SongResult.ClearState.NOT_PLAYED:
 		%PrevClearLabel.text = "MENU_NOTPLAYED"
 		%PrevScoreLabel.text = ""
@@ -324,7 +326,6 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 	if bpm_tween:
 		bpm_tween.kill()
 	%AnimationPlayer.stop()
-	var song_info
 	match reference[&"type"]:
 		&"song_all_difficulties":
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -350,6 +351,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 			%DifficultyContainer.show()
 			%PrevBestContainer.show()
+			_update_previous_bests()
 			selected_difficulty = held_difficulty
 			_update_difficulty_panels(reference[&"difficulties"])
 			%AnimationPlayer.play("select_item")
@@ -378,6 +380,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			bpm_tween.tween_method(_update_tempo_level, prev_bpm, song_info.bpm, 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 			%DifficultyContainer.show()
 			%PrevBestContainer.show()
+			_update_previous_bests()
 			_update_difficulty_panels({reference[&"difficulty_offset"]: reference[&"difficulty_rating"]})
 			%AnimationPlayer.play("select_item")
 

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://coucd74ci5vq3"]
+
+[ext_resource type="Script" uid="uid://coiai1g3011kv" path="res://menu/ingest.gd" id="1_vk82j"]
+
+[node name="IngestScreen" type="TextureRect" unique_id=1930818117]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vk82j")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=231611599]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.85
+anchor_right = 0.5
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=46340002]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer" unique_id=526030765]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Loading song library..."
+
+[node name="ProgressBar" type="ProgressBar" parent="PanelContainer/VBoxContainer" unique_id=774362883]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+indeterminate = true
+editor_preview_indeterminate = false
