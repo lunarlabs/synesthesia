@@ -98,7 +98,7 @@ signal difficulty_changed(difficulty: int)
 func _ready():
 	subscreen_buttons = $SubScreenContainer/SubScreenButtons.get_children()
 	await get_tree().process_frame # Wait a frame for UI to initialize
-	SongCatalog.scan_for_songs()
+	# SongCatalog.scan_for_songs() <- handled in ingest.gd now
 	%LoadingContainer.visible = false
 	if SongCatalog.song_catalog.is_empty():
 		print("No valid songs found!")
@@ -107,12 +107,13 @@ func _ready():
 		return
 	else:
 		print("Song catalog generated with %d songs." % SongCatalog.song_catalog.size())
-	
-#	if SessionManager.song_records.is_empty():
-		# temporary until we have a splash screen proper
-#		SessionManager.load_session()
 	_connect_signals()
+	# Because carousel's _current_difficulty mirrors selected_difficulty here, we can just let
+	# it handle the difficulty state. Nifty!
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
+	held_difficulty = selected_difficulty
+	# TODO: replace with new mod select screen crap -- getting rid of the old modifier buttons
+	# on the song select screen
 	energy_modifier_index = SessionManager.previous_select_options.get("energy_modifier_index", 0)
 	checkpoint_modifier_index = SessionManager.previous_select_options.get("checkpoint_modifier_index", 0)
 	timing_modifier_index = SessionManager.previous_select_options.get("timing_modifier_index", 0)
@@ -126,6 +127,7 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
+	
 
 func _load_async():
 	print("Loading song catalog (async)...")
@@ -133,12 +135,13 @@ func _load_async():
 	await SongCatalog.await_catalog_ready()
 
 func _connect_signals():
-	
 	# Connect difficulty panels
 	%BeginnerDifficulty.gui_input.connect(_on_difficulty_clicked.bind(96))
 	%IntermediateDifficulty.gui_input.connect(_on_difficulty_clicked.bind(102))
 	%AdvancedDifficulty.gui_input.connect(_on_difficulty_clicked.bind(108))
 	%ExpertDifficulty.gui_input.connect(_on_difficulty_clicked.bind(114))
+
+	# TODO: connect subscreen buttons to actually open the subscreen
 
 func _select_song(index: int):
 	if index < 0 or index >= SongCatalog.song_catalog.size():
@@ -333,7 +336,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			song_info = SongCatalog.get_song_info(reference[&"folder_id"])
 			if song_info[&"cover_art"]:
 				var img = Image.create_from_data(
-					song_info[&"cover_art_width"], 
+					song_info[&"cover_art_width"],
 					song_info[&"cover_art_height"],
 					false,
 					song_info[&"cover_art_fmt"],
@@ -362,7 +365,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			song_info = SongCatalog.get_song_info(reference[&"folder_id"])
 			if song_info[&"cover_art"]:
 				var img = Image.create_from_data(
-					song_info[&"cover_art_width"], 
+					song_info[&"cover_art_width"],
 					song_info[&"cover_art_height"],
 					false,
 					song_info[&"cover_art_fmt"],
@@ -431,18 +434,7 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
 	manager.autoblast = %AutoblastButton.button_pressed
 
-	#save current session options
-	SessionManager.previous_select_options = {
-		"song_index": selected_song_index,
-		"difficulty": selected_difficulty,
-		"energy_modifier_index": energy_modifier_index,
-		"checkpoint_modifier_index": checkpoint_modifier_index,
-		"timing_modifier_index": timing_modifier_index,
-		"reset_modifier_index": reset_modifier_index,
-		"hi_speed_index": hi_speed_index,
-		"hide_streak_hints": %NoStreakHintButton.button_pressed,
-		"autoblast": %AutoblastButton.button_pressed
-		}
+	# TODO: call transition handler here so there's no loading lag
 
 	# Load the song
 	get_tree().root.add_child(manager)

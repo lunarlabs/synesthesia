@@ -140,9 +140,12 @@ func _ready() -> void:
 		push_error("Failed to load song data from %s" % song_file)
 		return
 
+	# TODO: Put the heavy song loading stuff in a WorkerThreadPool thread
+	
 	song_name = song_file.get_file().get_slice(".", 0)
 	note_maps = _get_note_maps()
-	ChunkManager.manager_node = self
+	ChunkManager.manager_node = self # TODO: Make ChunkManager a child node, we don't need it running
+	                                 # in the menus (could also move chunk calculation there too)
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
 	seconds_per_beat = song_data.seconds_per_beat
@@ -327,7 +330,8 @@ func _on_song_finished(stats) -> void:
 				_:
 					song_stats.clear_state = SessionManager.SongResult.ClearState.CLEAR
 	# I think I want particle effects and stuff to show in the 3D scene, so delay showing
-	await get_tree().create_timer(8 * song_data.seconds_per_beat).timeout
+	var beats_to_wait = 8 if not autoblast else 2
+	await get_tree().create_timer(beats_to_wait * song_data.seconds_per_beat).timeout
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	song_instance.hud.hide()
 	result_screen.display(finish_state, song_stats,

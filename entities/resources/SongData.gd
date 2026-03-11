@@ -41,21 +41,21 @@ const MIDI_META_TEMPO_EVENT = 0x51
 @export var tracks: Array[SongTrackData]
 
 ## Path to the audio file for the song's main track
-@export_file("*.wav","*.mp3","*.ogg") var click_track = ""
+@export_file("*.wav", "*.mp3", "*.ogg") var click_track = ""
 
-@export_file("*.wav","*.mp3","*.ogg") var preview_audio = ""
+@export_file("*.wav", "*.mp3", "*.ogg") var preview_audio = ""
 
-@export_file("*.wav","*.mp3","*.ogg") var selection_audio = "res://assets/transition.mp3"
+@export_file("*.wav", "*.mp3", "*.ogg") var selection_audio = "res://assets/transition.mp3"
 
 @export_category("Gameplay")
 
 @export_range(0.5, 2.0, 0.1) var scale_fudge_factor: float = 1.0
 
 ## Number of measures to lead in before gameplay starts
-@export_range(0,500,1) var lead_in_measures: int = 4
+@export_range(0, 500, 1) var lead_in_measures: int = 4
 
 ## Number of playable measures in the song
-@export_range(0,500,1) var playable_measures: int = 100
+@export_range(0, 500, 1) var playable_measures: int = 100
 
 ## Array of measure indices where checkpoints occur
 @export var checkpoints: Array[int]
@@ -131,7 +131,7 @@ var bpm: float:
 					_bpm = MICROSECONDS_PER_MINUTE / float(event["data"])
 			if is_nan(_bpm):
 				push_warning("No tempo event found in MIDI data.")
-				return 120.0  # Default BPM if not found
+				return 120.0 # Default BPM if not found
 		return _bpm
 
 ## The duration of one beat in seconds.
@@ -157,8 +157,9 @@ var total_measures: int:
 ## @param difficulty_offset: The offset value to determine the difficulty level
 ## @return: A Dictionary where keys are timestamps (float) and values are note identifiers (int)
 func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[float, int]:
+	var time_start = Time.get_ticks_usec()
 	var note_map: Dictionary[float, int] = {}
-	var valid_note_positions:Array[int] = [difficulty_offset, difficulty_offset + 2, difficulty_offset + 4]
+	var valid_note_positions: Array[int] = [difficulty_offset, difficulty_offset + 2, difficulty_offset + 4]
 	var tick := 0
 	for i in _midi_data.tracks[track].events.size():
 		var event = _midi_data.tracks[track].events[i]
@@ -170,14 +171,19 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 	note_map.sort()
 	if note_map.size() == 0:
 		push_warning("No valid notes found in track %d with difficulty offset %d." % [track, difficulty_offset])
+	@warning_ignore("integer_division")
+	print("Loaded note map %d in %d ms" % [track, (Time.get_ticks_usec() - time_start) / 1000])
 	return note_map
 
 func _load_midi_data() -> void:
+	var time_start = Time.get_ticks_usec()
 	_midi_data = MidiResource.new()
 	_err = _midi_data.load_file(ResourceUID.ensure_path(midi_file))
 	assert(_err == OK)
 	if _err != OK:
 		push_error("Failed to load MIDI data from %s" % midi_file)
+	@warning_ignore("integer_division")
+	print("Loaded MIDI data in %d ms" % ((Time.get_ticks_usec() - time_start) / 1000))
 
 func _get_song_track_locations() -> Dictionary[String, int]:
 	if !_midi_data:
