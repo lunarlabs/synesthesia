@@ -145,7 +145,7 @@ func _ready() -> void:
 	song_name = song_file.get_file().get_slice(".", 0)
 	note_maps = _get_note_maps()
 	ChunkManager.manager_node = self # TODO: Make ChunkManager a child node, we don't need it running
-	                                 # in the menus (could also move chunk calculation there too)
+									 # in the menus (could also move chunk calculation there too)
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
 	seconds_per_beat = song_data.seconds_per_beat

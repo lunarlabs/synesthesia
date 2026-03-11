@@ -7,7 +7,12 @@
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="3_mbci5"]
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="5_hjgwb"]
 [ext_resource type="LabelSettings" uid="uid://dbc78u04j01q8" path="res://menu/theme/SongTitleLabel.tres" id="5_mbci5"]
+[ext_resource type="Texture2D" uid="uid://g7aj5m5cbd3m" path="res://assets/textures/circles_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="5_wm27l"]
+[ext_resource type="Texture2D" uid="uid://dao5babkqldv6" path="res://assets/textures/settings_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="6_jldp2"]
+[ext_resource type="Texture2D" uid="uid://cf76nekempr57" path="res://assets/textures/library_music_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="7_h6xa0"]
 [ext_resource type="AudioStream" uid="uid://b4h8ap5v4lyh7" path="res://assets/songselsynch.tres" id="8_ctryq"]
+[ext_resource type="Texture2D" uid="uid://khvj02sviubn" path="res://assets/textures/equalizer_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="8_qhtwy"]
+[ext_resource type="Texture2D" uid="uid://gdmiskcvvsfv" path="res://assets/textures/query_stats_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="9_byi8g"]
 [ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
@@ -369,32 +374,53 @@ offset_bottom = 97.5
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
+custom_minimum_size = Vector2(72, 0)
 layout_mode = 2
 
 [node name="ModifierButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=1261412322]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "MODS"
+icon = ExtResource("5_wm27l")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="SystemButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=353088189]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SYS"
+icon = ExtResource("6_jldp2")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="SongsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=881269748]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SONGS"
+icon = ExtResource("7_h6xa0")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="EffectsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=977080346]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "EQ/FX"
+icon = ExtResource("8_qhtwy")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="PlayerButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=2132771351]
 layout_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "STATS"
+icon = ExtResource("9_byi8g")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="TopBox" type="HBoxContainer" parent="." unique_id=178165679]
 layout_mode = 1
