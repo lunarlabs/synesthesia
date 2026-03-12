@@ -252,7 +252,7 @@ func record_song_result(midi_hash: String, song_stats: SongResult):
 		"difficulty" = song_stats.difficulty,
 		"score" = song_stats.score,
 		"percent_complete" = song_stats.percent_completed,
-		"capture_accuracy" = song_stats.accuracy,
+		"capture_accuracy" = song_stats.accuracy if song_stats.accuracy else 0.0,
 		"streak_breaks" = song_stats.streak_breaks,
 		"energy_modifier" = song_stats.energy_modifier + 1, # the SQL records are 1-based
 		"checkpoint_modifier" = song_stats.checkpoint_modifier + 1,

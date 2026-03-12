@@ -112,6 +112,7 @@ func _ready():
 	# it handle the difficulty state. Nifty!
 	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
 	held_difficulty = selected_difficulty
+	_select_difficulty(selected_difficulty)
 	# TODO: replace with new mod select screen crap -- getting rid of the old modifier buttons
 	# on the song select screen
 	energy_modifier_index = SessionManager.previous_select_options.get("energy_modifier_index", 0)
