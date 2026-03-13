@@ -305,6 +305,8 @@ func _on_timing_option_pressed() -> void:
 	%TimingOption.text = tr(TIMING_MODIFIER_NAMES[timing_modifier_index])
 
 func _update_previous_bests():
+	if not song_info or song_info.is_empty():
+		return
 	var record = SessionManager.get_song_best_record(song_info.midi_hash, selected_difficulty)
 	if not record or record.clear_state == SessionManager.SongResult.ClearState.NOT_PLAYED:
 		%PrevClearLabel.text = "MENU_NOTPLAYED"

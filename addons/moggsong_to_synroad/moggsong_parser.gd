@@ -43,7 +43,10 @@ static func create_songdata_from_moggsong(moggsong_file: String) -> SongData:
 		songdata.checkpoints.clear()
 		for sec in sections:
 			songdata.checkpoints.append(int(sec))
-	update_songdata_tracks(moggsong_file)
+	# Populate tracks from MIDI directly on the in-memory SongData.
+	# update_songdata_tracks() requires the .tres to already be saved, so we
+	# call _set_songdata_tracks_from_midi here instead.
+	_set_songdata_tracks_from_midi(songdata)
 	return songdata
 
 static func update_songdata_tracks(moggsong_file: String):
@@ -52,7 +55,7 @@ static func update_songdata_tracks(moggsong_file: String):
 		return
 	var songdata: SongData = load(get_songdata_path(moggsong_file))
 	if songdata.tracks.is_empty():
-		_set_songdata_tracks_from_midi(get_songdata_path(moggsong_file))
+		_set_songdata_tracks_from_midi(songdata)
 	var moggsong_data = _read_moggsong_file(moggsong_file)
 	var mogg_file = get_folder(moggsong_file) + "/" + moggsong_data["mogg_path"]
 	# We're gonna be slightly stupid here and assume that the order of tracks
@@ -84,12 +87,14 @@ static func update_songdata_tracks(moggsong_file: String):
 				print("assigned click track: %s" % output_file)
 		else:
 			push_error("Failed to create track %s" % output_file)
+	# Save the mutated songdata back to disk so changes are not lost.
+	var save_err = ResourceSaver.save(songdata, get_songdata_path(moggsong_file))
+	if save_err != OK:
+		push_error("update_songdata_tracks: failed to save songdata: %s" % error_string(save_err))
 
-static func _set_songdata_tracks_from_midi(songdata_path: String):
-	if not FileAccess.file_exists(songdata_path):
-		push_error("Songdata file not found: %s" % songdata_path)
-		return
-	var songdata: SongData = load(songdata_path)
+## Populates [param songdata].tracks from the MIDI file referenced by [param songdata].midi_file.
+## Works directly on the in-memory SongData object; the caller is responsible for saving.
+static func _set_songdata_tracks_from_midi(songdata: SongData) -> void:
 	var midi_data = _read_midi_file(songdata.midi_file)
 	var track_names: Array[String] = midi_data.get("track_names", [])
 	for track_name in track_names:
