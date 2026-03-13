@@ -437,6 +437,19 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
 	manager.autoblast = %AutoblastButton.button_pressed
 
+	# Save current session options so returning to song select restores state correctly
+	SessionManager.previous_select_options = {
+		"song_index": selected_song_index,
+		"difficulty": selected_difficulty if difficulty == -1 else difficulty,
+		"energy_modifier_index": energy_modifier_index,
+		"checkpoint_modifier_index": checkpoint_modifier_index,
+		"timing_modifier_index": timing_modifier_index,
+		"reset_modifier_index": reset_modifier_index,
+		"hi_speed_index": hi_speed_index,
+		"hide_streak_hints": %NoStreakHintButton.button_pressed,
+		"autoblast": %AutoblastButton.button_pressed
+	}
+
 	# TODO: call transition handler here so there's no loading lag
 
 	# Load the song
