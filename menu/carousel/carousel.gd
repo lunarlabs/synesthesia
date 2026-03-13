@@ -140,7 +140,8 @@ func _ready():
 	update_carousel()
 
 func _unhandled_input(event: InputEvent):
-	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons:
+	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons\
+	or %ModifierContainer.visible:
 		return
 	if event.is_action_pressed("ui_up"):
 		get_viewport().set_input_as_handled()

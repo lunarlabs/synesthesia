@@ -99,7 +99,6 @@ func _ready():
 	subscreen_buttons = $SubScreenContainer/SubScreenButtons.get_children()
 	await get_tree().process_frame # Wait a frame for UI to initialize
 	# SongCatalog.scan_for_songs() <- handled in ingest.gd now
-	%LoadingContainer.visible = false
 	if SongCatalog.song_catalog.is_empty():
 		print("No valid songs found!")
 		push_error("No valid songs found!")
@@ -415,3 +414,8 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	get_tree().root.add_child(manager)
 	get_tree().current_scene = manager
 	queue_free()
+
+
+func _on_modifier_button_pressed() -> void:
+	for button in subscreen_buttons:
+		button.disabled = true
