@@ -216,47 +216,6 @@ func _on_difficulty_clicked(event: InputEvent, difficulty: int):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_select_difficulty(difficulty)
 
-func _on_play_pressed():
-	var entry = SongCatalog.song_catalog[selected_song_index]
-	if not entry.files_ok:
-		return
-	
-	# Create song manager instance
-	var manager = SONG_MANAGER_SCENE.instantiate()
-	manager.song_file = SongCatalog.get_resource_path(entry.folder_id)
-	manager.difficulty = selected_difficulty
-	manager.resource_hash = entry.resource_hash
-	manager.midi_hash = entry.midi_hash
-	
-	# Apply modifiers
-	# TODO: Button cycling and values not implemented yet
-	
-	manager.energy_modifier = energy_modifier_index
-	manager.hi_speed = HI_SPEED_MULTS_VAL[hi_speed_index]
-	manager.checkpoint_modifier = checkpoint_modifier_index
-	manager.hide_streak_hints = %NoStreakHintButton.button_pressed
-	manager.timing_modifier = timing_modifier_index
-	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
-	manager.autoblast = %AutoblastButton.button_pressed
-	
-	#save current session options
-	SessionManager.previous_select_options = {
-		"song_index": selected_song_index,
-		"difficulty": selected_difficulty,
-		"energy_modifier_index": energy_modifier_index,
-		"checkpoint_modifier_index": checkpoint_modifier_index,
-		"timing_modifier_index": timing_modifier_index,
-		"reset_modifier_index": reset_modifier_index,
-		"hi_speed_index": hi_speed_index,
-		"hide_streak_hints": %NoStreakHintButton.button_pressed,
-		"autoblast": %AutoblastButton.button_pressed
-	}
-
-	# Load the song
-	get_tree().root.add_child(manager)
-	get_tree().current_scene = manager
-	queue_free()
-
 #func _input(event: InputEvent):
 	#if event.is_action_pressed("ui_up"):
 		#var new_index = max(selected_song_index - 1, 0)

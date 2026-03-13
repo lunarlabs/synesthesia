@@ -1,5 +1,6 @@
 extends TextureRect
 
+var song_root_directory
 
 func _ready() -> void:
 	await get_tree().process_frame # Wait a frame for UI to initialize

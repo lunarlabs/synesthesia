@@ -5,18 +5,19 @@ var song_indices: Dictionary[String, int] = {}
 var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
 var additions: Array = []
+var _db_mutex: Mutex
 
-const CATALOG_JSON_PATH = "user://song_catalog.json"
-const DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
-const SONG_DIRECTORY_PATH = "res://song/"
-const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
-const DIFFICULTY_NAMES = {
+static var CATALOG_JSON_PATH = "user://song_catalog.json"
+static var DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
+static var SONG_DIRECTORY_PATH = "res://song/"
+static var DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
+static var DIFFICULTY_NAMES = {
 	96: "Beginner",
 	102: "Basic",
 	108: "Advanced",
 	114: "Expert",
 }
-const INSTRUMENT_NAMES = [
+static var INSTRUMENT_NAMES = [
 	"drums",
 	"bass",
 	"guitar",
@@ -24,19 +25,19 @@ const INSTRUMENT_NAMES = [
 	"vocals",
 	"fx",
 ]
-const EPSILON = 0.001 # because floating point
-const QUANT_FACTOR_QUARTER = 1.0
-const QUANT_FACTOR_EIGHTH = 1.1
-const QUANT_FACTOR_SIXTEENTH = 1.3
-const QUANT_FACTOR_THIRTY_SECOND = 1.5
-const BASE_SPEED_WEIGHT = 1.0
-const JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
-const PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
-const PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
-const PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
+static var EPSILON = 0.001 # because floating point
+static var QUANT_FACTOR_QUARTER = 1.0
+static var QUANT_FACTOR_EIGHTH = 1.1
+static var QUANT_FACTOR_SIXTEENTH = 1.3
+static var QUANT_FACTOR_THIRTY_SECOND = 1.5
+static var BASE_SPEED_WEIGHT = 1.0
+static var JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
+static var PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
+static var PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
+static var PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
 
 #region Query Constants
-const QUERY_BASE = """SELECT 
+static var QUERY_BASE = """SELECT
 	folder_id, 
 	title, 
 	sub_title, 
@@ -54,7 +55,7 @@ const QUERY_BASE = """SELECT
 	cover_art_fmt
 FROM v_song_select"""
 
-const QUERY_DIFFICULTY = """SELECT 
+static var QUERY_DIFFICULTY = """SELECT
 	folder_id, 
 	title, 
 	sub_title, 
@@ -73,22 +74,22 @@ const QUERY_DIFFICULTY = """SELECT
 	cover_art_fmt
 FROM v_full_library"""
 
-const QUERY_COVER_ART = """SELECT cover_art, cover_art_width, cover_art_height, cover_art_fmt FROM songs WHERE folder_id = ?"""
+static var QUERY_COVER_ART = """SELECT cover_art, cover_art_width, cover_art_height, cover_art_fmt FROM songs WHERE folder_id = ?"""
 
-const FILTER_FOLDER = """folder_id = ?"""
-const FILTER_DIFFICULTY = """difficulty_offset = ?"""
-const FILTER_FOLDER_DIFFICULTY = """folder_id = ? AND difficulty_offset = ?"""
-const FILTER_BETWEEN_BPM = """bpm BETWEEN ? AND ?"""
-const FILTER_BETWEEN_RATING = """difficulty_rating >= ? AND difficulty_rating < ?"""
-const FILTER_SOURCE = """source_name = ?"""
-const FILTER_GENRE = """genre = ?"""
+static var FILTER_FOLDER = """folder_id = ?"""
+static var FILTER_DIFFICULTY = """difficulty_offset = ?"""
+static var FILTER_FOLDER_DIFFICULTY = """folder_id = ? AND difficulty_offset = ?"""
+static var FILTER_BETWEEN_BPM = """bpm BETWEEN ? AND ?"""
+static var FILTER_BETWEEN_RATING = """difficulty_rating >= ? AND difficulty_rating < ?"""
+static var FILTER_SOURCE = """source_name = ?"""
+static var FILTER_GENRE = """genre = ?"""
 
-const ORDER_DEFAULT = "ORDER BY sort_key ASC"
-const ORDER_BPM = "ORDER BY bpm ASC"
-const ORDER_DIFF_RATING = "ORDER BY difficulty_rating ASC"
+static var ORDER_DEFAULT = "ORDER BY sort_key ASC"
+static var ORDER_BPM = "ORDER BY bpm ASC"
+static var ORDER_DIFF_RATING = "ORDER BY difficulty_rating ASC"
 
 #const MENU_ITEM_TYPES = ["submenu", "category", "song_single_difficulty", "song_all_difficulties"]
-const BPM_BUCKET_SIZE = 20
+static var BPM_BUCKET_SIZE = 20
 #endregion
 
 var is_initialized: bool:
@@ -136,9 +137,9 @@ func scan_for_songs(rescan := false):
 
 #region Ingest
 func process_song(folder_name: String, force_rescan := false):
-	const SONGS_TABLE = "songs"
-	const DIFFICULTIES_TABLE = "difficulties"
-	const SONG_INSERT_VIEW = "v_song_upsert"
+	var songs_table = "songs"
+	var difficulties_table = "difficulties"
+	var song_insert_view = "v_song_upsert"
 	var db = SessionManager.library_db
 
 	# Handle song metadata first
@@ -149,7 +150,7 @@ func process_song(folder_name: String, force_rescan := false):
 	if file_exists:
 		resource_hash = FileAccess.get_md5(file_path)
 	var condition_string = "folder_id = '%s'" % folder_name
-	var select_array: Array = db.select_rows(SONGS_TABLE, condition_string, ["resource_hash", "midi_hash"])
+	var select_array: Array = db.select_rows(songs_table, condition_string, ["resource_hash", "midi_hash"])
 	var result_is_empty := select_array.size() == 0
 	if force_rescan or result_is_empty or select_array[0]["resource_hash"] != resource_hash:
 		print("Processing song: %s" % folder_name)
@@ -160,11 +161,11 @@ func process_song(folder_name: String, force_rescan := false):
 		if file_exists:
 			song_data = ResourceLoader.load(file_path) as SongData
 			upsert_dict.merge(_extract_songdata_meta(song_data))
-			db.insert_row(SONG_INSERT_VIEW, upsert_dict) # if the row exists, this will update it
+			db.insert_row(song_insert_view, upsert_dict) # if the row exists, this will update it
 		else:
 			upsert_dict["files_ok"] = 0
 			upsert_dict["midi_hash"] = null
-			db.insert_row(SONGS_TABLE, upsert_dict)
+			db.insert_row(songs_table, upsert_dict)
 	
 	if song_data:
 		var midi_hash = null
@@ -191,7 +192,7 @@ func process_song(folder_name: String, force_rescan := false):
 						}
 						difficulty_rows.append(row)
 				if not difficulty_rows.is_empty():
-					db.insert_rows(DIFFICULTIES_TABLE, difficulty_rows)
+					db.insert_rows(difficulties_table, difficulty_rows)
 
 
 ## Creates a dictionary of song metadata for INSERT or UPDATE statements.

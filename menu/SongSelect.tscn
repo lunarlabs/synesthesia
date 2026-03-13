@@ -520,7 +520,6 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
-visible = false
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -638,24 +637,85 @@ base_color = Color(0.31, 0.062000014, 0, 1)
 selected_color = Color(0.81, 0.16200005, 0, 1)
 difficulty_name = "DIFF_114"
 
-[node name="LoadingContainer" type="CenterContainer" parent="." unique_id=1542685177]
-unique_name_in_owner = true
-visible = false
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1138930775]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.66
-anchor_bottom = 0.47000003
-offset_left = 40.0
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 100.0
+grow_vertical = 2
 
-[node name="LoadingPanel" type="PanelContainer" parent="LoadingContainer" unique_id=1386295410]
+[node name="GridContainer" type="VBoxContainer" parent="PanelContainer" unique_id=266826154]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="LoadingContainer/LoadingPanel" unique_id=1862968087]
-custom_minimum_size = Vector2(200, 40)
+[node name="EnergyBarTitle" type="Label" parent="PanelContainer/GridContainer" unique_id=1086967898]
 layout_mode = 2
-text = "MENU_SONG_CATALOG_LOADING"
-horizontal_alignment = 1
-vertical_alignment = 1
+text = "Energy Bar"
+
+[node name="EnergyBarOptions" type="OptionButton" parent="PanelContainer/GridContainer" unique_id=448698383]
+layout_mode = 2
+selected = 0
+item_count = 5
+popup/item_0/text = "Normal"
+popup/item_0/id = 0
+popup/item_1/text = "Constant Drain"
+popup/item_1/id = 1
+popup/item_2/text = "No Recovery"
+popup/item_2/id = 2
+popup/item_3/text = "Sudden Death"
+popup/item_3/id = 3
+popup/item_4/text = "Practice (No Fail)"
+popup/item_4/id = 4
+
+[node name="TrackResetTitle" type="Label" parent="PanelContainer/GridContainer" unique_id=492627195]
+layout_mode = 2
+text = "Track Reset"
+
+[node name="TrackResetOptions" type="OptionButton" parent="PanelContainer/GridContainer" unique_id=1369181277]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Normal"
+popup/item_0/id = 0
+popup/item_1/text = "Fast Reset 1"
+popup/item_1/id = 1
+popup/item_2/text = "Fast Reset 2"
+popup/item_2/id = 2
+
+[node name="TimingOptions" type="Label" parent="PanelContainer/GridContainer" unique_id=742783542]
+layout_mode = 2
+text = "Timing Window"
+
+[node name="TrackResetOptions2" type="OptionButton" parent="PanelContainer/GridContainer" unique_id=1037482499]
+layout_mode = 2
+selected = 1
+item_count = 3
+popup/item_0/text = "Loose"
+popup/item_0/id = 0
+popup/item_1/text = "Normal"
+popup/item_1/id = 1
+popup/item_2/text = "Strict"
+popup/item_2/id = 2
+
+[node name="Seperator" type="HSeparator" parent="PanelContainer/GridContainer" unique_id=1721255299]
+layout_mode = 2
+
+[node name="CheckpointsButton" type="CheckButton" parent="PanelContainer/GridContainer" unique_id=1389897372]
+layout_mode = 2
+button_pressed = true
+text = "Checkpoints "
+
+[node name="HighlightsButton" type="CheckButton" parent="PanelContainer/GridContainer" unique_id=738055518]
+layout_mode = 2
+button_pressed = true
+text = "Highlight Phrase Starts"
+
+[node name="Seperator2" type="HSeparator" parent="PanelContainer/GridContainer" unique_id=1731785847]
+layout_mode = 2
+
+[node name="AutoblastButton" type="CheckButton" parent="PanelContainer/GridContainer" unique_id=1984656097]
+layout_mode = 2
+text = "Autoblast"
 
 [node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
 stream = ExtResource("8_ctryq")
