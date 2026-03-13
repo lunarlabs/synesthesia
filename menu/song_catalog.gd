@@ -514,11 +514,12 @@ func make_menu_structure():
 	var max_bpm = result[0]["MAX(bpm)"] if not result_is_empty else null
 	if result_is_empty or not success or min_bpm == null or max_bpm == null:
 		return
-	var bpm_range = max_bpm - min_bpm
-	var num_buckets = int(ceil(bpm_range / float(BPM_BUCKET_SIZE)))
+	var min_bucket = int(floor(min_bpm / float(BPM_BUCKET_SIZE)))
+	var max_bucket = int(ceil(max_bpm / float(BPM_BUCKET_SIZE)))
+	var num_buckets = max_bucket - min_bucket
 	var buckets = []
 	for i in range(num_buckets):
-		var bucket_min = min_bpm + i * BPM_BUCKET_SIZE
+		var bucket_min = (min_bucket + i) * BPM_BUCKET_SIZE
 		var bucket_max = bucket_min + BPM_BUCKET_SIZE
 		buckets.append({
 			"min": bucket_min,
