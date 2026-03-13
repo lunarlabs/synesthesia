@@ -127,9 +127,9 @@ draw_pass_1 = SubResource("QuadMesh_hjeaj")
 transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, 0)
 mesh = SubResource("PlaneMesh_1e67b")
 
-[node name="Gate" parent="." unique_id=1040974308 instance=ExtResource("5_nos5s")]
+[node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
-[node name="RightGate" parent="Gate" index="1" unique_id=775979860]
+[node name="RightGate" parent="Gate" index="1" unique_id=229744792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
 
 [editable path="Gate"]
