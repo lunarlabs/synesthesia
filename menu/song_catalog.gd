@@ -692,7 +692,7 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	for i in range(1, difficulty_ceil):
+	for i in range(0, difficulty_ceil):
 		var entry = {
 			&"name": "Level %d" % i,
 			&"type": &"category",

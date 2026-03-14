@@ -640,6 +640,7 @@ difficulty_name = "DIFF_114"
 
 [node name="ModifierContainer" type="PanelContainer" parent="." unique_id=1138930775]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.5
