@@ -3,7 +3,7 @@ extends Control
 const SONG_MANAGER_SCENE = preload("res://menu/SongManager.tscn")
 const DIFFICULTY_VALUES = {
 	96: "Beginner",
-	102: "Intermediate",
+	102: "Basic",
 	108: "Advanced",
 	114: "Expert"
 }

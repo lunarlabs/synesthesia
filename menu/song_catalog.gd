@@ -273,9 +273,19 @@ func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> D
 		ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
 	# Average across all tracks
 	var total_avg := 0.0
-	for i in range(track_count):
-		total_avg += ddi.track_avg_raw_difficulties[i]
-	ddi.avg_raw_difficulty = total_avg / float(track_count)
+	var active_measures := 0
+	for m in range(song_data.total_measures):
+		var active_tracks := 0
+		var measure_sum := 0.0
+		for i in range(track_count):
+			var v = ddi.phrase_raw_difficulties[i][m]
+			if v > 0.0:
+				active_tracks += 1
+				measure_sum += v
+		if active_tracks > 0:
+			total_avg += measure_sum / float(active_tracks)
+			active_measures += 1
+	ddi.avg_raw_difficulty = total_avg / float(max(active_measures, 1))
 	return ddi
 
 func _calculate_phrase_difficulty(
@@ -506,6 +516,15 @@ func get_cover_art(folder_id: String) -> ImageTexture:
 func make_menu_structure():
 	_menu_structure.clear()
 	var db = SessionManager.library_db
+	# Pre-fetch all difficulty ratings into a local cache to avoid
+	# one SQL query per song per difficulty tier during menu construction.
+	var diff_cache: Dictionary = {}
+	if db.query("SELECT song_folder, difficulty_offset, difficulty_rating FROM difficulties"):
+		for row in db.query_result:
+			var fid: String = row["song_folder"]
+			if not diff_cache.has(fid):
+				diff_cache[fid] = {}
+			diff_cache[fid][row["difficulty_offset"]] = row["difficulty_rating"]
 	# first determine bucket ranges
 	var success = db.query("SELECT MIN(bpm), MAX(bpm) FROM songs")
 	var result = db.query_result
@@ -561,9 +580,9 @@ func make_menu_structure():
 				&"difficulties": {}
 			}
 			for difficulty_offset in DIFFICULTY_LEVELS:
-				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
-				if difficulty_rating > 0:
-					entry[&"difficulties"][difficulty_offset] = difficulty_rating
+				var rating: float = diff_cache.get(info.folder_id, {}).get(difficulty_offset, 0.0)
+				if rating > 0.0:
+					entry[&"difficulties"][difficulty_offset] = rating
 
 			if not entry.difficulties.is_empty():
 				title_menu_entry.children.append(entry)
@@ -599,9 +618,9 @@ func make_menu_structure():
 				&"difficulties": {}
 			}
 			for difficulty_offset in DIFFICULTY_LEVELS:
-				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
-				if difficulty_rating > 0:
-					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
+				var rating: float = diff_cache.get(info.folder_id, {}).get(difficulty_offset, 0.0)
+				if rating > 0.0:
+					song_entry[&"difficulties"][difficulty_offset] = rating
 			if not song_entry.difficulties.is_empty():
 				entry.children.append(song_entry)
 		source_menu_entry.children.append(entry)
@@ -638,9 +657,9 @@ func make_menu_structure():
 						&"difficulties": {}
 					}
 					for difficulty_offset in DIFFICULTY_LEVELS:
-						var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
-						if difficulty_rating > 0:
-							song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
+						var rating: float = diff_cache.get(info.folder_id, {}).get(difficulty_offset, 0.0)
+						if rating > 0.0:
+							song_entry[&"difficulties"][difficulty_offset] = rating
 					if not song_entry.difficulties.is_empty():
 						entry.children.append(song_entry)
 			if not entry.children.is_empty():
@@ -677,9 +696,9 @@ func make_menu_structure():
 				&"difficulties": {}
 			}
 			for difficulty_offset in DIFFICULTY_LEVELS:
-				var difficulty_rating = get_difficulty_rating(info.folder_id, difficulty_offset)
-				if difficulty_rating > 0:
-					song_entry[&"difficulties"][difficulty_offset] = difficulty_rating
+				var rating: float = diff_cache.get(info.folder_id, {}).get(difficulty_offset, 0.0)
+				if rating > 0.0:
+					song_entry[&"difficulties"][difficulty_offset] = rating
 			if not song_entry.difficulties.is_empty():
 				entry.children.append(song_entry)
 		bpm_menu_entry.children.append(entry)
@@ -691,7 +710,7 @@ func make_menu_structure():
 		&"children": []
 	}
 
-	for i in range(0, difficulty_ceil):
+	for i in range(0, difficulty_ceil + 1):
 		var entry = {
 			&"name": "Level %d" % i,
 			&"type": &"category",
