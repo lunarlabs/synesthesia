@@ -5,7 +5,6 @@ var song_indices: Dictionary[String, int] = {}
 var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
 var additions: Array = []
-var _db_mutex: Mutex
 
 static var CATALOG_JSON_PATH = "user://song_catalog.json"
 static var DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
