@@ -33,8 +33,8 @@ func blast(emit:bool = false):
 	if emit:
 		particles.emitting = true
 		star.emitting = true
-	capsule.hide()
-	ghost.show()
+	$capsule.hide()
+	$ghost.show()
 
 func set_phrase_note(is_phrase: bool):
 	get_node("capsule").material_override = PHRASE_MATERIAL if is_phrase else capsule_material
