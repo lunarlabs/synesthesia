@@ -251,7 +251,7 @@ func _process(delta: float):
 		var target_z = %Conductor.current_beat * -length_per_beat
 		playhead.position.z = lerpf(playhead.position.z, target_z, 0.5)
 		# WARN: Engaging the RenderingServer via global_shader_parameter_set every frame introduces a synchronization point that can cause CPU-GPU stalls or micro-stutters, especially if the driver queue is full.
-		RenderingServer.global_shader_parameter_set("beat", fmod(%Conductor.current_beat, 1.0))
+		RenderingServer.global_shader_parameter_set("beat", %Conductor.current_beat)
 
 		var new_active_track = active_track
 		if !mn.autoblast and input_enabled:

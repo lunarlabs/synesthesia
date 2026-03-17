@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://gdmiskcvvsfv" path="res://assets/textures/query_stats_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="9_byi8g"]
 [ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
 [ext_resource type="Script" uid="uid://g27msrpofjyu" path="res://menu/modifier_container.gd" id="13_jldp2"]
+[ext_resource type="Shader" uid="uid://c6xf5ii8jqq85" path="res://assets/testshader.tres" id="16_h6xa0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjgwb"]
 shader = ExtResource("3_ctryq")
@@ -242,6 +243,9 @@ _data = {
 &"RESET": SubResource("Animation_ctryq"),
 &"select_item": SubResource("Animation_pjj6u")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qhtwy"]
+shader = ExtResource("16_h6xa0")
 
 [node name="SongSelect" type="Control" unique_id=1474968882]
 layout_mode = 3
@@ -835,6 +839,14 @@ grow_horizontal = 1
 [node name="PreviewPlayer" type="AudioStreamPlayer" parent="." unique_id=1646222971]
 volume_db = -6.0
 bus = &"Tracks"
+
+[node name="CanvasLayer" type="ColorRect" parent="." unique_id=998416940]
+material = SubResource("ShaderMaterial_qhtwy")
+layout_mode = 0
+offset_left = 486.0
+offset_top = 3.0
+offset_right = 777.0
+offset_bottom = 16.0
 
 [connection signal="difficulty_changed" from="." to="Carousel" method="_on_song_select_difficulty_changed"]
 [connection signal="pressed" from="SubScreenContainer/SubScreenButtons/ModifierButton" to="." method="_on_modifier_button_pressed"]

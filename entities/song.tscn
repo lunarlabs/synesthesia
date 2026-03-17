@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://cenaxc1qvl3ig" path="res://assets/textures/progressmeter.svg" id="11_a22vp"]
 [ext_resource type="Script" uid="uid://edb4dhq2llws" path="res://entities/conductor.gd" id="11_jycet"]
 [ext_resource type="Texture2D" uid="uid://n0gwuuqgxkfc" path="res://assets/textures/progressmeter.png" id="12_36g15"]
+[ext_resource type="Shader" uid="uid://c6xf5ii8jqq85" path="res://assets/testshader.tres" id="15_bn0wb"]
 
 [sub_resource type="Gradient" id="Gradient_36g15"]
 interpolation_mode = 2
@@ -1371,11 +1372,15 @@ shading_mode = 0
 material = SubResource("StandardMaterial3D_scy1h")
 size = Vector3(20, 0.02, 0.02)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qk6wt"]
+shader = ExtResource("15_bn0wb")
+
 [node name="Song" type="Node3D" unique_id=1923928850]
 script = ExtResource("1_jv32a")
 energy_gradient = SubResource("Gradient_36g15")
 
 [node name="SongPlayer" type="AudioStreamPlayer" parent="." unique_id=1984526006 groups=["AudioPlayers", "LoopingAudio"]]
+bus = &"Song"
 
 [node name="DebugInfo" type="Label" parent="." unique_id=1195024175]
 z_index = 100
@@ -1913,6 +1918,13 @@ color = Color(0, 0, 0, 1)
 unique_name_in_owner = true
 process_priority = -100
 script = ExtResource("11_jycet")
+
+[node name="CanvasLayer" type="ColorRect" parent="." unique_id=1346296572]
+material = SubResource("ShaderMaterial_qk6wt")
+offset_left = 486.0
+offset_top = 3.0
+offset_right = 777.0
+offset_bottom = 16.0
 
 [connection signal="timeout" from="HUD/FastSlowLabel/FastSlowTimer" to="." method="_hide_fast_slow_label"]
 [connection signal="new_measure" from="Conductor" to="." method="_on_conductor_new_measure"]

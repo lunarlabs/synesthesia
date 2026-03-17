@@ -4,8 +4,8 @@ extends Node
 const VU_COUNT = 16
 const FREQ_MIN = 20.0
 const FREQ_MAX = 15000.0 # 15k is usually the upper limit of useful visual data
-const ATTACK_RATE = 15.0 # How fast the VU meter rises (higher = faster)
-const DECAY_RATE = 10.0 # How fast the VU meter falls (lower = slower, more natural)
+const ATTACK_RATE = 35.0 # How fast the VU meter rises (higher = faster)
+const DECAY_RATE = 20.0 # How fast the VU meter falls (lower = slower, more natural)
 
 # State
 var spectrum: AudioEffectSpectrumAnalyzerInstance
@@ -16,6 +16,7 @@ var frequency_bands: Array[float] = []
 var previous_magnitudes: Array[float] = []
 
 func _ready():
+	process_thread_group = Node.PROCESS_THREAD_GROUP_SUB_THREAD
 	# Setup the arrays
 	frequency_bands.resize(VU_COUNT)
 	previous_magnitudes.resize(VU_COUNT)
