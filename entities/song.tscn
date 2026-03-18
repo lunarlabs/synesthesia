@@ -1920,6 +1920,7 @@ process_priority = -100
 script = ExtResource("11_jycet")
 
 [node name="CanvasLayer" type="ColorRect" parent="." unique_id=1346296572]
+visible = false
 material = SubResource("ShaderMaterial_qk6wt")
 offset_left = 486.0
 offset_top = 3.0

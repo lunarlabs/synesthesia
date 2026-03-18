@@ -45,7 +45,7 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 	var new_note_nodes: Dictionary[int, SynRoadNote] = {}
 
 	for i in track_data.measures_in_chunks[chunk_idx]:
-		if not manager_node.suppressed_measures[i] or (i < track_node.reset_measure):
+		if not manager_node.suppressed_measures[i]:
 			var new_measure: Node3D
 			if not _measure_stack.is_empty():
 				_mutex.lock()

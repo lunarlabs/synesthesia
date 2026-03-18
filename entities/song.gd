@@ -20,7 +20,7 @@ const ENERGY_BAR_TEXT: Dictionary = {
 }
 const START_POSITION := Vector3(0.0, 15.0, 5.0)
 const START_ROTATION := Vector3(-50.0, 0.0, -20.0)
-const GAME_POSITION := Vector3(0.0, 2.5, 2.25)
+const GAME_POSITION := Vector3(0.0, 2.5, 1.75)
 const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
 
