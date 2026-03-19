@@ -109,9 +109,11 @@ func _ready():
 	_connect_signals()
 	# Because carousel's _current_difficulty mirrors selected_difficulty here, we can just let
 	# it handle the difficulty state. Nifty!
-	selected_difficulty = SessionManager.previous_select_options.get("difficulty", 102)
+	$Carousel.restore_state_from_session()
+	selected_difficulty = SessionManager.previous_select_options.get(&"difficulty", 102)
 	held_difficulty = selected_difficulty
 	_select_difficulty(selected_difficulty)
+	$Carousel.update_carousel()
 	# TODO: replace with new mod select screen crap -- getting rid of the old modifier buttons
 	# on the song select screen
 	energy_modifier_index = SessionManager.previous_select_options.get("energy_modifier_index", 0)

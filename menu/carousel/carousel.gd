@@ -56,14 +56,14 @@ func select_item(item: Dictionary):
 		&"song_single_difficulty":
 			song_selected.emit(item[&"folder_id"], item[&"difficulty_offset"])
 
-func navigate_into_submenu(submenu_item: Dictionary):
+func navigate_into_submenu(submenu_item: Dictionary, emit:= true):
 	_back_stack.push_back(_current_menu_structure)
 	_current_menu_structure = submenu_item[&"children"]
 	_current_submenu_name = submenu_item[&"name"]
 	_current_category_name = ""
 	_current_item_index = 0
 	_update_displayed_menu_structure()
-	update_carousel()
+	update_carousel(emit)
 
 func toggle_category(category_item: Dictionary):
 	category_item[&"open"] = not category_item[&"open"]
@@ -136,8 +136,6 @@ func _ready():
 		add_child(instance)
 		entry_y_pos += total_height
 	fetch_menu_structure(false)
-	_restore_state_from_session()
-	update_carousel()
 
 func _unhandled_input(event: InputEvent):
 	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons\
@@ -184,7 +182,7 @@ func _save_state_to_session() -> void:
 		&"difficulty": _current_difficulty,
 	}
 
-func _restore_state_from_session() -> void:
+func restore_state_from_session() -> void:
 	var opts := SessionManager.previous_select_options
 	if opts.is_empty():
 		return
@@ -195,7 +193,7 @@ func _restore_state_from_session() -> void:
 	if opts.has(&"submenu_name") and not (opts[&"submenu_name"] as String).is_empty():
 		for item: Dictionary in _root_menu_structure:
 			if item[&"name"] == opts[&"submenu_name"]:
-				navigate_into_submenu(item)
+				navigate_into_submenu(item, false)
 				break
 	# Open the saved category, if any.
 	if opts.has(&"category_name") and not (opts[&"category_name"] as String).is_empty():

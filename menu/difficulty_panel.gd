@@ -21,7 +21,11 @@ var selected:
 		_selected = v
 		selected_tex.visible = v
 		unselected_tex.visible = !v
-		name_lbl.modulate = Color.WHITE if v else selected_color
+		if value_lbl.text != "--":
+			name_lbl.modulate = Color.WHITE if v else selected_color
+		else:
+			name_lbl.modulate = Color(0.5,0.5,0.5)
+			
 
 func _ready():
 	update()

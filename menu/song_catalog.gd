@@ -35,6 +35,8 @@ static var PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
 static var PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
 static var PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
 
+var catalog_loading_scene: PackedScene = preload("res://menu/CatalogLoading.tscn")
+
 #region Query Constants
 static var QUERY_BASE = """SELECT
 	folder_id, 
@@ -119,10 +121,17 @@ func scan_for_songs(rescan := false):
 	if not dir:
 		push_error("Failed to open song directory.")
 		return
+	var catalog_loading = catalog_loading_scene.instantiate()
+	add_child(catalog_loading)
+	var loading_label: Label = catalog_loading.get_node("%Label")
+	var loading_bar: ProgressBar = catalog_loading.get_node("%ProgressBar")
+
+	# ── Phase 1: Scan folders and check hashes ──
+	loading_label.text = "Scanning song folders…"
+	loading_bar.indeterminate = true
 
 	var db = SessionManager.library_db
 
-	# ── Phase 1: Scan folders and check hashes ──
 	var existing_hashes: Dictionary = {} # folder_id -> { resource_hash, midi_hash }
 	if db.query("SELECT folder_id, resource_hash, midi_hash FROM songs"):
 		for row in db.query_result:
@@ -157,8 +166,20 @@ func scan_for_songs(rescan := false):
 	print("Scan complete: %d folders found, %d need processing." % [total_folders, work_list.size()])
 
 	# ── Phase 2: Process only changed songs ──
-	for item in work_list:
-		process_song(item)
+	if work_list.is_empty():
+		loading_label.text = "Library is up to date."
+	else:
+		loading_bar.indeterminate = false
+		loading_bar.min_value = 0
+		loading_bar.max_value = work_list.size()
+		loading_bar.value = 0
+		for i in work_list.size():
+			var item = work_list[i]
+			loading_label.text = "Processing song %d / %d: %s" % [i + 1, work_list.size(), item.folder]
+			loading_bar.value = i
+			await get_tree().process_frame
+			process_song(item)
+		loading_bar.value = work_list.size()
 
 	# Refresh catalog
 	if not db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
@@ -166,6 +187,8 @@ func scan_for_songs(rescan := false):
 	_song_catalog = db.query_result
 	for i in range(_song_catalog.size()):
 		song_indices[_song_catalog[i]["folder_id"]] = i
+
+	catalog_loading.queue_free()
 
 #region Ingest
 ## Processes a single song folder that was flagged as changed during the scan phase.

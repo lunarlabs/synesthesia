@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://s3ixw18eh7dt"]
 
 [node name="CatalogLoading" type="PanelContainer" unique_id=314465347]
+z_index = 10
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -23,7 +24,6 @@ text = "Loading song library..."
 
 [node name="ProgressBar" type="ProgressBar" parent="VBoxContainer" unique_id=1960494590]
 unique_name_in_owner = true
-z_index = 100
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 indeterminate = true

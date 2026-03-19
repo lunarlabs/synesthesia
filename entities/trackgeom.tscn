@@ -1,16 +1,38 @@
 [gd_scene format=3 uid="uid://b5rou2au557hc"]
 
 [ext_resource type="PackedScene" uid="uid://b3f3ytkxxv0lr" path="res://assets/trackgeom.blend" id="1_oblog"]
-[ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/trackshader.res" id="2_plo11"]
+[ext_resource type="Shader" uid="uid://dvvrpixtrx6n4" path="res://entities/trackshader.gdshader" id="2_plo11"]
+[ext_resource type="Texture2D" uid="uid://dhxi8wpabpu4y" path="res://assets/textures/trackalbedo.png" id="3_qblm2"]
+[ext_resource type="Shader" uid="uid://bue2h033anbms" path="res://entities/trackgeom.gdshader" id="3_y256c"]
+[ext_resource type="Texture2D" uid="uid://csmuen2dj6djg" path="res://assets/textures/beatlines.png" id="4_meoiv"]
+[ext_resource type="Texture2D" uid="uid://vindqqfkjnve" path="res://assets/textures/phaseemit.png" id="5_sx2hd"]
+[ext_resource type="Texture2D" uid="uid://diuk1axbm2vgi" path="res://assets/textures/track-normal.png" id="6_edc6x"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_y256c"]
 render_priority = 0
 shader = ExtResource("2_plo11")
+shader_parameter/tex_frg_23 = ExtResource("3_qblm2")
+shader_parameter/tex_frg_38 = ExtResource("5_sx2hd")
+shader_parameter/tex_frg_33 = ExtResource("4_meoiv")
+shader_parameter/tex_frg_45 = ExtResource("6_edc6x")
 
-[node name="trackgeom" unique_id=702242862 instance=ExtResource("1_oblog")]
+[sub_resource type="Curve" id="Curve_qblm2"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.01, 0), 0.0, 0.0, 0, 0, Vector2(0.99, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
 
-[node name="Cube" parent="." index="0" unique_id=178433247]
+[sub_resource type="CurveTexture" id="CurveTexture_meoiv"]
+curve = SubResource("Curve_qblm2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k044i"]
+render_priority = 0
+shader = ExtResource("3_y256c")
+shader_parameter/curve_frg_6 = SubResource("CurveTexture_meoiv")
+
+[node name="trackgeom" unique_id=281112438 instance=ExtResource("1_oblog")]
+
+[node name="Cube" parent="." index="0" unique_id=331308337]
 visibility_range_end = 200.0
 visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
 surface_material_override/0 = SubResource("ShaderMaterial_y256c")
+surface_material_override/1 = SubResource("ShaderMaterial_k044i")

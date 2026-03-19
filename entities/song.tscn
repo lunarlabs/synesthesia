@@ -106,6 +106,8 @@ tonemap_mode = 2
 ssao_radius = 1.08
 ssao_intensity = 9.3
 ssao_horizon = 0.05
+ssil_enabled = true
+sdfgi_enabled = true
 glow_enabled = true
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q2dmg"]
@@ -1454,7 +1456,9 @@ vertical_alignment = 0
 width = 1000.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=803851345]
-transform = Transform3D(0.9981166, 0.05234906, -0.03198038, 1.3554622e-08, 0.5213224, 0.8533598, 0.061344683, -0.85175264, 0.5203406, 0, 0, 0)
+transform = Transform3D(0.9885914, -0.109501645, -0.10342392, 0.13013022, 0.27514234, 0.9525559, -0.07585014, -0.95514715, 0.28625277, 0, 0, 0)
+light_energy = 0.5
+light_cull_mask = 4293918721
 shadow_enabled = true
 directional_shadow_mode = 0
 

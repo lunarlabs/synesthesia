@@ -9,7 +9,7 @@ func _ready() -> void:
 	if not library_file_exists:
 		%Label.text = "Initializing library file for the first time..."
 	await get_tree().process_frame
-	SongCatalog.scan_for_songs(!library_file_exists)
+	await SongCatalog.scan_for_songs(!library_file_exists)
 	SongCatalog.make_menu_structure()
 
 	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")

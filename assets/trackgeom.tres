@@ -1,0 +1,62 @@
+[gd_resource type="VisualShader" format=3 uid="uid://dwn0uj31jlpfq"]
+
+[sub_resource type="VisualShaderNodeMix" id="VisualShaderNodeMix_5ui0p"]
+default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0, 0, 0), 2, 0.5]
+op_type = 4
+
+[sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_ou1j3"]
+parameter_name = "measure_tint"
+qualifier = 2
+
+[sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_fddbc"]
+constant = Color(0.06469653, 0.06469653, 0.06469653, 1)
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_lfgnn"]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id="VisualShaderNodeVectorDecompose_ape2b"]
+default_input_values = [0, Vector2(0, 0)]
+op_type = 0
+
+[sub_resource type="Curve" id="Curve_fu44k"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.01, 0), 0.0, 0.0, 0, 0, Vector2(0.99, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_fejyn"]
+curve = SubResource("Curve_fu44k")
+
+[sub_resource type="VisualShaderNodeCurveTexture" id="VisualShaderNodeCurveTexture_u4570"]
+texture = SubResource("CurveTexture_fejyn")
+
+[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_ikwfi"]
+function = 17
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_4wbxo"]
+operator = 1
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_mru6v"]
+parameter_name = "beat"
+qualifier = 1
+hint = 1
+
+[resource]
+nodes/fragment/0/position = Vector2(1020, 140)
+nodes/fragment/2/node = SubResource("VisualShaderNodeColorParameter_ou1j3")
+nodes/fragment/2/position = Vector2(260, 660)
+nodes/fragment/3/node = SubResource("VisualShaderNodeColorConstant_fddbc")
+nodes/fragment/3/position = Vector2(40, 120)
+nodes/fragment/4/node = SubResource("VisualShaderNodeInput_lfgnn")
+nodes/fragment/4/position = Vector2(-780, 260)
+nodes/fragment/5/node = SubResource("VisualShaderNodeVectorDecompose_ape2b")
+nodes/fragment/5/position = Vector2(-440, 260)
+nodes/fragment/6/node = SubResource("VisualShaderNodeCurveTexture_u4570")
+nodes/fragment/6/position = Vector2(280, 320)
+nodes/fragment/7/node = SubResource("VisualShaderNodeFloatFunc_ikwfi")
+nodes/fragment/7/position = Vector2(60, 320)
+nodes/fragment/8/node = SubResource("VisualShaderNodeFloatOp_4wbxo")
+nodes/fragment/8/position = Vector2(-160, 320)
+nodes/fragment/9/node = SubResource("VisualShaderNodeFloatParameter_mru6v")
+nodes/fragment/9/position = Vector2(-480, 460)
+nodes/fragment/10/node = SubResource("VisualShaderNodeMix_5ui0p")
+nodes/fragment/10/position = Vector2(720, 520)
+nodes/fragment/connections = PackedInt32Array(3, 0, 0, 0, 4, 0, 5, 0, 7, 0, 6, 0, 8, 0, 7, 0, 5, 1, 8, 0, 9, 0, 8, 1, 10, 0, 0, 5, 6, 0, 10, 2, 2, 0, 10, 1)
