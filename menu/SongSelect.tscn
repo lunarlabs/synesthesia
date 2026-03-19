@@ -841,6 +841,7 @@ volume_db = -6.0
 bus = &"Tracks"
 
 [node name="CanvasLayer" type="ColorRect" parent="." unique_id=998416940]
+visible = false
 material = SubResource("ShaderMaterial_qhtwy")
 layout_mode = 0
 offset_left = 486.0

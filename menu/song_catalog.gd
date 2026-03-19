@@ -120,78 +120,112 @@ func scan_for_songs(rescan := false):
 		push_error("Failed to open song directory.")
 		return
 
+	var db = SessionManager.library_db
+
+	# ── Phase 1: Scan folders and check hashes ──
+	var existing_hashes: Dictionary = {} # folder_id -> { resource_hash, midi_hash }
+	if db.query("SELECT folder_id, resource_hash, midi_hash FROM songs"):
+		for row in db.query_result:
+			existing_hashes[row["folder_id"]] = row
+
+	var total_folders := 0
+	var work_list: Array = []
 	dir.list_dir_begin()
 	var folder_name = dir.get_next()
 	while folder_name != "":
 		if dir.current_is_dir() and not folder_name.begins_with("."):
-			print("Found song folder: %s" % folder_name)
-			process_song(folder_name, rescan)
+			total_folders += 1
+			var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+			var file_exists = FileAccess.file_exists(file_path)
+			var resource_hash = null
+			if file_exists:
+				resource_hash = FileAccess.get_md5(file_path)
+			var prev = existing_hashes.get(folder_name, {})
+			var is_new = prev.is_empty()
+			var hash_changed = rescan or is_new or prev.get("resource_hash") != resource_hash
+			if hash_changed:
+				work_list.append({
+					"folder": folder_name,
+					"file_exists": file_exists,
+					"resource_hash": resource_hash,
+					"is_new": is_new,
+					"prev_midi_hash": prev.get("midi_hash"),
+				})
 		folder_name = dir.get_next()
 	dir.list_dir_end()
-	if not SessionManager.library_db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
-		printerr(SessionManager.library_db.error_message)
-	_song_catalog = SessionManager.library_db.query_result
+
+	print("Scan complete: %d folders found, %d need processing." % [total_folders, work_list.size()])
+
+	# ── Phase 2: Process only changed songs ──
+	for item in work_list:
+		process_song(item)
+
+	# Refresh catalog
+	if not db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
+		printerr(db.error_message)
+	_song_catalog = db.query_result
 	for i in range(_song_catalog.size()):
 		song_indices[_song_catalog[i]["folder_id"]] = i
 
 #region Ingest
-func process_song(folder_name: String, force_rescan := false):
+## Processes a single song folder that was flagged as changed during the scan phase.
+## scan_info is a Dictionary with keys: folder, file_exists, resource_hash, is_new, prev_midi_hash.
+func process_song(scan_info: Dictionary):
 	var songs_table = "songs"
 	var difficulties_table = "difficulties"
 	var song_insert_view = "v_song_upsert"
 	var db = SessionManager.library_db
 
-	# Handle song metadata first
-	var song_data = null
-	var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
-	var resource_hash = null
-	var file_exists = FileAccess.file_exists(file_path)
+	var folder_name: String = scan_info.folder
+	var file_exists: bool = scan_info.file_exists
+	var resource_hash = scan_info.resource_hash
+	var is_new: bool = scan_info.is_new
+	var prev_midi_hash = scan_info.prev_midi_hash
+
+	print("Processing song: %s" % folder_name)
+
+	# Handle song metadata
+	var song_data: SongData = null
+	var upsert_dict = {
+		"folder_id": folder_name,
+		"resource_hash": resource_hash,
+	}
+
 	if file_exists:
-		resource_hash = FileAccess.get_md5(file_path)
-	var condition_string = "folder_id = '%s'" % folder_name
-	var select_array: Array = db.select_rows(songs_table, condition_string, ["resource_hash", "midi_hash"])
-	var result_is_empty := select_array.size() == 0
-	if force_rescan or result_is_empty or select_array[0]["resource_hash"] != resource_hash:
-		print("Processing song: %s" % folder_name)
-		var upsert_dict = {
-			"folder_id": folder_name,
-			"resource_hash": resource_hash,
-		}
-		if file_exists:
-			song_data = ResourceLoader.load(file_path) as SongData
-			upsert_dict.merge(_extract_songdata_meta(song_data))
-			db.insert_row(song_insert_view, upsert_dict) # if the row exists, this will update it
-		else:
-			upsert_dict["files_ok"] = 0
-			upsert_dict["midi_hash"] = null
-			db.insert_row(songs_table, upsert_dict)
-	
-	if song_data:
-		var midi_hash = null
-		if song_data.midi_file:
-			midi_hash = FileAccess.get_md5(ResourceUID.ensure_path(song_data.midi_file))
-			if result_is_empty or midi_hash != select_array[0]["midi_hash"]:
-				var difficulty_rows = []
-				var midi_track_indices = song_data.song_track_locations.values()
-				for i in DIFFICULTY_LEVELS:
-					var track_map: Array[Dictionary] = []
-					var total_note_count := 0
-					for track_idx in midi_track_indices:
-						var note_map = song_data.get_note_map_from_track(track_idx, i)
-						total_note_count += note_map.size()
-						track_map.append(note_map)
-					if total_note_count > 0:
-						print("Processing difficulty: %s" % i)
-						var ddi: DetailedDifficultyInfo = _calculate_detailed_difficulty(track_map, song_data)
-						var row = {
-							"song_folder": folder_name,
-							"difficulty_offset": i,
-							"difficulty_rating": ddi.avg_raw_difficulty,
-							"details_json": JSON.stringify(_difficulty_info_to_json(ddi))
-						}
-						difficulty_rows.append(row)
-				if not difficulty_rows.is_empty():
-					db.insert_rows(difficulties_table, difficulty_rows)
+		var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+		song_data = ResourceLoader.load(file_path) as SongData
+		upsert_dict.merge(_extract_songdata_meta(song_data))
+		db.insert_row(song_insert_view, upsert_dict) # if the row exists, this will update it
+	else:
+		upsert_dict["files_ok"] = 0
+		upsert_dict["midi_hash"] = null
+		db.insert_row(songs_table, upsert_dict)
+
+	# Handle difficulty calculation if MIDI changed
+	if song_data and song_data.midi_file:
+		var midi_hash = FileAccess.get_md5(ResourceUID.ensure_path(song_data.midi_file))
+		if is_new or midi_hash != prev_midi_hash:
+			var difficulty_rows = []
+			var midi_track_indices = song_data.song_track_locations.values()
+			for i in DIFFICULTY_LEVELS:
+				var track_map: Array[Dictionary] = []
+				var total_note_count := 0
+				for track_idx in midi_track_indices:
+					var note_map = song_data.get_note_map_from_track(track_idx, i)
+					total_note_count += note_map.size()
+					track_map.append(note_map)
+				if total_note_count > 0:
+					print("  Processing difficulty: %s" % i)
+					var ddi: DetailedDifficultyInfo = _calculate_detailed_difficulty(track_map, song_data)
+					var row = {
+						"song_folder": folder_name,
+						"difficulty_offset": i,
+						"difficulty_rating": ddi.avg_raw_difficulty,
+						"details_json": JSON.stringify(_difficulty_info_to_json(ddi))
+					}
+					difficulty_rows.append(row)
+			if not difficulty_rows.is_empty():
+				db.insert_rows(difficulties_table, difficulty_rows)
 
 
 ## Creates a dictionary of song metadata for INSERT or UPDATE statements.

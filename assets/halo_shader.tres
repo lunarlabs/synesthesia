@@ -12,6 +12,8 @@ input_name = "time"
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_73vgk"]
 function = 19
 
+[sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_t83ue"]
+
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_t83ue"]
 function = 31
 
@@ -88,6 +90,8 @@ nodes/fragment/13/node = SubResource("VisualShaderNodeInput_73vgk")
 nodes/fragment/13/position = Vector2(-640, 1020)
 nodes/fragment/14/node = SubResource("VisualShaderNodeFloatFunc_73vgk")
 nodes/fragment/14/position = Vector2(-360, 1100)
+nodes/fragment/15/node = SubResource("VisualShaderNodeColorConstant_t83ue")
+nodes/fragment/15/position = Vector2(480, 220)
 nodes/fragment/16/node = SubResource("VisualShaderNodeFloatFunc_t83ue")
 nodes/fragment/16/position = Vector2(220, 520)
 nodes/fragment/17/node = SubResource("VisualShaderNodeTexture_hq4n2")
@@ -100,4 +104,4 @@ nodes/fragment/20/node = SubResource("VisualShaderNodeFloatOp_utoe7")
 nodes/fragment/20/position = Vector2(-340, 120)
 nodes/fragment/21/node = SubResource("VisualShaderNodeFloatOp_q5mg3")
 nodes/fragment/21/position = Vector2(-100, 140)
-nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 12, 0, 6, 0, 13, 0, 14, 0, 14, 0, 12, 2, 7, 0, 11, 0, 5, 0, 6, 1, 5, 0, 16, 0, 16, 0, 11, 1, 17, 0, 0, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0, 11, 0, 0, 1)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 12, 0, 6, 0, 13, 0, 14, 0, 14, 0, 12, 2, 15, 0, 0, 5, 7, 0, 11, 0, 11, 0, 0, 1, 5, 0, 6, 1, 5, 0, 16, 0, 16, 0, 11, 1, 17, 0, 0, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0)
