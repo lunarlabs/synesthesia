@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cua2en2u3p0ie"]
+
+[ext_resource type="Script" uid="uid://rxvi6yjltkkd" path="res://entities/scenery/finish_tower.gd" id="1_hxkf2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_a7anv"]
+size = Vector3(25, 6, 25)
+
+[node name="FinishTower" type="Node3D" unique_id=32694067]
+process_mode = 4
+script = ExtResource("1_hxkf2")
+
+[node name="rotator" type="MeshInstance3D" parent="." unique_id=385180838]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+mesh = SubResource("BoxMesh_a7anv")

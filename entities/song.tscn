@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://edb4dhq2llws" path="res://entities/conductor.gd" id="11_jycet"]
 [ext_resource type="Texture2D" uid="uid://n0gwuuqgxkfc" path="res://assets/textures/progressmeter.png" id="12_36g15"]
 [ext_resource type="Shader" uid="uid://c6xf5ii8jqq85" path="res://assets/testshader.tres" id="15_bn0wb"]
+[ext_resource type="PackedScene" uid="uid://cua2en2u3p0ie" path="res://entities/scenery/finishTower.tscn" id="16_qk6wt"]
 
 [sub_resource type="Gradient" id="Gradient_36g15"]
 interpolation_mode = 2
@@ -1931,5 +1932,8 @@ offset_top = 3.0
 offset_right = 777.0
 offset_bottom = 16.0
 
+[node name="FinishTower" parent="." unique_id=32694067 instance=ExtResource("16_qk6wt")]
+
+[connection signal="song_finished" from="." to="FinishTower" method="_on_song_song_finished"]
 [connection signal="timeout" from="HUD/FastSlowLabel/FastSlowTimer" to="." method="_hide_fast_slow_label"]
 [connection signal="new_measure" from="Conductor" to="." method="_on_conductor_new_measure"]

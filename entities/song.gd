@@ -153,6 +153,9 @@ func _ready():
 	end_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
 	end_gate.get_node("BoundaryLine").scale.z = 1.5
 	add_child(end_gate)
+	$FinishTower.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
+	$FinishTower.set_speed(bpm)
+	$FinishTower.position.z = end_gate.position.z - 50
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
