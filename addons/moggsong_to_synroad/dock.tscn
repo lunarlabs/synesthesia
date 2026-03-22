@@ -33,6 +33,12 @@ layout_mode = 2
 disabled = true
 text = "Save"
 
+[node name="ClearButton" type="Button" parent="ButtonBar" unique_id=1774348511]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Clear"
+
 [node name="Main" type="HSplitContainer" parent="." unique_id=148554575]
 layout_mode = 2
 split_offsets = PackedInt32Array(3)

@@ -30,7 +30,9 @@ static func create_songdata_from_moggsong(moggsong_file: String) -> SongData:
 	songdata.scale_fudge_factor = float(moggsong_data.get("tunnel_scale", 1.0))
 	var song_info_slice = moggsong_data.get("song_info", [])
 	for i in song_info_slice.size():
-		var value = song_info_slice[i] as Dictionary
+		if typeof(song_info_slice[i]) != TYPE_DICTIONARY:
+			continue
+		var value: Dictionary = song_info_slice[i]
 		if value.has("countin"):
 			songdata.lead_in_measures = int(value["countin"])
 			continue
@@ -42,7 +44,7 @@ static func create_songdata_from_moggsong(moggsong_file: String) -> SongData:
 		var sections = moggsong_data["section_start_bars"] as Array
 		songdata.checkpoints.clear()
 		for sec in sections:
-			songdata.checkpoints.append(int(sec))
+			songdata.checkpoints.append(int(sec) - 1) # SongData uses 0-based indexing for checkpoints
 	# Populate tracks from MIDI directly on the in-memory SongData.
 	# update_songdata_tracks() requires the .tres to already be saved, so we
 	# call _set_songdata_tracks_from_midi here instead.

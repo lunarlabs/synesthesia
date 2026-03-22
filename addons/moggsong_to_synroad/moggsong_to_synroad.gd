@@ -5,15 +5,17 @@ var dock: Control
 var panel_button: Button
 
 # UI references
-var _folder_edit: LineEdit
 var _import_btn: Button
 var _save_btn: Button
+var _clear_btn: Button
+var _extract_btn
 var _warning_label: Label
 var _title_edit: LineEdit
-var _long_title_edit: LineEdit
+var _sub_title_edit: LineEdit
 var _artist_edit: LineEdit
 var _genre_edit: LineEdit
 var _desc_edit: TextEdit
+var _source_edit: LineEdit
 var _fixed_bpm_check: CheckBox
 var _fixed_bpm_spin: SpinBox
 var _intro_measures_spin: SpinBox
@@ -47,7 +49,7 @@ class TrackRow:
 			instrument.add_item(options[i], i)
 		root.add_child(instrument)
 		audio = LineEdit.new()
-		audio.placeholder_text = "Audio file (.wav)"
+		audio.placeholder_text = "Audio file"
 		audio.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		root.add_child(audio)
 		browse = Button.new()
@@ -59,7 +61,7 @@ class TrackRow:
 		file_dialog = FileDialog.new()
 		file_dialog.access = FileDialog.ACCESS_RESOURCES
 		file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
-		file_dialog.filters = PackedStringArray(["*.wav ; Audio Stems"])
+		file_dialog.filters = PackedStringArray(["*.wav,*.ogg,*.mp3 ; Audio Stems"])
 		root.add_child(file_dialog)
 
 func _clear_track_rows():
@@ -100,14 +102,16 @@ func _enter_tree() -> void:
 	dock = preload("res://addons/moggsong_to_synroad/dock.tscn").instantiate()
 	panel_button = add_control_to_bottom_panel(dock, "MoggSong to SynRoad Converter")
 	# Cache node references
-	_folder_edit = dock.get_node("%SourceEntry")
 	_import_btn = dock.get_node("%ImportButton")
 	_save_btn = dock.get_node("%SaveButton")
+	_clear_btn = dock.get_node("%ClearButton")
+	_extract_btn = dock.get_node("%ExtractAudioButton")
 	_warning_label = dock.get_node("%StatusLine")
 	_title_edit = dock.get_node("%SongTitleEntry")
-	_long_title_edit = dock.get_node("%SubTitleEntry")
+	_sub_title_edit = dock.get_node("%SubTitleEntry")
 	_artist_edit = dock.get_node("%ArtistEntry")
 	_genre_edit = dock.get_node("%GenreEntry")
+	_source_edit = dock.get_node("%SourceEntry")
 	_desc_edit = dock.get_node("%DescEntry")
 	_fixed_bpm_check = dock.get_node("%FixedBPMTitle")
 	_fixed_bpm_spin = dock.get_node("%FixedBPMEntry")
@@ -120,10 +124,10 @@ func _enter_tree() -> void:
 	_checkpoint_list = dock.get_node("%CheckpointList")
 	
 	# Connect signals
-	var _extract_btn = dock.get_node("%ExtractAudioButton")
 	_extract_btn.pressed.connect(_on_extract_button_pressed)
 	_import_btn.pressed.connect(_on_import_button_pressed)
 	_save_btn.pressed.connect(_on_save_button_pressed)
+	_clear_btn.pressed.connect(_on_clear_button_pressed)
 	_add_track_btn.pressed.connect(_on_add_track_button_pressed)
 	_add_checkpoint_btn.pressed.connect(_on_add_checkpoint_button_pressed)
 	
@@ -147,7 +151,6 @@ func _on_import_button_pressed() -> void:
 func _on_moggsong_file_selected(path: String) -> void:
 	_current_moggsong_file = path
 	_current_folder = path.get_base_dir()
-	_folder_edit.text = _current_folder
 	
 	if not FileAccess.file_exists(MoggsongParser.get_songdata_path(path)):
 		_current_songdata = MoggsongParser.create_songdata_from_moggsong(path)
@@ -172,6 +175,9 @@ func _on_extract_button_pressed() -> void:
 	_on_save_button_pressed()
 	
 	MoggsongParser.update_songdata_tracks(_current_moggsong_file)
+	# Reload from disk — update_songdata_tracks works on its own SongData instance,
+	# so _current_songdata is stale and won't have the audio file assignments.
+	_current_songdata = load(MoggsongParser.get_songdata_path(_current_moggsong_file))
 	_populate_gui_from_songdata(_current_songdata)
 
 func _on_save_button_pressed() -> void:
@@ -181,9 +187,10 @@ func _on_save_button_pressed() -> void:
 	
 	# Update songdata from GUI
 	_current_songdata.title = _title_edit.text
-	_current_songdata.long_title = _long_title_edit.text
+	_current_songdata.sub_title = _sub_title_edit.text
 	_current_songdata.artist = _artist_edit.text
 	_current_songdata.genre = _genre_edit.text
+	_current_songdata.source = _source_edit.text
 	_current_songdata.description = _desc_edit.text
 	_current_songdata.bpm_fix = _fixed_bpm_check.button_pressed
 	_current_songdata.fixed_bpm = _fixed_bpm_spin.value
@@ -241,6 +248,9 @@ func _on_add_checkpoint_button_pressed() -> void:
 	_checkpoint_list.add_item("Measure %d" % measure)
 	_warning_label.text = "Added checkpoint at measure %d" % measure
 
+func _on_clear_button_pressed() -> void:
+	_clear_gui()
+
 func _try_load_songdata(folder_path: String) -> SongData:
 	var songdata_name = folder_path.get_file()
 	var current_songdata_path = folder_path + "/" + songdata_name + ".tres"
@@ -255,14 +265,16 @@ func _populate_gui_from_songdata(songdata: SongData) -> void:
 		return
 	_title_edit.text = songdata.title
 	_title_edit.editable = true
-	_long_title_edit.text = songdata.long_title
-	_long_title_edit.editable = true
+	_sub_title_edit.text = songdata.sub_title
+	_sub_title_edit.editable = true
 	_artist_edit.text = songdata.artist
 	_artist_edit.editable = true
 	_genre_edit.text = songdata.genre
 	_genre_edit.editable = true
 	_desc_edit.text = songdata.description
 	_desc_edit.editable = true
+	_source_edit.text = songdata.source
+	_source_edit.editable = true
 	_fixed_bpm_check.button_pressed = songdata.bpm_fix
 	_fixed_bpm_check.disabled = false
 	_fixed_bpm_spin.value = songdata.fixed_bpm
@@ -290,18 +302,22 @@ func _populate_gui_from_songdata(songdata: SongData) -> void:
 	_checkpoint_spin.editable = true
 	_import_btn.disabled = true
 	_save_btn.disabled = false
+	_clear_btn.disabled = false
+	_extract_btn.disabled = false
 
 func _clear_gui() -> void:
 	_title_edit.text = ""
 	_title_edit.editable = false
-	_long_title_edit.text = ""
-	_long_title_edit.editable = false
+	_sub_title_edit.text = ""
+	_sub_title_edit.editable = false
 	_artist_edit.text = ""
 	_artist_edit.editable = false
 	_genre_edit.text = ""
 	_genre_edit.editable = false
 	_desc_edit.text = ""
 	_desc_edit.editable = false
+	_source_edit.text = ""
+	_source_edit.editable = false
 	_fixed_bpm_check.button_pressed = false
 	_fixed_bpm_check.disabled = true
 	_fixed_bpm_spin.value = 120.0
@@ -321,5 +337,7 @@ func _clear_gui() -> void:
 	_checkpoint_spin.value = 4
 	_checkpoint_spin.editable = false
 	_clear_track_rows()
-	_import_btn.disabled = true
+	_import_btn.disabled = false
+	_extract_btn.disabled = true
 	_save_btn.disabled = true
+	_clear_btn.disabled = true
