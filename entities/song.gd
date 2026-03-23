@@ -359,6 +359,9 @@ func _on_streak_broken():
 	_last_streak_break_measure = %Conductor.current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
+	if lbl_phrase_value.visible:
+		pv_anims[pv_pointer].phrase_failed(lbl_phrase_value.text)
+		pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	lbl_phrase_value.hide()
 	match manager_node.energy_modifier:
 		0, 2:
@@ -382,8 +385,6 @@ func _on_streak_broken():
 	lbl_streak.text = "x%d" % streak
 
 func _on_active_phrase_missed(phrase_score_value: int):
-	pv_anims[pv_pointer].phrase_failed(phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
-	pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	_phrases_missed += 1
 
 func _on_inactive_phrase_missed():
