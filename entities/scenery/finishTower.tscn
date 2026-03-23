@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://rxvi6yjltkkd" path="res://entities/scenery/finish_tower.gd" id="1_hxkf2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_a7anv"]
-size = Vector3(25, 6, 25)
+size = Vector3(10, 6, 10)
 
 [node name="FinishTower" type="Node3D" unique_id=32694067]
 process_mode = 4

@@ -34,7 +34,7 @@ void fragment() {
         vec3 base_emission = (measure_tint.rgb * tex38_color) * phrase_multiplier;
         
         vec3 tex33_color = texture(tex_frg_33, UV).rgb;
-        final_emission = mix(base_emission, vec3(0.7), tex33_color);
+        final_emission = mix(base_emission, vec3(0.4), tex33_color);
     }
     
     EMISSION = final_emission;
