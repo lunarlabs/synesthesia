@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1920"
+   height="1080"
+   viewBox="0 0 1920 1080"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="srdoors.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showguides="true"
+     showgrid="true"
+     inkscape:zoom="0.52902063"
+     inkscape:cx="959.31987"
+     inkscape:cy="540.62164"
+     inkscape:window-width="1904"
+     inkscape:window-height="993"
+     inkscape:window-x="-40"
+     inkscape:window-y="164"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1">
+    <sodipodi:guide
+       position="960,540"
+       orientation="0,-1"
+       id="guide1"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="960,600"
+       orientation="0,1"
+       id="guide2"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="960,480"
+       orientation="0,1"
+       id="guide3"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="0,521.28713"
+       orientation="1,0"
+       id="guide4"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="1913.2764,940"
+       orientation="0,-1"
+       id="guide5"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="0,140"
+       orientation="0,-1"
+       id="guide6"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="1920,962.32973"
+       orientation="1,0"
+       id="guide7"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="960,600"
+       orientation="1,0"
+       id="guide8"
+       inkscape:locked="false" />
+    <inkscape:grid
+       id="grid8"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="10"
+       spacingy="10"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="6"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64px;line-height:1.25;font-family:'Science Gothic';-inkscape-font-specification:'Science Gothic, @wght=650,wdth=125,YOPQ=120';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;font-variation-settings:'wdth' 125, 'wght' 650, 'YOPQ' 120"
+       x="238.01605"
+       y="1550"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         x="238.01605"
+         y="1550"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64px;font-family:'Science Gothic';-inkscape-font-specification:'Science Gothic @wght=650,wdth=110,YOPQ=120';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;font-variation-settings:'wdth' 110, 'wght' 650, 'YOPQ' 120;text-align:center;text-anchor:middle">SYNESTHESIA</tspan><tspan
+         sodipodi:role="line"
+         x="238.01605"
+         y="1630"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:64px;font-family:'Science Gothic';-inkscape-font-specification:'Science Gothic @wght=650,wdth=110,YOPQ=120';font-variant-ligatures:none;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;font-variation-settings:'wdth' 110, 'wght' 650, 'YOPQ' 120;text-align:center;text-anchor:middle"
+         id="tspan7">ROAD</tspan></text>
+    <g
+       id="g2">
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;enable-background:accumulate;stop-color:#000000;stop-opacity:1;opacity:1;stroke:none"
+         d="m 50,1300 c -13.333333,0 -27.865651,2.8225 -41.4433594,9.6113 C -5.0210681,1316.4002 -20,1330 -20,1350 c 0,20 14.9789319,33.5998 28.5566406,40.3887 C 22.134349,1397.1775 36.666667,1400 50,1400 h 110 c 6.66667,0 17.13435,2.1775 23.55664,5.3887 C 189.97893,1408.5998 190,1410 190,1410 c 0,0 -0.0211,1.4002 -6.44336,4.6113 C 177.13435,1417.8225 166.66667,1420 160,1420 H -20 v 40 h 180 c 13.33333,0 27.86565,-2.8225 41.44336,-9.6113 C 215.02107,1443.5998 230,1430 230,1410 c 0,-20 -14.97893,-33.5998 -28.55664,-40.3887 C 187.86565,1362.8225 173.33333,1360 160,1360 H 50 c -6.666667,0 -17.134349,-2.1775 -23.556641,-5.3887 C 20.021068,1351.4002 20,1350 20,1350 c 0,0 0.02107,-1.4002 6.443359,-4.6113 C 32.865651,1342.1775 43.333333,1340 50,1340 h 180 v -40 z"
+         id="path9" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;enable-background:accumulate;stop-color:#000000;stop-opacity:1;opacity:1;stroke:none"
+         d="m 250,1300 v 40 h 180 c 6.66667,0 17.13435,2.1775 23.55664,5.3887 C 459.97893,1348.5998 460,1350 460,1350 c 0,0 -0.0211,1.4002 -6.44336,4.6113 C 447.13435,1357.8225 436.66667,1360 430,1360 H 296.77148 l 40.0586,35.0508 c 0,0 21.23196,18.5961 51.52148,37.0332 C 418.64108,1450.5211 458.33333,1470 500,1470 v -40 c -27.1301,0 -60.57823,-14.2502 -87.26563,-30 H 430 c 13.33333,0 27.86565,-2.8225 41.44336,-9.6113 C 485.02107,1383.5998 500,1370 500,1350 c 0,-20 -14.97893,-33.5998 -28.55664,-40.3887 C 457.86565,1302.8225 443.33333,1300 430,1300 Z"
+         id="path1" />
+    </g>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#g2"
+       id="use2"
+       transform="matrix(1.5244892,0,0,1.5244892,594.12259,-1571.4175)"
+       style="fill:#b3b3b3" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 600,180 420,0 H 0 V 1080 H 420 L 600,900 V 610 l 50,-50 h 430 V 360 L 960,240 H 600 Z"
+       id="path2"
+       sodipodi:nodetypes="ccccccccccccc" />
+  </g>
+</svg>

@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://868nvo23i8n8" path="res://addons/kenney_particle_pack/circle_05.png" id="4_36g15"]
 [ext_resource type="Texture2D" uid="uid://dil27tl3d85hr" path="res://assets/textures/scorearea.svg" id="5_q2dmg"]
 [ext_resource type="FontVariation" uid="uid://cxlh2wreioa5o" path="res://menu/theme/tabularmenufont.tres" id="7_0yoam"]
+[ext_resource type="PackedScene" uid="uid://cudxvl0sfy2us" path="res://entities/pvl_ani.tscn" id="7_gwrde"]
 [ext_resource type="Texture2D" uid="uid://owpby88d13pj" path="res://assets/textures/energyarea.svg" id="8_otm2r"]
 [ext_resource type="Texture2D" uid="uid://5q8cu3on2cso" path="res://assets/textures/energybarempty.svg" id="9_jycet"]
 [ext_resource type="Texture2D" uid="uid://rc6bir30grrf" path="res://assets/textures/energybar.svg" id="10_nbke4"]
@@ -1511,7 +1512,21 @@ grow_vertical = 2
 pivot_offset = Vector2(256, 256)
 texture = ExtResource("3_0mt4k")
 
-[node name="PhraseValueLabel" type="Label" parent="HUD" unique_id=620704031]
+[node name="PhraseValue" type="Control" parent="HUD" unique_id=2012156817]
+custom_minimum_size = Vector2(170, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 163.0
+offset_top = -100.0
+offset_right = 333.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PhraseValueLabel" type="Label" parent="HUD/PhraseValue" unique_id=620704031]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(170, 0)
@@ -1521,18 +1536,39 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 207.0
-offset_top = -100.0
-offset_right = 289.0
-offset_bottom = -1.0
+offset_left = -85.0
+offset_top = -50.0
+offset_right = 85.0
+offset_bottom = 49.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(85, 50)
+pivot_offset_ratio = Vector2(0.5, 0.5)
 size_flags_horizontal = 8
 text = "0"
 label_settings = SubResource("LabelSettings_scy1h")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="PhraseValueAnims" type="Control" parent="HUD/PhraseValue" unique_id=313056461]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PvlAni1" parent="HUD/PhraseValue/PhraseValueAnims" unique_id=894985603 instance=ExtResource("7_gwrde")]
+visible = false
+layout_mode = 1
+
+[node name="PvlAni2" parent="HUD/PhraseValue/PhraseValueAnims" unique_id=200128491 instance=ExtResource("7_gwrde")]
+visible = false
+layout_mode = 1
+
+[node name="PvlAni3" parent="HUD/PhraseValue/PhraseValueAnims" unique_id=2038405290 instance=ExtResource("7_gwrde")]
+visible = false
+layout_mode = 1
 
 [node name="EnergyArea" type="TextureRect" parent="HUD" unique_id=1421754843]
 layout_mode = 1

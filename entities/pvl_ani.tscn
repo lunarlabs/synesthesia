@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cudxvl0sfy2us"]
+
+[ext_resource type="FontVariation" uid="uid://de56o0qyx4dvi" path="res://menu/theme/score.tres" id="1_krn4e"]
+[ext_resource type="Script" uid="uid://cgwni5gcs7rax" path="res://entities/pvl_ani.gd" id="2_6r2p5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_scy1h"]
+font = ExtResource("1_krn4e")
+font_size = 56
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[node name="PvlAni" type="Label" unique_id=894985603]
+z_index = -1
+custom_minimum_size = Vector2(170, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -85.0
+offset_top = -49.5
+offset_right = 85.0
+offset_bottom = 49.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(85, 50)
+size_flags_horizontal = 8
+text = "xx"
+label_settings = SubResource("LabelSettings_scy1h")
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("2_6r2p5")

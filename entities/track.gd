@@ -68,7 +68,7 @@ signal started_phrase(phrase_score_value: int, start_measure: int, measure_count
 signal track_activated(phrase_score_value: int, start_measure: int)
 signal streak_broken
 signal inactive_phrase_missed()
-signal active_phrase_missed
+signal active_phrase_missed(phrase_score_value: int)
 signal note_hit(timing: float)
 
 func _enter_tree():
@@ -153,7 +153,7 @@ func _process_manual(current_time: float):
 			if current_phrase_index < track_data.phrase_note_indices.size() \
 			and note_idx >= track_data.phrase_first_note_indices[current_phrase_index] \
 			and note_idx <= track_data.phrase_last_note_indices[current_phrase_index]:
-				active_phrase_missed.emit()
+				active_phrase_missed.emit(track_data.phrase_note_counts[current_phrase_index])
 				streak_broken.emit()
 				_advance_phrase()
 
@@ -245,7 +245,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 				phrase_notes_blasted = 0
 				song_node.change_track_volume(track_index, MUTED_VOLUME)
 				blasting_phrase = false
-				active_phrase_missed.emit()
+				active_phrase_missed.emit(track_data.phrase_note_counts[current_phrase_index])
 				streak_broken.emit()
 				_advance_phrase()
 			return
@@ -284,7 +284,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 				phrase_notes_blasted = 0
 				song_node.change_track_volume(track_index, MUTED_VOLUME)
 				blasting_phrase = false
-				active_phrase_missed.emit()
+				active_phrase_missed.emit(track_data.phrase_note_counts[current_phrase_index])
 				streak_broken.emit()
 				_advance_phrase()
 
@@ -383,7 +383,7 @@ func set_active(active: bool):
 			blasting_phrase = false
 			phrase_notes_blasted = 0
 #			print("  Track %d: Deactivating while blasting phrase, breaking streak" % track_index)
-			active_phrase_missed.emit()
+			active_phrase_missed.emit(track_data.phrase_note_counts[current_phrase_index])
 			streak_broken.emit()
 			_advance_phrase()
 	if not active and song_node.get_track_volume(track_index) != MUTED_VOLUME:

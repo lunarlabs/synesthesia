@@ -74,7 +74,7 @@ var _last_streak_break_measure: int = -1
 @onready var hud = $HUD
 @onready var lbl_score = %ScoreLabel
 @onready var lbl_streak = %StreakLabel
-@onready var lbl_phrase_value = $HUD/PhraseValueLabel
+@onready var lbl_phrase_value = %PhraseValueLabel
 @onready var lbl_auto_blast = $HUD/AutoblastLabel
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 @onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
@@ -82,10 +82,10 @@ var _last_streak_break_measure: int = -1
 signal song_failed(stats)
 signal song_finished(stats)
 
+var pv_anims: Array
+var pv_pointer := 0
 var lead_distance: float = 0.0
 var energy_tween: Tween
-
-# FIXME: AudioStreamSynchronized is a thing?! HOLY FREAKING CRAP WE HAVE TO REFACTOR FOR THIS
 
 func _enter_tree() -> void:
 	manager_node = get_parent() as SynRoadSongManager
@@ -188,6 +188,7 @@ func _ready():
 				%EnergyBar.show()
 				%EnergyBar.value = energy
 	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
+	pv_anims = %PhraseValueAnims.get_children()
 	print("Precompiling shaders...")
 	for i in range(3):
 		await get_tree().process_frame
@@ -324,11 +325,14 @@ func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_cou
 
 func _on_track_activated(note_count: int, start_measure: int):
 	_inactive_safeguard_measure = start_measure # Prevents another phrase on the same measure from breaking streak
-	score += note_count * min(streak, MAX_COMBO_MULTIPLIER)
+	var value = note_count * min(streak, MAX_COMBO_MULTIPLIER)
+	score += value
 	if streak > max_streak:
 		max_streak = streak
 	_phrases_completed += 1
 	lbl_phrase_value.hide()
+	pv_anims[pv_pointer].phrase_passed(value)
+	pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	%HUDAnimations.play("phrase_completed")
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
@@ -355,6 +359,7 @@ func _on_streak_broken():
 	_last_streak_break_measure = %Conductor.current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
+	lbl_phrase_value.hide()
 	match manager_node.energy_modifier:
 		0, 2:
 			energy_change(-1)
@@ -368,7 +373,6 @@ func _on_streak_broken():
 		3:
 			fail_song()
 			return
-	lbl_phrase_value.hide()
 #	print("Streak break, was %d at measure %d" % [streak, current_measure])
 	streak = 0
 	if had_streak:
@@ -377,7 +381,9 @@ func _on_streak_broken():
 		_streak_breaks += 1
 	lbl_streak.text = "x%d" % streak
 
-func _on_active_phrase_missed():
+func _on_active_phrase_missed(phrase_score_value: int):
+	pv_anims[pv_pointer].phrase_failed(phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
+	pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	_phrases_missed += 1
 
 func _on_inactive_phrase_missed():
