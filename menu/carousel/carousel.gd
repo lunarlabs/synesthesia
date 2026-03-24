@@ -20,6 +20,10 @@ var current_item: Dictionary:
 const ITEM_SPACING_PX := 6
 const COL_OFFSET_PX := 20
 const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
+const SCROLL_ANIM_DURATION := 0.15
+
+var _scroll_tween: Tween
+var _entry_height: float
 
 signal selection_changed(reference: Dictionary)
 signal song_selected(song_folder: String, difficulty: int)
@@ -56,7 +60,7 @@ func select_item(item: Dictionary):
 		&"song_single_difficulty":
 			song_selected.emit(item[&"folder_id"], item[&"difficulty_offset"])
 
-func navigate_into_submenu(submenu_item: Dictionary, emit:= true):
+func navigate_into_submenu(submenu_item: Dictionary, emit := true):
 	_back_stack.push_back(_current_menu_structure)
 	_current_menu_structure = submenu_item[&"children"]
 	_current_submenu_name = submenu_item[&"name"]
@@ -96,14 +100,34 @@ func navigate_back() -> bool:
 	return true
 #endregion
 
-func update_carousel(emit := true):
+func update_carousel(emit := true, animate_direction: int = 0):
 	for i in range(get_child_count()):
 		var entry = get_child(i)
 		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
 		entry.current_difficulty = _current_difficulty
 		entry.update_entry(_displayed_menu_structure[item_index])
+	if animate_direction != 0:
+		_animate_scroll(animate_direction)
 	if emit:
 		emit_currently_selected()
+
+func _animate_scroll(direction: int) -> void:
+	if _scroll_tween and _scroll_tween.is_valid():
+		_scroll_tween.kill()
+	_scroll_tween = create_tween().set_parallel(true)
+	_scroll_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+	var offset_y := _entry_height * direction # positive = items come from below
+	for i in range(get_child_count()):
+		var entry = get_child(i)
+		var home_y: float = entry.home_y
+		var home_left_offset: float = entry.home_left_offset
+		entry.position.y = home_y + offset_y
+		entry.offset_left = abs(entry.carousel_index + direction) * COL_OFFSET_PX
+		_scroll_tween.tween_property(entry, "position:y", home_y, SCROLL_ANIM_DURATION)
+		_scroll_tween.tween_property(entry, "offset_left", home_left_offset, SCROLL_ANIM_DURATION)
+		# Animate modulate: selected entry (carousel_index == 0) brightens, others dim
+		var target_color := Color.WHITE if entry.carousel_index == 0 else Color(0.5, 0.5, 0.5, 1.0)
+		_scroll_tween.tween_property(entry, "modulate", target_color, SCROLL_ANIM_DURATION)
 
 func emit_currently_selected():
 	selection_changed.emit(current_item)
@@ -116,6 +140,7 @@ func _ready():
 	# We need enough to fill the viewport, plus a few extra for scrolling
 	var instance = ENTRY_SCENE.instantiate()
 	var total_height = instance.get_size().y + ITEM_SPACING_PX
+	_entry_height = total_height
 	var viewport_height = get_viewport().get_visible_rect().size.y
 	var num_entries = int(viewport_height / total_height) + 1
 	if num_entries % 2 == 0:
@@ -125,12 +150,14 @@ func _ready():
 		if i != 0:
 			instance = ENTRY_SCENE.instantiate()
 		instance.position.y = entry_y_pos
+		instance.home_y = entry_y_pos
 		instance.anchor_right = 1.0
 		instance.offset_right = 0.0
 		@warning_ignore("integer_division")
 		var index = - num_entries / 2 + i
 		instance.carousel_index = index
-		instance.offset_left = abs(instance.carousel_index) * COL_OFFSET_PX
+		instance.home_left_offset = abs(instance.carousel_index) * COL_OFFSET_PX
+		instance.offset_left = instance.home_left_offset
 		instance.gui_input.connect(_on_entry_gui_input.bind(index))
 		instance.name = "Entry%d" % instance.carousel_index
 		add_child(instance)
@@ -138,17 +165,17 @@ func _ready():
 	fetch_menu_structure(false)
 
 func _unhandled_input(event: InputEvent):
-	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons\
+	if get_viewport().gui_get_focus_owner() in get_parent().subscreen_buttons \
 	or %ModifierContainer.visible:
 		return
 	if event.is_action_pressed("ui_up"):
 		get_viewport().set_input_as_handled()
 		_current_item_index = _get_index_at_offset(-1)
-		update_carousel()
+		update_carousel(true, -1)
 	elif event.is_action_pressed("ui_down"):
 		get_viewport().set_input_as_handled()
 		_current_item_index = _get_index_at_offset(1)
-		update_carousel()
+		update_carousel(true, 1)
 	elif event.is_action_pressed("ui_accept"):
 		select_item(current_item)
 	elif event.is_action_pressed("ui_cancel"):
