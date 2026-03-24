@@ -153,6 +153,7 @@ func _process_manual(current_time: float):
 			if current_phrase_index < track_data.phrase_note_indices.size() \
 			and note_idx >= track_data.phrase_first_note_indices[current_phrase_index] \
 			and note_idx <= track_data.phrase_last_note_indices[current_phrase_index]:
+				blasting_phrase = false
 				active_phrase_missed.emit(track_data.phrase_note_counts[current_phrase_index])
 				streak_broken.emit()
 				_advance_phrase()
