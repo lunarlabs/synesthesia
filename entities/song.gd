@@ -79,6 +79,7 @@ var _last_streak_break_measure: int = -1
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 @onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
 
+signal song_prepared
 signal song_failed(stats)
 signal song_finished(stats)
 
@@ -194,6 +195,9 @@ func _ready():
 		await get_tree().process_frame
 
 	_song_start()
+
+func _prepare_song():
+	pass
 
 func _song_start():
 	print("Starting song playback.")

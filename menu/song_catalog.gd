@@ -663,7 +663,7 @@ func make_menu_structure():
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
-			printerr("Failed to query songs for source: %s" % source.name)
+			push_warning("Failed to query songs for source: %s" % source.name)
 			continue
 		for j in result.size():
 			var info = result[j]
@@ -741,7 +741,7 @@ func make_menu_structure():
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
-			printerr("Failed to query songs for BPM range: %d-%d" % [bucket.min, bucket.max])
+			push_warning("Failed to query songs for BPM range: %d-%d" % [bucket.min, bucket.max])
 			continue
 		for j in result.size():
 			var info = result[j]
@@ -778,7 +778,7 @@ func make_menu_structure():
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
-			printerr("Failed to query songs for difficulty: %d" % i)
+			push_warning("Failed to query songs for difficulty: %d" % i)
 			continue
 		for j in result.size():
 			var info = result[j]

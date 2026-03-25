@@ -12,4 +12,4 @@ func _ready() -> void:
 	await SongCatalog.scan_for_songs(!library_file_exists)
 	SongCatalog.make_menu_structure()
 
-	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
+	get_tree().change_scene_to_file("res://menu/song_select.tscn")

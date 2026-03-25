@@ -131,23 +131,57 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	var load_result: Dictionary = {}
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	get_window().focus_exited.connect(_on_lose_focus)
-	print("Loading %s" % song_file)
-	song_data = load(song_file) as SongData
-	await get_tree().process_frame
-	if not song_data:
-		push_error("Failed to load song data from %s" % song_file)
-		return
-
-	# TODO: Put the heavy song loading stuff in a WorkerThreadPool thread
-	
 	song_name = song_file.get_file().get_slice(".", 0)
-	note_maps = _get_note_maps()
-	ChunkManager.manager_node = self # TODO: Make ChunkManager a child node, we don't need it running
+
+	var prepare_func = Callable(self , "_prepare_song_data").bind(load_result)
+	var task = WorkerThreadPool.add_task(prepare_func)
+	
+	ChunkManager.manager_node = self # TODO: Make ChunkManager a child node of Song, we don't need it running
 									 # in the menus (could also move chunk calculation there too)
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
+	
+	
+	# Connect pause menu buttons
+	btn_continue.pressed.connect(_on_continue_pressed)
+	btn_restart.pressed.connect(_on_restart_pressed)
+	btn_quit.pressed.connect(_on_quit_pressed)
+	
+	# Connect result screen buttons
+	var result_exit_btn = result_screen.get_node("%ExitButton") as Button
+	var result_restart_btn = result_screen.get_node("%RestartButton") as Button
+	result_exit_btn.pressed.connect(_on_quit_pressed)
+	result_restart_btn.pressed.connect(_on_restart_pressed)
+	
+	# Connect fail screen buttons
+	
+	song_instance = SONG_SCENE.instantiate() as SynRoadSong
+
+	song_instance.song_failed.connect(_on_song_failed)
+	song_instance.song_finished.connect(_on_song_finished)
+	var err = WorkerThreadPool.wait_for_task_completion(task)
+	if err != OK:
+		push_error("Failed to wait for task completion")
+		return
+	if not load_result.get("success", false):
+		return
+	print("handing over to song node now")
+	add_child.call_deferred(song_instance)
+
+func _prepare_song_data(out_load_result: Dictionary) -> void:
+	song_data = load(song_file) as SongData
+	if not song_data:
+		push_error("Failed to load song data from %s" % song_file)
+		out_load_result["success"] = false
+		return
+	note_maps = _get_note_maps()
+	if note_maps.size() == 0:
+		push_error("No note maps found for song %s" % song_file)
+		out_load_result["success"] = false
+		return
 	seconds_per_beat = song_data.seconds_per_beat
 	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
 	print("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
@@ -158,7 +192,7 @@ func _ready() -> void:
 	total_measures = song_data.lead_in_measures + song_data.playable_measures
 	finish_time = total_measures * seconds_per_beat * BEATS_PER_MEASURE
 	for i in range(total_measures + 2):
-		print("calculate chunk %d" % i)
+		#print("calculate chunk %d" % i)
 		measure_times.append(seconds_per_beat * BEATS_PER_MEASURE * i)
 		measure_positions.append(i * length_per_beat * BEATS_PER_MEASURE)
 		@warning_ignore("integer_division")
@@ -196,27 +230,9 @@ func _ready() -> void:
 	if track_data.size() == 0:
 		push_error("No valid track data found for selected difficulty %d" % difficulty)
 		OS.alert("The selected song does not have valid note data for the chosen difficulty. Please select a different difficulty or song.")
+		out_load_result["success"] = false
 		return
-	
-	# Connect pause menu buttons
-	btn_continue.pressed.connect(_on_continue_pressed)
-	btn_restart.pressed.connect(_on_restart_pressed)
-	btn_quit.pressed.connect(_on_quit_pressed)
-	
-	# Connect result screen buttons
-	var result_exit_btn = result_screen.get_node("%ExitButton") as Button
-	var result_restart_btn = result_screen.get_node("%RestartButton") as Button
-	result_exit_btn.pressed.connect(_on_quit_pressed)
-	result_restart_btn.pressed.connect(_on_restart_pressed)
-	
-	# Connect fail screen buttons
-	
-	song_instance = SONG_SCENE.instantiate() as SynRoadSong
-
-	song_instance.song_failed.connect(_on_song_failed)
-	song_instance.song_finished.connect(_on_song_finished)
-	print("handing over to song node now")
-	add_child.call_deferred(song_instance)
+	out_load_result["success"] = true
 
 func _fetch_track_data() -> void:
 	preprocessor = SynRoadTrackPreprocessor.new()
@@ -374,7 +390,7 @@ func _on_restart_pressed() -> void:
 func _on_quit_pressed() -> void:
 	get_tree().paused = false
 #	SessionManager.save_campaign_data()
-	get_tree().change_scene_to_file("res://menu/SongSelect.tscn")
+	get_tree().change_scene_to_file("res://menu/song_select.tscn")
 
 func _on_lose_focus():
 	if not get_tree().paused:
