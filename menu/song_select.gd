@@ -129,8 +129,10 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
+	var vol_tween = create_tween()
+	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 1.0)
+	vol_tween.tween_callback(Transition.start_transition_out)
 	
-
 func _load_async():
 	print("Loading song catalog (async)...")
 	SongCatalog.start_reload_async()

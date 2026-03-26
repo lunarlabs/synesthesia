@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://20prs1tmvmbh"]
 
+[ext_resource type="Script" uid="uid://cpd46t60hchtp" path="res://menu/transition.gd" id="1_2bhp6"]
 [ext_resource type="Shader" uid="uid://cn3r0f32is5so" path="res://assets/shaders/hex_pulse.gdshader" id="1_51re6"]
 [ext_resource type="Shader" uid="uid://b6570yhqwpu5q" path="res://assets/shaders/vignette.gdshader" id="2_jb3rd"]
 [ext_resource type="Texture2D" uid="uid://df5bdpqu2ggem" path="res://assets/textures/logo/logo.svg" id="3_fq6ve"]
@@ -137,7 +138,7 @@ tracks/10/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Color(1, 1, 1, 1)]
+"values": [Color(1, 1, 1, 0)]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
@@ -237,7 +238,7 @@ tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.76666665),
 "transitions": PackedFloat32Array(0.5, 1),
 "update": 0,
-"values": [Vector2(1.75, 1.75), Vector2(1, 1)]
+"values": [Vector2(3, 3), Vector2(1, 1)]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
@@ -246,7 +247,7 @@ tracks/7/path = NodePath("HexBackground:material:shader_parameter/base_alpha")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.76666665),
+"times": PackedFloat32Array(0, 1.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 0.07]
@@ -258,7 +259,7 @@ tracks/8/path = NodePath("HexBackground:material:shader_parameter/pulse_strength
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.76666665),
+"times": PackedFloat32Array(0, 0.16666667),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 0.1850000087875]
@@ -422,7 +423,7 @@ _data = {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fq6ve"]
 shader = ExtResource("1_51re6")
 shader_parameter/speed = 0.8
-shader_parameter/line_width = 0.038000001804999996
+shader_parameter/line_width = 0.03800000180499999
 shader_parameter/line_color = Color(0.1, 0.49, 0.91, 1)
 shader_parameter/base_alpha = 0.0
 shader_parameter/pulse_strength = 0.0
@@ -433,18 +434,21 @@ shader_parameter/strength = 0.0
 shader_parameter/radius = 0.6
 
 [node name="Transition" type="CanvasLayer" unique_id=1199933552]
+process_mode = 3
+script = ExtResource("1_2bhp6")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=505794100]
 libraries/ = SubResource("AnimationLibrary_2bhp6")
 
 [node name="Scanlines" type="ColorRect" parent="." unique_id=553872973]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.10865607, 0.07145923, 0.30092227, 1)
+color = Color(0, 0, 0, 1)
 
 [node name="HexBackground" type="ColorRect" parent="." unique_id=27049521]
 material = SubResource("ShaderMaterial_fq6ve")
@@ -481,11 +485,12 @@ anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -260.0
-offset_top = -171.0
+offset_top = -140.0
 offset_right = 260.0
-offset_bottom = -1.0
+offset_bottom = 30.000122
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.5, 0.5)
 pivot_offset_ratio = Vector2(0.5, 0.5)
 texture = ExtResource("3_fq6ve")
 
@@ -497,10 +502,13 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -302.5
-offset_top = 37.0
+offset_top = -40.0
 offset_right = 302.5
-offset_bottom = 207.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.5, 0.5)
 pivot_offset_ratio = Vector2(0.5, 0.5)
 texture = ExtResource("4_2bhp6")
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

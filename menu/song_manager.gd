@@ -373,6 +373,7 @@ func _on_continue_pressed() -> void:
 	_toggle_pause()
 
 func _on_restart_pressed() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	get_tree().paused = false
 	pause_panel.hide()
 	result_screen.hide()
@@ -388,9 +389,17 @@ func _on_restart_pressed() -> void:
 #	song_instance.start_song()
 
 func _on_quit_pressed() -> void:
-	get_tree().paused = false
+	Transition.start_transition_in()
 #	SessionManager.save_campaign_data()
-	get_tree().change_scene_to_file("res://menu/song_select.tscn")
+	await Transition.animation_completed
+	if get_tree().paused:
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://menu/song_select.tscn")
+	else:
+		var vol_tween = create_tween()
+		vol_tween.tween_property(song_instance.get_node("SongPlayer"), "volume_db", -80.0, 1.0)
+		await vol_tween.finished
+		get_tree().change_scene_to_file("res://menu/song_select.tscn")
 
 func _on_lose_focus():
 	if not get_tree().paused:
