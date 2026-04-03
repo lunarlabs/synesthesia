@@ -244,6 +244,10 @@ func _unhandled_input(event: InputEvent):
 func _on_energy_option_pressed() -> void:
 	energy_modifier_index = (energy_modifier_index + 1) % ENERGY_MODIFIER_NAMES.size()
 	%EnergyOption.text = tr(ENERGY_MODIFIER_NAMES[energy_modifier_index])
+	# No Recover locks checkpoint modifier to Disabled (No Checkpoints)
+	if energy_modifier_index == 2 and checkpoint_modifier_index != 1:
+		checkpoint_modifier_index = 1
+		%CheckpointOption.text = tr(CHECKPOINT_MODIFIER_NAMES[checkpoint_modifier_index])
 
 
 func _on_reset_option_pressed() -> void:
@@ -259,6 +263,9 @@ func _on_hi_speed_option_pressed() -> void:
 
 
 func _on_checkpoint_option_pressed() -> void:
+	# No Recover locks checkpoint modifier to Disabled
+	if energy_modifier_index == 2:
+		return
 	checkpoint_modifier_index = (checkpoint_modifier_index + 1) % CHECKPOINT_MODIFIER_NAMES.size()
 	%CheckpointOption.text = tr(CHECKPOINT_MODIFIER_NAMES[checkpoint_modifier_index])
 

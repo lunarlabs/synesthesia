@@ -127,6 +127,8 @@ var chunk_count := 0
 var checkpoint_positions: PackedFloat32Array = []
 var checkpoint_measures: PackedInt32Array = []
 var suppressed_measures: Array[bool] = []
+## For barrier mode: array of {checkpoint, zone_start, streak_start, reset_at} dicts
+var barrier_zones: Array[Dictionary] = []
 var hit_window: float
 var miss_window: float
 
@@ -214,13 +216,27 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 			1:
 				# Disabled -- leave the checkpoint gates as is but they won't do anything
 				pass
-			# TODO: Barrier logic.
-			2:
-				pass
-			3:
-				pass
-			4:
-				pass
+			2, 3, 4:
+				# Barrier mode: set up 10-measure approach zone
+				# Zone start clamped to last checkpoint measure (or lead-in boundary)
+				var last_cp = checkpoint_measures[-2] if checkpoint_measures.size() > 1 else song_data.lead_in_measures
+				var zone_start = max(last_cp, actual_measure - 10)
+				# Suppress first 2 measures of zone (approach buffer)
+				if zone_start >= 0 and zone_start < total_measures:
+					suppressed_measures[zone_start] = true
+				if zone_start + 1 >= 0 and zone_start + 1 < total_measures:
+					suppressed_measures[zone_start + 1] = true
+				# Suppress C and C+1 (post-checkpoint)
+				suppressed_measures[actual_measure] = true
+				if actual_measure + 1 < total_measures:
+					suppressed_measures[actual_measure + 1] = true
+				# Record barrier zone for preprocessor
+				barrier_zones.append({
+					"checkpoint": actual_measure,
+					"zone_start": zone_start,
+					"streak_start": zone_start + 2,
+					"reset_at": min(actual_measure + 2, total_measures),
+				})
 
 	track_data.resize(song_data.tracks.size())
 	_fetch_track_data()
@@ -252,6 +268,7 @@ func _fetch_track_data() -> void:
 			"track_reset": fast_track_reset,
 			"length_per_beat": length_per_beat,
 			"total_measures": total_measures,
+			"barrier_zones": barrier_zones,
 		}
 		preprocessor.queue_job(job)
 

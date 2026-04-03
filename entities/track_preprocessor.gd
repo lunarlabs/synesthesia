@@ -158,7 +158,36 @@ func _process_job(job: Dictionary):
 		else:
 			phrase_first_note_indices.append(-1)
 			phrase_last_note_indices.append(-1)
+	
+	# Fourth pass: barrier zone activation capping
+	var barrier_zones = job.get("barrier_zones", [])
+	var barrier_cached: Dictionary[int, int] = {}  # keyed by measure number
+	var phrase_starts_list = phrase_lengths.keys()
+	
+	for zone in barrier_zones:
+		var cp: int = zone.checkpoint
+		var bz_zone_start: int = zone.zone_start
+		var bz_streak_start: int = zone.streak_start
+		var bz_reset_at: int = zone.reset_at
+		
+		for m in phrase_starts_list:
+			# A. Phrases BEFORE the zone: cap activation at zone_start
+			if m < bz_zone_start:
+				if phrase_next_measures.has(m) and phrase_next_measures[m] > bz_zone_start:
+					phrase_next_measures[m] = bz_zone_start
 			
+			# B. Phrases IN the streak zone (streak_start to C-1): cap at reset_at, cache original
+			elif m >= bz_streak_start and m < cp:
+				if phrase_next_measures.has(m):
+					barrier_cached[m] = phrase_next_measures[m]
+					phrase_next_measures[m] = bz_reset_at
+	
+	# Convert barrier_cached (keyed by measure) to be keyed by phrase index
+	var barrier_cached_by_idx: Dictionary[int, int] = {}
+	for i in range(phrase_starts_list.size()):
+		if barrier_cached.has(phrase_starts_list[i]):
+			barrier_cached_by_idx[i] = barrier_cached[phrase_starts_list[i]]
+	
 	result.phrase_starts = PackedInt32Array(phrase_lengths.keys())
 	result.phrase_lengths = PackedInt32Array(phrase_lengths.values())
 	result.phrase_note_indices = phrase_note_indices.values()
@@ -168,6 +197,7 @@ func _process_job(job: Dictionary):
 	result.phrase_next_measures = PackedInt32Array(phrase_next_measures.values())
 	result.phrase_first_note_indices = PackedInt32Array(phrase_first_note_indices)
 	result.phrase_last_note_indices = PackedInt32Array(phrase_last_note_indices)
+	result.barrier_cached_next_measures = barrier_cached_by_idx
 	return result
 		
 func take_completed():

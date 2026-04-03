@@ -2,6 +2,7 @@ extends Node3D
 
 var gate_location: int
 var fadeout_time: float = 2.25
+var is_barrier: bool = false
 @onready var particles = $GPUParticles3D as GPUParticles3D
 
 func _on_song_new_measure(measure):

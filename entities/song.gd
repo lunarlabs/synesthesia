@@ -63,6 +63,7 @@ var closest_track_marker_measure: int = -1 # The closest track marker measure no
 var _targets: Array
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
+var _barrier_threshold: int = 0 # 0 = no barrier, 2/3/4 = streak required
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -135,6 +136,11 @@ func _ready():
 	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
+	# Initialize barrier threshold before gate setup
+	match manager_node.checkpoint_modifier:
+		2: _barrier_threshold = 2
+		3: _barrier_threshold = 3
+		4: _barrier_threshold = 4
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	print("instantiating checkpoints")
 	%Conductor.new_measure.connect(start_gate._on_song_new_measure)
@@ -143,7 +149,13 @@ func _ready():
 	start_gate.fadeout_time = checkpoint_fade_time
 	start_gate.gate_location = lead_in_measures
 	start_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
-	start_gate.get_node("BoundaryLine").visible = false
+	if _barrier_threshold > 0:
+		# Barrier mode: show barrier appearance on start gate (streak starts at 0)
+		start_gate.get_node("BoundaryLine").visible = true
+		start_gate.is_barrier = true
+		start_gate.get_node("GPUParticles3D").emitting = false
+	else:
+		start_gate.get_node("BoundaryLine").visible = false
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
@@ -167,7 +179,9 @@ func _ready():
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
-		checkpoint.get_node("BoundaryLine").visible = manager_node.checkpoint_modifier == 0
+		checkpoint.get_node("BoundaryLine").visible = (manager_node.checkpoint_modifier == 0 or _barrier_threshold > 0)
+		if _barrier_threshold > 0:
+			checkpoint.is_barrier = true
 		add_child(checkpoint)
 	if manager_node.autoblast:
 		%EnergyBar.hide()
@@ -319,6 +333,8 @@ func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_cou
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
 	lbl_phrase_value.show()
+	if _barrier_threshold > 0:
+		_update_barrier_visual()
 	# Tell inactive tracks to position their markers after this phrase
 	var next_phrase_measure = start_measure + measure_count
 	for i in tracks.size():
@@ -340,6 +356,13 @@ func _on_track_activated(note_count: int, start_measure: int):
 	%HUDAnimations.play("phrase_completed")
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
+	if _barrier_threshold > 0:
+		if streak >= _barrier_threshold:
+			%BarrierWarningLbl.text = "HUD_BARRIER_MAINTAIN"
+			%BarrierWarningLbl.remove_theme_color_override("font_color")
+		else:
+			%BarrierWarningLbl.text = "HUD_BARRIER_WARNING"
+			%BarrierWarningLbl.add_theme_color_override("font_color", Color.ORANGE_RED)
 	match manager_node.energy_modifier:
 		0:
 			# Gain 1 energy per successful phrase
@@ -382,12 +405,18 @@ func _on_streak_broken():
 			return
 #	print("Streak break, was %d at measure %d" % [streak, current_measure])
 	streak = 0
+	if _barrier_threshold > 0:
+		%BarrierWarningLbl.text = "HUD_BARRIER_WARNING"
+		%BarrierWarningLbl.add_theme_color_override("font_color", Color.ORANGE_RED)
 	if had_streak:
 #		print("Stat updated for proper streak break.")
 		%HUDAnimations.play("phrase_fail")
 		_streak_breaks += 1
 	lbl_streak.text = "x%d" % streak
+	if _barrier_threshold > 0:
+		_update_barrier_visual()
 
+@warning_ignore("unused_parameter")
 func _on_active_phrase_missed(phrase_score_value: int):
 	_phrases_missed += 1
 
@@ -693,10 +722,14 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			if measure == checkpoint_measure:
 				print("Reached checkpoint at measure %d" % checkpoint_measure)
 				_next_checkpoint += 1
-				if manager_node.energy_modifier in [0, 1] and manager_node.checkpoint_modifier == 0:
-					%TargetPfx.emitting = true
-					energy_change(2) # Reward 2 energy at checkpoints for energy modifier 0
-#				print("measure %d/%d" % [current_measure + 1, total_measures])
+				if _barrier_threshold > 0:
+					_process_barrier_crossing()
+				elif manager_node.checkpoint_modifier == 0:
+					if manager_node.energy_modifier in [0, 1]:
+						%TargetPfx.emitting = true
+						energy_change(2) # Reward 2 energy at checkpoints for energy modifier 0
+			elif _barrier_threshold > 0 and measure == checkpoint_measure - 10: # Start of warning zone
+				%BarrierWarningContainer.show()
 		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
 			var any_unactivated = false
 			for track in tracks:
@@ -721,6 +754,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			lead_in_measures -= 1
 		elif lead_in_measures == 0:
 			lead_in_measures = -1
+			if _barrier_threshold > 0:
+				_process_barrier_crossing() # Start gate barrier (always fails, streak = 0)
 						
 		if lead_in_measures < 1:
 			# Cache active track node reference for this frame
@@ -728,3 +763,47 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			
 
 	#lblDebugInfo.text = debug_info()
+
+func _process_barrier_crossing() -> void:
+	if streak >= _barrier_threshold:
+		# SUCCESS — energy bonus + restore cached activations on all tracks
+		print("Barrier crossed successfully (streak %d >= %d)" % [streak, _barrier_threshold])
+		%TargetPfx.emitting = true
+		energy_change(2)
+		for track in tracks:
+			var t = track as SynRoadTrack
+			if t.last_activated_phrase_idx >= 0:
+				t.restore_barrier_activation(t.last_activated_phrase_idx)
+		_show_barrier_message("HUD_BARRIER_SUCCESS")
+	else:
+		# FAILURE — energy penalty, tracks stay reset at C+2
+		print("Barrier failed (streak %d < %d)" % [streak, _barrier_threshold])
+		_apply_barrier_penalty()
+		_show_barrier_message("HUD_BARRIER_FAILED")
+
+func _apply_barrier_penalty() -> void:
+	if energy >= 6:
+		energy_change(-4)
+	elif energy > 2:
+		var penalty = - (energy - 2)
+		energy_change(penalty)
+	# else: energy <= 2, no damage
+	
+	if energy <= 0:
+		fail_song()
+
+func _update_barrier_visual() -> void:
+	# TODO: Find out what the next checkpoint is instead of using the start gate
+	var start_gate = get_node_or_null("SongStart")
+	if start_gate:
+		var above_threshold = streak >= _barrier_threshold
+		start_gate.get_node("GPUParticles3D").emitting = above_threshold
+		# TODO: Toggle barrier-specific geometry visibility inversely
+	# Update barrier warning message based on streak vs threshold
+
+func _show_barrier_message(message_key: String) -> void:
+	%BarrierWarningLbl.text = message_key
+	%BarrierWarningContainer.show()
+	# Auto-hide after a delay
+	var timer = get_tree().create_timer(2.0)
+	timer.timeout.connect(%BarrierWarningContainer.hide)

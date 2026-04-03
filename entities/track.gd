@@ -37,6 +37,7 @@ var marker_measure_index: int = 0
 var current_phrase_index: int = 0
 var phrase_notes_blasted: int = 0
 var blasting_phrase: bool = false
+var last_activated_phrase_idx: int = -1
 var next_note_idx_per_lane: Array[int] = [0, 0, 0, ] # Track which note we're processing next in each lane
 var next_note_idx := 0 # Track which note we're processing next in autoblast
 var _active_track := false
@@ -363,7 +364,6 @@ func move_marker(measure_index: int):
 	marker.position.z = track_data.phrase_marker_positions[measure_index].y
 	marker_measure_index = measure_index
 	# tell the song node to update its marker cache with the actual measure number
-	# tell the song node to update its marker cache with the actual measure number
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[marker_measure_index])
 
 func marker_measure() -> int:
@@ -427,6 +427,7 @@ func request_chunks(furthest: int):
 
 func activate(phrase_idx: int):
 #	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+	last_activated_phrase_idx = phrase_idx
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
 	blasting_phrase = false
@@ -452,6 +453,26 @@ func activate(phrase_idx: int):
 func _play_pfx(start_measure: int):
 	pfx.position.z = start_measure * - (BEATS_PER_MEASURE * length_per_beat)
 	pfx.emitting = true
+
+func restore_barrier_activation(phrase_idx: int) -> void:
+	if not track_data.barrier_cached_next_measures.has(phrase_idx):
+		return
+	var original_next = track_data.barrier_cached_next_measures[phrase_idx]
+	var current_reset = reset_measure
+	if original_next <= current_reset:
+		return # Nothing to extend
+	reset_measure = original_next
+	song_node._update_track_reset_cache(track_index, reset_measure)
+	# Extend activation: hide geometry and auto-blast notes from current_reset to original_next
+	for i in range(current_reset, original_next):
+		if i < measure_nodes.size() and measure_nodes[i]:
+			var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
+			cube.hide()
+		if i in track_data.notes_in_measure.keys():
+			for j in track_data.notes_in_measure[i]:
+				if j < note_nodes.size() and note_nodes[j]:
+					note_nodes[j].blast(false)
+	_advance_phrase()
 
 func current_measure_is_unactivated() -> bool:
 	return conductor.current_measure >= reset_measure and conductor.current_measure in track_data.phrase_starts
@@ -488,3 +509,6 @@ class GameplayTrackData:
 	var phrase_next_measures: PackedInt32Array = []
 	var phrase_first_note_indices: PackedInt32Array = []
 	var phrase_last_note_indices: PackedInt32Array = []
+	## Original (uncapped) phrase_next_measures for phrases in barrier streak zones.
+	## Key: phrase index, Value: original next measure
+	var barrier_cached_next_measures: Dictionary[int, int] = {}
