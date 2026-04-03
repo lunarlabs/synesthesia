@@ -730,6 +730,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 						energy_change(2) # Reward 2 energy at checkpoints for energy modifier 0
 			elif _barrier_threshold > 0 and measure == checkpoint_measure - 10: # Start of warning zone
 				%BarrierWarningContainer.show()
+				for i in tracks.size():
+					change_track_volume(i, -6.0)
 		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
 			var any_unactivated = false
 			for track in tracks:
@@ -775,6 +777,16 @@ func _process_barrier_crossing() -> void:
 			if t.last_activated_phrase_idx >= 0:
 				t.restore_barrier_activation(t.last_activated_phrase_idx)
 		_show_barrier_message("HUD_BARRIER_SUCCESS")
+		for i in tracks.size():
+			change_track_volume(i, -6.0)
+		if manager_node.autoblast:
+			# Since there's activations after the barrier, we need to update the active track
+			var next_track = _find_best_track_for_autoblast()
+			if next_track != active_track:
+				print("Autoblast: Updating active track from %d to %d" % [active_track, next_track])
+				_switch_active_track(next_track)
+			else:
+				print("Autoblast: Staying on track %d" % active_track)
 	else:
 		# FAILURE — energy penalty, tracks stay reset at C+2
 		print("Barrier failed (streak %d < %d)" % [streak, _barrier_threshold])
