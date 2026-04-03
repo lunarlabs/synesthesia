@@ -135,13 +135,13 @@ mesh = SubResource("PlaneMesh_1e67b")
 
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
-[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 1731398852) index="0" unique_id=1217249057]
+[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 941155593) index="0" unique_id=23098908]
 surface_material_override/0 = SubResource("ShaderMaterial_2ivja")
 
-[node name="RightGate" parent="Gate" index="1" unique_id=1542456635]
+[node name="RightGate" parent="Gate" index="1" unique_id=229744792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
 
-[node name="GateHalo_001" parent="Gate/RightGate" index="0" unique_id=1606980335]
+[node name="GateHalo_001" parent="Gate/RightGate" index="0" unique_id=224203035]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [editable path="Gate"]
