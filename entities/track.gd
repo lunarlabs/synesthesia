@@ -471,7 +471,7 @@ func restore_barrier_activation(phrase_idx: int) -> void:
 		if i in track_data.notes_in_measure.keys():
 			for j in track_data.notes_in_measure[i]:
 				if j < note_nodes.size() and note_nodes[j]:
-					note_nodes[j].blast(false)
+					note_nodes[j].blast(true)
 	_advance_phrase()
 
 func current_measure_is_unactivated() -> bool:

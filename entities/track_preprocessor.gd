@@ -174,7 +174,7 @@ func _process_job(job: Dictionary):
 			# A. Phrases BEFORE the zone: cap activation at zone_start
 			if m < bz_zone_start:
 				if phrase_next_measures.has(m) and phrase_next_measures[m] > bz_zone_start:
-					phrase_next_measures[m] = bz_zone_start
+					phrase_next_measures[m] = bz_streak_start
 			
 			# B. Phrases IN the streak zone (streak_start to C-1): cap at reset_at, cache original
 			elif m >= bz_streak_start and m < cp:
