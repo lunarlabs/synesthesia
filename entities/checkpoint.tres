@@ -1,0 +1,41 @@
+[gd_resource type="VisualShader" format=3 uid="uid://c5o5up1c5jgkn"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_twb6v"]
+input_name = "custom"
+
+[sub_resource type="VisualShaderNodeParticleRandomness" id="VisualShaderNodeParticleRandomness_ir6nj"]
+default_input_values = [1, Vector3(-1.25, -1.75, 0), 2, Vector3(1.25, 6.25, 0)]
+op_type = 2
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_8b0vp"]
+default_input_values = [0, 0.0, 1, 6.25, 2, 0.0]
+
+[sub_resource type="VisualShaderNodeExpression" id="VisualShaderNodeExpression_wadh6"]
+size = Vector2(268, 240.00002)
+expression = "output0 = 1.25 + (float(tracks - 1) * 2.5);"
+
+[sub_resource type="VisualShaderNodeIntConstant" id="VisualShaderNodeIntConstant_wahii"]
+output_port_for_preview = 0
+constant = 6
+
+[resource]
+mode = 2
+flags/collision_use_scale = false
+flags/disable_force = false
+flags/disable_velocity = false
+flags/keep_data = false
+nodes/start/3/node = SubResource("VisualShaderNodeParticleRandomness_ir6nj")
+nodes/start/3/position = Vector2(20, 240)
+nodes/start/4/node = SubResource("VisualShaderNodeVectorCompose_8b0vp")
+nodes/start/4/position = Vector2(-220, 280)
+nodes/start/5/node = SubResource("VisualShaderNodeExpression_wadh6")
+nodes/start/5/position = Vector2(-740, 320)
+nodes/start/5/size = Vector2(268, 240.00002)
+nodes/start/5/input_ports = "0,1,tracks;"
+nodes/start/5/output_ports = "0,0,output0;"
+nodes/start/5/expression = "output0 = 1.25 + (float(tracks - 1) * 2.5);"
+nodes/start/6/node = SubResource("VisualShaderNodeIntConstant_wahii")
+nodes/start/6/position = Vector2(-980, 380)
+nodes/start/connections = PackedInt32Array(3, 0, 0, 4, 4, 0, 3, 2, 6, 0, 5, 0, 5, 0, 4, 0)
+nodes/process/2/node = SubResource("VisualShaderNodeInput_twb6v")
+nodes/process/2/position = Vector2(-260, 220)

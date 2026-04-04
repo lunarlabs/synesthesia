@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://che0tg4hwisbv" path="res://entities/checkpoint.gd" id="1_hjeaj"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_l3rob"]
 [ext_resource type="Texture2D" uid="uid://pu8tsidf1snv" path="res://addons/kenney_particle_pack/star_02.png" id="3_l3rob"]
+[ext_resource type="Texture2D" uid="uid://bonpfjdyaxk1v" path="res://addons/kenney_particle_pack/rotated/trace_07_rotated.png" id="4_1e67b"]
 [ext_resource type="Shader" uid="uid://bt0wv8w2tjngg" path="res://assets/checkpointline.tres" id="5_8w72o"]
 [ext_resource type="PackedScene" uid="uid://dmwb2wxd5gn4v" path="res://assets/mesh/checkpoint.blend" id="5_nos5s"]
 [ext_resource type="Shader" uid="uid://ha5bdas7rcte" path="res://assets/halo_shader.tres" id="6_nos5s"]
@@ -20,7 +21,7 @@ opentype_features = {
 [sub_resource type="Gradient" id="Gradient_wpuaw"]
 interpolation_mode = 2
 interpolation_color_space = 1
-offsets = PackedFloat32Array(0, 0.071428575, 0.78968257, 1)
+offsets = PackedFloat32Array(0, 0.3197279, 0.78968257, 1)
 colors = PackedColorArray(0, 0.39999986, 1, 0, 0, 0.39999986, 1, 1, 0, 0.93, 0.15499985, 1, 0.49019608, 0.9254902, 0.56078434, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_hjeaj"]
@@ -36,8 +37,8 @@ angle_max = 180.00002
 inherit_velocity_ratio = 1.0
 direction = Vector3(0, 1, 0)
 spread = 5.0
-initial_velocity_min = 2.31
-initial_velocity_max = 5.0
+initial_velocity_min = 5.0
+initial_velocity_max = 8.0
 angular_velocity_min = -193.24
 angular_velocity_max = 193.23997
 gravity = Vector3(0, 0, 0)
@@ -65,6 +66,46 @@ particles_anim_loop = false
 [sub_resource type="QuadMesh" id="QuadMesh_hjeaj"]
 material = SubResource("StandardMaterial3D_6wqo1")
 size = Vector2(4, 4)
+
+[sub_resource type="Curve" id="Curve_2ivja"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.503125, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_4abvr"]
+texture_mode = 1
+curve = SubResource("Curve_2ivja")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_p3toe"]
+emission_shape_offset = Vector3(6.25, 2.25, 0)
+emission_shape = 3
+emission_box_extents = Vector3(7.825, 4, 0)
+spread = 0.0
+initial_velocity_min = -4.0
+initial_velocity_max = 4.0
+gravity = Vector3(0, 0, 0)
+color = Color(1.8247963, 0.93389755, 0.93389755, 1)
+alpha_curve = SubResource("CurveTexture_4abvr")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_byq8c"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+specular_mode = 2
+disable_ambient_light = true
+disable_fog = true
+disable_specular_occlusion = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("4_1e67b")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_g8myr"]
+material = SubResource("StandardMaterial3D_byq8c")
+size = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nos5s"]
 render_priority = 0
@@ -120,7 +161,7 @@ autowrap_mode = 1
 width = 4000.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1935396468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, -0.2, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, -1.5, 0.2)
 amount = 500
 preprocess = 1.0
 visibility_aabb = AABB(-12.9835205, -3.1711996, -3, 25.97467, 17.557516, 6)
@@ -129,6 +170,12 @@ trail_lifetime = 0.66
 process_material = SubResource("ParticleProcessMaterial_hjeaj")
 draw_pass_1 = SubResource("QuadMesh_hjeaj")
 
+[node name="BarrierParticles" type="GPUParticles3D" parent="." unique_id=973293312]
+visible = false
+amount = 50
+process_material = SubResource("ParticleProcessMaterial_p3toe")
+draw_pass_1 = SubResource("QuadMesh_g8myr")
+
 [node name="BoundaryLine" type="MeshInstance3D" parent="." unique_id=1272142734]
 transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, 0)
 mesh = SubResource("PlaneMesh_1e67b")
@@ -136,12 +183,14 @@ mesh = SubResource("PlaneMesh_1e67b")
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
 [node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 941155593) index="0" unique_id=23098908]
+instance_shader_parameters/Warning = false
 surface_material_override/0 = SubResource("ShaderMaterial_2ivja")
 
 [node name="RightGate" parent="Gate" index="1" unique_id=229744792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
 
 [node name="GateHalo_001" parent="Gate/RightGate" index="0" unique_id=224203035]
+instance_shader_parameters/Warning = false
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [editable path="Gate"]
