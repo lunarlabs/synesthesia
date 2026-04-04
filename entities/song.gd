@@ -371,6 +371,12 @@ func _on_track_activated(note_count: int, start_measure: int):
 			# Gain 3 energy per successful phrase
 			energy_change(3)
 	if manager_node.autoblast and %Conductor.current_measure < total_measures:
+		if _barrier_threshold > 0 \
+		and _next_checkpoint < manager_node.checkpoint_measures.size():
+			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
+			if %Conductor.current_measure== checkpoint_measure - 1:
+				# prevents "bouncing" from one track to the next while approaching gate
+				return
 		# Switch immediately to the next best track
 		var next_track = _find_best_track_for_autoblast()
 		if next_track != active_track:
