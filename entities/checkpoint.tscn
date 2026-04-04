@@ -7,6 +7,7 @@
 [ext_resource type="Shader" uid="uid://bt0wv8w2tjngg" path="res://assets/checkpointline.tres" id="5_8w72o"]
 [ext_resource type="PackedScene" uid="uid://dmwb2wxd5gn4v" path="res://assets/mesh/checkpoint.blend" id="5_nos5s"]
 [ext_resource type="Shader" uid="uid://ha5bdas7rcte" path="res://assets/halo_shader.tres" id="6_nos5s"]
+[ext_resource type="Shader" uid="uid://cv8op8vy5wp4u" path="res://assets/shaders/finishplane.tres" id="8_2ivja"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_0bd8t"]
 left_to_right = 1.0
@@ -116,13 +117,19 @@ material = SubResource("ShaderMaterial_nos5s")
 size = Vector2(2.5, 6)
 center_offset = Vector3(1.25, 0, -3)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2ivja"]
-render_priority = 0
-shader = ExtResource("6_nos5s")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1e67b"]
 render_priority = 0
 shader = ExtResource("6_nos5s")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4abvr"]
+render_priority = 0
+shader = ExtResource("8_2ivja")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_p3toe"]
+material = SubResource("ShaderMaterial_4abvr")
+size = Vector2(16.58, 7.5)
+center_offset = Vector3(0, 2.225, 0)
+orientation = 2
 
 [node name="Checkpoint" type="Node3D" unique_id=1251994640]
 script = ExtResource("1_hjeaj")
@@ -151,6 +158,8 @@ visibility_range_fade_mode = 1
 pixel_size = 0.004
 double_sided = false
 alpha_antialiasing_mode = 1
+render_priority = 1
+outline_render_priority = 0
 modulate = Color(0.98039216, 0.69411767, 0, 1)
 text = "00% Completed"
 font = SubResource("FontVariation_6wqo1")
@@ -171,8 +180,9 @@ process_material = SubResource("ParticleProcessMaterial_hjeaj")
 draw_pass_1 = SubResource("QuadMesh_hjeaj")
 
 [node name="BarrierParticles" type="GPUParticles3D" parent="." unique_id=973293312]
-visible = false
+emitting = false
 amount = 50
+visibility_aabb = AABB(-6.3823657, -3.6965325, -2, 24.178467, 11.906005, 4)
 process_material = SubResource("ParticleProcessMaterial_p3toe")
 draw_pass_1 = SubResource("QuadMesh_g8myr")
 
@@ -183,14 +193,17 @@ mesh = SubResource("PlaneMesh_1e67b")
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
 [node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 941155593) index="0" unique_id=23098908]
-instance_shader_parameters/Warning = false
-surface_material_override/0 = SubResource("ShaderMaterial_2ivja")
+surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [node name="RightGate" parent="Gate" index="1" unique_id=229744792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
 
 [node name="GateHalo_001" parent="Gate/RightGate" index="0" unique_id=224203035]
-instance_shader_parameters/Warning = false
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
+
+[node name="FinishPlane" type="MeshInstance3D" parent="." unique_id=1480233852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 0, -0.06)
+visible = false
+mesh = SubResource("PlaneMesh_p3toe")
 
 [editable path="Gate"]

@@ -1961,12 +1961,25 @@ layout_mode = 2
 
 [node name="BarrierWarningLbl" type="Label" parent="HUD/BarrierWarningContainer/HBoxContainer" unique_id=1067525592]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
 text = "HUD_BARRIER_WARNING"
-horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 uppercase = true
+
+[node name="VSeparator" type="VSeparator" parent="HUD/BarrierWarningContainer/HBoxContainer" unique_id=1430274343]
+layout_mode = 2
+
+[node name="BarrierStreakLbl" type="Label" parent="HUD/BarrierWarningContainer/HBoxContainer" unique_id=1528649434]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "x0"
+label_settings = SubResource("LabelSettings_q2dmg")
+horizontal_alignment = 1
 
 [node name="actualplayhead" type="MeshInstance3D" parent="." unique_id=100685933]
 unique_name_in_owner = true

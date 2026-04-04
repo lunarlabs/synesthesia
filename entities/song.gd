@@ -61,6 +61,7 @@ var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak pe
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
 var closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
 var _targets: Array
+var _checkpoint_nodes: Array[Node3D]
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
 var _barrier_threshold: int = 0 # 0 = no barrier, 2/3/4 = streak required
@@ -141,6 +142,7 @@ func _ready():
 		2: _barrier_threshold = 2
 		3: _barrier_threshold = 3
 		4: _barrier_threshold = 4
+	%BarrierStreakLbl.text = "x0/x%d" % _barrier_threshold
 	var start_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	print("instantiating checkpoints")
 	%Conductor.new_measure.connect(start_gate._on_song_new_measure)
@@ -151,11 +153,8 @@ func _ready():
 	start_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
 	if _barrier_threshold > 0:
 		# Barrier mode: show barrier appearance on start gate (streak starts at 0)
-		start_gate.get_node("BoundaryLine").visible = true
-		start_gate.is_barrier = true
-		start_gate.get_node("GPUParticles3D").emitting = false
-	else:
-		start_gate.get_node("BoundaryLine").visible = false
+		start_gate.set_warning_state(true)
+	start_gate.get_node("BoundaryLine").visible = false
 	add_child(start_gate)
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
@@ -164,8 +163,10 @@ func _ready():
 	end_gate.fadeout_time = checkpoint_fade_time
 	end_gate.gate_location = total_measures
 	end_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
+	end_gate.get_node("FinishPlane").show()
 	end_gate.get_node("BoundaryLine").scale.z = 1.5
 	add_child(end_gate)
+	end_gate.particles.hide()
 	$FinishTower.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
 	$FinishTower.set_speed(bpm)
 	$FinishTower.position.z = end_gate.position.z - 75
@@ -183,6 +184,7 @@ func _ready():
 		if _barrier_threshold > 0:
 			checkpoint.is_barrier = true
 		add_child(checkpoint)
+		_checkpoint_nodes.append(checkpoint)
 	if manager_node.autoblast:
 		%EnergyBar.hide()
 		%EnergyTitle.hide()
@@ -357,6 +359,7 @@ func _on_track_activated(note_count: int, start_measure: int):
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	if _barrier_threshold > 0:
+		%BarrierStreakLbl.text = "x%d/x%d" % [min(streak, MAX_COMBO_MULTIPLIER), _barrier_threshold]
 		if streak >= _barrier_threshold:
 			%BarrierWarningLbl.text = "HUD_BARRIER_MAINTAIN"
 			%BarrierWarningLbl.remove_theme_color_override("font_color")
@@ -374,7 +377,7 @@ func _on_track_activated(note_count: int, start_measure: int):
 		if _barrier_threshold > 0 \
 		and _next_checkpoint < manager_node.checkpoint_measures.size():
 			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
-			if %Conductor.current_measure== checkpoint_measure - 1:
+			if %Conductor.current_measure == checkpoint_measure - 1:
 				# prevents "bouncing" from one track to the next while approaching gate
 				return
 		# Switch immediately to the next best track
@@ -414,6 +417,7 @@ func _on_streak_broken():
 	if _barrier_threshold > 0:
 		%BarrierWarningLbl.text = "HUD_BARRIER_WARNING"
 		%BarrierWarningLbl.add_theme_color_override("font_color", Color.ORANGE_RED)
+		%BarrierStreakLbl.text = "x0/x%d" % _barrier_threshold
 	if had_streak:
 #		print("Stat updated for proper streak break.")
 		%HUDAnimations.play("phrase_fail")
@@ -812,11 +816,10 @@ func _apply_barrier_penalty() -> void:
 
 func _update_barrier_visual() -> void:
 	# TODO: Find out what the next checkpoint is instead of using the start gate
-	var start_gate = get_node_or_null("SongStart")
-	if start_gate:
-		var above_threshold = streak >= _barrier_threshold
-		start_gate.get_node("GPUParticles3D").emitting = above_threshold
-		# TODO: Toggle barrier-specific geometry visibility inversely
+	if _next_checkpoint < manager_node.checkpoint_measures.size():
+		var barrier = _checkpoint_nodes[_next_checkpoint]
+		var below_threshold = streak < _barrier_threshold
+		barrier.set_warning_state(below_threshold)
 	# Update barrier warning message based on streak vs threshold
 
 func _show_barrier_message(message_key: String) -> void:
