@@ -335,8 +335,6 @@ func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_cou
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
 	lbl_phrase_value.show()
-	if _barrier_threshold > 0:
-		_update_barrier_visual()
 	# Tell inactive tracks to position their markers after this phrase
 	var next_phrase_measure = start_measure + measure_count
 	for i in tracks.size():
@@ -359,6 +357,7 @@ func _on_track_activated(note_count: int, start_measure: int):
 	lbl_score.text = "%d" % score
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	if _barrier_threshold > 0:
+		_update_barrier_visual()
 		%BarrierStreakLbl.text = "x%d/x%d" % [min(streak, MAX_COMBO_MULTIPLIER), _barrier_threshold]
 		if streak >= _barrier_threshold:
 			%BarrierWarningLbl.text = "HUD_BARRIER_MAINTAIN"
