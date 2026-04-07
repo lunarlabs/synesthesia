@@ -41,6 +41,7 @@ var last_activated_phrase_idx: int = -1
 var next_note_idx_per_lane: Array[int] = [0, 0, 0, ] # Track which note we're processing next in each lane
 var next_note_idx := 0 # Track which note we're processing next in autoblast
 var _active_track := false
+var _pfx_tween: Tween
 var is_active: bool:
 	get: return _active_track
 
@@ -407,6 +408,22 @@ func _get_note_lane(note_index: int):
 	var beat = track_data.note_map.keys()[note_index]
 	return track_data.note_map[beat]
 
+func _get_global_next_note_idx() -> int:
+	if song_node.manager_node.autoblast:
+		return next_note_idx
+
+	var earliest_global_idx = -1
+
+	for lane_index in range(3):
+		var local_lane_idx = next_note_idx_per_lane[lane_index]
+		var lane_notes = track_data.lane_notes[lane_index]
+		if local_lane_idx < lane_notes.size():
+			var global_note_idx = lane_notes[local_lane_idx]
+			if earliest_global_idx == -1 or global_note_idx < earliest_global_idx:
+				earliest_global_idx = global_note_idx
+
+	return earliest_global_idx
+
 func _on_song_new_measure(_measure_num: int):
 	if _measure_num < song_node.manager_node.measure_in_chunks.size():
 		var current_chunk = song_node.manager_node.measure_in_chunks[_measure_num]
@@ -426,7 +443,7 @@ func request_chunks(furthest: int):
 		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
 
 func activate(phrase_idx: int):
-#	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	last_activated_phrase_idx = phrase_idx
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
@@ -436,23 +453,43 @@ func activate(phrase_idx: int):
 		track_data.phrase_note_counts[phrase_idx],
 		phrase_end_measure
 	)
-	_play_pfx(phrase_end_measure)
+	_play_pfx(reset_measure)
 	var activation_end_measure = reset_measure if reset_measure != -1 else song_node.total_measures
 	for i in range(phrase_end_measure, activation_end_measure):
 		if measure_nodes[i]:
 			var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
 			cube.hide()
-		if i in track_data.notes_in_measure.keys():
-			for j in track_data.notes_in_measure[i]:
-				if note_nodes[j]:
-					note_nodes[j].blast(false)
+#		if i in track_data.notes_in_measure.keys():
+#			for j in track_data.notes_in_measure[i]:
+#				if note_nodes[j]:
+#					note_nodes[j].blast(false)
 	phrase_notes_blasted = 0
 	song_node._update_track_reset_cache(track_index, reset_measure)
 	_advance_phrase()
 
-func _play_pfx(start_measure: int):
-	pfx.position.z = start_measure * - (BEATS_PER_MEASURE * length_per_beat)
+func _play_pfx(end_measure: int):
+	if _pfx_tween:
+		_pfx_tween.kill()
+	var next_note: Array = [_get_global_next_note_idx()] # for pass-by-reference
+	pfx.position.z = song_node.playhead.position.z
+	# calculate the tween duration
+	var speed = (length_per_beat / song_node.seconds_per_beat) * 4.
+	var destination = -(BEATS_PER_MEASURE * length_per_beat) * end_measure
+	var distance = abs(destination - pfx.position.z)
+	var duration = distance / speed
+
 	pfx.emitting = true
+	_pfx_tween = create_tween()
+	_pfx_tween.tween_method(_pfx_process.bind(next_note), pfx.position.z, destination, duration)
+	_pfx_tween.tween_callback(func(): pfx.emitting = false)
+
+func _pfx_process(z: float, next_idx: Array):
+	pfx.position.z = z
+	if next_idx[0] > -1 \
+	and next_idx[0] < track_data.note_positions.size() \
+	and track_data.note_positions[next_idx[0]].y > z + 0.2:
+		note_nodes[next_idx[0]].blast(false)
+		next_idx[0] += 1
 
 func restore_barrier_activation(phrase_idx: int) -> void:
 	if not track_data.barrier_cached_next_measures.has(phrase_idx):
@@ -463,15 +500,16 @@ func restore_barrier_activation(phrase_idx: int) -> void:
 		return # Nothing to extend
 	reset_measure = original_next
 	song_node._update_track_reset_cache(track_index, reset_measure)
+	_play_pfx(reset_measure)
 	# Extend activation: hide geometry and auto-blast notes from current_reset to original_next
 	for i in range(current_reset, original_next):
 		if i < measure_nodes.size() and measure_nodes[i]:
 			var cube = measure_nodes[i].get_node("track_geometry").get_node("Cube")
 			cube.hide()
-		if i in track_data.notes_in_measure.keys():
-			for j in track_data.notes_in_measure[i]:
-				if j < note_nodes.size() and note_nodes[j]:
-					note_nodes[j].blast(true)
+#		if i in track_data.notes_in_measure.keys():
+#			for j in track_data.notes_in_measure[i]:
+#				if j < note_nodes.size() and note_nodes[j]:
+#					note_nodes[j].blast(true)
 	_advance_phrase()
 
 func current_measure_is_unactivated() -> bool:

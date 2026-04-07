@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dmuke66cpgwmx" path="res://entities/track.gd" id="1_q435s"]
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
 [ext_resource type="Shader" uid="uid://bv346rfeg10c5" path="res://entities/trackmarker.tres" id="3_3q0ve"]
-[ext_resource type="Texture2D" uid="uid://q4h65rpug2ae" path="res://addons/kenney_particle_pack/star_01.png" id="3_tmkqs"]
+[ext_resource type="Texture2D" uid="uid://if1o7huv4x16" path="res://addons/kenney_particle_pack/star_05.png" id="4_3q0ve"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7l36f"]
 render_priority = 0
@@ -18,29 +18,28 @@ rings = 0
 cap_top = false
 cap_bottom = false
 
-[sub_resource type="Curve" id="Curve_3q0ve"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.3872232, 0.0, 0, 0]
+[sub_resource type="Curve" id="Curve_7l36f"]
+_data = [Vector2(0, 1), 0.0, -0.6631459, 0, 0, Vector2(1, 0), -1.4308038, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="CurveTexture" id="CurveTexture_3q0ve"]
-curve = SubResource("Curve_3q0ve")
+[sub_resource type="CurveTexture" id="CurveTexture_xv6yt"]
+curve = SubResource("Curve_7l36f")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dgpj8"]
 resource_local_to_scene = true
-lifetime_randomness = 1.0
-emission_shape_offset = Vector3(0, -0.2, -64)
+lifetime_randomness = 0.25
+emission_shape_offset = Vector3(0, -0.3, -0.3)
 emission_shape = 3
-emission_box_extents = Vector3(1.25, 0.2, -64)
+emission_box_extents = Vector3(1.25, 0.3, 0.3)
 angle_min = -89.99999
 angle_max = 90.000015
 direction = Vector3(0, 1, 0)
-spread = 0.0
-initial_velocity_min = -7.0
-initial_velocity_max = 4.0
-scale_min = 0.39999998
+spread = 30.0
+initial_velocity_max = 5.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
 scale_max = 2.0
-scale_curve = SubResource("CurveTexture_3q0ve")
-turbulence_enabled = true
+alpha_curve = SubResource("CurveTexture_xv6yt")
 turbulence_noise_speed = Vector3(0, -1, 0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cidh0"]
@@ -48,7 +47,7 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("3_tmkqs")
+albedo_texture = ExtResource("4_3q0ve")
 billboard_mode = 3
 billboard_keep_scale = true
 particles_anim_h_frames = 1
@@ -81,11 +80,9 @@ mesh = SubResource("CylinderMesh_tmkqs")
 
 [node name="Whoosh" type="GPUParticles3D" parent="." unique_id=1927056625]
 emitting = false
-amount = 5000
-lifetime = 1.5
-one_shot = true
-explosiveness = 1.0
-visibility_aabb = AABB(-2.393, -1, -128, 4.768, 2, 128)
+amount = 500
+lifetime = 0.5
+visibility_aabb = AABB(-2.4916842, -1.5931671, -1.3870578, 4.9777603, 3.9763145, 2.807129)
 process_material = SubResource("ParticleProcessMaterial_dgpj8")
 draw_pass_1 = SubResource("QuadMesh_24ful")
 

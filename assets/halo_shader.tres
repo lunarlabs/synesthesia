@@ -1,7 +1,6 @@
 [gd_resource type="VisualShader" format=3 uid="uid://ha5bdas7rcte"]
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_73vgk"]
-default_input_values = [0, 1.0, 1, 1.0]
 operator = 2
 
 [sub_resource type="VisualShaderNodeMultiplyAdd" id="VisualShaderNodeMultiplyAdd_t83ue"]
@@ -150,4 +149,4 @@ nodes/fragment/25/node = SubResource("VisualShaderNodeBooleanParameter_utoe7")
 nodes/fragment/25/position = Vector2(-520, -100)
 nodes/fragment/26/node = SubResource("VisualShaderNodeCurveTexture_hq4n2")
 nodes/fragment/26/position = Vector2(140, 440)
-nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 12, 0, 6, 0, 13, 0, 14, 0, 14, 0, 12, 2, 15, 0, 0, 5, 11, 0, 0, 1, 5, 0, 6, 1, 5, 0, 16, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0, 16, 0, 11, 1, 22, 0, 11, 0, 18, 0, 23, 0, 23, 0, 24, 1, 17, 0, 24, 2, 24, 0, 0, 0, 25, 0, 24, 0, 25, 0, 22, 0, 7, 0, 26, 0, 26, 0, 22, 2)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 12, 0, 6, 0, 13, 0, 14, 0, 14, 0, 12, 2, 15, 0, 0, 5, 7, 0, 11, 0, 11, 0, 0, 1, 5, 0, 6, 1, 5, 0, 16, 0, 16, 0, 11, 1, 17, 0, 0, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0, 22, 0, 11, 0, 18, 0, 23, 0, 23, 0, 24, 1, 17, 0, 24, 2, 24, 0, 0, 0, 25, 0, 24, 0, 25, 0, 22, 0, 7, 0, 26, 0, 26, 0, 22, 2)
