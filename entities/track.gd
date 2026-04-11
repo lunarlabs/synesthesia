@@ -62,6 +62,7 @@ var phrase_start_measure: int:
 @onready var marker = $Marker as Node3D
 @onready var pfx = $Whoosh as GPUParticles3D
 var rails: MultiMeshInstance3D
+var lo_rez: MultiMeshInstance3D
 var vol_dB: float:
 	get:
 		return song_node.get_track_volume(track_index)
@@ -74,7 +75,7 @@ signal active_phrase_missed(phrase_score_value: int)
 signal note_hit(timing: float)
 
 func _enter_tree():
-	rails = get_node("MultiMesh") as MultiMeshInstance3D
+	rails = get_node("Rails") as MultiMeshInstance3D
 	lane_tint = INSTRUMENTS[instrument][1] as Color
 	instrument_note_material = load(INSTRUMENTS[instrument][2]) as StandardMaterial3D
 	instrument_ghost_material = load(INSTRUMENTS[instrument][3]) as StandardMaterial3D
@@ -96,6 +97,17 @@ func _enter_tree():
 		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		rail_transform.basis = rail_transform.basis.scaled(Vector3(1.0, 1.0, scale_z))
 		rails.multimesh.set_instance_transform(i, rail_transform)
+
+	lo_rez = get_node("PlanarTrack") as MultiMeshInstance3D
+	lo_rez.multimesh.instance_count = track_data.phrase_starts.size()
+	for i in range(track_data.phrase_starts.size()):
+		var plane_transform := Transform3D.IDENTITY
+		@warning_ignore("integer_division")
+		var z_scale = length_per_beat / STANDARD_LENGTH_PER_BEAT
+		plane_transform.basis = plane_transform.basis.scaled(Vector3(1., 1., z_scale))
+		var z_pos = -(BEATS_PER_MEASURE * length_per_beat) * (track_data.phrase_starts[i] + 0.5)
+		plane_transform.origin = Vector3(0., 0., z_pos)
+		lo_rez.multimesh.set_instance_transform(i, plane_transform)
 
 func _ready():
 	# Cache materials once at track level instead of loading in each chunk
@@ -471,7 +483,7 @@ func _play_pfx(end_measure: int):
 	if _pfx_tween:
 		_pfx_tween.kill()
 	var next_note: Array = [_get_global_next_note_idx()] # for pass-by-reference
-	pfx.position.z = song_node.playhead.position.z
+	pfx.position.z = song_node.playhead.position.z - 0.5
 	# calculate the tween duration
 	var speed = (length_per_beat / song_node.seconds_per_beat) * 4.
 	var destination = -(BEATS_PER_MEASURE * length_per_beat) * end_measure
@@ -485,6 +497,7 @@ func _play_pfx(end_measure: int):
 
 func _pfx_process(z: float, next_idx: Array):
 	pfx.position.z = z
+	lo_rez.set_instance_shader_parameter("z_limit", z)
 	if next_idx[0] > -1 \
 	and next_idx[0] < track_data.note_positions.size() \
 	and track_data.note_positions[next_idx[0]].y > z + 0.2:

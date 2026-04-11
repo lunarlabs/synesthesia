@@ -21,4 +21,3 @@ visible = false
 mesh = SubResource("PlaneMesh_ri2lq")
 
 [node name="track_geometry" parent="." unique_id=1135575059 instance=ExtResource("3_aeq1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00073444843, 0, -9.346008e-05)
