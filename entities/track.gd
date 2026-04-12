@@ -105,7 +105,7 @@ func _enter_tree():
 		@warning_ignore("integer_division")
 		var z_scale = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		plane_transform.basis = plane_transform.basis.scaled(Vector3(1., 1., z_scale))
-		var z_pos = -(BEATS_PER_MEASURE * length_per_beat) * (track_data.phrase_starts[i] + 0.5)
+		var z_pos = - (BEATS_PER_MEASURE * length_per_beat) * (track_data.phrase_starts[i] + 0.5)
 		plane_transform.origin = Vector3(0., 0., z_pos)
 		lo_rez.multimesh.set_instance_transform(i, plane_transform)
 
@@ -486,14 +486,16 @@ func _play_pfx(end_measure: int):
 	pfx.position.z = song_node.playhead.position.z - 0.5
 	# calculate the tween duration
 	var speed = (length_per_beat / song_node.seconds_per_beat) * 4.
-	var destination = -(BEATS_PER_MEASURE * length_per_beat) * end_measure
+	var destination = - (BEATS_PER_MEASURE * length_per_beat) * end_measure
 	var distance = abs(destination - pfx.position.z)
 	var duration = distance / speed
 
+	lo_rez.show()
 	pfx.emitting = true
 	_pfx_tween = create_tween()
 	_pfx_tween.tween_method(_pfx_process.bind(next_note), pfx.position.z, destination, duration)
 	_pfx_tween.tween_callback(func(): pfx.emitting = false)
+	_pfx_tween.tween_callback(func(): lo_rez.hide())
 
 func _pfx_process(z: float, next_idx: Array):
 	pfx.position.z = z
