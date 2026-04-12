@@ -4,7 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://cvfeplds4l3wi" path="res://assets/Fart.ogg" id="2_p7e7j"]
 [ext_resource type="Shader" uid="uid://bv346rfeg10c5" path="res://entities/trackmarker.tres" id="3_3q0ve"]
 [ext_resource type="Texture2D" uid="uid://if1o7huv4x16" path="res://addons/kenney_particle_pack/star_05.png" id="4_3q0ve"]
-[ext_resource type="Shader" path="res://assets/shaders/flat_track.gdshader" id="5_xv6yt"]
+[ext_resource type="Shader" uid="uid://d3t03fam2ys4q" path="res://assets/shaders/flat_track.gdshader" id="5_xv6yt"]
 [ext_resource type="Texture2D" uid="uid://dhxi8wpabpu4y" path="res://assets/textures/trackalbedo.png" id="6_4do6k"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7l36f"]

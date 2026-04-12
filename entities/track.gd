@@ -482,7 +482,7 @@ func activate(phrase_idx: int):
 func _play_pfx(end_measure: int):
 	if _pfx_tween:
 		_pfx_tween.kill()
-	var next_note: Array = [_get_global_next_note_idx()] # for pass-by-reference
+	var next_note: Array = [track_data.phrase_last_note_indices[last_activated_phrase_idx] + 1] # for pass-by-reference
 	pfx.position.z = song_node.playhead.position.z - 0.5
 	# calculate the tween duration
 	var speed = (length_per_beat / song_node.seconds_per_beat) * 4.
