@@ -46,7 +46,7 @@ func _process(delta):
 		var energy = linear_to_db(magnitude)
 		
 		# Normalize: -60db becomes 0.0, 0db becomes 1.0
-		var height = clamp((min_db + energy) / min_db, 0.0, 1.5)
+		var height = clamp((min_db + energy) / min_db, 0.0, 1)
 		
 		# Smooth the value with attack/decay (frame-rate independent)
 		# Use faster attack when rising, slower decay when falling

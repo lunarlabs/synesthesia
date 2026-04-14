@@ -44,7 +44,7 @@ default_input_values = [0, Vector2(0, 0)]
 op_type = 0
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_7xh1d"]
-default_input_values = [0, 0.0, 1, -4.0]
+default_input_values = [0, 0.0, 1, -2.0]
 operator = 2
 
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_km25s"]

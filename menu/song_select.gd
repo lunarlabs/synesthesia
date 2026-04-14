@@ -74,6 +74,7 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 var subscreen_buttons: Array = []
 var bpm_tween: Tween
 var prev_bpm: float
+var vol_tween: Tween
 
 var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
@@ -129,7 +130,9 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
-	var vol_tween = create_tween()
+	if vol_tween:
+		vol_tween.kill()
+	vol_tween = create_tween()
 	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 1.0)
 	vol_tween.tween_callback(Transition.start_transition_out)
 	
@@ -430,3 +433,10 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 func _on_modifier_button_pressed() -> void:
 	for button in subscreen_buttons:
 		button.disabled = true
+
+
+func _on_preview_player_finished() -> void:
+	if vol_tween:
+		vol_tween.kill()
+	vol_tween = create_tween()
+	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 4.0)

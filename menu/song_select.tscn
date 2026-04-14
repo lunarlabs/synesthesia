@@ -870,3 +870,4 @@ offset_bottom = 16.0
 [connection signal="pressed" from="ModifierContainer/GridContainer/CloseButton" to="ModifierContainer" method="_on_close_button_pressed"]
 [connection signal="selection_changed" from="Carousel" to="." method="_on_carousel_selection_changed"]
 [connection signal="song_selected" from="Carousel" to="." method="_on_carousel_song_selected"]
+[connection signal="finished" from="PreviewPlayer" to="." method="_on_preview_player_finished"]

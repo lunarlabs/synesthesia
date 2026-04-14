@@ -1392,6 +1392,7 @@ script = ExtResource("1_jv32a")
 energy_gradient = SubResource("Gradient_36g15")
 
 [node name="SongPlayer" type="AudioStreamPlayer" parent="." unique_id=1984526006 groups=["AudioPlayers", "LoopingAudio"]]
+volume_db = -6.0
 bus = &"Song"
 
 [node name="DebugInfo" type="Label" parent="." unique_id=1195024175]
