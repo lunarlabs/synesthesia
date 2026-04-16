@@ -308,11 +308,13 @@ func _advance_phrase():
 		# unmark previous phrase
 		for i in range(track_data.phrase_lengths[current_phrase_index]):
 			var measure = track_data.phrase_starts[current_phrase_index] + i
-			var cube = measure_nodes[measure].get_node("track_geometry").get_node("Cube")
-			cube.set_instance_shader_parameter("phrase", false)
+			if measure_nodes[measure]:
+				var cube = measure_nodes[measure].get_node("track_geometry").get_node("Cube")
+				cube.set_instance_shader_parameter("phrase", false)
 		for i in track_data.phrase_note_indices[current_phrase_index]:
 			var note = note_nodes[i]
-			note.set_phrase_note(false)
+			if note:
+				note.set_phrase_note(false)
 	phrase_notes_blasted = 0
 	if current_phrase_index >= track_data.phrase_starts.size():
 		# no more phrases
