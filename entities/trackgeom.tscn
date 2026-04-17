@@ -31,6 +31,7 @@ shader_parameter/curve_frg_6 = SubResource("CurveTexture_meoiv")
 [node name="trackgeom" unique_id=281112438 instance=ExtResource("1_oblog")]
 
 [node name="Cube" parent="." index="0" unique_id=1860648946]
+unique_name_in_owner = true
 visibility_range_end = 200.0
 visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1

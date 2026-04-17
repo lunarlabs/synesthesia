@@ -6,12 +6,6 @@ operator = 2
 [sub_resource type="VisualShaderNodeMultiplyAdd" id="VisualShaderNodeMultiplyAdd_t83ue"]
 default_input_values = [0, 0.0, 1, 4.0, 2, 0.0]
 
-[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_73vgk"]
-input_name = "time"
-
-[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_73vgk"]
-function = 19
-
 [sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_t83ue"]
 
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_t83ue"]
@@ -125,10 +119,6 @@ nodes/fragment/11/node = SubResource("VisualShaderNodeFloatOp_73vgk")
 nodes/fragment/11/position = Vector2(760, 360)
 nodes/fragment/12/node = SubResource("VisualShaderNodeMultiplyAdd_t83ue")
 nodes/fragment/12/position = Vector2(-760, 1000)
-nodes/fragment/13/node = SubResource("VisualShaderNodeInput_73vgk")
-nodes/fragment/13/position = Vector2(-1400, 1100)
-nodes/fragment/14/node = SubResource("VisualShaderNodeFloatFunc_73vgk")
-nodes/fragment/14/position = Vector2(-1020, 1100)
 nodes/fragment/15/node = SubResource("VisualShaderNodeColorConstant_t83ue")
 nodes/fragment/15/position = Vector2(560, 540)
 nodes/fragment/16/node = SubResource("VisualShaderNodeFloatFunc_t83ue")
@@ -155,4 +145,4 @@ nodes/fragment/26/node = SubResource("VisualShaderNodeCurveTexture_hq4n2")
 nodes/fragment/26/position = Vector2(140, 440)
 nodes/fragment/27/node = SubResource("VisualShaderNodeFloatOp_t83ue")
 nodes/fragment/27/position = Vector2(-1083, 920.00006)
-nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 12, 0, 6, 0, 13, 0, 14, 0, 14, 0, 12, 2, 15, 0, 0, 5, 7, 0, 11, 0, 11, 0, 0, 1, 5, 0, 6, 1, 5, 0, 16, 0, 16, 0, 11, 1, 17, 0, 0, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0, 22, 0, 11, 0, 18, 0, 23, 0, 23, 0, 24, 1, 17, 0, 24, 2, 24, 0, 0, 0, 25, 0, 24, 0, 25, 0, 22, 0, 7, 0, 26, 0, 26, 0, 22, 2, 19, 0, 27, 0, 27, 0, 12, 2)
+nodes/fragment/connections = PackedInt32Array(2, 0, 3, 2, 4, 0, 5, 0, 3, 0, 7, 0, 5, 1, 12, 0, 6, 0, 3, 0, 15, 0, 0, 5, 7, 0, 11, 0, 11, 0, 0, 1, 5, 0, 6, 1, 5, 0, 16, 0, 16, 0, 11, 1, 17, 0, 0, 0, 18, 0, 17, 0, 19, 0, 20, 0, 20, 0, 21, 0, 21, 0, 18, 0, 22, 0, 11, 0, 18, 0, 23, 0, 23, 0, 24, 1, 17, 0, 24, 2, 24, 0, 0, 0, 25, 0, 24, 0, 25, 0, 22, 0, 7, 0, 26, 0, 26, 0, 22, 2, 12, 0, 6, 0, 19, 0, 27, 0, 27, 0, 12, 2)

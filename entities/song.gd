@@ -18,8 +18,8 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
-const START_POSITION := Vector3(-10.0, 15.0, 1.0)
-const START_ROTATION := Vector3(-50.0, 0.0, -45.0)
+const START_POSITION := Vector3(-2.0, 25.0, 5.0)
+const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
 const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
 const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
@@ -245,7 +245,7 @@ func _song_start():
 	var _intro_anim_call := Callable(%HUDAnimations, "play").bind("BuildIn")
 	var fade_tween = create_tween()
 	fade_tween.tween_property(%FadeOut, "modulate", Color(1, 1, 1, 0),
-	 (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
+	 (seconds_per_beat * BEATS_PER_MEASURE) * 1.5).set_trans(Tween.TRANS_QUAD) \
 	.set_ease(Tween.EASE_IN)
 	fade_tween.tween_callback(_intro_anim_call)
 	var intro_tween = create_tween().set_parallel()
@@ -254,7 +254,7 @@ func _song_start():
 	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK) \
 	.set_ease(Tween.EASE_OUT)
 	intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_QUAD) \
+	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
 	.set_ease(Tween.EASE_OUT)
 	intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
 	2.5 * (seconds_per_beat * BEATS_PER_MEASURE)) \
