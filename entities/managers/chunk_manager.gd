@@ -9,8 +9,8 @@ var _note_scene: PackedScene = preload("res://entities/note.tscn")
 var _measure_scene: PackedScene = preload("res://entities/measure.tscn")
 var _manager_node: SynRoadSongManager
 var _song_node: SynRoadSong
-var _note_stack: Array = []
-var _measure_stack: Array = []
+var _note_pool: SynRoadObjectPool
+var _measure_pool: SynRoadObjectPool
 var _z_scale: float
 var _measure_positions: PackedFloat32Array
 var _suppressed_measures: Array[bool]
@@ -26,6 +26,8 @@ func _ready():
 	_suppressed_measures = _manager_node.suppressed_measures
 	_semaphore = Semaphore.new()
 	_mutex = Mutex.new()
+	_note_pool = SynRoadObjectPool.new(_note_scene)
+	_measure_pool = SynRoadObjectPool.new(_measure_scene)
 
 	thread = Thread.new()
 	thread.start(Callable(self , "_thread_func"))
@@ -54,7 +56,7 @@ func _thread_func():
 
 func generate_chunk(chunk_idx: int):
 	var track_count = _song_node.tracks.size()
-	var worker_callable = Callable(self, "_chunk_generation_worker").bind(chunk_idx)
+	var worker_callable = Callable(self , "_chunk_generation_worker").bind(chunk_idx)
 	var task_id = WorkerThreadPool.add_group_task(worker_callable, track_count)
 	WorkerThreadPool.wait_for_group_task_completion(task_id)
 
@@ -80,17 +82,9 @@ func _chunk_generation_worker(track_idx: int, chunk_idx: int):
 
 	for i in track_data.measures_in_chunks[chunk_idx]:
 		if not _manager_node.suppressed_measures[i]:
-			var new_measure: Node3D
+			var new_measure = _measure_pool.get_instance() as Node3D
 
-			_mutex.lock()
-			if not _measure_stack.is_empty():
-				new_measure = _measure_stack.pop_back() as Node3D
-			_mutex.unlock()
-
-			if not is_instance_valid(new_measure):
-				new_measure = _measure_scene.instantiate() as Node3D
-
-#			new_measure.name = "measure_%d" % i
+			new_measure.name = "measure_%d" % i
 			var cube = new_measure.get_node("track_geometry/Cube")
 			cube.set_instance_shader_parameter("this_track", track_idx)
 			cube.set_instance_shader_parameter("measure_tint", track_node.lane_tint)
@@ -102,15 +96,7 @@ func _chunk_generation_worker(track_idx: int, chunk_idx: int):
 			chunk.add_child(new_measure)
 
 		for j in track_data.notes_in_measure[i]:
-			var new_note: SynRoadNote
-
-			_mutex.lock()
-			if not _note_stack.is_empty():
-				new_note = _note_stack.pop_back() as SynRoadNote
-			_mutex.unlock()
-
-			if not is_instance_valid(new_note):
-				new_note = _note_scene.instantiate() as SynRoadNote
+			var new_note = _note_pool.get_instance() as SynRoadNote
 
 			new_note.request_ready()
 #			new_note.name = "note_%d" % j
@@ -137,8 +123,22 @@ func _apply_chunk(track_idx: int, chunk_idx: int, chunk: Node3D, measures: Dicti
 		track_node.add_child(chunk)
 
 func _recycle_chunk(chunk_idx: int):
-	# TODO: remove all nodes with chunk_idx from all tracks then place them in object pool.
-	pass
+	call_deferred("_recycle_chunk_deferred", chunk_idx)
+
+func _recycle_chunk_deferred(chunk_idx: int):
+	var collected_chunks: Array[Node3D] = []
+	for track_node in _song_node.tracks:
+		if track_node.chunks[chunk_idx] != null:
+			collected_chunks.append(track_node.chunks[chunk_idx])
+			track_node.chunks[chunk_idx] = null
+	for chunk in collected_chunks:
+		for i in range(chunk.get_child_count() - 1, -1, -1):
+			var child = chunk.get_child(i)
+			if child is SynRoadNote:
+				_note_pool.recycle_instance(child)
+			elif child is Node3D and child.name.begins_with("measure_"):
+				_measure_pool.recycle_instance(child)
+		chunk.queue_free()
 
 func enqueue_request(chunk_idx: int):
 	_mutex.lock()
