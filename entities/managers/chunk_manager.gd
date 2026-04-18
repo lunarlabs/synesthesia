@@ -70,9 +70,11 @@ func _chunk_generation_worker(track_idx: int, chunk_idx: int):
 	var track_data = track_node.track_data
 	var phrase_measures: Array[int] = []
 	var current_p_index = track_node.current_phrase_index
-	if current_p_index < track_data.phrase_lengths[current_p_index]:
-		for i in track_data.phrase_lengths[current_p_index]:
-			phrase_measures.append(track_data.phrase_starts[current_p_index] + i)
+	if current_p_index < track_data.phrase_lengths.size():
+		var length = track_data.phrase_lengths[current_p_index]
+		var start = track_data.phrase_starts[current_p_index]
+		for i in range(length):
+			phrase_measures.append(start + i)
 
 	var chunk := Node3D.new()
 	chunk.name = "chunk_%d" % chunk_idx

@@ -18,18 +18,18 @@ func get_instance() -> Node:
 	return instance
 
 func recycle_instance(instance: Node):
+	_mutex.lock()
 	var parent = instance.get_parent()
 	if is_instance_valid(parent):
 		parent.remove_child(instance)
-    
-	_mutex.lock()
 	_stack.append(instance)
 	_mutex.unlock()
 
 func clear():
 	_mutex.lock()
-	for item in _stack:
-		if is_instance_valid(item):
-			item.queue_free()
+	var items_to_free = _stack.duplicate()
 	_stack.clear()
 	_mutex.unlock()
+	for item in items_to_free:
+		if is_instance_valid(item):
+			item.queue_free()
