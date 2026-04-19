@@ -22,7 +22,7 @@ buses/default_bus_layout="uid://dgtf2ermp4iqc"
 [autoload]
 
 SongCatalog="*res://menu/song_catalog.gd"
-ChunkManager="*res://entities/chunk_manager.gd"
+ChunkManager="res://entities/chunk_manager.gd"
 DebugMenu="*uid://cggqb75a8w8r"
 SessionManager="*res://entities/managers/session_manager.gd"
 VizManager="*uid://dq61i85kle6gq"
