@@ -271,7 +271,7 @@ tracks/9/path = NodePath("Scanlines:modulate")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0.36666667, 1.0666667),
+"times": PackedFloat32Array(0, 0.75),
 "transitions": PackedFloat32Array(2, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]

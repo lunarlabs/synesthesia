@@ -23,6 +23,8 @@ const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
 const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
 const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
+const CHUNK_LOAD_RANGE_FORWARD = 3
+const CHUNK_UNLOAD_RANGE_BEHIND = 2
 
 var energy: int = MAX_ENERGY
 var manager_node: SynRoadSongManager
@@ -65,6 +67,8 @@ var _checkpoint_nodes: Array[Node3D]
 var _next_checkpoint: int = 0
 var _last_streak_break_measure: int = -1
 var _barrier_threshold: int = 0 # 0 = no barrier, 2/3/4 = streak required
+var _furthest_chunk_loaded := -1
+var _closest_chunk_recycled := -1
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -123,7 +127,6 @@ func _ready():
 		newTrack.name = "Track%d" % i
 		newTrack.track_data = manager_node.track_data[i].track_data
 		tracks.append(newTrack)
-		%Conductor.new_measure.connect(newTrack._on_song_new_measure)
 		newTrack.track_activated.connect(_on_track_activated)
 		newTrack.inactive_phrase_missed.connect(_on_inactive_phrase_missed)
 		newTrack.streak_broken.connect(_on_streak_broken)
@@ -131,8 +134,8 @@ func _ready():
 		newTrack.active_phrase_missed.connect(_on_active_phrase_missed)
 		newTrack.note_hit.connect(_on_note_hit)
 		add_child(newTrack)
-		ChunkManager.request_chunk(i, 0)
-		await ChunkManager.queue_empty
+		%ChunkManager.chunk_generation_worker(i, 0)
+	await get_tree().process_frame
 	print("tracks added")
 	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
@@ -206,6 +209,11 @@ func _ready():
 				%EnergyBar.value = energy
 	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
 	pv_anims = %PhraseValueAnims.get_children()
+	var initial_chunks = CHUNK_LOAD_RANGE_FORWARD + CHUNK_UNLOAD_RANGE_BEHIND
+	for i in range(initial_chunks):
+		%ChunkManager.enqueue_request(i)
+	_furthest_chunk_loaded = initial_chunks - 1
+	_closest_chunk_recycled = 0
 	print("Precompiling shaders...")
 	for i in range(3):
 		await get_tree().process_frame
@@ -728,6 +736,19 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
 	elif not finished:
+		if measure < manager_node.measure_in_chunks.size():
+			var current_chunk = manager_node.measure_in_chunks[measure]
+			var target_ahead = current_chunk + CHUNK_LOAD_RANGE_FORWARD
+			if _furthest_chunk_loaded < target_ahead and target_ahead < manager_node.chunk_count:
+				for ci in range(_furthest_chunk_loaded + 1, target_ahead + 1):
+					if ci < manager_node.chunk_count:
+						%ChunkManager.enqueue_request(ci)
+				_furthest_chunk_loaded = target_ahead
+			var target_behind = current_chunk - CHUNK_UNLOAD_RANGE_BEHIND
+			if target_behind >= 0 and _closest_chunk_recycled < target_behind:
+				for ci in range(_closest_chunk_recycled, target_behind):
+					%ChunkManager.enqueue_recycle(ci)
+				_closest_chunk_recycled = target_behind
 		_update_closest_track_marker_cache()
 		if _next_checkpoint < manager_node.checkpoint_measures.size():
 			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]

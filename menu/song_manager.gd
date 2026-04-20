@@ -141,8 +141,6 @@ func _ready() -> void:
 	var prepare_func = Callable(self , "_prepare_song_data").bind(load_result)
 	var task = WorkerThreadPool.add_task(prepare_func)
 	
-	ChunkManager.manager_node = self # TODO: Make ChunkManager a child node of Song, we don't need it running
-									 # in the menus (could also move chunk calculation there too)
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
 	

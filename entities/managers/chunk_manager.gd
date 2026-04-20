@@ -48,20 +48,20 @@ func _thread_func():
 			var job = job_queue.pop_front()
 			_mutex.unlock()
 			if job.type == REQUEST_CHUNK:
-				generate_chunk(job.chunk_idx)
+				_generate_chunk(job.chunk_idx)
 			elif job.type == RECYCLE_CHUNK:
 				_recycle_chunk(job.chunk_idx)
 		else:
 			_mutex.unlock()
 
-func generate_chunk(chunk_idx: int):
+func _generate_chunk(chunk_idx: int):
 	var track_count = _song_node.tracks.size()
-	var worker_callable = Callable(self , "_chunk_generation_worker").bind(chunk_idx)
+	var worker_callable = Callable(self , "chunk_generation_worker").bind(chunk_idx)
 	var task_id = WorkerThreadPool.add_group_task(worker_callable, track_count)
 	WorkerThreadPool.wait_for_group_task_completion(task_id)
 
 
-func _chunk_generation_worker(track_idx: int, chunk_idx: int):
+func chunk_generation_worker(track_idx: int, chunk_idx: int):
 	var track_node = _song_node.tracks[track_idx] as SynRoadTrack
 	if track_node.chunks[chunk_idx] != null:
 		# there's already a chunk here, move on

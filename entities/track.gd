@@ -438,24 +438,6 @@ func _get_global_next_note_idx() -> int:
 
 	return earliest_global_idx
 
-func _on_song_new_measure(_measure_num: int):
-	if _measure_num < song_node.manager_node.measure_in_chunks.size():
-		var current_chunk = song_node.manager_node.measure_in_chunks[_measure_num]
-	#	print ("We are on chunk %d" % current_chunk)
-		var target_ahead = current_chunk + CHUNK_LOAD_RANGE_FORWARD
-		var target_behind = current_chunk - CHUNK_UNLOAD_RANGE_BEHIND
-		if furthest_chunk_loaded < target_ahead and target_ahead < song_node.manager_node.chunk_count:
-			request_chunks(target_ahead)
-		if target_behind >= 0 and chunks[target_behind]:
-#			print("Track %d recycling chunk %d" % [track_index, target_behind])
-			ChunkManager.recycle_chunk(chunks[target_behind])
-			chunks[target_behind] = null
-
-func request_chunks(furthest: int):
-	while furthest_chunk_loaded < furthest:
-		furthest_chunk_loaded += 1
-		ChunkManager.request_chunk(track_index, furthest_chunk_loaded)
-
 func activate(phrase_idx: int):
 	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	last_activated_phrase_idx = phrase_idx
