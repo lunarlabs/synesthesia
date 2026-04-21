@@ -299,7 +299,7 @@ func _on_song_failed(stats) -> void:
 	var percent_completed = (float(stats.measure) / (song_data.playable_measures + song_data.lead_in_measures)) * 100.0
 	var song_stats := SessionManager.SongResult.new()
 	song_stats.song = song_name
-	song_stats.title = song_data.title
+	song_stats.title = song_data.long_title
 	song_stats.artist = song_data.artist
 	song_stats.difficulty = difficulty
 	song_stats.energy_modifier = energy_modifier
@@ -326,7 +326,7 @@ func _on_song_failed(stats) -> void:
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
 	song_stats.song = song_name
-	song_stats.title = song_data.title
+	song_stats.title = song_data.long_title
 	song_stats.artist = song_data.artist
 	song_stats.difficulty = difficulty
 	song_stats.energy_modifier = energy_modifier

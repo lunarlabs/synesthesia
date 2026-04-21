@@ -237,7 +237,8 @@ func _process_autoblast(current_time: float):
 				next_note_idx += 1
 			else:
 				# Track is not active, but we've passed the note. Mute the track.
-				if song_node.get_track_volume(track_index) != MUTED_VOLUME:
+				if song_node.get_track_volume(track_index) != MUTED_VOLUME \
+				and not song_node.manager_node.suppressed_measures[conductor.current_measure]:
 					song_node.change_track_volume(track_index, MUTED_VOLUME)
 				
 				# See if the passed note was the first note in the phrase
@@ -439,7 +440,7 @@ func _get_global_next_note_idx() -> int:
 	return earliest_global_idx
 
 func activate(phrase_idx: int):
-	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+#	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	last_activated_phrase_idx = phrase_idx
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]

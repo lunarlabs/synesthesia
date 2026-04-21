@@ -234,12 +234,12 @@ func _song_start():
 	%SongProgress.max_value = total_measures
 	%SongProgress.min_value = lead_in_measures - 1
 	if manager_node.autoblast:
-		lbl_auto_blast.show()
+		#lbl_auto_blast.show()
 		_autoblast_next_track = _find_best_track_for_autoblast()
 		if _autoblast_next_track != active_track:
 			_switch_active_track(_autoblast_next_track, false)
-	else:
-		lbl_auto_blast.hide()
+	#else:
+		#lbl_auto_blast.hide()
 	_set_instrument_label()
 	tracks[active_track].set_active(true)
 	%Conductor.new_measure.emit(0)
