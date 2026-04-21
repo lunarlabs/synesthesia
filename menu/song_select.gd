@@ -392,11 +392,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 
 func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> void:
 	var manager = SONG_MANAGER_SCENE.instantiate()
-	var entry = SongCatalog.get_song_info(song_folder)
-	manager.song_file = SongCatalog.get_resource_path(entry.folder_id)
+	manager.catalog_entry = SongCatalog.get_song_info(song_folder)
 	manager.difficulty = selected_difficulty if difficulty == -1 else difficulty
-	manager.resource_hash = entry.resource_hash
-	manager.midi_hash = entry.midi_hash
 
 	# Apply modifiers
 	# TODO: Button cycling and values not implemented yet

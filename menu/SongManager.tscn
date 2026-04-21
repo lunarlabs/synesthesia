@@ -6,7 +6,6 @@
 
 [node name="SongManager" type="Node" unique_id=1145367271]
 script = ExtResource("1_o7bha")
-song_file = "uid://dh1lpldjfaa2x"
 difficulty = 114
 checkpoint_modifier = 1
 

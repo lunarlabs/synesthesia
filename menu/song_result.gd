@@ -9,6 +9,23 @@ enum FinishMode {
 
 @onready var anim = $AnimationPlayer as AnimationPlayer
 
+func populate_from_catalog_entry(entry: Dictionary, difficulty: int) -> void:
+	if entry.sub_title == null or entry.sub_title.is_empty():
+		%SongTitleLabel.text = entry.title
+	else:
+		%SongTitleLabel.text = "%s\n%s" % [entry.title, entry.sub_title]
+	%ArtistLabel.text = entry.artist
+	%DifficultyLabel.text = SynRoadSongManager.DIFFICULTY_NAMES[difficulty]
+	if entry[&"cover_art"]:
+		var img = Image.create_from_data(
+					entry[&"cover_art_width"],
+					entry[&"cover_art_height"],
+					false,
+					entry[&"cover_art_fmt"],
+					entry[&"cover_art"])
+		var texture = ImageTexture.create_from_image(img)
+		%AlbumCover.texture = texture
+
 func display(
 	finish_type: FinishMode,
 	result: SessionManager.SongResult,
@@ -30,9 +47,6 @@ func display(
 	var lbl_acc_diff = %AccuracyPanel.get_node("%Difference")
 	if not prev:
 		prev = SessionManager.SongResult.new()
-	%SongTitleLabel.text = result.title
-	%ArtistLabel.text = result.artist
-	%DifficultyLabel.text = SynRoadSongManager.DIFFICULTY_NAMES[result.difficulty]
 	lbl_clear_type_prev.text = prev.get_clear_string(true)
 	lbl_clear_type_new.text = result.get_clear_string(true)
 	lbl_rank_prev.text = prev.get_rank_string()

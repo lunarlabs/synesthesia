@@ -1,7 +1,7 @@
 extends Node
 class_name SynRoadSongManager
 
-@export_file("*.tres") var song_file: String
+@export_file("*.tres") var song_file: String = ""
 @export_enum("Beginner:96", "Intermediate:102", "Advanced:108", "Expert:114")
 var difficulty: int = 96
 @export_group("Modifiers")
@@ -102,13 +102,13 @@ const MISS_WINDOW_OFFSET = 0.01
 @onready var btn_quit: Button = $PausePanel/VBoxContainer/QuitButton
 @onready var result_screen: Control = $SongResult
 
+var catalog_entry: Dictionary = {}
 # For this refactor, we'll use time instead of beats for everything
 # Also measures will be zero-indexed
 var song_data: SongData
 var song_instance: SynRoadSong
 var preprocessor: SynRoadTrackPreprocessor
 var song_name: String
-var resource_hash: String
 var midi_hash: String
 var note_maps: Array[Dictionary]
 var track_data: Array[Dictionary]
@@ -133,6 +133,15 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	if song_file == "":
+		# Were we passed a catalog entry directly?
+		if catalog_entry.has("folder_id"):
+			song_file = SongCatalog.get_resource_path(catalog_entry.folder_id)
+			midi_hash = catalog_entry.midi_hash
+			result_screen.populate_from_catalog_entry(catalog_entry, difficulty)
+		else:
+			push_error("No song file provided")
+			return
 	var load_result: Dictionary = {}
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	get_window().focus_exited.connect(_on_lose_focus)
@@ -298,13 +307,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_song_failed(stats) -> void:
 	var percent_completed = (float(stats.measure) / (song_data.playable_measures + song_data.lead_in_measures)) * 100.0
 	var song_stats := SessionManager.SongResult.new()
-	song_stats.song = song_name
-	song_stats.title = song_data.long_title
-	song_stats.artist = song_data.artist
 	song_stats.difficulty = difficulty
 	song_stats.energy_modifier = energy_modifier
 	song_stats.checkpoint_modifier = checkpoint_modifier
-	song_stats.hide_streak_hints = hide_streak_hints
 	song_stats.fast_track_reset = fast_track_reset
 	song_stats.timing_modifier = timing_modifier
 	song_stats.score = stats["score"]
@@ -325,13 +330,9 @@ func _on_song_failed(stats) -> void:
 
 func _on_song_finished(stats) -> void:
 	var song_stats := SessionManager.SongResult.new()
-	song_stats.song = song_name
-	song_stats.title = song_data.long_title
-	song_stats.artist = song_data.artist
 	song_stats.difficulty = difficulty
 	song_stats.energy_modifier = energy_modifier
 	song_stats.checkpoint_modifier = checkpoint_modifier
-	song_stats.hide_streak_hints = hide_streak_hints
 	song_stats.fast_track_reset = fast_track_reset
 	song_stats.timing_modifier = timing_modifier
 	song_stats.score = stats["score"]
