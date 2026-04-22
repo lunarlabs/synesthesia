@@ -4,8 +4,8 @@ extends Node
 const VU_COUNT = 16
 const FREQ_MIN = 20.0
 const FREQ_MAX = 15000.0 # 15k is usually the upper limit of useful visual data
-const ATTACK_RATE = 25.0 # How fast the VU meter rises (higher = faster)
-const DECAY_RATE = 10.0 # How fast the VU meter falls (lower = slower, more natural)
+const ATTACK_RATE = 30.0 # How fast the VU meter rises (higher = faster)
+const DECAY_RATE = 15.0 # How fast the VU meter falls (lower = slower, more natural)
 
 # State
 var spectrum: AudioEffectSpectrumAnalyzerInstance

@@ -177,19 +177,39 @@ static func generate_preview_audio(
 	var fade_duration := minf(3.0, preview_length_s * 0.3)
 	var fade_start := preview_length_s - fade_duration
 
-	# Build a pan filter that maps the collected channels into stereo.
-	# MOGG files interleave L/R pairs, so even-indexed channels (within each
-	# instrument) go left and odd-indexed go right.  When we have an arbitrary
-	# bag of channels from multiple instruments the safest strategy is to sum
-	# each channel equally into both stereo outputs and let ffmpeg normalise.
+	# Read per-channel mixer data (one entry per MOGG channel).
+	var mixer_vols: Array = moggsong_data.get("vols", [])
+	var mixer_pans: Array = moggsong_data.get("pans", [])
+
+	# Build a pan filter that maps the collected channels into stereo,
+	# respecting the per-channel volume (dB) and pan position (-1..1).
+	# Pan law: left_gain = cos(θ), right_gain = sin(θ)  where θ = (pan+1)/2 * π/2
 	var pan_parts_l: PackedStringArray = []
 	var pan_parts_r: PackedStringArray = []
 	for ch in all_song_channels:
-		pan_parts_l.append("c%d" % ch)
-		pan_parts_r.append("c%d" % ch)
+		# Volume: convert dB to linear gain.  Missing entries default to 0 dB.
+		var vol_db: float = float(mixer_vols[ch]) if ch < mixer_vols.size() else 0.0
+		var vol_linear: float = pow(10.0, vol_db / 20.0)
+		# Pan position: -1 = hard left, 0 = centre, 1 = hard right.
+		var pan_pos: float = float(mixer_pans[ch]) if ch < mixer_pans.size() else 0.0
+		# Constant-power pan: θ goes from 0 (full left) to π/2 (full right).
+		var theta: float = (pan_pos + 1.0) / 2.0 * (PI / 2.0)
+		var gain_l: float = vol_linear * cos(theta)
+		var gain_r: float = vol_linear * sin(theta)
+		if gain_l > 0.0001:
+			pan_parts_l.append("%.4f*c%d" % [gain_l, ch])
+		if gain_r > 0.0001:
+			pan_parts_r.append("%.4f*c%d" % [gain_r, ch])
+	# Fallback: if everything was filtered out, sum all channels equally.
+	if pan_parts_l.is_empty():
+		for ch in all_song_channels:
+			pan_parts_l.append("c%d" % ch)
+	if pan_parts_r.is_empty():
+		for ch in all_song_channels:
+			pan_parts_r.append("c%d" % ch)
 	var pan_filter := "[0:a]pan=stereo|c0=%s|c1=%s[mix]" % [
 		"+".join(pan_parts_l), "+".join(pan_parts_r)]
-	# Chain a loudnorm filter to prevent clipping from the multi-channel sum,
+	# Chain a loudnorm filter to ensure consistent loudness across previews,
 	# then an afade filter for the fade-out.
 	var norm_filter := "[mix]loudnorm=I=-16:TP=-1.5:LRA=11[norm]"
 	var fade_filter := "[norm]afade=t=out:st=%.3f:d=%.3f[a]" % [fade_start, fade_duration]
