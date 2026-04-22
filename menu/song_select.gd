@@ -79,11 +79,11 @@ var vol_tween: Tween
 var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
 var song_info: Dictionary = {}
-var selected_song_folder_id: String
 var selected_song_index: int = 0
 var available_difficulties := []
 var selected_difficulty: int = 102 # Default to Intermediate
 var held_difficulty: int = 102
+var play_preview_on_select: bool = false
 
 var energy_modifier_index: int = 0
 var checkpoint_modifier_index: int = 0
@@ -103,7 +103,7 @@ func _ready():
 	if SongCatalog.song_catalog.is_empty():
 		print("No valid songs found!")
 		push_error("No valid songs found!")
-		%PlayButton.disabled = true
+#		%PlayButton.disabled = true
 		return
 	else:
 		print("Song catalog generated with %d songs." % SongCatalog.song_catalog.size())
@@ -135,6 +135,9 @@ func _ready():
 	vol_tween = create_tween()
 	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 1.0)
 	vol_tween.tween_callback(Transition.start_transition_out)
+	await Transition.animation_completed
+	_play_current_item_preview()
+	play_preview_on_select = true
 	
 func _load_async():
 	print("Loading song catalog (async)...")
@@ -333,6 +336,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			selected_difficulty = held_difficulty
 			_update_difficulty_panels(reference[&"difficulties"])
 			%AnimationPlayer.play("select_item")
+			if play_preview_on_select:
+				_play_song_preview()
 
 		&"song_single_difficulty":
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -361,6 +366,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			_update_previous_bests()
 			_update_difficulty_panels({reference[&"difficulty_offset"]: reference[&"difficulty_rating"]})
 			%AnimationPlayer.play("select_item")
+			if play_preview_on_select:
+				_play_song_preview()
 
 		&"submenu":
 			available_difficulties.clear()
@@ -375,6 +382,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%GenreLabel.text = "Category Select"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%AnimationPlayer.play("select_item")
+			if play_preview_on_select:
+				_stop_song_preview()
 
 		&"category":
 			available_difficulties.clear()
@@ -389,6 +398,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%GenreLabel.text = "Folder"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%AnimationPlayer.play("select_item")
+			if play_preview_on_select:
+				_stop_song_preview()
 
 func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> void:
 	var manager = SONG_MANAGER_SCENE.instantiate()
@@ -437,3 +448,31 @@ func _on_preview_player_finished() -> void:
 		vol_tween.kill()
 	vol_tween = create_tween()
 	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 4.0)
+
+func _play_current_item_preview() -> void:
+	if $Carousel.current_item[&"type"] in [&"song_all_difficulties", &"song_single_difficulty"]:
+		_play_song_preview()
+
+func _play_song_preview() -> void:
+	if %PreviewPlayer.playing:
+		%PreviewPlayer.stop()
+	if vol_tween:
+		vol_tween.kill()
+	vol_tween = create_tween()
+	vol_tween.tween_property(%MenuMusic, "volume_db", -80.0, 0.5)
+
+	var resource = SongCatalog.get_song_preview(song_info.folder_id)
+	if not resource:
+		_stop_song_preview()
+		return
+	%PreviewPlayer.stream = resource
+	await vol_tween.finished
+	%PreviewPlayer.play()
+
+func _stop_song_preview() -> void:
+	if %PreviewPlayer.playing:
+		%PreviewPlayer.stop()
+	if vol_tween:
+		vol_tween.kill()
+	vol_tween = create_tween()
+	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 0.5)

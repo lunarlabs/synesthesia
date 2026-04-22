@@ -51,6 +51,7 @@ CREATE TABLE "songs" (
             ELSE title
         END || COALESCE(' ' || NULLIF(TRIM(sub_title), ''), '')
     ) STORED,
+    "preview_filename"  TEXT DEFAULT '',
     CHECK (("cover_art_height" IS NULL) = ("cover_art" IS NULL)
     AND ("cover_art_width" IS NULL) = ("cover_art" IS NULL)
     AND ("cover_art_fmt" IS NULL) = ("cover_art" IS NULL)),
@@ -100,6 +101,7 @@ SELECT
     s."files_ok",
     s."resource_hash",
     s."midi_hash",
+    s."preview_filename",
     s."cover_art",
     s."cover_art_fmt",
     s."cover_art_height",
@@ -124,6 +126,7 @@ SELECT
     s."files_ok",
     s."resource_hash",
     s."midi_hash",
+    s."preview_filename",
     s."cover_art",
     s."cover_art_fmt",
     s."cover_art_height",
@@ -149,6 +152,7 @@ SELECT
     s."genre",
     s."bpm",
     s."desc",
+    s."preview_filename",
     s."cover_art",
     s."cover_art_fmt",
     s."cover_art_height",
@@ -177,6 +181,7 @@ BEGIN
         "genre",
         "bpm",
         "desc",
+        "preview_filename",
         "cover_art",
         "cover_art_fmt",
         "cover_art_height",
@@ -194,6 +199,7 @@ BEGIN
         NEW."genre",
         NEW."bpm",
         NEW."desc",
+        NEW."preview_filename",
         NEW."cover_art",
         NEW."cover_art_fmt",
         NEW."cover_art_height",
@@ -211,6 +217,7 @@ BEGIN
         genre = excluded.genre,
         bpm = excluded.bpm,
         desc = excluded.desc,
+        preview_filename = excluded.preview_filename,
         cover_art = excluded.cover_art,
         cover_art_fmt = excluded.cover_art_fmt,
         cover_art_height = excluded.cover_art_height,

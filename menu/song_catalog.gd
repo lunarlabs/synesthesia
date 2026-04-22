@@ -50,6 +50,7 @@ static var QUERY_BASE = """SELECT
 	files_ok, 
 	resource_hash,
 	midi_hash,
+	preview_filename,
 	cover_art,
 	cover_art_width,
 	cover_art_height,
@@ -69,6 +70,7 @@ static var QUERY_DIFFICULTY = """SELECT
 	files_ok, 
 	resource_hash,
 	midi_hash,
+	preview_filename,
 	cover_art,
 	cover_art_width,
 	cover_art_height,
@@ -76,6 +78,7 @@ static var QUERY_DIFFICULTY = """SELECT
 FROM v_full_library"""
 
 static var QUERY_COVER_ART = """SELECT cover_art, cover_art_width, cover_art_height, cover_art_fmt FROM songs WHERE folder_id = ?"""
+static var QUERY_PREVIEW_FILE = """SELECT preview_filename FROM songs"""
 
 static var FILTER_FOLDER = """folder_id = ?"""
 static var FILTER_DIFFICULTY = """difficulty_offset = ?"""
@@ -263,6 +266,7 @@ func _extract_songdata_meta(song_data: SongData) -> Dictionary:
 		"bpm": song_data.bpm,
 		"desc": song_data.description,
 		"source_name": song_data.source,
+		"preview_filename": song_data.preview_audio.get_file(),
 		}
 	if song_data.cover_art:
 		var cover_art_img = song_data.cover_art.get_image()
@@ -539,6 +543,19 @@ func get_song_info(folder_id: String) -> Dictionary:
 	if result_is_empty or not success:
 		return {}
 	return result[0]
+
+func get_song_preview(folder_id: String) -> AudioStream:
+	var db = SessionManager.library_db
+	var success = db.query_with_bindings("%s WHERE %s;" % [QUERY_PREVIEW_FILE, FILTER_FOLDER], [folder_id])
+	var result = db.query_result
+	var result_is_empty = result.size() == 0
+	if result_is_empty or not success:
+		return null
+	var preview_filename = result[0]["preview_filename"]
+	if preview_filename == null:
+		return null
+	var resource = load("res://song/%s/%s" % [folder_id, preview_filename])
+	return resource
 
 func get_difficulties(folder_id: String) -> Array:
 	var db = SessionManager.library_db

@@ -840,7 +840,6 @@ grow_horizontal = 1
 
 [node name="PreviewPlayer" type="AudioStreamPlayer" parent="." unique_id=1646222971]
 unique_name_in_owner = true
-volume_db = -6.0
 bus = &"Tracks"
 
 [node name="CanvasLayer" type="ColorRect" parent="." unique_id=998416940]

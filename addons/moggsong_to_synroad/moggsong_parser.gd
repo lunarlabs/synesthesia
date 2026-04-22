@@ -89,6 +89,8 @@ static func update_songdata_tracks(moggsong_file: String):
 				print("assigned click track: %s" % output_file)
 		else:
 			push_error("Failed to create track %s" % output_file)
+	# Generate preview audio from the mogg file
+	generate_preview_audio(moggsong_file, songdata, moggsong_data, mogg_file)
 	# Save the mutated songdata back to disk so changes are not lost.
 	var save_err = ResourceSaver.save(songdata, get_songdata_path(moggsong_file))
 	if save_err != OK:
@@ -128,6 +130,100 @@ static func _set_songdata_tracks_from_midi(songdata: SongData) -> void:
 			songdata.tracks.append(trackdata)
 			print("added track %s" % track_name)
 
+## Generates a stereo preview audio file by mixing down all SONG_BUS channels
+## from the mogg, trimming to [code]preview_start_ms[/code] / [code]preview_length_ms[/code],
+## and applying a fade-out at the end.
+##
+## If [param moggsong_data] or [param mogg_file] are omitted the moggsong is re-parsed.
+static func generate_preview_audio(
+		moggsong_file: String,
+		songdata: SongData,
+		moggsong_data: Dictionary = {},
+		mogg_file: String = "") -> void:
+	if moggsong_data.is_empty():
+		moggsong_data = _read_moggsong_file(moggsong_file)
+	if mogg_file.is_empty():
+		mogg_file = get_folder(moggsong_file) + "/" + moggsong_data["mogg_path"]
+
+	var preview_start_ms = moggsong_data.get("preview_start_ms", -1)
+	var preview_length_ms = moggsong_data.get("preview_length_ms", -1)
+	if preview_start_ms < 0 or preview_length_ms < 0:
+		print("No preview_start_ms / preview_length_ms in moggsong – skipping preview generation.")
+		return
+
+	# Collect every channel index that belongs to a SONG_BUS track.
+	var all_song_channels: Array[int] = []
+	var moggsong_tracks = moggsong_data.get("tracks", [])
+	for track_entry in moggsong_tracks:
+		var key = track_entry.keys()[0]
+		var value = track_entry[key] as Array
+		var audio_destination = value[1] as String
+		if audio_destination == "event:/SONG_BUS":
+			for ch in value[0]:
+				all_song_channels.append(int(ch))
+
+	if all_song_channels.is_empty():
+		push_warning("generate_preview_audio: no SONG_BUS channels found.")
+		return
+
+	# Resolve ffmpeg
+	var ffmpeg_path = _resolve_ffmpeg()
+	if ffmpeg_path.is_empty():
+		return
+
+	var preview_start_s := float(preview_start_ms) / 1000.0
+	var preview_length_s := float(preview_length_ms) / 1000.0
+	# Fade-out for the last 3 seconds (or less if the preview is shorter).
+	var fade_duration := minf(3.0, preview_length_s * 0.3)
+	var fade_start := preview_length_s - fade_duration
+
+	# Build a pan filter that maps the collected channels into stereo.
+	# MOGG files interleave L/R pairs, so even-indexed channels (within each
+	# instrument) go left and odd-indexed go right.  When we have an arbitrary
+	# bag of channels from multiple instruments the safest strategy is to sum
+	# each channel equally into both stereo outputs and let ffmpeg normalise.
+	var pan_parts_l: PackedStringArray = []
+	var pan_parts_r: PackedStringArray = []
+	for ch in all_song_channels:
+		pan_parts_l.append("c%d" % ch)
+		pan_parts_r.append("c%d" % ch)
+	var pan_filter := "[0:a]pan=stereo|c0=%s|c1=%s[mix]" % [
+		"+".join(pan_parts_l), "+".join(pan_parts_r)]
+	# Chain a loudnorm filter to prevent clipping from the multi-channel sum,
+	# then an afade filter for the fade-out.
+	var norm_filter := "[mix]loudnorm=I=-16:TP=-1.5:LRA=11[norm]"
+	var fade_filter := "[norm]afade=t=out:st=%.3f:d=%.3f[a]" % [fade_start, fade_duration]
+	var filter_complex := "%s;%s;%s" % [pan_filter, norm_filter, fade_filter]
+
+	var output_file := get_folder(moggsong_file) + "/preview.ogg"
+	var global_in := ProjectSettings.globalize_path(mogg_file)
+	var global_out := ProjectSettings.globalize_path(output_file)
+
+	var params: PackedStringArray = [
+		"-y",
+		"-ss", "%.3f" % preview_start_s,
+		"-f", "ogg", "-i", global_in,
+		"-t", "%.3f" % preview_length_s,
+		"-filter_complex", filter_complex,
+		"-map", "[a]",
+		global_out
+	]
+
+	print("Generating preview audio: %s" % output_file)
+	print("ffmpeg params: %s" % str(params))
+	var stdout := []
+	var exit_code := OS.execute(ffmpeg_path, params, stdout, true)
+	if exit_code != 0:
+		push_error("generate_preview_audio: ffmpeg returned %d" % exit_code)
+		print(stdout)
+		return
+
+	if FileAccess.file_exists(output_file):
+		songdata.preview_audio = output_file
+		print("Preview audio saved: %s" % output_file)
+	else:
+		push_error("generate_preview_audio: output file not found after ffmpeg.")
+
 #endregion
 
 #region Import functions
@@ -162,20 +258,25 @@ static func _read_midi_file(path: String) -> Dictionary:
 
 # ===== Multi-channel ogg conversion =====
 
-static func _convert_mogg_to_stereo_files(in_file: String, out_file: String, channels: Array):
-	var ffmpeg_path = "ffmpeg"
-	# Check if ffmpeg is in path
-	var output = []
-	var exit_code = OS.execute(ffmpeg_path, ["-version"], output)
+## Locates the ffmpeg binary, returning its path or an empty string on failure.
+static func _resolve_ffmpeg() -> String:
+	var ffmpeg_path := "ffmpeg"
+	var output := []
+	var exit_code := OS.execute(ffmpeg_path, ["-version"], output)
 	if exit_code != 0:
 		# Try common Windows path
 		ffmpeg_path = "C:/Program Files/ffmpeg/bin/ffmpeg.exe"
 		exit_code = OS.execute(ffmpeg_path, ["-version"], output)
 		if exit_code != 0:
 			push_error("ffmpeg not found. Please install ffmpeg and add it to your system PATH.")
-			return
-	
+			return ""
 	print("Using ffmpeg at: %s" % ffmpeg_path)
+	return ffmpeg_path
+
+static func _convert_mogg_to_stereo_files(in_file: String, out_file: String, channels: Array):
+	var ffmpeg_path := _resolve_ffmpeg()
+	if ffmpeg_path.is_empty():
+		return
 
 	var stdout := []
 	var filter := ""
@@ -201,7 +302,7 @@ static func _convert_mogg_to_stereo_files(in_file: String, out_file: String, cha
 	var params := ["-y", "-f", "ogg", "-i", global_in, "-filter_complex", filter, "-map", "[a]", global_out]
 	
 	print("Running ffmpeg with params: " + str(params))
-	exit_code = OS.execute(ffmpeg_path, params, stdout, true)
+	var exit_code = OS.execute(ffmpeg_path, params, stdout, true)
 	print(stdout)
 	if exit_code != 0:
 		print("Failed to extract %s to %s" % [in_file, out_file])
