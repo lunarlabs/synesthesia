@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://coucd74ci5vq3"]
 
+[ext_resource type="Texture2D" uid="uid://d0vdu0qvtgp6m" path="res://assets/textures/loadscreen.png" id="1_1g2i4"]
 [ext_resource type="Script" uid="uid://coiai1g3011kv" path="res://menu/ingest.gd" id="1_vk82j"]
 
 [node name="IngestScreen" type="TextureRect" unique_id=1930818117]
@@ -8,6 +9,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("1_1g2i4")
+expand_mode = 3
+stretch_mode = 4
 script = ExtResource("1_vk82j")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=231611599]
