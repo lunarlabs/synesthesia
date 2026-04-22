@@ -114,6 +114,7 @@ sky = SubResource("Sky_xubvx")
 ambient_light_source = 2
 ambient_light_color = Color(0.08280001, 0.11714671, 0.23, 1)
 tonemap_mode = 2
+ssr_enabled = true
 ssao_radius = 1.08
 ssao_intensity = 9.3
 ssao_horizon = 0.05

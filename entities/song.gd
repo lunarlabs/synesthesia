@@ -186,6 +186,7 @@ func _ready():
 		checkpoint.get_node("BoundaryLine").visible = (manager_node.checkpoint_modifier == 0 or _barrier_threshold > 0)
 		if _barrier_threshold > 0:
 			checkpoint.is_barrier = true
+			checkpoint.set_warning_state(true)
 		add_child(checkpoint)
 		_checkpoint_nodes.append(checkpoint)
 	if manager_node.autoblast:

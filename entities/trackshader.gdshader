@@ -20,7 +20,7 @@ void fragment() {
     
     // 2. Normal Map
     NORMAL_MAP = texture(tex_frg_45, UV).rgb;
-    NORMAL_MAP_DEPTH = 0.5;
+    NORMAL_MAP_DEPTH = 0.4;
 
     // 3. Emission Logic
     vec3 final_emission = vec3(0.0);
