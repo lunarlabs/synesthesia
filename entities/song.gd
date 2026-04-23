@@ -139,7 +139,7 @@ func _ready():
 	print("tracks added")
 	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
-	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE)
+	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE) * 2
 	# Initialize barrier threshold before gate setup
 	match manager_node.checkpoint_modifier:
 		2: _barrier_threshold = 2
