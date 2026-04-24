@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 # Configuration
@@ -11,7 +12,7 @@ const DECAY_RATE = 15.0 # How fast the VU meter falls (lower = slower, more natu
 var spectrum: AudioEffectSpectrumAnalyzerInstance
 var spectrum_image: Image
 var spectrum_texture: ImageTexture
-var min_db = 60.0
+var min_db = 80.0
 var frequency_bands: Array[float] = []
 var previous_magnitudes: Array[float] = []
 
@@ -46,7 +47,7 @@ func _process(delta):
 		var energy = linear_to_db(magnitude)
 		
 		# Normalize: -60db becomes 0.0, 0db becomes 1.0
-		var height = clamp((min_db + energy) / min_db, 0.0, 1)
+		var height = clamp((min_db + energy) / min_db, 0.0, 2)
 		
 		# Smooth the value with attack/decay (frame-rate independent)
 		# Use faster attack when rising, slower decay when falling

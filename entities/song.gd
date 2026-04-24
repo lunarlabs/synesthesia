@@ -172,7 +172,7 @@ func _ready():
 	end_gate.particles.hide()
 	$FinishTower.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
 	$FinishTower.set_speed(bpm)
-	$FinishTower.position.z = end_gate.position.z - 75
+	$FinishTower.position.z = end_gate.position.z - (40 * length_multiplier)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D

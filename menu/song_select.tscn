@@ -821,7 +821,6 @@ text = "Close"
 [node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
 unique_name_in_owner = true
 stream = ExtResource("8_ctryq")
-volume_db = -80.0
 autoplay = true
 bus = &"Menu"
 
