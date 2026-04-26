@@ -61,6 +61,7 @@ var phrase_start_measure: int:
 @onready var miss_sound = $MissSound as AudioStreamPlayer
 @onready var marker = $Marker as Node3D
 @onready var pfx = $Whoosh as GPUParticles3D
+@onready var _phrase_line = $PhraseLine as MeshInstance3D
 var rails: MultiMeshInstance3D
 var lo_rez: MultiMeshInstance3D
 var vol_dB: float:
@@ -359,6 +360,7 @@ func _advance_phrase():
 		var note = note_nodes[i]
 		if note and is_active:
 			note.set_phrase_note(true)
+	_build_phrase_line()
 
 func get_measure_index_after(measure_num: int) -> int:
 	for i in range(current_phrase_index, track_data.phrase_starts.size()):
@@ -408,8 +410,11 @@ func set_active(active: bool):
 	# When becoming active, update to the current phrase if not in reset countdown
 	if active:
 		_advance_phrase()
+		_build_phrase_line()
 		if song_node.manager_node.autoblast:
 			_sync_autoblast_state()
+	else:
+		_build_phrase_line()
 
 func _sync_autoblast_state():
 	var current_time = conductor.time_elapsed
@@ -522,6 +527,28 @@ func _misblast(beat_position: float, lane_index: int):
 	misblast.position.z = - (beat_position * length_per_beat)
 	misblast.position.x = (lane_index - 1) * 0.6
 	add_child(misblast)
+
+func _build_phrase_line():
+	if not _phrase_line:
+		return
+
+	if not is_active \
+		or current_phrase_index >= track_data.phrase_note_indices.size() \
+		or track_data.phrase_note_indices[current_phrase_index].size() < 2:
+			_phrase_line.mesh = null
+			return
+
+	var im = ImmediateMesh.new()
+	im.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, _phrase_line.material_override)
+
+	var note_indices = track_data.phrase_note_indices[current_phrase_index]
+	for note_idx in note_indices:
+		var pos = track_data.note_positions[note_idx]
+		print(str(pos))
+		im.surface_add_vertex(Vector3(pos.x, 0.00, pos.y))
+
+	im.surface_end()
+	_phrase_line.mesh = im
 
 class GameplayTrackData:
 	## A map of the notes on the track. The key is its beat, the value is its lane.
