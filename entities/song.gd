@@ -175,11 +175,23 @@ func _ready():
 	$FinishTower.position.z = end_gate.position.z - (40 * length_multiplier)
 	for i in range(manager_node.checkpoint_measures.size()):
 		var measure = manager_node.checkpoint_measures[i]
+		var fraction = float(measure - lead_in_measures) / (total_measures - (lead_in_measures - 1))
+
+		var checkpoint_marker := ColorRect.new()
+		checkpoint_marker.color = Color(1., 1., 1., 0.5)
+
+		checkpoint_marker.anchor_bottom = 1. - fraction
+		checkpoint_marker.anchor_top = checkpoint_marker.anchor_bottom
+		checkpoint_marker.anchor_left = 0.1
+		checkpoint_marker.anchor_right = 0.9
+		checkpoint_marker.offset_top = -3
+		%SongProgress.add_sibling(checkpoint_marker)
+
 		var checkpoint = CHECKPOINT_SCENE.instantiate() as Node3D
 		%Conductor.new_measure.connect(checkpoint._on_song_new_measure)
 		checkpoint.name = "Checkpoint%d" % (i)
 		checkpoint.fadeout_time = checkpoint_fade_time
-		var percentage = float(measure * 100) / total_measures
+		var percentage =  float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
@@ -187,6 +199,16 @@ func _ready():
 		if _barrier_threshold > 0:
 			checkpoint.is_barrier = true
 			checkpoint.set_warning_state(true)
+			var barrier_start_fraction = float(measure - (10 + lead_in_measures)) / (total_measures - (lead_in_measures - 1))
+
+			var barrier_marker := ColorRect.new()
+			barrier_marker.color = Color(1., 0, 0, 0.5)
+
+			barrier_marker.anchor_bottom = 1. - barrier_start_fraction
+			barrier_marker.anchor_top = 1. - fraction
+			barrier_marker.anchor_left = 0.1
+			barrier_marker.anchor_right = 0.9
+			%SongProgress.add_sibling(barrier_marker)
 		add_child(checkpoint)
 		_checkpoint_nodes.append(checkpoint)
 	if manager_node.autoblast:
