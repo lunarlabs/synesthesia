@@ -39,8 +39,14 @@ func _ready():
 func update_difficulty(difficulty_offset: int, item: Dictionary):
 	if item[&"type"] == &"song_all_difficulties" \
 	and not item[&"difficulties"].has(difficulty_offset):
-		difficulty_offset = 102 # TODO: stinky hack since 96 is the only missing difficulty in
-									#       freQ songs... for now
+		# Fall back to the nearest available difficulty
+		var available = item[&"difficulties"].keys()
+		if not available.is_empty():
+			var nearest = available[0]
+			for d in available:
+				if abs(d - difficulty_offset) < abs(nearest - difficulty_offset):
+					nearest = d
+			difficulty_offset = nearest
 	current_difficulty = difficulty_offset
 	song_difficulty_name.text = DIFFICULTY_NAMES[difficulty_offset]
 	var rating

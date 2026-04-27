@@ -232,6 +232,7 @@ func process_song(scan_info: Dictionary):
 		var midi_hash = FileAccess.get_md5(ResourceUID.ensure_path(song_data.midi_file))
 		if is_new or midi_hash != prev_midi_hash:
 			var difficulty_rows = []
+			var difficulty_track_maps: Array[Array] = [] # parallel array for dedup
 			var midi_track_indices = song_data.song_track_locations.values()
 			for i in DIFFICULTY_LEVELS:
 				var track_map: Array[Dictionary] = []
@@ -250,8 +251,23 @@ func process_song(scan_info: Dictionary):
 						"details_json": JSON.stringify(_difficulty_info_to_json(ddi))
 					}
 					difficulty_rows.append(row)
-			if not difficulty_rows.is_empty():
-				db.insert_rows(difficulties_table, difficulty_rows)
+					difficulty_track_maps.append(track_map)
+			# Deduplicate: when multiple tiers share identical note maps
+			# (same timings + lane patterns), keep only the highest offset.
+			var unique_rows: Array = []
+			var unique_maps: Array[Array] = []
+			for idx in range(difficulty_rows.size() - 1, -1, -1):
+				var is_duplicate := false
+				for kept_map in unique_maps:
+					if _track_maps_equal(difficulty_track_maps[idx], kept_map):
+						print("  Skipping duplicate difficulty %s (identical chart)" % difficulty_rows[idx]["difficulty_offset"])
+						is_duplicate = true
+						break
+				if not is_duplicate:
+					unique_rows.append(difficulty_rows[idx])
+					unique_maps.append(difficulty_track_maps[idx])
+			if not unique_rows.is_empty():
+				db.insert_rows(difficulties_table, unique_rows)
 
 
 ## Creates a dictionary of song metadata for INSERT or UPDATE statements.
@@ -443,6 +459,16 @@ func _get_pattern_weight(
 			return PATTERN_WEIGHT_JUMP
 		_:
 			return 1.0 # Fallback neutral weight
+
+## Returns true when two arrays of note-map dictionaries are identical.
+## Used to detect difficulty tiers that share the exact same chart data.
+func _track_maps_equal(a: Array, b: Array) -> bool:
+	if a.size() != b.size():
+		return false
+	for i in range(a.size()):
+		if a[i] != b[i]:
+			return false
+	return true
 #endregion
 # TODO: function to get song details from database
 # as well as sorting and filtering

@@ -752,6 +752,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		var stop_distance = length_per_beat * BEATS_PER_MEASURE
 		tween.tween_property(%Camera, "position:z", %Camera.position.z - stop_distance, stop_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(%Camera, "rotation_degrees:x", 0.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(%TargetPfx, "position:z", %TargetPfx.position.z - (2. * stop_distance), stop_duration).set_trans(Tween.TRANS_LINEAR)
 		tween.tween_property(instrument_container, "scale", Vector2.ZERO, 0.2)
 		for i in tracks.size():
 			asp.stream.set_sync_stream_volume(i + 1, -6.0)
