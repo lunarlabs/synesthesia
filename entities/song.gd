@@ -44,6 +44,8 @@ var score: int
 var streak: int = 0
 var max_streak: int
 var _inactive_safeguard_measure: int = -1
+var _phrase_started_this_measure: bool = false
+var _latest_first_note_this_measure: float = -1.0
 var _miss_count: int = 0
 var _in_fail_state: bool = false
 var _phrases_completed: int = 0
@@ -191,7 +193,7 @@ func _ready():
 		%Conductor.new_measure.connect(checkpoint._on_song_new_measure)
 		checkpoint.name = "Checkpoint%d" % (i)
 		checkpoint.fadeout_time = checkpoint_fade_time
-		var percentage =  float(measure * 100) / total_measures
+		var percentage = float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure)
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
@@ -323,6 +325,15 @@ func _process(delta: float):
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
 		# Use cached measure_times reference for boundary check
+		if not _phrase_started_this_measure and _latest_first_note_this_measure > 0 \
+		and _latest_first_note_this_measure + manager_node.miss_window < %Conductor.get_audio_time():
+			# Don't penalize if the active track is reset and has notes to play
+			if _cached_active_track_node.reset_measure <= %Conductor.current_measure \
+			and _cached_active_track_node.get_note_count_in_measure(%Conductor.current_measure) > 0:
+				pass
+			else:
+				# last opportunity passed, penalize.
+				_on_streak_broken()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -365,6 +376,7 @@ func debug_info() -> String:
 	return "\n".join(lines)
 
 func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_count: int):
+	_phrase_started_this_measure = true
 	streak += 1
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
 	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
@@ -463,23 +475,10 @@ func _on_streak_broken():
 func _on_active_phrase_missed(phrase_score_value: int):
 	_phrases_missed += 1
 
+# Inactive phrase miss penalties are now applied after the last opportunity passes
+# each measure (see _process and _get_latest_first_note_time).
 func _on_inactive_phrase_missed():
-	if _inactive_safeguard_measure >= %Conductor.current_measure: # this measure already had a phrase activation, do not penalize
-		return
-
-	# Enforce only one penalty per measure for inactive phrase misses
-	if %Conductor.current_measure == _last_inactive_penalty_measure:
-		return
-		
-	# If the active track is reset and there are notes in the current measure, do not penalize
-	var active_track_node = tracks[active_track] as SynRoadTrack
-	if active_track_node.reset_measure <= %Conductor.current_measure:
-		var notes_in_measure = active_track_node.get_note_count_in_measure(%Conductor.current_measure)
-		if notes_in_measure > 0:
-			return
-	
-	_last_inactive_penalty_measure = %Conductor.current_measure
-	_on_streak_broken()
+	pass
 	
 
 func _switch_active_track(new_active_track: int, use_tween: bool = true):
@@ -760,6 +759,9 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		var _phrase_capture_accuracy = float(_phrases_completed * 100) / (_phrases_completed + _phrases_missed)
 		print("Song finished!")
 	elif not finished:
+		if _cached_active_track_node:
+			_phrase_started_this_measure = _cached_active_track_node.blasting_phrase
+		_latest_first_note_this_measure = _get_latest_first_note_time(measure)
 		if measure < manager_node.measure_in_chunks.size():
 			var current_chunk = manager_node.measure_in_chunks[measure]
 			var target_ahead = current_chunk + CHUNK_LOAD_RANGE_FORWARD
@@ -860,6 +862,14 @@ func _apply_barrier_penalty() -> void:
 	
 	if energy <= 0:
 		fail_song()
+
+func _get_latest_first_note_time(measure: int) -> float:
+	var time: float = -1.0
+	for i in range(tracks.size()):
+		var track = tracks[i] as SynRoadTrack
+		if track.reset_measure <= measure:
+			time = maxf(time, track.get_phrase_first_note_time(measure))
+	return time
 
 func _update_barrier_visual() -> void:
 	# TODO: Find out what the next checkpoint is instead of using the start gate

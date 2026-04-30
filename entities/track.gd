@@ -373,6 +373,16 @@ func get_note_count_in_measure(measure_num: int) -> int:
 		return track_data.measure_note_counts[measure_num]
 	return 0
 
+func get_phrase_first_note_time(measure: int) -> float:
+	if current_phrase_index >= track_data.phrase_starts.size():
+		return -1.0
+	if track_data.phrase_starts[current_phrase_index] != measure:
+		return -1.0
+	var first_note_idx = track_data.phrase_first_note_indices[current_phrase_index]
+	if first_note_idx < 0:
+		return -1.0
+	return track_data.note_times[first_note_idx]
+
 func move_marker(measure_index: int):
 	if measure_index < 0 or measure_index >= track_data.phrase_marker_positions.size():
 		song_node._update_track_marker_cache(track_index, -1)
@@ -544,7 +554,7 @@ func _build_phrase_line():
 	var note_indices = track_data.phrase_note_indices[current_phrase_index]
 	for note_idx in note_indices:
 		var pos = track_data.note_positions[note_idx]
-		print(str(pos))
+#		print(str(pos))
 		im.surface_add_vertex(Vector3(pos.x, 0.00, pos.y))
 
 	im.surface_end()
