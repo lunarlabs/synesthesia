@@ -325,13 +325,13 @@ func _process(delta: float):
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
 		# Use cached measure_times reference for boundary check
-		if not _phrase_started_this_measure and _latest_first_note_this_measure > 0 \
+		if not _phrase_started_this_measure and _latest_first_note_this_measure >= 0.0 \
 		and _latest_first_note_this_measure + manager_node.miss_window < %Conductor.get_audio_time():
-			# Don't penalize if the active track is reset and has notes to play
-			if _cached_active_track_node.reset_measure <= %Conductor.current_measure \
-			and _cached_active_track_node.get_note_count_in_measure(%Conductor.current_measure) > 0:
-				pass
-			else:
+			# Don't penalize if the active track is reset and has not advanced its phrase
+			# to the next measure. If the track has notes in the current measure,
+			# that implies the last opportunity has not yet passed.
+			if not (_cached_active_track_node.reset_measure <= %Conductor.current_measure \
+			and _cached_active_track_node.get_phrase_first_note_time(%Conductor.current_measure) >= 0.0):
 				# last opportunity passed, penalize.
 				_on_streak_broken()
 
