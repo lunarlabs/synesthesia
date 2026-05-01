@@ -93,7 +93,6 @@ signal song_finished(stats)
 
 var pv_anims: Array
 var pv_pointer := 0
-var lead_distance: float = 0.0
 var energy_tween: Tween
 
 func _enter_tree() -> void:
@@ -117,7 +116,6 @@ func _ready():
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	_playhead_speed = - (length_per_beat / seconds_per_beat)
-	lead_distance = PLAYHEAD_LEAD_DIST * length_multiplier
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	_track_marker_measures.resize(6) # Initialize cache for 6 instrument tracks
 	for i in manager_node.track_data.size():
