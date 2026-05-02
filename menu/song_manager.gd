@@ -16,6 +16,7 @@ var difficulty: int = 96
 var can_pause := false
 
 const SONG_SCENE: PackedScene = preload("res://entities/song.tscn")
+const LOAD_SCENE: PackedScene = preload("res://menu/load_screen.tscn")
 
 const DIFFICULTY_NAMES = {
 	96: "DIFF_96",
@@ -107,7 +108,11 @@ var catalog_entry: Dictionary = {}
 # Also measures will be zero-indexed
 var song_data: SongData
 var song_instance: SynRoadSong
+var load_screen: ColorRect
 var preprocessor: SynRoadTrackPreprocessor
+var waiting_for_task: bool = false
+var task = null
+var load_result: Dictionary = {}
 var song_name: String
 var midi_hash: String
 var note_maps: Array[Dictionary]
@@ -133,22 +138,35 @@ var hit_window: float
 var miss_window: float
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
+	load_screen = LOAD_SCENE.instantiate()
+	add_child.call_deferred(load_screen)
 	if song_file == "":
 		# Were we passed a catalog entry directly?
 		if catalog_entry.has("folder_id"):
+			var song_info_container = load_screen.get_node("SongInfo")
+			var title_label = song_info_container.get_node("TitleLabel") as Label
+			var artist_label = song_info_container.get_node("ArtistLabel") as Label
+			if catalog_entry.sub_title == null or catalog_entry.sub_title.is_empty():
+				title_label.text = catalog_entry["title"]
+			else:
+				title_label.text = "%s\n%s" % [catalog_entry["title"], catalog_entry["sub_title"]]
+			artist_label.text = catalog_entry["artist"]
 			song_file = SongCatalog.get_resource_path(catalog_entry.folder_id)
 			midi_hash = catalog_entry.midi_hash
 			result_screen.populate_from_catalog_entry(catalog_entry, difficulty)
+			var tween = create_tween()
+			tween.tween_property(song_info_container, "modulate:a", 1.0, 0.5)
+			await tween.finished
 		else:
 			push_error("No song file provided")
 			return
-	var load_result: Dictionary = {}
-	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	get_window().focus_exited.connect(_on_lose_focus)
 	song_name = song_file.get_file().get_slice(".", 0)
 
 	var prepare_func = Callable(self , "_prepare_song_data").bind(load_result)
-	var task = WorkerThreadPool.add_task(prepare_func)
+	task = WorkerThreadPool.add_task(prepare_func)
+	waiting_for_task = true
 	
 	hit_window = TIMING_WINDOWS[timing_modifier]
 	miss_window = hit_window + MISS_WINDOW_OFFSET
@@ -164,21 +182,24 @@ func _ready() -> void:
 	var result_restart_btn = result_screen.get_node("%RestartButton") as Button
 	result_exit_btn.pressed.connect(_on_quit_pressed)
 	result_restart_btn.pressed.connect(_on_restart_pressed)
-	
-	# Connect fail screen buttons
-	
-	song_instance = SONG_SCENE.instantiate() as SynRoadSong
 
-	song_instance.song_failed.connect(_on_song_failed)
-	song_instance.song_finished.connect(_on_song_finished)
-	var err = WorkerThreadPool.wait_for_task_completion(task)
-	if err != OK:
-		push_error("Failed to wait for task completion")
-		return
-	if not load_result.get("success", false):
-		return
-	print("handing over to song node now")
-	add_child.call_deferred(song_instance)
+@warning_ignore("unused_parameter")
+func _process(delta: float) -> void:
+	if waiting_for_task:
+		if WorkerThreadPool.is_task_completed(task):
+			var err = WorkerThreadPool.wait_for_task_completion(task)
+			if err != OK:
+				push_error("Failed to wait for task completion")
+				return
+			if not load_result.get("success", false):
+				return
+			print("handing over to song node now")
+			song_instance = SONG_SCENE.instantiate() as SynRoadSong
+			song_instance.song_failed.connect(_on_song_failed)
+			song_instance.song_finished.connect(_on_song_finished)
+			add_child.call_deferred(song_instance)
+			load_screen.color = Color(1, 1, 1, 0)
+			waiting_for_task = false
 
 func _prepare_song_data(out_load_result: Dictionary) -> void:
 	song_data = load(song_file) as SongData

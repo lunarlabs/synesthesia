@@ -68,6 +68,7 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 var _bpm = NAN
 var _err = Error.ERR_INVALID_DATA
+var _midi_mutex: Mutex = Mutex.new()
 
 var long_title: String:
 	get:
@@ -106,6 +107,7 @@ var track_names: Array[String]:
 					break
 		if names.size() == 0:
 			push_warning("No track names found in MIDI data.")
+			printerr("No track names found in MIDI data!")
 		return names
 
 ## A dictionary mapping song track names to their storage locations.
@@ -176,14 +178,21 @@ func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[f
 	return note_map
 
 func _load_midi_data() -> void:
+	_midi_mutex.lock()
+	if _midi_data:
+		_midi_mutex.unlock()
+		return
 	var time_start = Time.get_ticks_usec()
-	_midi_data = MidiResource.new()
-	_err = _midi_data.load_file(ResourceUID.ensure_path(midi_file))
-	assert(_err == OK)
-	if _err != OK:
+	var new_midi_data = MidiResource.new()
+	var new_err = new_midi_data.load_file(ResourceUID.ensure_path(midi_file))
+	assert(new_err == OK)
+	if new_err != OK:
 		push_error("Failed to load MIDI data from %s" % midi_file)
+	_err = new_err
+	_midi_data = new_midi_data
 	@warning_ignore("integer_division")
 	print("Loaded MIDI data in %d ms" % ((Time.get_ticks_usec() - time_start) / 1000))
+	_midi_mutex.unlock()
 
 func _get_song_track_locations() -> Dictionary[String, int]:
 	if !_midi_data:

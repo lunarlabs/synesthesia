@@ -402,9 +402,18 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 				_stop_song_preview()
 
 func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> void:
+	var time_start = Time.get_ticks_usec()
 	var manager = SONG_MANAGER_SCENE.instantiate()
+	var time_end = Time.get_ticks_usec()
+	print("instantiate: %d microseconds" % (time_end - time_start))
+	time_start = time_end
 	manager.catalog_entry = SongCatalog.get_song_info(song_folder)
+	time_end = Time.get_ticks_usec()
+	print("get_song_info: %d microseconds" % (time_end - time_start))
+	time_start = time_end
 	manager.difficulty = selected_difficulty if difficulty == -1 else difficulty
+	time_end = Time.get_ticks_usec()
+	print("set difficulty: %d microseconds" % (time_end - time_start))
 
 	# Apply modifiers
 	# TODO: Button cycling and values not implemented yet
@@ -433,7 +442,10 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	# TODO: call transition handler here so there's no loading lag
 
 	# Load the song
+	time_start = Time.get_ticks_usec()
 	get_tree().root.add_child(manager)
+	time_end = Time.get_ticks_usec()
+	print("add child: %d microseconds" % (time_end - time_start))
 	get_tree().current_scene = manager
 	queue_free()
 

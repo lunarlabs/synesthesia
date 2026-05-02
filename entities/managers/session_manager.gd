@@ -12,6 +12,7 @@ var _player_db: SQLite = null
 var player_attached := false
 
 var previous_select_options: Dictionary = {}
+var modifiers: Dictionary = {}
 
 #region Database Functions
 var library_db: SQLite:

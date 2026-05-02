@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://ctarixkk533c8"]
+
+[ext_resource type="FontVariation" uid="uid://duwh7pck1j4u4" path="res://menu/theme/SG_conbold.tres" id="1_onbqj"]
+
+[resource]
+font = ExtResource("1_onbqj")
+font_size = 37
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)

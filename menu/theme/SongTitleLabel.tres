@@ -3,6 +3,7 @@
 [ext_resource type="FontVariation" uid="uid://duwh7pck1j4u4" path="res://menu/theme/SG_conbold.tres" id="1_r688y"]
 
 [resource]
+line_spacing = -30.0
 font = ExtResource("1_r688y")
 font_size = 74
 outline_size = 10

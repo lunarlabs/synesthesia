@@ -117,32 +117,57 @@ mat3 rotateX(float angle) {
 }
 
 // --- Scene Map Function ---
-float map(vec3 p) {
+float map(vec3 p, out int object_id) {
     float d = 1e10;
+    object_id = 0;
     
     // 1. Central Geometry (Unchanged)
     {
         vec3 q = p - vec3(0., 5., 0.);
-        d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., -.8));
+        float dist = sdParallelogram(opRevolution(q, 10.), 0.5, 1., -.8);
+		if(dist < d) {
+			d = dist;
+			object_id = 1;
+		}
     }
     {
         vec3 q = p - vec3(0., -5., 0.);
-        d = min(d, sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8));
+        float dist = sdParallelogram(opRevolution(q, 10.), 0.5, 1., .8);
+		if(dist < d) {
+			d = dist;
+			object_id = 2;
+		}
     }
     {
         // Slowly rotating octahedron
         vec3 q = p;
         q *= rotateY(TIME * 0.3); // Rotate around Y axis
         q *= rotateX(TIME * 0.2);  // Rotate around X axis for more interesting motion
-        d = min(d, sdOctahedron(q, 3.0));
+		float dist = sdOctahedron(q, 3.0);
+		if(dist < d) {
+			d = dist;
+			object_id = 3;
+		}
     }
     
     // 2. Optimized Rings (Replaces the loop)
     // Top Ring (Rotates Positive, Offset 0.75)
-    d = min(d, opRing(p, 0.75, 1.0, true));
+	{
+		float dist = opRing(p, 0.75, 1.0, true);
+		if(dist < d) {
+			d = dist;
+			object_id = 4;
+		}
+	}
     
     // Bottom Ring (Rotates Negative, Offset -0.75)
-    d = min(d, opRing(p, -0.75, -1.0, false));
+	{
+		float dist = opRing(p, -0.75, -1.0, false);
+		if(dist < d) {
+			d = dist;
+			object_id = 5;
+		}
+	}
     
     return d;
 }
@@ -150,12 +175,13 @@ float map(vec3 p) {
 // --- Raymarcher ---
 
 // Casts a ray from 'ro' (Ray Origin) in direction 'rd' (Ray Direction)
-float ray_march(vec3 ro, vec3 rd) {
+float ray_march(vec3 ro, vec3 rd, out int hit_object_id) {
     float dO = 0.0; // Distance Origin (total distance traveled)
+    hit_object_id = 0;
 
     for(int i = 0; i < MAX_STEPS; i++) {
         vec3 p = ro + rd * dO; // Current position along the ray
-        float dS = map(p);     // Distance to closest Surface
+        float dS = map(p, hit_object_id);     // Distance to closest Surface
 
         dO += dS; // March forward
 
@@ -171,19 +197,20 @@ float ray_march(vec3 ro, vec3 rd) {
 // Calculates the normal vector at a surface point
 // Used for lighting calculations
 vec3 get_normal(vec3 p) {
-    float d = map(p);
+	int dummy;
+    float d = map(p, dummy);
     vec2 e = vec2(0.01, 0.0);
 
     vec3 n = d - vec3(
-        map(p - e.xyy),
-        map(p - e.yxy),
-        map(p - e.yyx)
+        map(p - e.xyy, dummy),
+        map(p - e.yxy, dummy),
+        map(p - e.yyx, dummy)
     );
 
     return normalize(n);
 }
 
-// Calculates lighting with specular highlights for shininess
+// Calculates lighting with specular base
 vec2 get_light(vec3 p, vec3 view_dir) {
     // Light position (relative to camera or fixed in world)
     vec3 light_pos = vec3(0.5, -3.0, p.z - 4.0);
@@ -194,11 +221,11 @@ vec2 get_light(vec3 p, vec3 view_dir) {
     // Diffuse component (Lambertian)
     float dif = clamp(dot(n, l), 0.0, 1.0);
     
-    // Specular component (Blinn-Phong for shininess)
+    // Specular component (Blinn-Phong base)
     vec3 h = normalize(l + view_dir); // Half vector
-    float spec = pow(clamp(dot(n, h), 0.0, 1.0), 64.0); // Shininess = 64
+    float base_spec = clamp(dot(n, h), 0.0, 1.0);
     
-    return vec2(dif, spec);
+    return vec2(dif, base_spec);
 }
 
 // Convert HSL to RGB
@@ -227,6 +254,8 @@ void fragment() {
     // Fix aspect ratio so X is wider than Y on landscape screens
     uv.x *= SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
 
+    int object_id;
+
     // 2. Camera Setup
     // Ray Origin (Camera Position)
     vec3 ro = camera_location;
@@ -236,7 +265,7 @@ void fragment() {
     vec3 rd = normalize(vec3(uv, 1.0));
 
     // 3. Perform Raymarching
-    float d = ray_march(ro, rd);
+    float d = ray_march(ro, rd, object_id);
 
     // 4. Coloring with Blue-Cyan Palette and Depth Fog
     // Background color (deep blue)
@@ -248,23 +277,46 @@ void fragment() {
         vec3 p = ro + rd * d;
         vec2 lighting = get_light(p, -rd); // Pass view direction for specular
         float diffuse = lighting.x;
-        float specular = lighting.y;
+        float base_spec = lighting.y;
         
-        // Color based on lighting and depth
-        // Hue: Blue (0.55) to Cyan (0.52) based on height
-        float hue = mix(0.55, 0.52, (p.y + 5.0) / 10.0);
+        // Material properties
+        float hue = 0.55;
+        float sat = 0.5;
+        float lightness = 0.5;
+        float shininess = 64.0;
+        float spec_intensity = 0.8;
+        vec3 specular_color = vec3(1.0);
         
-        // Saturation: Low for subtlety (0.3-0.5)
-        float sat = mix(0.3, 0.5, diffuse);
+        if (object_id == 1 || object_id == 2) {
+            // Parallelograms (Outer rings / walls)
+            hue = mix(0.65, 0.60, (p.y + 5.0) / 10.0);
+            sat = mix(0.4, 0.6, diffuse);
+            lightness = mix(0.1, 0.25, diffuse);
+            shininess = 32.0;
+            spec_intensity = 0.4;
+            specular_color = hsl_to_rgb(0.60, 0.8, 0.8);
+        } else if (object_id == 3) {
+            // Octahedron (Center piece)
+            hue = mix(0.85, 0.90, (p.y + 3.0) / 6.0); // Pink/Magenta
+            sat = mix(0.6, 0.9, diffuse);
+            lightness = mix(0.2, 0.6, diffuse);
+            shininess = 128.0;
+            spec_intensity = 1.0;
+            specular_color = hsl_to_rgb(0.90, 0.9, 0.9);
+        } else if (object_id == 4 || object_id == 5) {
+            // Visualizer Rings (Audio reactive pills)
+            hue = mix(0.50, 0.55, (p.y + 5.0) / 10.0);
+            sat = mix(0.5, 0.8, diffuse);
+            lightness = mix(0.2, 0.5, diffuse);
+            shininess = 64.0;
+            spec_intensity = 0.9;
+            specular_color = hsl_to_rgb(0.52, 0.8, 0.9);
+        }
         
-        // Lightness: Based on diffuse lighting
-        float lightness = mix(0.15, 0.45, diffuse);
+        float specular = pow(base_spec, shininess);
         
         vec3 surface_color = hsl_to_rgb(hue, sat, lightness);
-        
-        // Add specular highlights (bright white/cyan for shininess)
-        vec3 specular_color = hsl_to_rgb(0.52, 0.8, 0.9); // Bright cyan
-        surface_color += specular_color * specular * 0.8;
+        surface_color += specular_color * specular * spec_intensity;
         
         // Depth fog: Mix surface color with background based on distance
         float fog_factor = smoothstep(0.0, MAX_DIST * 0.7, d);

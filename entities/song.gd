@@ -6,8 +6,6 @@ extends Node3D
 const TRACK_SCENE: PackedScene = preload("res://entities/track.tscn")
 const CHECKPOINT_SCENE: PackedScene = preload("res://entities/checkpoint.tscn")
 const TRACK_WIDTH := 2.5
-const PLAYHEAD_LEAD_DIST := 0.305
-  # Tuned to minimize player hit offset
 const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
@@ -805,6 +803,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 			count_in.position.z = - (BEATS_PER_MEASURE * length_per_beat) * (%Conductor.current_measure + 1)
 			count_in.text = str(lead_in_measures)
 			if lead_in_measures == 2:
+				if manager_node.load_screen:
+					manager_node.load_screen.queue_free()
 				var tween = create_tween()
 				tween.tween_property(instrument_container, "scale", Vector2.ONE, 0.2)
 				%TargetPfx.emitting = true
