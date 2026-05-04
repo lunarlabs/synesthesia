@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://rxvi6yjltkkd" path="res://entities/scenery/finish_tower.gd" id="1_hxkf2"]
 [ext_resource type="Shader" uid="uid://b8mou4qmc8lsc" path="res://assets/shaders/vu_meter.gdshader" id="2_ocuee"]
-[ext_resource type="PackedScene" uid="uid://b0r3k2uormod8" path="res://assets/mesh/hugetower.blend" id="3_vqcuo"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vqcuo"]
 render_priority = 0
@@ -14,12 +13,6 @@ shader_parameter/on_color = Color(1, 1, 1, 1)
 material = SubResource("ShaderMaterial_vqcuo")
 size = Vector3(10, 6, 10)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_70nke"]
-render_priority = 0
-shader = ExtResource("2_ocuee")
-shader_parameter/off_color = Color(0, 0, 0, 1)
-shader_parameter/on_color = Color(0, 1, 0, 1)
-
 [node name="FinishTower" type="Node3D" unique_id=32694067]
 process_mode = 4
 script = ExtResource("1_hxkf2")
@@ -27,10 +20,3 @@ script = ExtResource("1_hxkf2")
 [node name="rotator" type="MeshInstance3D" parent="." unique_id=385180838]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 mesh = SubResource("BoxMesh_a7anv")
-
-[node name="hugetower" parent="." unique_id=441399770 instance=ExtResource("3_vqcuo")]
-
-[node name="Cylinder" parent="hugetower" index="0" unique_id=225110197]
-surface_material_override/1 = SubResource("ShaderMaterial_70nke")
-
-[editable path="hugetower"]

@@ -151,6 +151,29 @@ func scan_for_songs(rescan := false):
 			var file_exists = FileAccess.file_exists(file_path)
 			var resource_hash = null
 			if file_exists:
+				# Check to see if all audio track files exist
+				# and clear the file path if not.
+				# This will change the resource hash, forcing a rescan.
+				var song_data = ResourceLoader.load(file_path) as SongData
+				var file_changed := false
+				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track)):
+					song_data.click_track = ""
+					file_changed = true
+				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.preview_audio)):
+					song_data.preview_audio = ""
+					file_changed = true
+				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.selection_audio)):
+					song_data.selection_audio = "res://assets/transition.mp3"
+					file_changed = true
+				for i in song_data.tracks.size():
+					var track = song_data.tracks[i] as SongTrackData
+					if not FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file)):
+						print("Track %s: Audio file not found!" % track.midi_track_name)
+						track.audio_file = ""
+						file_changed = true
+				if file_changed:
+					ResourceSaver.save(song_data)
+
 				resource_hash = FileAccess.get_md5(file_path)
 			var prev = existing_hashes.get(folder_name, {})
 			var is_new = prev.is_empty()

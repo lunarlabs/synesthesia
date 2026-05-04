@@ -24,7 +24,10 @@ func _generate_preview(folder_path: String) -> void:
 	if not song_data:
 		push_error("Cannot load songdata file: %s" % tres_path)
 		return
-	MoggsongParser.generate_preview_audio(moggsong_path, song_data)
+	if not song_data.click_track or song_data.click_track.is_empty():
+		MoggsongParser.update_songdata_tracks(moggsong_path)
+	elif not song_data.preview_audio or song_data.preview_audio.is_empty():
+		MoggsongParser.generate_preview_audio(moggsong_path, song_data)
 	var save_err = ResourceSaver.save(song_data, tres_path)
 	if save_err != OK:
 		push_error("Failed to save songdata file: %s" % save_err)

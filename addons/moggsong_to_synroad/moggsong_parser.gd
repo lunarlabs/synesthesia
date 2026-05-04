@@ -323,8 +323,8 @@ static func _convert_mogg_to_stereo_files(in_file: String, out_file: String, cha
 	
 	print("Running ffmpeg with params: " + str(params))
 	var exit_code = OS.execute(ffmpeg_path, params, stdout, true)
-	print(stdout)
 	if exit_code != 0:
+		print(stdout)
 		print("Failed to extract %s to %s" % [in_file, out_file])
 		push_error("ffmpeg returned %d" % exit_code)
 		return

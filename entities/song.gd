@@ -16,7 +16,7 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
-const START_POSITION := Vector3(-2.0, 25.0, 5.0)
+const START_POSITION := Vector3(-10.0, 25.0, 5.0)
 const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
 const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
 const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
@@ -98,8 +98,6 @@ func _enter_tree() -> void:
 
 func _ready():
 	%FadeOut.show()
-	%Camera.position = START_POSITION
-	%Camera.rotation_degrees = START_ROTATION
 	RenderingServer.global_shader_parameter_set("danger", false)
 	RenderingServer.global_shader_parameter_set("current_track", 0)
 	if not manager_node.song_data:
@@ -157,6 +155,8 @@ func _ready():
 		start_gate.set_warning_state(true)
 	start_gate.get_node("BoundaryLine").visible = false
 	add_child(start_gate)
+	if lead_in_measures < 3:
+		start_gate.particles.hide()
 	var end_gate = CHECKPOINT_SCENE.instantiate() as Node3D
 	%Conductor.new_measure.connect(end_gate._on_song_new_measure)
 	end_gate.get_node("Text").text = "Song End"
@@ -277,20 +277,27 @@ func _song_start():
 	 (seconds_per_beat * BEATS_PER_MEASURE) * 1.5).set_trans(Tween.TRANS_QUAD) \
 	.set_ease(Tween.EASE_IN)
 	fade_tween.tween_callback(_intro_anim_call)
-	var intro_tween = create_tween().set_parallel()
-	intro_tween.tween_subtween(fade_tween)
-	intro_tween.tween_property(%Camera, "position:x", GAME_POSITION.x, \
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK) \
-	.set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_SINE) \
-	.set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
-	2.5 * (seconds_per_beat * BEATS_PER_MEASURE)) \
-	.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
-	2 * (seconds_per_beat * BEATS_PER_MEASURE)).set_trans(Tween.TRANS_BACK) \
-	.set_ease(Tween.EASE_OUT)
+	if lead_in_measures > 2:
+		%Camera.position = START_POSITION
+		%Camera.rotation_degrees = START_ROTATION
+		var intro_tween = create_tween().set_parallel()
+		intro_tween.tween_subtween(fade_tween)
+		intro_tween.tween_property(%Camera, "position:x", GAME_POSITION.x, \
+		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
+		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
+		(lead_in_measures - 0.5) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
+		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	else:
+		%Camera.position = GAME_POSITION
+		%Camera.rotation_degrees = GAME_ROTATION
+
 
 @warning_ignore("unused_parameter")
 func _process(delta: float):
