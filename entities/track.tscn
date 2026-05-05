@@ -42,8 +42,6 @@ gravity = Vector3(0, 0, 0)
 scale_min = 0.5
 scale_max = 2.0
 alpha_curve = SubResource("CurveTexture_xv6yt")
-hue_variation_min = -0.050000023
-hue_variation_max = 0.049999975
 turbulence_noise_speed = Vector3(0, -1, 0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cidh0"]

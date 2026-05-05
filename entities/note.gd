@@ -30,7 +30,7 @@ func blast(emit:bool = false):
 	if _blasted:
 		return
 	_blasted = true
-	if emit:
+	if emit and not suppressed:
 		particles.emitting = true
 		star.emitting = true
 	$capsule.hide()

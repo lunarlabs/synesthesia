@@ -1786,7 +1786,7 @@ horizontal_alignment = 2
 [node name="EarlyHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=1354764883]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
-text = "Early"
+text = "FAST"
 uppercase = true
 
 [node name="EarlyHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=93037641]
@@ -1800,7 +1800,7 @@ horizontal_alignment = 2
 [node name="LateHitTitle" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=182923840]
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
-text = "Late"
+text = "SLOW"
 uppercase = true
 
 [node name="LateHitLabel" type="Label" parent="HUD/ScoreBar/TimingStats/VBoxContainer" unique_id=946900410]
