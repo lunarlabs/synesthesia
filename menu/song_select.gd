@@ -130,11 +130,9 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
-	if vol_tween:
-		vol_tween.kill()
-	vol_tween = create_tween()
-	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 1.0)
-	vol_tween.tween_callback(Transition.start_transition_out)
+	Transition.play_menu_track(Transition.MenuTracks.SONG_SELECT, 1.0)
+	await Transition.audio_transition_completed
+	Transition.start_transition_out()
 	await Transition.animation_completed
 	_play_current_item_preview()
 	play_preview_on_select = true
@@ -447,6 +445,7 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	time_end = Time.get_ticks_usec()
 	print("add child: %d microseconds" % (time_end - time_start))
 	get_tree().current_scene = manager
+	Transition.stop_menu_music()
 	queue_free()
 
 
@@ -456,10 +455,7 @@ func _on_modifier_button_pressed() -> void:
 
 
 func _on_preview_player_finished() -> void:
-	if vol_tween:
-		vol_tween.kill()
-	vol_tween = create_tween()
-	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 4.0)
+	Transition.set_menu_music_volume(0.0, 4.0)
 
 func _play_current_item_preview() -> void:
 	if $Carousel.current_item[&"type"] in [&"song_all_difficulties", &"song_single_difficulty"]:
@@ -468,23 +464,17 @@ func _play_current_item_preview() -> void:
 func _play_song_preview() -> void:
 	if %PreviewPlayer.playing:
 		%PreviewPlayer.stop()
-	if vol_tween:
-		vol_tween.kill()
-	vol_tween = create_tween()
-	vol_tween.tween_property(%MenuMusic, "volume_db", -80.0, 0.5)
+	Transition.set_menu_music_volume(-80.0, 0.5)
 
 	var resource = SongCatalog.get_song_preview(song_info.folder_id)
 	if not resource:
 		_stop_song_preview()
 		return
 	%PreviewPlayer.stream = resource
-	await vol_tween.finished
+	await Transition.audio_transition_completed
 	%PreviewPlayer.play()
 
 func _stop_song_preview() -> void:
 	if %PreviewPlayer.playing:
 		%PreviewPlayer.stop()
-	if vol_tween:
-		vol_tween.kill()
-	vol_tween = create_tween()
-	vol_tween.tween_property(%MenuMusic, "volume_db", 0.0, 0.5)
+	Transition.set_menu_music_volume(0.0, 0.5)

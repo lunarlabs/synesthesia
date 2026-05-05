@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://g7aj5m5cbd3m" path="res://assets/textures/circles_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="5_wm27l"]
 [ext_resource type="Texture2D" uid="uid://dao5babkqldv6" path="res://assets/textures/settings_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="6_jldp2"]
 [ext_resource type="Texture2D" uid="uid://cf76nekempr57" path="res://assets/textures/library_music_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="7_h6xa0"]
-[ext_resource type="AudioStream" uid="uid://b4h8ap5v4lyh7" path="res://assets/songselsynch.tres" id="8_ctryq"]
 [ext_resource type="Texture2D" uid="uid://khvj02sviubn" path="res://assets/textures/equalizer_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="8_qhtwy"]
 [ext_resource type="Texture2D" uid="uid://gdmiskcvvsfv" path="res://assets/textures/query_stats_24dp_E3E3E3_FILL0_wght300_GRAD0_opsz24.svg" id="9_byi8g"]
 [ext_resource type="PackedScene" uid="uid://cpchno0oyio6o" path="res://menu/carousel/Carousel.tscn" id="9_ctryq"]
@@ -817,12 +816,6 @@ focus_neighbor_bottom = NodePath(".")
 focus_next = NodePath("../EnergyBarOptions")
 focus_previous = NodePath("../AutoblastButton")
 text = "Close"
-
-[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=123578084]
-unique_name_in_owner = true
-stream = ExtResource("8_ctryq")
-autoplay = true
-bus = &"Menu"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628454593]
 unique_name_in_owner = true

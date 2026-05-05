@@ -1,11 +1,14 @@
 [gd_resource type="AudioStreamSynchronized" format=3 uid="uid://b4h8ap5v4lyh7"]
 
 [ext_resource type="AudioStream" uid="uid://cahskgr3vv5if" path="res://assets/SongSelect.mp3" id="1_7x0ee"]
-[ext_resource type="AudioStream" uid="uid://rpnnp1hrsh8d" path="res://assets/songsel2.mp3" id="2_577mr"]
+[ext_resource type="AudioStream" uid="uid://rpnnp1hrsh8d" path="res://assets/stats.mp3" id="2_7x0ee"]
+[ext_resource type="AudioStream" uid="uid://dfupxbsgx7io" path="res://assets/Challenge.mp3" id="3_577mr"]
 
 [resource]
-stream_count = 2
+stream_count = 3
 stream_0/stream = ExtResource("1_7x0ee")
 stream_0/volume = 0.0
-stream_1/stream = ExtResource("2_577mr")
+stream_1/stream = ExtResource("2_7x0ee")
 stream_1/volume = -60.0
+stream_2/stream = ExtResource("3_577mr")
+stream_2/volume = -60.0
