@@ -141,7 +141,7 @@ func _process_job(job: Dictionary):
 			# Find the next available measure with notes after target_measure
 			var next_measure = target_measure + 1
 			while next_measure < job.total_measures:
-				if measure_note_counts.keys().has(next_measure):
+				if measure_note_counts.keys().has(next_measure) and not job.suppressed_measures[next_measure]:
 					phrase_next_measures[m] = next_measure
 					break
 				next_measure += 1
@@ -161,7 +161,7 @@ func _process_job(job: Dictionary):
 	
 	# Fourth pass: barrier zone activation capping
 	var barrier_zones = job.get("barrier_zones", [])
-	var barrier_cached: Dictionary[int, int] = {}  # keyed by measure number
+	var barrier_cached: Dictionary[int, int] = {} # keyed by measure number
 	var phrase_starts_list = phrase_lengths.keys()
 	
 	for zone in barrier_zones:
