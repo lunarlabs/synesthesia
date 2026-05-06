@@ -763,7 +763,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		print("Song finished!")
 	elif not finished:
 		if _cached_active_track_node:
-			_phrase_started_this_measure = _cached_active_track_node.blasting_phrase
+			_phrase_started_this_measure = _cached_active_track_node.blasting_phrase or _inactive_safeguard_measure >= measure
 		_latest_first_note_this_measure = _get_latest_first_note_time(measure)
 		if measure < manager_node.measure_in_chunks.size():
 			var current_chunk = manager_node.measure_in_chunks[measure]
