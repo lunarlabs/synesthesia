@@ -256,9 +256,10 @@ func _song_start():
 	%SongProgress.min_value = lead_in_measures - 1
 	if manager_node.autoblast:
 		#lbl_auto_blast.show()
-		_autoblast_next_track = _find_best_track_for_autoblast()
-		if _autoblast_next_track != active_track:
-			_switch_active_track(_autoblast_next_track, false)
+		_autoblast_next_track = 0
+#		_autoblast_next_track = _find_best_track_for_autoblast()
+#		if _autoblast_next_track != active_track:
+#			_switch_active_track(_autoblast_next_track, false)
 	#else:
 		#lbl_auto_blast.hide()
 	_set_instrument_label()

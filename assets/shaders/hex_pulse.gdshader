@@ -2,7 +2,7 @@
 shader_type canvas_item;
 
 uniform float speed : hint_range(0.0, 3.0) = 0.8;
-uniform float line_width : hint_range(0.001, 0.05) = 0.018;
+uniform float line_width : hint_range(0.0, 0.5) = 0.018;
 uniform vec4 line_color : source_color = vec4(0.1, 0.49, 0.91, 1.0);
 uniform float base_alpha : hint_range(0.0, 1.0) = 0.07;
 uniform float pulse_strength : hint_range(0.0, 1.0) = 0.05;
@@ -46,10 +46,10 @@ void fragment() {
     float d = hex_dist(local);
 
     // Your original logic draws solid pulsing hexes separated by transparent gaps
-    float edge = 1.0 - smoothstep(0.5 - line_width, 0.5, d);
+    float edge = 1.0 - smoothstep(line_width - 0.01, line_width + 0.01, d);
 
     float pulse = sin(TIME * speed + center.x * 0.4 + center.y * 0.7) * 0.5 + 0.5;
     float alpha = edge * (base_alpha + pulse * pulse_strength);
 
-    COLOR = vec4(line_color.rgb, alpha);
+    COLOR = vec4(line_color.rgb , alpha);
 }

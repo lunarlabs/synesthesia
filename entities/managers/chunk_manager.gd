@@ -166,3 +166,5 @@ func _exit_tree():
 	_mutex.unlock()
 	_semaphore.post()
 	thread.wait_to_finish()
+	_note_pool.clear()
+	_measure_pool.clear()

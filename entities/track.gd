@@ -430,7 +430,7 @@ func _sync_autoblast_state():
 	var current_time = conductor.time_elapsed
 	while next_note_idx < track_data.note_times.size() and track_data.note_times[next_note_idx] < current_time:
 		next_note_idx += 1
-	print("Track %d synced autoblast state. Next note idx: %d, Time: %.2f" % [track_index, next_note_idx, current_time])
+#	print("Track %d synced autoblast state. Next note idx: %d, Time: %.2f" % [track_index, next_note_idx, current_time])
 func _get_note_time(note_index: int) -> float:
 	return track_data.note_times[note_index]
 

@@ -232,6 +232,11 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 	chunk_count += 1
 
 	suppressed_measures.resize(total_measures)
+	for measure in range(song_data.lead_in_measures):
+		# There may be notes in the lead in measures. There *shouldn't*,
+		# but sometimes there are. Suppress the measures so that playable notes 
+		# don't appear before the song start.
+		suppressed_measures[measure] = true
 	print("suppressing checkpoint measures")
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
@@ -297,6 +302,7 @@ func _fetch_track_data() -> void:
 			"length_per_beat": length_per_beat,
 			"total_measures": total_measures,
 			"barrier_zones": barrier_zones,
+			"lead_in_measures": song_data.lead_in_measures # damnyou, bulletproof!
 		}
 		preprocessor.queue_job(job)
 

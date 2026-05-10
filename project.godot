@@ -124,6 +124,11 @@ pause={
 
 locale/translations=PackedStringArray("res://gen/interface.en.translation")
 
+[rendering]
+
+anti_aliasing/quality/msaa_2d=1
+anti_aliasing/quality/msaa_3d=1
+
 [shader_globals]
 
 beat={
