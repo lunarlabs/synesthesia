@@ -478,3 +478,102 @@ func _stop_song_preview() -> void:
 func _on_modifier_container_closed() -> void:
 	for button in subscreen_buttons:
 		button.disabled = false
+
+
+func _on_modifier_container_setting_changed() -> void:
+	# gather the modifiers
+	var energy_modifier = SessionManager.modifiers.get("energy_modifier", SynRoadSongManager.EnergyModifiers.NORMAL)
+	var fast_track_reset = SessionManager.modifiers.get("fast_track_reset", SynRoadSongManager.TrackReset.NORMAL)
+	var timing_mode = SessionManager.modifiers.get("timing_mode", SynRoadSongManager.TimingModifiers.NORMAL)
+	var checkpoint_mode = SessionManager.modifiers.get("checkpoint_mode", SynRoadSongManager.CheckpointModifiers.CHECKPOINT)
+	var streak_hints = SessionManager.modifiers.get("streak_hints", true)
+	var constant_velocity_mode = SessionManager.modifiers.get("constant_velocity_mode", false)
+	var length_multiplier = SessionManager.modifiers.get("length_multiplier", 1.0)
+	var autoblast = SessionManager.modifiers.get("autoblast", false)
+	
+	var energy_label = %ModifierStatus.get_node("EnergySetting") as Label
+	var reset_label = %ModifierStatus.get_node("ResetSetting") as Label
+	var timing_label = %ModifierStatus.get_node("TimingSetting") as Label
+	var checkpoint_label = %ModifierStatus.get_node("CheckpointSetting") as Label
+	var highlight_label = %ModifierStatus.get_node("HighlightSetting") as Label
+	var speed_label = %ModifierStatus.get_node("SpeedSetting") as Label
+	var autoblast_label = %ModifierStatus.get_node("AutoblastSetting") as Label
+	
+	var energy_str: String
+	energy_label.remove_theme_color_override("font_color")
+	match energy_modifier:
+		SynRoadSongManager.EnergyModifiers.NORMAL:
+			energy_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			energy_str = &"Normal"
+		SynRoadSongManager.EnergyModifiers.DRAIN:
+			energy_str = &"Drain"
+		SynRoadSongManager.EnergyModifiers.NO_RECOVER:
+			energy_str = &"No Recover"
+		SynRoadSongManager.EnergyModifiers.SUDDEN_DEATH:
+			energy_str = &"S.Death"
+		SynRoadSongManager.EnergyModifiers.NO_FAIL:
+			energy_label.add_theme_color_override("font_color", Color.RED)
+			energy_str = &"No Fail"
+		_:
+			energy_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			energy_str = &"Normal"
+	energy_label.text = energy_str
+	
+	var reset_str: String
+	reset_label.remove_theme_color_override("font_color")
+	match fast_track_reset:
+		SynRoadSongManager.TrackReset.NORMAL:
+			reset_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			reset_str = &"Normal"
+		SynRoadSongManager.TrackReset.FAST_ONE:
+			reset_str = &"Fast 1"
+		SynRoadSongManager.TrackReset.FAST_TWO:
+			reset_str = &"Fast 2"
+		_:
+			reset_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			reset_str = &"Normal"
+	reset_label.text = reset_str
+	
+	var timing_str: String
+	timing_label.remove_theme_color_override("font_color")
+	match timing_mode:
+		SynRoadSongManager.TimingModifiers.NORMAL:
+			timing_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			timing_str = &"Normal"
+		SynRoadSongManager.TimingModifiers.LOOSE:
+			timing_str = &"Loose"
+		SynRoadSongManager.TimingModifiers.STRICT:
+			timing_str = &"Strict"
+		_:
+			timing_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+			timing_str = &"Normal"
+	timing_label.text = timing_str
+	
+	if (checkpoint_mode == SynRoadSongManager.CheckpointModifiers.NO_CHECKPOINT_RECOVERY):
+		checkpoint_label.remove_theme_color_override("font_color")
+		checkpoint_label.text = &"Off"
+	else:
+		checkpoint_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+		checkpoint_label.text = &"On"
+	
+	if streak_hints:
+		highlight_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+		highlight_label.text = &"On"
+	else:
+		highlight_label.remove_theme_color_override("font_color")
+		highlight_label.text = &"Off"
+	
+	speed_label.remove_theme_color_override("font_color")
+	if constant_velocity_mode:
+		speed_label.text = "%d BPM" % int(120 * length_multiplier)
+	else:
+		speed_label.text = "%sx" % length_multiplier
+		if length_multiplier == 1.0:
+			speed_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+	
+	if autoblast:
+		autoblast_label.add_theme_color_override("font_color", Color.RED)
+		autoblast_label.text = &"On"
+	else:
+		autoblast_label.add_theme_color_override("font_color", Color.WEB_GRAY)
+		autoblast_label.text = &"Off"

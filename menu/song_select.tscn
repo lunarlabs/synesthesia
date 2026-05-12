@@ -860,6 +860,128 @@ grow_horizontal = 1
 unique_name_in_owner = true
 bus = &"Tracks"
 
+[node name="BottomLeft" type="PanelContainer" parent="." unique_id=57138801]
+custom_minimum_size = Vector2(925, 0)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 8.0
+grow_vertical = 0
+
+[node name="ModifierStatus" type="GridContainer" parent="BottomLeft" unique_id=295303416]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 8
+columns = 7
+
+[node name="EnergyTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=903463844]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "ENERGY"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="ResetTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=899969166]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "RESET"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="TimingTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1403016696]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "JUDGE"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="CheckpointTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=2098734455]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "CHKPT"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="HighlightTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1409176802]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "HILITE"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="SpeedTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=506687875]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "SPEED"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="AutoblastTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=78023791]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+text = "AUTO"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="EnergySetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1715848575]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Normal"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="ResetSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1127499923]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Normal"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="TimingSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=343815466]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Normal"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="CheckpointSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1078675353]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "On"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="HighlightSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1833196648]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "On"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="SpeedSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=507177983]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "1.0x"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="AutoblastSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=442327866]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Off"
+horizontal_alignment = 1
+uppercase = true
+
 [node name="CanvasLayer" type="ColorRect" parent="." unique_id=998416940]
 visible = false
 material = SubResource("ShaderMaterial_qhtwy")
@@ -877,6 +999,7 @@ offset_bottom = 16.0
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/ResetOption" to="." method="_on_reset_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/HiSpeedOption" to="." method="_on_hi_speed_option_pressed"]
 [connection signal="closed" from="ModifierContainer" to="." method="_on_modifier_container_closed"]
+[connection signal="setting_changed" from="ModifierContainer" to="." method="_on_modifier_container_setting_changed"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/EnergyBarOptions" to="ModifierContainer" method="_on_energy_bar_options_item_selected"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/TrackResetOptions" to="ModifierContainer" method="_on_track_reset_options_item_selected"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/TimingOptions" to="ModifierContainer" method="_on_timing_options_item_selected"]

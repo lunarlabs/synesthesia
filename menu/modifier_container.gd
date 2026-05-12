@@ -1,6 +1,7 @@
 extends PanelContainer
 
 signal closed
+signal setting_changed
 
 @onready var energy_bar_options = $GridContainer/EnergyBarOptions
 @onready var track_reset_options = $GridContainer/TrackResetOptions
@@ -107,7 +108,7 @@ func _on_energy_bar_options_item_selected(index: int) -> void:
 	elif checkpoints_button.disabled:
 		checkpoints_button.disabled = false
 		checkpoints_button.button_pressed = previous_checkpoint_choice
-
+	setting_changed.emit()
 
 func _on_track_reset_options_item_selected(index: int) -> void:
 	match index:
@@ -118,7 +119,8 @@ func _on_track_reset_options_item_selected(index: int) -> void:
 		2:
 			SessionManager.modifiers["fast_track_reset"] = SynRoadSongManager.TrackReset.FAST_TWO
 		_:
-			SessionManager.modifiers["fast_track_reset"] = 12
+			SessionManager.modifiers["fast_track_reset"] = SynRoadSongManager.TrackReset.NORMAL
+	setting_changed.emit()
 
 
 func _on_timing_options_item_selected(index: int) -> void:
@@ -131,17 +133,19 @@ func _on_timing_options_item_selected(index: int) -> void:
 			SessionManager.modifiers["timing_mode"] = SynRoadSongManager.TimingModifiers.STRICT
 		_: # Default
 			SessionManager.modifiers["timing_mode"] = SynRoadSongManager.TimingModifiers.NORMAL
-
+	setting_changed.emit()
 
 func _on_checkpoints_button_toggled(toggled_on: bool) -> void:
 	# Barrier modes are not selectable; they can only be applied by the future challenge stage system.
 	SessionManager.modifiers["checkpoint_mode"] = \
 		SynRoadSongManager.CheckpointModifiers.CHECKPOINT if toggled_on \
 		else SynRoadSongManager.CheckpointModifiers.NO_CHECKPOINT_RECOVERY
+	setting_changed.emit()
 
 
 func _on_highlights_button_toggled(toggled_on: bool) -> void:
 	SessionManager.modifiers["streak_hints"] = toggled_on
+	setting_changed.emit()
 
 
 func _on_speed_option_item_selected(index: int) -> void:
@@ -150,14 +154,17 @@ func _on_speed_option_item_selected(index: int) -> void:
 	_change_velocity_mode(mode)
 	_update_velocity_label()
 	SessionManager.modifiers["length_multiplier"] = 1.0
+	setting_changed.emit()
 
 
+@warning_ignore("unused_parameter")
 func _on_speed_slider_value_changed(value: float) -> void:
 	_update_velocity_label()
 
 
 func _on_autoblast_button_toggled(toggled_on: bool) -> void:
 	SessionManager.modifiers["autoblast"] = toggled_on
+	setting_changed.emit()
 
 
 func _on_close_button_pressed() -> void:
@@ -190,3 +197,4 @@ func _on_speed_slider_drag_ended(value_changed: bool) -> void:
 			SessionManager.modifiers["length_multiplier"] = speed_slider.value / 120.0
 		else:
 			SessionManager.modifiers["length_multiplier"] = speed_slider.value
+	setting_changed.emit()
