@@ -69,6 +69,7 @@ var _last_streak_break_measure: int = -1
 var _barrier_threshold: int = 0 # 0 = no barrier, 2/3/4 = streak required
 var _furthest_chunk_loaded := -1
 var _closest_chunk_recycled := -1
+var show_phrase_highlights := true
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -85,7 +86,7 @@ var _closest_chunk_recycled := -1
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 @onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
 
-signal song_prepared
+#signal song_prepared
 signal song_failed(stats)
 signal song_finished(stats)
 
@@ -230,6 +231,7 @@ func _ready():
 				%EnergyBar.value = energy
 	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
 	pv_anims = %PhraseValueAnims.get_children()
+	show_phrase_highlights = manager_node.streak_hints
 	var initial_chunks = CHUNK_LOAD_RANGE_FORWARD + CHUNK_UNLOAD_RANGE_BEHIND
 	for i in range(initial_chunks):
 		%ChunkManager.enqueue_request(i)
@@ -604,7 +606,7 @@ func _update_closest_track_marker_cache() -> void:
 		closest_track_marker_measure = -1
 		
 	for track in tracks:
-		var should_be_visible = (manager_node.hide_streak_hints == false) \
+		var should_be_visible = show_phrase_highlights \
 			and (closest_track_marker_measure != -1) \
 			and (track.marker_measure() == closest_track_marker_measure)
 			

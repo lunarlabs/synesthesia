@@ -69,7 +69,7 @@ const HI_SPEED_MULTS_STR: Dictionary = {
 	2.0: "2.0x",
 }
 
-@onready var anim = $AnimationPlayer
+@onready var anim = $SongSelectAnimation
 
 var subscreen_buttons: Array = []
 var bpm_tween: Tween
@@ -304,7 +304,7 @@ func _update_previous_bests():
 func _on_carousel_selection_changed(reference: Dictionary) -> void:
 	if bpm_tween:
 		bpm_tween.kill()
-	%AnimationPlayer.stop()
+	%SongSelectAnimation.stop()
 	match reference[&"type"]:
 		&"song_all_difficulties":
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -333,7 +333,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			_update_previous_bests()
 			selected_difficulty = held_difficulty
 			_update_difficulty_panels(reference[&"difficulties"])
-			%AnimationPlayer.play("select_item")
+			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_play_song_preview()
 
@@ -363,7 +363,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%PrevBestContainer.show()
 			_update_previous_bests()
 			_update_difficulty_panels({reference[&"difficulty_offset"]: reference[&"difficulty_rating"]})
-			%AnimationPlayer.play("select_item")
+			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_play_song_preview()
 
@@ -379,7 +379,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%GenreLabel.text = "Category Select"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			%AnimationPlayer.play("select_item")
+			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_stop_song_preview()
 
@@ -395,7 +395,7 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%GenreLabel.text = "Folder"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			%AnimationPlayer.play("select_item")
+			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_stop_song_preview()
 
@@ -416,25 +416,18 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 	# Apply modifiers
 	# TODO: Button cycling and values not implemented yet
 
-	manager.energy_modifier = energy_modifier_index
-	manager.hi_speed = HI_SPEED_MULTS_VAL[hi_speed_index]
-	manager.checkpoint_modifier = checkpoint_modifier_index
-	manager.hide_streak_hints = %NoStreakHintButton.button_pressed
-	manager.timing_modifier = timing_modifier_index
-	manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
-	manager.autoblast = %AutoblastButton.button_pressed
+	#manager.energy_modifier = energy_modifier_index
+	#manager.hi_speed = HI_SPEED_MULTS_VAL[hi_speed_index]
+	#manager.checkpoint_modifier = checkpoint_modifier_index
+	#manager.hide_streak_hints = %NoStreakHintButton.button_pressed
+	#manager.timing_modifier = timing_modifier_index
+	#manager.fast_track_reset = [12, 10, 8][reset_modifier_index]
+	#manager.autoblast = %AutoblastButton.button_pressed
 
 	# Save current session options so returning to song select restores state correctly
 	SessionManager.previous_select_options = {
 		"song_index": selected_song_index,
 		"difficulty": selected_difficulty if difficulty == -1 else difficulty,
-		"energy_modifier_index": energy_modifier_index,
-		"checkpoint_modifier_index": checkpoint_modifier_index,
-		"timing_modifier_index": timing_modifier_index,
-		"reset_modifier_index": reset_modifier_index,
-		"hi_speed_index": hi_speed_index,
-		"hide_streak_hints": %NoStreakHintButton.button_pressed,
-		"autoblast": %AutoblastButton.button_pressed
 	}
 
 	# TODO: call transition handler here so there's no loading lag
@@ -452,6 +445,8 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 func _on_modifier_button_pressed() -> void:
 	for button in subscreen_buttons:
 		button.disabled = true
+	%ModifierContainer.show()
+	%ModifierContainer.get_node("GridContainer/EnergyBarOptions").grab_focus()
 
 
 func _on_preview_player_finished() -> void:
@@ -478,3 +473,8 @@ func _stop_song_preview() -> void:
 	if %PreviewPlayer.playing:
 		%PreviewPlayer.stop()
 	Transition.set_menu_music_volume(0.0, 0.5)
+
+
+func _on_modifier_container_closed() -> void:
+	for button in subscreen_buttons:
+		button.disabled = false

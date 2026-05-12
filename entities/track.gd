@@ -294,7 +294,7 @@ func try_blast(lane_index: int, specific_time: float = -1.0):
 					activate(current_phrase_index)
 					phrase_notes_blasted = 0
 					blasting_phrase = false
-					marker.visible = song_node.manager_node.hide_streak_hints == false
+					marker.visible = song_node.show_phrase_highlights
 		elif conductor.current_measure >= reset_measure:
 			_misblast(conductor.current_beat, lane_index)
 			if blasting_phrase:

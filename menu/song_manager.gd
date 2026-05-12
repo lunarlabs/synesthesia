@@ -7,12 +7,13 @@ var difficulty: int = 96
 @export_group("Modifiers")
 @export_enum("Normal", "Constant Drain", "No Recover", "Sudden Death", "No Fail") var energy_modifier: int = 0
 @export_enum("Normal", "Disabled", "Barrier 2", "Barrier 3", "Barrier 4") var checkpoint_modifier: int = 0
-@export var hide_streak_hints: bool = false
+@export var streak_hints: bool = true
 @export_enum("Normal", "Loose", "Strict") var timing_modifier: int = 0
 @export_enum("Normal:12", "Fast Reset 1:10", "Fast Reset 2:8") var fast_track_reset: int = 12
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
 
+var constant_velocity_mode = false
 var can_pause := false
 
 const SONG_SCENE: PackedScene = preload("res://entities/song.tscn")
@@ -45,6 +46,12 @@ enum TimingModifiers {
 	NORMAL,
 	LOOSE,
 	STRICT,
+}
+
+enum TrackReset {
+	NORMAL = 12,
+	FAST_ONE = 10,
+	FAST_TWO = 8,
 }
 
 const ENERGY_MODIFIER_NAMES = [
@@ -96,6 +103,7 @@ const BEATS_PER_MEASURE = 4.0
 const CHUNK_LENGTH_IN_MEASURES = 8
 const TIMING_WINDOWS = [0.08, 0.1, 0.06, ]
 const MISS_WINDOW_OFFSET = 0.01
+const STANDARD_BPM = 120.0
 
 @onready var pause_panel: PanelContainer = $PausePanel
 @onready var btn_continue: Button = $PausePanel/VBoxContainer/ContinueButton
@@ -163,6 +171,14 @@ func _ready() -> void:
 			return
 	get_window().focus_exited.connect(_on_lose_focus)
 	song_name = song_file.get_file().get_slice(".", 0)
+	energy_modifier = SessionManager.modifiers.get("energy_modifier", EnergyModifiers.NORMAL)
+	fast_track_reset = SessionManager.modifiers.get("fast_track_reset", TrackReset.NORMAL)
+	checkpoint_modifier = SessionManager.modifiers.get("checkpoint_mode", CheckpointModifiers.CHECKPOINT)
+	timing_modifier = SessionManager.modifiers.get("timing_mode", TimingModifiers.NORMAL)
+	streak_hints = SessionManager.modifiers.get("streak_hints", true)
+	constant_velocity_mode = SessionManager.modifiers.get("constant_velocity_mode", false)
+	hi_speed = SessionManager.modifiers.get("length_multiplier", 1.0)
+	autoblast = SessionManager.modifiers.get("autoblast", false)
 
 	var prepare_func = Callable(self , "_prepare_song_data").bind(load_result)
 	task = WorkerThreadPool.add_task(prepare_func)
@@ -213,8 +229,12 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		out_load_result["success"] = false
 		return
 	seconds_per_beat = song_data.seconds_per_beat
-	length_multiplier = (hi_speed) / song_data.scale_fudge_factor
-	print("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
+	if constant_velocity_mode:
+		length_multiplier = (hi_speed * STANDARD_BPM)  / song_data.bpm
+		print("length_multiplier set to %.3f (constant velocity: %.2fx, song tempo %.2f bpm)" % [length_multiplier, hi_speed, song_data.bpm])
+	else:
+		length_multiplier = hi_speed / song_data.scale_fudge_factor
+		print("Length multiplier set to %.3f (Hi-Speed: %.2f, Fudge: %.2f)" % [length_multiplier, hi_speed, song_data.scale_fudge_factor])
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
 	ideal_playhead_speed = length_per_beat / seconds_per_beat
 	print("Ideal playhead speed: %.3f units/sec" % ideal_playhead_speed)

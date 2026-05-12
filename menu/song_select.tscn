@@ -110,6 +110,12 @@ font_color = Color(0.078431375, 1, 0.3647059, 1)
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="InputEventAction" id="InputEventAction_voan6"]
+action = &"ui_cancel"
+
+[sub_resource type="Shortcut" id="Shortcut_tlsan"]
+events = [SubResource("InputEventAction_voan6")]
+
 [sub_resource type="Animation" id="Animation_ctryq"]
 length = 0.001
 tracks/0/type = "value"
@@ -383,6 +389,7 @@ layout_mode = 2
 
 [node name="ModifierButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=1261412322]
 layout_mode = 2
+tooltip_text = "Gameplay Modifiers"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "MODS"
 icon = ExtResource("5_wm27l")
@@ -392,6 +399,7 @@ expand_icon = true
 
 [node name="SystemButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=353088189]
 layout_mode = 2
+tooltip_text = "Game Settings"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SYS"
 icon = ExtResource("6_jldp2")
@@ -401,6 +409,7 @@ expand_icon = true
 
 [node name="SongsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=881269748]
 layout_mode = 2
+tooltip_text = "Song Audit"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "SONGS"
 icon = ExtResource("7_h6xa0")
@@ -410,6 +419,7 @@ expand_icon = true
 
 [node name="EffectsButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=977080346]
 layout_mode = 2
+tooltip_text = "Equalizer/Effects"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "EQ/FX"
 icon = ExtResource("8_qhtwy")
@@ -419,6 +429,7 @@ expand_icon = true
 
 [node name="PlayerButton" type="Button" parent="SubScreenContainer/SubScreenButtons" unique_id=2132771351]
 layout_mode = 2
+tooltip_text = "Player Statistics"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
 text = "STATS"
 icon = ExtResource("9_byi8g")
@@ -524,6 +535,7 @@ text = "??? BPM"
 label_settings = SubResource("LabelSettings_0tx4y")
 
 [node name="LeftSide" type="VBoxContainer" parent="." unique_id=371374671]
+visible = false
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 1
 anchors_preset = -1
@@ -667,6 +679,12 @@ text = "Energy Bar"
 
 [node name="EnergyBarOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=448698383]
 layout_mode = 2
+tooltip_text = "Behavior of the energy bar.
+Normal: Energy drops on errors and increases when phrases are completed.
+Constant Drain: Energy drains away with each measure and increases when phrases are complete.
+No Recovery: Energy drops when errors are made, but cannot be increased. (DISABLES CHECKPOINTS)
+Sudden Death: Perfect Run or fail. (DISABLES CHECKPOINTS)
+Practice (No Fail): No energy bar. Scores in this mode are not recorded."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath(".")
 focus_neighbor_right = NodePath(".")
@@ -692,6 +710,7 @@ text = "Track Reset"
 
 [node name="TrackResetOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=1369181277]
 layout_mode = 2
+tooltip_text = "How quickly tracks reset after activation."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../EnergyBarOptions")
 focus_neighbor_right = NodePath(".")
@@ -713,6 +732,7 @@ text = "Timing Window"
 
 [node name="TimingOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=1037482499]
 layout_mode = 2
+tooltip_text = "Adjusts the note accuracy timing."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../TrackResetOptions")
 focus_neighbor_right = NodePath(".")
@@ -733,6 +753,7 @@ layout_mode = 2
 
 [node name="CheckpointsButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=1389897372]
 layout_mode = 2
+tooltip_text = "Whether to have checkpoints grant energy bonuses."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../TimingOptions")
 focus_neighbor_right = NodePath(".")
@@ -744,6 +765,7 @@ text = "Checkpoints "
 
 [node name="HighlightsButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=738055518]
 layout_mode = 2
+tooltip_text = "If enabled, highlights phrases that continue the streak."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../CheckpointsButton")
 focus_neighbor_right = NodePath(".")
@@ -762,6 +784,7 @@ text = "Speed Options"
 
 [node name="SpeedOption" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=434068311]
 layout_mode = 2
+tooltip_text = "Chooses between constant length and constant speed modes."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../HighlightsButton")
 focus_neighbor_right = NodePath(".")
@@ -796,6 +819,7 @@ layout_mode = 2
 
 [node name="AutoblastButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=1984656097]
 layout_mode = 2
+tooltip_text = "If enabled, automatically plays the song. Does not save score data if on."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../SpeedSlider")
 focus_neighbor_right = NodePath(".")
@@ -807,7 +831,7 @@ text = "Autoblast"
 [node name="Seperator4" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=578384054]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="ModifierContainer/GridContainer" unique_id=12439741]
+[node name="CloseButton" type="Button" parent="ModifierContainer/GridContainer" unique_id=12439741 node_paths=PackedStringArray("shortcut_context")]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../AutoblastButton")
@@ -815,9 +839,11 @@ focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath(".")
 focus_next = NodePath("../EnergyBarOptions")
 focus_previous = NodePath("../AutoblastButton")
+shortcut_context = NodePath("../..")
+shortcut = SubResource("Shortcut_tlsan")
 text = "Close"
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1628454593]
+[node name="SongSelectAnimation" type="AnimationPlayer" parent="." unique_id=1628454593]
 unique_name_in_owner = true
 root_node = NodePath("../TopBox/SongInfo")
 libraries/ = SubResource("AnimationLibrary_hjgwb")
@@ -850,12 +876,14 @@ offset_bottom = 16.0
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/TimingOption" to="." method="_on_timing_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/ResetOption" to="." method="_on_reset_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/HiSpeedOption" to="." method="_on_hi_speed_option_pressed"]
+[connection signal="closed" from="ModifierContainer" to="." method="_on_modifier_container_closed"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/EnergyBarOptions" to="ModifierContainer" method="_on_energy_bar_options_item_selected"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/TrackResetOptions" to="ModifierContainer" method="_on_track_reset_options_item_selected"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/TimingOptions" to="ModifierContainer" method="_on_timing_options_item_selected"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/CheckpointsButton" to="ModifierContainer" method="_on_checkpoints_button_toggled"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/HighlightsButton" to="ModifierContainer" method="_on_highlights_button_toggled"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/SpeedOption" to="ModifierContainer" method="_on_speed_option_item_selected"]
+[connection signal="drag_ended" from="ModifierContainer/GridContainer/SpeedSlider" to="ModifierContainer" method="_on_speed_slider_drag_ended"]
 [connection signal="value_changed" from="ModifierContainer/GridContainer/SpeedSlider" to="ModifierContainer" method="_on_speed_slider_value_changed"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/AutoblastButton" to="ModifierContainer" method="_on_autoblast_button_toggled"]
 [connection signal="pressed" from="ModifierContainer/GridContainer/CloseButton" to="ModifierContainer" method="_on_close_button_pressed"]
