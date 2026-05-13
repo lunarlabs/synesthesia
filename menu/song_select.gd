@@ -84,6 +84,7 @@ var available_difficulties := []
 var selected_difficulty: int = 102 # Default to Intermediate
 var held_difficulty: int = 102
 var play_preview_on_select: bool = false
+var preview_request_id: int = 0
 
 var energy_modifier_index: int = 0
 var checkpoint_modifier_index: int = 0
@@ -457,6 +458,9 @@ func _play_current_item_preview() -> void:
 		_play_song_preview()
 
 func _play_song_preview() -> void:
+	preview_request_id += 1
+	var current_request = preview_request_id
+	
 	if %PreviewPlayer.playing:
 		%PreviewPlayer.stop()
 	Transition.set_menu_music_volume(-80.0, 0.5)
@@ -467,9 +471,12 @@ func _play_song_preview() -> void:
 		return
 	%PreviewPlayer.stream = resource
 	await Transition.audio_transition_completed
-	%PreviewPlayer.play()
+	
+	if current_request == preview_request_id:
+		%PreviewPlayer.play()
 
 func _stop_song_preview() -> void:
+	preview_request_id += 1
 	if %PreviewPlayer.playing:
 		%PreviewPlayer.stop()
 	Transition.set_menu_music_volume(0.0, 0.5)

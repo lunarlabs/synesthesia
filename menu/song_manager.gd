@@ -230,7 +230,7 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		return
 	seconds_per_beat = song_data.seconds_per_beat
 	if constant_velocity_mode:
-		length_multiplier = (hi_speed * STANDARD_BPM)  / song_data.bpm
+		length_multiplier = (hi_speed * STANDARD_BPM) / song_data.bpm
 		print("length_multiplier set to %.3f (constant velocity: %.2fx, song tempo %.2f bpm)" % [length_multiplier, hi_speed, song_data.bpm])
 	else:
 		length_multiplier = hi_speed / song_data.scale_fudge_factor

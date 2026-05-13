@@ -43,6 +43,10 @@ func _ready() -> void:
 		_:
 			energy_bar_options.select(0)
 	
+	# It'd be stupid to have checkpoints when you can't recover energy, right?
+	# Yes, I know you can't recover energy in practice mode too -- but at least in that
+	# mode we allow the 2-measure gap after the checkpoint...
+	# TODO: Mention the gap in the control tooltip.
 	var hardcore = energy_modifier in [
 		SynRoadSongManager.EnergyModifiers.NO_RECOVER,
 		SynRoadSongManager.EnergyModifiers.SUDDEN_DEATH
@@ -69,20 +73,26 @@ func _ready() -> void:
 			timing_options.select(1)
 	
 	if hardcore:
+		# No recovery
 		checkpoints_button.button_pressed = false
 		checkpoints_button.disabled = true
 	else:
+		# Barrier 2, 3, 4 will only be used for boss songs in challenge stage play.
+		# In freeplay? Just checkpoints or no checkpoints -- reduce player headache.
 		checkpoints_button.button_pressed = (checkpoint_mode != SynRoadSongManager.CheckpointModifiers.NO_CHECKPOINT_RECOVERY)
 	
+	# If you want to feel like playing FreQuency and think the bouncing streak arrows
+	# in Amplitude were a tiny bit distracting, then by all means... turn them off.
 	highlights_button.button_pressed = streak_hints
 	
+	# A reminder to RTFM before operating heavy machinery...
 	_change_velocity_mode(constant_velocity_mode)
 	if constant_velocity_mode:
 		speed_options.select(1)
-		speed_slider.value = 120 * length_multiplier
+		speed_slider.set_value_no_signal(120.0 * length_multiplier)
 	else:
 		speed_options.select(0)
-		speed_slider.value = length_multiplier
+		speed_slider.set_value_no_signal(length_multiplier)
 	_update_velocity_label()
 	
 	autoblast_button.button_pressed = autoblast
@@ -157,8 +167,12 @@ func _on_speed_option_item_selected(index: int) -> void:
 	setting_changed.emit()
 
 
-@warning_ignore("unused_parameter")
 func _on_speed_slider_value_changed(value: float) -> void:
+	if speed_options.selected == 1:
+		SessionManager.modifiers["length_multiplier"] = speed_slider.value / 120.0
+	else:
+		SessionManager.modifiers["length_multiplier"] = speed_slider.value
+	setting_changed.emit()
 	_update_velocity_label()
 
 
@@ -166,6 +180,11 @@ func _on_autoblast_button_toggled(toggled_on: bool) -> void:
 	SessionManager.modifiers["autoblast"] = toggled_on
 	setting_changed.emit()
 
+
+func _input(event: InputEvent) -> void:
+	if visible and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if not get_global_rect().has_point(get_global_mouse_position()):
+			_on_close_button_pressed()
 
 func _on_close_button_pressed() -> void:
 	hide()
@@ -189,12 +208,3 @@ func _update_velocity_label():
 		speed_label.text = "%d BPM" % speed_slider.value
 	else:
 		speed_label.text = "%sx" % speed_slider.value
-
-
-func _on_speed_slider_drag_ended(value_changed: bool) -> void:
-	if value_changed:
-		if speed_options.selected == 1:
-			SessionManager.modifiers["length_multiplier"] = speed_slider.value / 120.0
-		else:
-			SessionManager.modifiers["length_multiplier"] = speed_slider.value
-	setting_changed.emit()

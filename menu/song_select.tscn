@@ -655,13 +655,13 @@ difficulty_name = "DIFF_114"
 
 [node name="ModifierContainer" type="PanelContainer" parent="." unique_id=1138930775]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 100.0
 grow_vertical = 2
+theme_type_variation = &"OpaquePanelContainer"
 script = ExtResource("13_jldp2")
 
 [node name="GridContainer" type="VBoxContainer" parent="ModifierContainer" unique_id=266826154]
@@ -1006,7 +1006,6 @@ offset_bottom = 16.0
 [connection signal="toggled" from="ModifierContainer/GridContainer/CheckpointsButton" to="ModifierContainer" method="_on_checkpoints_button_toggled"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/HighlightsButton" to="ModifierContainer" method="_on_highlights_button_toggled"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/SpeedOption" to="ModifierContainer" method="_on_speed_option_item_selected"]
-[connection signal="drag_ended" from="ModifierContainer/GridContainer/SpeedSlider" to="ModifierContainer" method="_on_speed_slider_drag_ended"]
 [connection signal="value_changed" from="ModifierContainer/GridContainer/SpeedSlider" to="ModifierContainer" method="_on_speed_slider_value_changed"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/AutoblastButton" to="ModifierContainer" method="_on_autoblast_button_toggled"]
 [connection signal="pressed" from="ModifierContainer/GridContainer/CloseButton" to="ModifierContainer" method="_on_close_button_pressed"]
