@@ -89,7 +89,7 @@ func _ready() -> void:
 	_change_velocity_mode(constant_velocity_mode)
 	if constant_velocity_mode:
 		speed_options.select(1)
-		speed_slider.set_value_no_signal(120.0 * length_multiplier)
+		speed_slider.set_value_no_signal(length_multiplier * 120.0)
 	else:
 		speed_options.select(0)
 		speed_slider.set_value_no_signal(length_multiplier)
@@ -168,6 +168,8 @@ func _on_speed_option_item_selected(index: int) -> void:
 
 
 func _on_speed_slider_value_changed(value: float) -> void:
+	if dont_set_multiplier_value:
+		return
 	if speed_options.selected == 1:
 		SessionManager.modifiers["length_multiplier"] = speed_slider.value / 120.0
 	else:
@@ -191,17 +193,19 @@ func _on_close_button_pressed() -> void:
 	closed.emit()
 	
 func _change_velocity_mode(constant_velocity: bool):
+	dont_set_multiplier_value = true
 	if constant_velocity:
 		speed_slider.min_value = 90.0
 		speed_slider.max_value = 240.0
 		speed_slider.step = 15.0
-		speed_slider.value = 120.0
+		speed_slider.set_value_no_signal(120.0)
 	else:
 		speed_slider.min_value = 0.5
 		speed_slider.max_value = 2.0
 		speed_slider.step = 0.25
-		speed_slider.value = 1.0
-	
+		speed_slider.set_value_no_signal(1.0)
+	dont_set_multiplier_value = false
+
 func _update_velocity_label():
 	var mode = SessionManager.modifiers.get("constant_velocity_mode", false)
 	if mode:

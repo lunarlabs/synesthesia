@@ -297,7 +297,7 @@ void fragment() {
             specular_color = hsl_to_rgb(0.60, 0.8, 0.8);
         } else if (object_id == 3) {
             // Octahedron (Center piece)
-            hue = mix(0.85, 0.90, (p.y + 3.0) / 6.0); // Pink/Magenta
+            hue = mix(0.65, 0.70, (p.y + 3.0) / 6.0); 
             sat = mix(0.6, 0.9, diffuse);
             lightness = mix(0.2, 0.6, diffuse);
             shininess = 128.0;
