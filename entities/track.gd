@@ -116,7 +116,6 @@ func _ready():
 	marker.position.x = track_data.phrase_marker_positions[0].x
 	marker.position.z = track_data.phrase_marker_positions[0].y
 	song_node._update_track_marker_cache(track_index, track_data.phrase_starts[0])
-	song_node._update_track_reset_cache(track_index, track_data.phrase_starts[0])
 	reset_measure = track_data.phrase_starts[0]
 
 @warning_ignore("unused_parameter")
@@ -476,7 +475,6 @@ func activate(phrase_idx: int):
 #				if note_nodes[j]:
 #					note_nodes[j].blast(false)
 	phrase_notes_blasted = 0
-	song_node._update_track_reset_cache(track_index, reset_measure)
 	_advance_phrase()
 
 func _play_pfx(end_measure: int):
@@ -514,7 +512,6 @@ func restore_barrier_activation(phrase_idx: int) -> void:
 	if original_next <= current_reset:
 		return # Nothing to extend
 	reset_measure = original_next
-	song_node._update_track_reset_cache(track_index, reset_measure)
 	_play_pfx(reset_measure)
 	# Extend activation: hide geometry and auto-blast notes from current_reset to original_next
 	for i in range(current_reset, original_next):

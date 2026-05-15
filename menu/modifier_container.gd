@@ -96,6 +96,7 @@ func _ready() -> void:
 	_update_velocity_label()
 	
 	autoblast_button.button_pressed = autoblast
+	setting_changed.emit() # make the menu screen update
 
 func _on_energy_bar_options_item_selected(index: int) -> void:
 	match index:

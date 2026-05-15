@@ -59,7 +59,6 @@ var _late_note_hits: int = 0
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
-var _last_inactive_penalty_measure: int = -1 # Ensures only one energy/streak penalty per measure for inactive phrase misses
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
 var closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
 var _targets: Array
@@ -616,8 +615,16 @@ func _update_closest_track_marker_cache() -> void:
 			
 		track.marker.visible = should_be_visible
 
-func _update_track_reset_cache(_track_idx: int, _reset_measure: int) -> void:
-	pass
+func _select_initial_track_for_autoblast() -> int:
+	var target_track: int = -1
+	var candidate_tracks: Array[int] = []
+	for i in tracks.size():
+		if _track_marker_measures[i] == closest_track_marker_measure:
+			candidate_tracks.append(i)
+	if candidate_tracks.size() == 0:
+		return -1
+	target_track = candidate_tracks.min()
+	return target_track
 
 func energy_change(amount: int) -> void:
 	energy = clampi(energy + amount, 0, MAX_ENERGY)
@@ -816,6 +823,8 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				if manager_node.load_screen:
 					manager_node.load_screen.queue_free()
 				var tween = create_tween()
+				if manager_node.autoblast:
+					_switch_active_track(_select_initial_track_for_autoblast())
 				tween.tween_property(instrument_container, "scale", Vector2.ONE, 0.2)
 				%TargetPfx.emitting = true
 				for tgt in _targets:
