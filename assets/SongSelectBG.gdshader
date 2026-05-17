@@ -52,6 +52,12 @@ float sdVerticalCapsule( vec3 p, float h, float r )
   return length( p ) - r;
 }
 
+float sdTorus( vec3 p, vec2 t )
+{
+	vec2 q = vec2(length(p.xz)-t.x,p.y);
+	return length(q)-t.y;
+}
+
 // --- Optimized Helper Function ---
 // Calculates distance to a ring of capsules using domain repetition
 float opRing(vec3 p, float y_offset, float rot_dir, bool is_top) {
@@ -87,12 +93,12 @@ float opRing(vec3 p, float y_offset, float rot_dir, bool is_top) {
     vec2 d_xz = local_pos - obj_pos;
     
     // 6. Handle Vertical Offset
-    float y_pos = is_top ? y_offset : y_offset - (h * 2.5);
+    float y_pos = is_top ? y_offset : y_offset - (h * 3.0);
     
     // Construct the query point relative to the capsule center
     vec3 q = vec3(d_xz.x, p.y - y_pos, d_xz.y);
     
-    return sdVerticalCapsule(q, h * 2.5, 0.1);
+    return sdVerticalCapsule(q, h * 3., 0.1);
 }
 
 // --- Rotation Matrices ---
@@ -153,7 +159,7 @@ float map(vec3 p, out int object_id) {
     // 2. Optimized Rings (Replaces the loop)
     // Top Ring (Rotates Positive, Offset 0.75)
 	{
-		float dist = opRing(p, 0.75, 1.0, true);
+		float dist = opRing(p, 0.5, 1.0, true);
 		if(dist < d) {
 			d = dist;
 			object_id = 4;
@@ -162,7 +168,7 @@ float map(vec3 p, out int object_id) {
     
     // Bottom Ring (Rotates Negative, Offset -0.75)
 	{
-		float dist = opRing(p, -0.75, -1.0, false);
+		float dist = opRing(p, -0.5, -1.0, false);
 		if(dist < d) {
 			d = dist;
 			object_id = 5;

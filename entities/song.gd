@@ -208,6 +208,9 @@ func _ready():
 			barrier_marker.anchor_right = 0.9
 			%SongProgress.add_sibling(barrier_marker)
 		add_child(checkpoint)
+		if manager_node.checkpoint_modifier == SynRoadSongManager.CheckpointModifiers.NO_CHECKPOINT_RECOVERY:
+			checkpoint.particles.emitting = false
+			checkpoint.particles.hide()
 		_checkpoint_nodes.append(checkpoint)
 	if manager_node.autoblast:
 		%EnergyBar.hide()
