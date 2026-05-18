@@ -134,6 +134,7 @@ func _ready():
 	Transition.play_menu_track(Transition.MenuTracks.SONG_SELECT, 1.0)
 	await Transition.audio_transition_completed
 	Transition.start_transition_out()
+	$MenuAnimations.play("LoadIn")
 	await Transition.animation_completed
 	_play_current_item_preview()
 	play_preview_on_select = true

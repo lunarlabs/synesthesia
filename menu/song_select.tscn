@@ -252,6 +252,352 @@ _data = {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhtwy"]
 shader = ExtResource("16_h6xa0")
 
+[sub_resource type="FontVariation" id="FontVariation_voan6"]
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 125,
+2003265652: 600
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_tlsan"]
+font = SubResource("FontVariation_voan6")
+font_size = 48
+
+[sub_resource type="Animation" id="Animation_voan6"]
+resource_name = "LoadIn"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Carousel:anchor_left")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [0.7, 0.6]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Carousel:anchor_right")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [1.1, 1.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BottomLeft:offset_bottom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [70.0, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SubScreenContainer:position:x")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [-95.0, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("DifficultyContainer:offset_top")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.7, 1),
+"update": 0,
+"values": [64.0, 0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("DifficultyContainer:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.8, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("TopBox:offset_left")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [360.0, 120.0]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("TopBox:offset_right")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [240.0, 0.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Title:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0.3, 0.70000005),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector2(16, 24), Vector2(32, 24)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Title:modulate")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.3, 0.70000005),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/10/type = "bezier"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Background:material:shader_parameter/camera_location:x")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"handle_modes": PackedInt32Array(2, 0),
+"points": PackedFloat32Array(5, 0, 0, 0, 0, 3, -0.5, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.76666665)
+}
+tracks/11/type = "bezier"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Background:material:shader_parameter/camera_location:y")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"handle_modes": PackedInt32Array(2, 0),
+"points": PackedFloat32Array(0.28, 0, 0, 0.16666667, 0, 0.28, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.76666665)
+}
+tracks/12/type = "bezier"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Background:material:shader_parameter/camera_location:z")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"handle_modes": PackedInt32Array(2, 0),
+"points": PackedFloat32Array(0, 0, 0, 0, -5.847, -10, -0.5, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.76666665)
+}
+
+[sub_resource type="Animation" id="Animation_tlsan"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Carousel:anchor_left")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.6]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Carousel:anchor_right")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BottomLeft:offset_bottom")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("SubScreenContainer:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-90, 195)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("SubScreenContainer:position:x")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("DifficultyContainer:offset_top")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("DifficultyContainer:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("TopBox:offset_left")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [120.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("TopBox:offset_right")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Title:position")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(32, 24)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Title:modulate")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/11/type = "bezier"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Background:material:shader_parameter/camera_location:x")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/12/type = "bezier"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Background:material:shader_parameter/camera_location:y")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0.28, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/13/type = "bezier"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Background:material:shader_parameter/camera_location:z")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(-10, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qoeqo"]
+_data = {
+&"LoadIn": SubResource("Animation_voan6"),
+&"RESET": SubResource("Animation_tlsan")
+}
+
 [node name="SongSelect" type="Control" unique_id=1474968882]
 layout_mode = 3
 anchors_preset = 15
@@ -378,9 +724,10 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -97.5
-offset_right = 80.0
-offset_bottom = 97.5
+offset_left = -90.0
+offset_top = -165.0
+offset_right = -10.0
+offset_bottom = 165.0
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
@@ -862,73 +1209,73 @@ unique_name_in_owner = true
 bus = &"Tracks"
 
 [node name="BottomLeft" type="PanelContainer" parent="." unique_id=57138801]
-custom_minimum_size = Vector2(925, 0)
+custom_minimum_size = Vector2(925, 70)
 layout_mode = 1
-anchors_preset = 2
+anchors_preset = -1
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -40.0
-offset_right = 8.0
+grow_horizontal = 2
 grow_vertical = 0
 
 [node name="ModifierStatus" type="GridContainer" parent="BottomLeft" unique_id=295303416]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 0
 columns = 7
 
 [node name="EnergyTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=903463844]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "ENERGY"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="ResetTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=899969166]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "RESET"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="TimingTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1403016696]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "JUDGE"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="CheckpointTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=2098734455]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "CHKPT"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="HighlightTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1409176802]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "HILITE"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="SpeedTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=506687875]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "SPEED"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="AutoblastTitle" type="Label" parent="BottomLeft/ModifierStatus" unique_id=78023791]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 text = "AUTO"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="EnergySetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1715848575]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Normal"
@@ -936,7 +1283,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="ResetSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1127499923]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Normal"
@@ -944,7 +1291,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="TimingSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=343815466]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Normal"
@@ -952,7 +1299,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="CheckpointSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1078675353]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "On"
@@ -960,7 +1307,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="HighlightSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=1833196648]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "On"
@@ -968,7 +1315,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="SpeedSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=507177983]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "1.0x"
@@ -976,7 +1323,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="AutoblastSetting" type="Label" parent="BottomLeft/ModifierStatus" unique_id=442327866]
-custom_minimum_size = Vector2(125, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Off"
@@ -991,6 +1338,18 @@ offset_left = 486.0
 offset_top = 3.0
 offset_right = 777.0
 offset_bottom = 16.0
+
+[node name="Title" type="Label" parent="." unique_id=1379282397]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 942.0
+offset_bottom = 96.0
+text = "MENU_TITLE_SONG_SELECT"
+label_settings = SubResource("LabelSettings_tlsan")
+
+[node name="MenuAnimations" type="AnimationPlayer" parent="." unique_id=405272305]
+libraries/ = SubResource("AnimationLibrary_qoeqo")
 
 [connection signal="difficulty_changed" from="." to="Carousel" method="_on_song_select_difficulty_changed"]
 [connection signal="pressed" from="SubScreenContainer/SubScreenButtons/ModifierButton" to="." method="_on_modifier_button_pressed"]
