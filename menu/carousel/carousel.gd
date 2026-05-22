@@ -25,6 +25,8 @@ const SCROLL_ANIM_DURATION := 0.15
 var _scroll_tween: Tween
 var _entry_height: float
 
+@onready var entries = $Entries
+
 signal selection_changed(reference: Dictionary)
 signal song_selected(song_folder: String, difficulty: int)
 
@@ -61,7 +63,7 @@ func select_item(item: Dictionary):
 			song_selected.emit(item[&"folder_id"], item[&"difficulty_offset"])
 
 func navigate_into_submenu(submenu_item: Dictionary, emit := true):
-	_back_stack.push_back(_current_menu_structure)
+	_back_stack.push_back([_current_menu_structure, _current_item_index])
 	_current_menu_structure = submenu_item[&"children"]
 	_current_submenu_name = submenu_item[&"name"]
 	_current_category_name = ""
@@ -91,7 +93,9 @@ func switch_category(category_item: Dictionary):
 func navigate_back() -> bool:
 	if _back_stack.is_empty():
 		return false
-	_current_menu_structure = _back_stack.pop_back()
+	var previous_menu_structure = _back_stack.pop_back()
+	_current_menu_structure = previous_menu_structure[0]
+	_current_item_index = previous_menu_structure[1]
 	_current_category_name = ""
 	if _back_stack.is_empty():
 		_current_submenu_name = ""
@@ -101,8 +105,8 @@ func navigate_back() -> bool:
 #endregion
 
 func update_carousel(emit := true, animate_direction: int = 0):
-	for i in range(get_child_count()):
-		var entry = get_child(i)
+	for i in range(entries.get_child_count()):
+		var entry = entries.get_child(i)
 		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
 		entry.current_difficulty = _current_difficulty
 		entry.update_entry(_displayed_menu_structure[item_index])
@@ -117,8 +121,8 @@ func _animate_scroll(direction: int) -> void:
 	_scroll_tween = create_tween().set_parallel(true)
 	_scroll_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	var offset_y := _entry_height * direction # positive = items come from below
-	for i in range(get_child_count()):
-		var entry = get_child(i)
+	for i in range(entries.get_child_count()):
+		var entry = entries.get_child(i)
 		var home_y: float = entry.home_y
 		var home_left_offset: float = entry.home_left_offset
 		entry.position.y = home_y + offset_y
@@ -160,7 +164,7 @@ func _ready():
 		instance.offset_left = instance.home_left_offset
 		instance.gui_input.connect(_on_entry_gui_input.bind(index))
 		instance.name = "Entry%d" % instance.carousel_index
-		add_child(instance)
+		entries.add_child(instance)
 		entry_y_pos += total_height
 	fetch_menu_structure(false)
 

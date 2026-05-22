@@ -103,12 +103,13 @@ variation_opentype = {
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_tgeyx"]
 panorama = ExtResource("5_tgeyx")
+energy_multiplier = 2.0
 
 [sub_resource type="Sky" id="Sky_xubvx"]
 sky_material = SubResource("PanoramaSkyMaterial_tgeyx")
 
 [sub_resource type="Environment" id="Environment_0bd8t"]
-background_mode = 1
+background_mode = 2
 background_color = Color(0.021000022, 0, 0.06, 1)
 sky = SubResource("Sky_xubvx")
 sky_rotation = Vector3(0, 1.8395771, 0)
@@ -1442,6 +1443,7 @@ width = 300.0
 unique_name_in_owner = true
 emitting = false
 amount = 40
+lifetime = 1.5
 one_shot = true
 explosiveness = 1.0
 local_coords = true

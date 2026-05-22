@@ -273,8 +273,6 @@ void fragment() {
     // 3. Perform Raymarching
     float d = ray_march(ro, rd, object_id);
 
-    // 4. Coloring with Blue-Cyan Palette and Depth Fog
-    // Background color (deep blue)
     vec3 bg_color = hsl_to_rgb(0.58, 0.4, 0.08);
     
     vec3 col = bg_color;
