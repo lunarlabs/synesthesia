@@ -16,11 +16,11 @@ uniform sampler2D tex_frg_45;
 void fragment() {
     // 1. Base Material Properties
     ALBEDO = texture(tex_frg_23, UV).rgb;
-    ROUGHNESS = 0.4;
+    ROUGHNESS = 0.2;
     
     // 2. Normal Map
     NORMAL_MAP = texture(tex_frg_45, UV).rgb;
-    NORMAL_MAP_DEPTH = 0.4;
+    NORMAL_MAP_DEPTH = 0.1;
 
     // 3. Emission Logic
     vec3 final_emission = vec3(0.0);

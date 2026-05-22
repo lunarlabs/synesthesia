@@ -249,6 +249,11 @@ _data = {
 &"select_item": SubResource("Animation_pjj6u")
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_voan6"]
+bg_color = Color(0, 0, 0, 0.6627451)
+border_width_top = 2
+expand_margin_top = 5.0
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhtwy"]
 shader = ExtResource("16_h6xa0")
 
@@ -398,7 +403,7 @@ tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
 "handle_modes": PackedInt32Array(2, 0),
-"points": PackedFloat32Array(5, 0, 0, 0, 0, 3, -0.5, 0, 0.25, 0),
+"points": PackedFloat32Array(3.695, 0, 0, 0, 0, 3, -0.5, 0, 0.25, 0),
 "times": PackedFloat32Array(0, 0.76666665)
 }
 tracks/11/type = "bezier"
@@ -420,8 +425,32 @@ tracks/12/interp = 1
 tracks/12/loop_wrap = true
 tracks/12/keys = {
 "handle_modes": PackedInt32Array(2, 0),
-"points": PackedFloat32Array(0, 0, 0, 0, -5.847, -10, -0.5, 0, 0.25, 0),
+"points": PackedFloat32Array(-2, 0, 0, 0, 0, -10, -0.5, 0, 0.25, 0),
 "times": PackedFloat32Array(0, 0.76666665)
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("TopBox:modulate")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("PrevBestContainer:modulate")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0.10000001, 0.40000004),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_tlsan"]
@@ -590,6 +619,30 @@ tracks/13/keys = {
 "handle_modes": PackedInt32Array(0),
 "points": PackedFloat32Array(-10, -0.25, 0, 0.25, 0),
 "times": PackedFloat32Array(0)
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("TopBox:modulate")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("PrevBestContainer:modulate")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qoeqo"]
@@ -1217,6 +1270,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_voan6")
 
 [node name="ModifierStatus" type="GridContainer" parent="BottomLeft" unique_id=295303416]
 unique_name_in_owner = true
