@@ -67,6 +67,7 @@ visibility_range_fade_mode = 1
 mesh = SubResource("CapsuleMesh_sh8nu")
 
 [node name="ghost" type="MeshInstance3D" parent="." unique_id=695687394]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
 visible = false
 layers = 2
 cast_shadow = 0

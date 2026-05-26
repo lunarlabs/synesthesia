@@ -501,7 +501,9 @@ func _pfx_process(z: float, next_idx: Array):
 	if next_idx[0] > -1 \
 	and next_idx[0] < track_data.note_positions.size() \
 	and track_data.note_positions[next_idx[0]].y > z + 0.2:
-		note_nodes[next_idx[0]].blast(false)
+		var note = note_nodes[next_idx[0]] as SynRoadNote
+		if note:
+			note.blast(false)
 		next_idx[0] += 1
 
 func restore_barrier_activation(phrase_idx: int) -> void:
