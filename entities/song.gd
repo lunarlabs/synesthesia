@@ -21,7 +21,7 @@ const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
 const GAME_POSITION := Vector3(0.0, 2.5, 1.75)
 const GAME_ROTATION := Vector3(-37.5, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
-const CHUNK_LOAD_RANGE_FORWARD = 3
+const CHUNK_LOAD_RANGE_FORWARD = 5
 const CHUNK_UNLOAD_RANGE_BEHIND = 2
 
 var energy: int = MAX_ENERGY
@@ -234,7 +234,9 @@ func _ready():
 	%EnergyBar.tint_progress = energy_gradient.sample(float(energy) / MAX_ENERGY)
 	pv_anims = %PhraseValueAnims.get_children()
 	show_phrase_highlights = manager_node.streak_hints
-	var initial_chunks = CHUNK_LOAD_RANGE_FORWARD + CHUNK_UNLOAD_RANGE_BEHIND
+	# Make sure we have some nodes available to recycle into the node pools
+	# before we have to instantiate.
+	var initial_chunks = CHUNK_LOAD_RANGE_FORWARD + (2 * CHUNK_UNLOAD_RANGE_BEHIND) + 1
 	for i in range(initial_chunks):
 		%ChunkManager.enqueue_request(i)
 	_furthest_chunk_loaded = initial_chunks - 1
