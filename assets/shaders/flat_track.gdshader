@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
 
 instance uniform float z_limit;
 uniform sampler2D pattern : source_color;
@@ -19,4 +19,5 @@ void fragment() {
     ROUGHNESS = 0.4;
     float mask = smoothstep(z_limit - afwidth, z_limit + afwidth, val);
     ALPHA = 1. - mask;
+    ALPHA_SCISSOR_THRESHOLD = 0.5;
 }

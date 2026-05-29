@@ -72,7 +72,9 @@ operator = 2
 [sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_xchp7"]
 
 [resource]
+modes/specular = 2
 flags/depth_prepass_alpha = true
+flags/shadows_disabled = true
 nodes/vertex/0/position = Vector2(1060, 240)
 nodes/vertex/2/node = SubResource("VisualShaderNodeInput_68uyx")
 nodes/vertex/2/position = Vector2(-200, 420)

@@ -108,7 +108,7 @@ panorama = ExtResource("5_tgeyx")
 sky_material = SubResource("PanoramaSkyMaterial_tgeyx")
 
 [sub_resource type="Environment" id="Environment_0bd8t"]
-background_mode = 1
+background_mode = 2
 background_color = Color(0.021000022, 0, 0.06, 1)
 sky = SubResource("Sky_xubvx")
 ambient_light_color = Color(1, 1, 1, 1)

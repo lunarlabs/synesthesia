@@ -151,7 +151,7 @@ visibility_range_fade_mode = 1
 mesh = SubResource("PrismMesh_0bd8t")
 
 [node name="Text" type="Label3D" parent="." unique_id=1941177942]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 5, 1.174)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 4.125, 1.174)
 visibility_range_end = 128.0
 visibility_range_end_margin = 64.0
 visibility_range_fade_mode = 1
