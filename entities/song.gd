@@ -809,7 +809,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 				%BarrierWarningContainer.show()
 				for i in tracks.size():
 					change_track_volume(i, -6.0)
-		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measures[measure] == false):
+		if manager_node.energy_modifier == 1 and (manager_node.suppressed_measure_mask[measure] == false):
 			var any_unactivated = false
 			for track in tracks:
 				if (track as SynRoadTrack).current_measure_is_unactivated():

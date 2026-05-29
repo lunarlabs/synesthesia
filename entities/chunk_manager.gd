@@ -45,7 +45,7 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 	var new_note_nodes: Dictionary[int, SynRoadNote] = {}
 
 	for i in track_data.measures_in_chunks[chunk_idx]:
-		if not manager_node.suppressed_measures[i]:
+		if not manager_node.suppressed_measure_mask[i]:
 			var new_measure: Node3D
 			if not _measure_stack.is_empty():
 				_mutex.lock()
@@ -82,7 +82,7 @@ func generate_chunk(track_idx: int, chunk_idx: int):
 			new_note.name = "note_%d" % j
 			new_note.capsule_material = track_node.instrument_note_material
 			new_note.ghost_material = track_node.instrument_ghost_material
-			new_note.suppressed = manager_node.suppressed_measures[i]
+			new_note.suppressed = manager_node.suppressed_measure_mask[i]
 			new_note.position.x = track_data.note_positions[j].x
 			new_note.position.z = track_data.note_positions[j].y
 			if i < track_node.reset_measure:

@@ -23,7 +23,7 @@ func _ready():
 	_manager_node = _song_node.get_parent()
 	_z_scale = _manager_node.length_multiplier
 	_measure_positions = _manager_node.measure_positions
-	_suppressed_measures = _manager_node.suppressed_measures
+	_suppressed_measures = _manager_node.suppressed_measure_mask
 	_semaphore = Semaphore.new()
 	_mutex = Mutex.new()
 	_note_pool = SynRoadObjectPool.new(_note_scene)
@@ -83,7 +83,7 @@ func chunk_generation_worker(track_idx: int, chunk_idx: int):
 	var new_note_nodes: Dictionary[int, SynRoadNote] = {}
 
 	for i in track_data.measures_in_chunks[chunk_idx]:
-		if not _manager_node.suppressed_measures[i]:
+		if not _manager_node.suppressed_measure_mask[i]:
 			var new_measure = _measure_pool.get_instance() as Node3D
 
 			new_measure.name = "measure_%d" % i
@@ -104,7 +104,7 @@ func chunk_generation_worker(track_idx: int, chunk_idx: int):
 #			new_note.name = "note_%d" % j
 			new_note.capsule_material = track_node.instrument_note_material
 			new_note.ghost_material = track_node.instrument_ghost_material
-			new_note.suppressed = _manager_node.suppressed_measures[i]
+			new_note.suppressed = _manager_node.suppressed_measure_mask[i]
 			new_note.position.x = track_data.note_positions[j].x
 			new_note.position.z = track_data.note_positions[j].y
 			if i < track_node.reset_measure:

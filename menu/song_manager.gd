@@ -139,7 +139,7 @@ var measure_in_chunks: PackedInt32Array = []
 var chunk_count := 0
 var checkpoint_positions: PackedFloat32Array = []
 var checkpoint_measures: PackedInt32Array = []
-var suppressed_measures: Array[bool] = []
+var suppressed_measure_mask: Array[bool] = []
 ## For barrier mode: array of {checkpoint, zone_start, streak_start, reset_at} dicts
 var barrier_zones: Array[Dictionary] = []
 var hit_window: float
@@ -164,7 +164,7 @@ func _ready() -> void:
 			midi_hash = catalog_entry.midi_hash
 			result_screen.populate_from_catalog_entry(catalog_entry, difficulty)
 			var tween = create_tween()
-			tween.tween_property(song_info_container, "modulate:a", 1.0, 0.5)
+			tween.tween_property(song_info_container, "modulate:a", 1.0, 1.0)
 			await tween.finished
 		else:
 			push_error("No song file provided")
@@ -210,6 +210,13 @@ func _process(delta: float) -> void:
 			if not load_result.get("success", false):
 				return
 			print("handing over to song node now")
+			if OS.has_feature("editor"):
+				var json_out = _format_json(load_result)
+				var proc_file_path = "user://preprocessor_result_%s_diff%d.json" % [song_name, difficulty]
+				var file = FileAccess.open(proc_file_path, FileAccess.WRITE)
+				if file:
+					file.store_string(json_out)
+					file.close()
 			song_instance = SONG_SCENE.instantiate() as SynRoadSong
 			song_instance.song_failed.connect(_on_song_failed)
 			song_instance.song_finished.connect(_on_song_finished)
@@ -223,6 +230,19 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		push_error("Failed to load song data from %s" % song_file)
 		out_load_result["success"] = false
 		return
+	if OS.has_feature("editor"):
+		out_load_result["song_file"] = song_file
+		out_load_result["song_name"] = song_name
+		var metadata: Dictionary = {
+			"artist": song_data.artist,
+			"title": song_data.title,
+			"sub_title": song_data.sub_title,
+			"bpm": song_data.bpm,
+			"lead_in_measures": song_data.lead_in_measures,
+			"playable_measures": song_data.playable_measures,
+		}
+		out_load_result["metadata"] = metadata
+		out_load_result["difficulty"] = difficulty
 	note_maps = _get_note_maps()
 	if note_maps.size() == 0:
 		push_error("No note maps found for song %s" % song_file)
@@ -251,12 +271,16 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		chunk_count = max(chunk_count, chunk + 1)
 	chunk_count += 1
 
-	suppressed_measures.resize(total_measures)
+	var suppressed_measures: Array[int] = []
+	suppressed_measure_mask.resize(total_measures)
+	print("suppressing lead-in measures")
 	for measure in range(song_data.lead_in_measures):
 		# There may be notes in the lead in measures. There *shouldn't*,
 		# but sometimes there are. Suppress the measures so that playable notes 
 		# don't appear before the song start.
-		suppressed_measures[measure] = true
+		suppressed_measure_mask[measure] = true
+		if OS.has_feature("editor"):
+			suppressed_measures.append(measure)
 	print("suppressing checkpoint measures")
 	for measure in song_data.checkpoints:
 		var actual_measure = measure + song_data.lead_in_measures
@@ -264,8 +288,12 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		checkpoint_positions.append(measure_positions[actual_measure])
 		match checkpoint_modifier:
 			0:
-				suppressed_measures[actual_measure] = true
-				suppressed_measures[actual_measure + 1] = true
+				suppressed_measure_mask[actual_measure] = true
+				suppressed_measure_mask[actual_measure + 1] = true
+				if OS.has_feature("editor"):
+					suppressed_measures.append(actual_measure)
+					suppressed_measures.append(actual_measure + 1)
+				# Standard checkpoint: suppress checkpoint measure and the following measure for recovery buffer
 			1:
 				# Disabled -- leave the checkpoint gates as is but they won't do anything
 				pass
@@ -276,13 +304,19 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 				var zone_start = max(last_cp, actual_measure - 10)
 				# Suppress first 2 measures of zone (approach buffer)
 				if zone_start >= 0 and zone_start < total_measures:
-					suppressed_measures[zone_start] = true
+					suppressed_measure_mask[zone_start] = true
+					if OS.has_feature("editor"):
+						suppressed_measures.append(zone_start)
 				if zone_start + 1 >= 0 and zone_start + 1 < total_measures:
-					suppressed_measures[zone_start + 1] = true
+					suppressed_measure_mask[zone_start + 1] = true
+					if OS.has_feature("editor"):
+						suppressed_measures.append(zone_start + 1)
 				# Suppress C and C+1 (post-checkpoint)
-				suppressed_measures[actual_measure] = true
+				suppressed_measure_mask[actual_measure] = true
 				if actual_measure + 1 < total_measures:
-					suppressed_measures[actual_measure + 1] = true
+					suppressed_measure_mask[actual_measure + 1] = true
+					if OS.has_feature("editor"):
+						suppressed_measures.append(actual_measure + 1)
 				# Record barrier zone for preprocessor
 				barrier_zones.append({
 					"checkpoint": actual_measure,
@@ -290,6 +324,8 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 					"streak_start": zone_start + 2,
 					"reset_at": min(actual_measure + 2, total_measures),
 				})
+	if OS.has_feature("editor"):
+		out_load_result["suppressed_measures"] = suppressed_measures
 
 	track_data.resize(song_data.tracks.size())
 	_fetch_track_data()
@@ -302,6 +338,7 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		out_load_result["success"] = false
 		return
 	out_load_result["success"] = true
+
 
 func _fetch_track_data() -> void:
 	preprocessor = SynRoadTrackPreprocessor.new()
@@ -317,7 +354,7 @@ func _fetch_track_data() -> void:
 			"note_map": note_maps[i],
 			"seconds_per_beat": 60.0 / song_data.bpm,
 			"chunk_count": chunk_count,
-			"suppressed_measures": suppressed_measures,
+			"suppressed_measure_mask": suppressed_measure_mask,
 			"track_reset": fast_track_reset,
 			"length_per_beat": length_per_beat,
 			"total_measures": total_measures,
@@ -345,6 +382,39 @@ func _apply_preprocessor_results(results: Array) -> void:
 		if result.result.note_map.size() > 0:
 			track_data[result.track_index]["track_data"] = result.result
 			track_data[result.track_index]["track_info"] = track_info
+
+func _format_json(loaded_data: Dictionary) -> String:
+	var json_ready = {
+		"metadata": loaded_data.metadata,
+		"seconds_per_beat": seconds_per_beat,
+		"suppressed_measures": loaded_data.suppressed_measures,
+		"difficulty": difficulty,
+		"track_data": [],
+	}
+	for track in track_data:
+		var track_dict: Dictionary = {
+			"track_name": track.track_info.midi_track_name,
+			"track_instrument": track.track_info.instrument,
+			"notes": [],
+			"phrases": [],
+		}
+		for i in track.track_data.note_map.size():
+			track_dict["notes"].append([
+				track.track_data.note_times[i],
+				track.track_data.note_map.keys()[i],
+				track.track_data.note_map.values()[i],
+			])
+		for i in track.track_data.phrase_starts.size():
+			track_dict["phrases"].append({
+				"start_measure": track.track_data.phrase_starts[i],
+				"length_in_measures": track.track_data.phrase_lengths[i],
+				"first_note_index": track.track_data.phrase_first_note_indices[i],
+				"note_count": track.track_data.phrase_note_counts[i],
+				"activation_length": track.track_data.phrase_activation_lengths[i],
+				"reset_at": track.track_data.phrase_next_measures[i],
+			})
+		json_ready.track_data.append(track_dict)
+	return JSON.stringify(json_ready, "\t")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):

@@ -66,7 +66,7 @@ func _process_job(job: Dictionary):
 			var x_pos: float = (lane - 1) * LANE_GAP
 			var z_pos: float = (beat * job.length_per_beat)
 			note_positions.append(Vector2(x_pos, z_pos))
-			if not job.suppressed_measures[measure_num]:
+			if not job.suppressed_measure_mask[measure_num]:
 				lane_notes[lane].append(i)
 			note_times.append(beat * job.seconds_per_beat)
 			if not notes_in_measure.has(measure_num):
@@ -107,7 +107,7 @@ func _process_job(job: Dictionary):
 	
 	# Second pass: build phrases
 	for m in notes_in_measure.keys():
-		if job.suppressed_measures[m]:
+		if job.suppressed_measure_mask[m]:
 			continue
 		phrase_note_indices[m] = PackedInt32Array()
 		var first_note = notes_in_measure[m][0]
@@ -116,7 +116,7 @@ func _process_job(job: Dictionary):
 		var z_pos: float = (sorted_beats[first_note] * job.length_per_beat)
 		phrase_marker_positions[m] = Vector2(x_pos, z_pos)
 		phrase_note_indices[m].append_array(notes_in_measure[m])
-		if notes_in_measure.has(m + 1) and not job.suppressed_measures[m + 1]:
+		if notes_in_measure.has(m + 1) and not job.suppressed_measure_mask[m + 1]:
 			phrase_lengths[m] = 2
 			phrase_note_indices[m].append_array(notes_in_measure[m + 1])
 		else:
@@ -126,10 +126,10 @@ func _process_job(job: Dictionary):
 		var activation_length = job.track_reset
 		var target_measure = m + (phrase_lengths[m] - 1) + activation_length
 		for i in range(target_measure, m, -1):
-			if i < job.total_measures and job.suppressed_measures[i]:
+			if i < job.total_measures and job.suppressed_measure_mask[i]:
 				target_measure += 1
 				activation_length += 1
-		while target_measure < job.total_measures and job.suppressed_measures[target_measure]:
+		while target_measure < job.total_measures and job.suppressed_measure_mask[target_measure]:
 			target_measure += 1
 			activation_length += 1
 		phrase_activation_lengths[m] = min(job.track_reset, (job.total_measures - (m + phrase_lengths[m])))
@@ -141,7 +141,7 @@ func _process_job(job: Dictionary):
 			# Find the next available measure with notes after target_measure
 			var next_measure = target_measure + 1
 			while next_measure < job.total_measures:
-				if measure_note_counts.keys().has(next_measure) and not job.suppressed_measures[next_measure]:
+				if measure_note_counts.keys().has(next_measure) and not job.suppressed_measure_mask[next_measure]:
 					phrase_next_measures[m] = next_measure
 					break
 				next_measure += 1

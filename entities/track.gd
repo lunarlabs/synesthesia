@@ -238,7 +238,7 @@ func _process_autoblast(current_time: float):
 			else:
 				# Track is not active, but we've passed the note. Mute the track.
 				if song_node.get_track_volume(track_index) != MUTED_VOLUME \
-				and not song_node.manager_node.suppressed_measures[conductor.current_measure]:
+				and not song_node.manager_node.suppressed_measure_mask[conductor.current_measure]:
 					song_node.change_track_volume(track_index, MUTED_VOLUME)
 				
 				# See if the passed note was the first note in the phrase
