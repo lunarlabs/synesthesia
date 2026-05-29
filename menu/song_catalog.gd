@@ -8,7 +8,8 @@ var additions: Array = []
 
 static var CATALOG_JSON_PATH = "user://song_catalog.json"
 static var DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
-static var SONG_DIRECTORY_PATH = "res://song/"
+static var SONG_DIRECTORY_PATH = "user://song/"
+static var SONG_DIRECTORY_PATH_RES = "res://song/"
 static var DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 static var DIFFICULTY_NAMES = {
 	96: "Beginner",
@@ -120,101 +121,106 @@ class DetailedDifficultyInfo:
 	var avg_raw_difficulty: float
 
 func scan_for_songs(rescan := false):
-	var dir = DirAccess.open(SONG_DIRECTORY_PATH)
-	if not dir:
-		push_error("Failed to open song directory.")
-		return
-	var catalog_loading = catalog_loading_scene.instantiate()
-	add_child(catalog_loading)
-	var loading_label: Label = catalog_loading.get_node("%Label")
-	var loading_bar: ProgressBar = catalog_loading.get_node("%ProgressBar")
+	var dirs_to_scan = [SONG_DIRECTORY_PATH]
+	if OS.has_feature("res_song_catalog"):
+		dirs_to_scan.append(SONG_DIRECTORY_PATH_RES)
+	for dir_path in dirs_to_scan:
+		print("Scanning song directory: %s" % dir_path)
+		var dir = DirAccess.open(dir_path)
+		if not dir:
+			push_error("Failed to open song directory.")
+			continue
+		var catalog_loading = catalog_loading_scene.instantiate()
+		add_child(catalog_loading)
+		var loading_label: Label = catalog_loading.get_node("%Label")
+		var loading_bar: ProgressBar = catalog_loading.get_node("%ProgressBar")
 
-	# ── Phase 1: Scan folders and check hashes ──
-	loading_label.text = "Scanning song folders…"
-	loading_bar.indeterminate = true
+		# ── Phase 1: Scan folders and check hashes ──
+		loading_label.text = "Scanning song folders…"
+		loading_bar.indeterminate = true
 
-	var db = SessionManager.library_db
+		var db = SessionManager.library_db
 
-	var existing_hashes: Dictionary = {} # folder_id -> { resource_hash, midi_hash }
-	if db.query("SELECT folder_id, resource_hash, midi_hash FROM songs"):
-		for row in db.query_result:
-			existing_hashes[row["folder_id"]] = row
+		var existing_hashes: Dictionary = {} # folder_id -> { resource_hash, midi_hash }
+		if db.query("SELECT folder_id, resource_hash, midi_hash FROM songs"):
+			for row in db.query_result:
+				existing_hashes[row["folder_id"]] = row
 
-	var total_folders := 0
-	var work_list: Array = []
-	dir.list_dir_begin()
-	var folder_name = dir.get_next()
-	while folder_name != "":
-		if dir.current_is_dir() and not folder_name.begins_with("."):
-			total_folders += 1
-			var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
-			var file_exists = FileAccess.file_exists(file_path)
-			var resource_hash = null
-			if file_exists:
-				# Check to see if all audio track files exist
-				# and clear the file path if not.
-				# This will change the resource hash, forcing a rescan.
-				var song_data = ResourceLoader.load(file_path) as SongData
-				var file_changed := false
-				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track)):
-					song_data.click_track = ""
-					file_changed = true
-				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.preview_audio)):
-					song_data.preview_audio = ""
-					file_changed = true
-				if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.selection_audio)):
-					song_data.selection_audio = "res://assets/transition.mp3"
-					file_changed = true
-				for i in song_data.tracks.size():
-					var track = song_data.tracks[i] as SongTrackData
-					if not FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file)):
-						print("Track %s: Audio file not found!" % track.midi_track_name)
-						track.audio_file = ""
+		var total_folders := 0
+		var work_list: Array = []
+		dir.list_dir_begin()
+		var folder_name = dir.get_next()
+		while folder_name != "":
+			if dir.current_is_dir() and not folder_name.begins_with("."):
+				total_folders += 1
+				var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+				var file_exists = FileAccess.file_exists(file_path)
+				var resource_hash = null
+				if file_exists:
+					# Check to see if all audio track files exist
+					# and clear the file path if not.
+					# This will change the resource hash, forcing a rescan.
+					var song_data = ResourceLoader.load(file_path) as SongData
+					var file_changed := false
+					if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.click_track)):
+						song_data.click_track = ""
 						file_changed = true
-				if file_changed:
-					ResourceSaver.save(song_data)
+					if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.preview_audio)):
+						song_data.preview_audio = ""
+						file_changed = true
+					if not FileAccess.file_exists(ResourceUID.ensure_path(song_data.selection_audio)):
+						song_data.selection_audio = "res://assets/transition.mp3"
+						file_changed = true
+					for i in song_data.tracks.size():
+						var track = song_data.tracks[i] as SongTrackData
+						if not FileAccess.file_exists(ResourceUID.ensure_path(track.audio_file)):
+							print("Track %s: Audio file not found!" % track.midi_track_name)
+							track.audio_file = ""
+							file_changed = true
+					if file_changed:
+						ResourceSaver.save(song_data)
 
-				resource_hash = FileAccess.get_md5(file_path)
-			var prev = existing_hashes.get(folder_name, {})
-			var is_new = prev.is_empty()
-			var hash_changed = rescan or is_new or prev.get("resource_hash") != resource_hash
-			if hash_changed:
-				work_list.append({
-					"folder": folder_name,
-					"file_exists": file_exists,
-					"resource_hash": resource_hash,
-					"is_new": is_new,
-					"prev_midi_hash": prev.get("midi_hash"),
-				})
-		folder_name = dir.get_next()
-	dir.list_dir_end()
+					resource_hash = FileAccess.get_md5(file_path)
+				var prev = existing_hashes.get(folder_name, {})
+				var is_new = prev.is_empty()
+				var hash_changed = rescan or is_new or prev.get("resource_hash") != resource_hash
+				if hash_changed:
+					work_list.append({
+						"folder": folder_name,
+						"file_exists": file_exists,
+						"resource_hash": resource_hash,
+						"is_new": is_new,
+						"prev_midi_hash": prev.get("midi_hash"),
+					})
+			folder_name = dir.get_next()
+		dir.list_dir_end()
 
-	print("Scan complete: %d folders found, %d need processing." % [total_folders, work_list.size()])
+		print("Scan complete: %d folders found, %d need processing." % [total_folders, work_list.size()])
 
-	# ── Phase 2: Process only changed songs ──
-	if work_list.is_empty():
-		loading_label.text = "Library is up to date."
-	else:
-		loading_bar.indeterminate = false
-		loading_bar.min_value = 0
-		loading_bar.max_value = work_list.size()
-		loading_bar.value = 0
-		for i in work_list.size():
-			var item = work_list[i]
-			loading_label.text = "Processing song %d / %d: %s" % [i + 1, work_list.size(), item.folder]
-			loading_bar.value = i
-			await get_tree().process_frame
-			process_song(item)
-		loading_bar.value = work_list.size()
+		# ── Phase 2: Process only changed songs ──
+		if work_list.is_empty():
+			loading_label.text = "Library is up to date."
+		else:
+			loading_bar.indeterminate = false
+			loading_bar.min_value = 0
+			loading_bar.max_value = work_list.size()
+			loading_bar.value = 0
+			for i in work_list.size():
+				var item = work_list[i]
+				loading_label.text = "Processing song %d / %d: %s" % [i + 1, work_list.size(), item.folder]
+				loading_bar.value = i
+				await get_tree().process_frame
+				process_song(item)
+			loading_bar.value = work_list.size()
 
-	# Refresh catalog
-	if not db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
-		printerr(db.error_message)
-	_song_catalog = db.query_result
-	for i in range(_song_catalog.size()):
-		song_indices[_song_catalog[i]["folder_id"]] = i
+		# Refresh catalog
+		if not db.query("%s %s;" % [QUERY_BASE, ORDER_DEFAULT]):
+			printerr(db.error_message)
+		_song_catalog = db.query_result
+		for i in range(_song_catalog.size()):
+			song_indices[_song_catalog[i]["folder_id"]] = i
 
-	catalog_loading.queue_free()
+		catalog_loading.queue_free()
 
 #region Ingest
 ## Processes a single song folder that was flagged as changed during the scan phase.

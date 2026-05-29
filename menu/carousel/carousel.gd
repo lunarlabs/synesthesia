@@ -61,6 +61,8 @@ func select_item(item: Dictionary):
 			song_selected.emit(item[&"folder_id"], -1)
 		&"song_single_difficulty":
 			song_selected.emit(item[&"folder_id"], item[&"difficulty_offset"])
+		&"challenge_menu":
+			pass # TODO: implement changing to challenge course menu whenever I write the damn thing
 
 func navigate_into_submenu(submenu_item: Dictionary, emit := true):
 	_back_stack.push_back([_current_menu_structure, _current_item_index])

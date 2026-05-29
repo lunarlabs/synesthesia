@@ -3,6 +3,7 @@ extends Node
 const LIBRARY_DB_VERSION = 1
 const PLAYER_DB_VERSION = 1
 const LIBRARY_DB_PATH = "user://library.db"
+const LIBRARY_RES_DB_PATH = "user://library_res.db"
 const PLAYER_DB_PATH = "user://player.db"
 const LIBRARY_DDL_PATH = "res://data/library.sql"
 const PLAYER_DDL_PATH = "res://data/player.sql"
@@ -13,6 +14,17 @@ var player_attached := false
 
 var previous_select_options: Dictionary = {}
 var modifiers: Dictionary = {}
+
+var _library_db_file_path: String:
+	get:
+		if OS.has_feature("res_song_catalog"):
+			return LIBRARY_RES_DB_PATH
+		else:
+			return LIBRARY_DB_PATH
+
+var library_db_file_exists: bool:
+	get:
+		return FileAccess.file_exists(_library_db_file_path)
 
 #region Database Functions
 var library_db: SQLite:
@@ -44,7 +56,7 @@ func _exit_tree():
 func _prepare_library_db():
 	if not _library_db:
 		_library_db = SQLite.new()
-		_library_db.path = LIBRARY_DB_PATH
+		_library_db.path = _library_db_file_path
 		_library_db.foreign_keys = true
 		if _library_db.open_db() == false:
 			printerr("Problem opening library database!")

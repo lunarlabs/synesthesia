@@ -5,7 +5,7 @@ var song_root_directory
 func _ready() -> void:
 	await get_tree().process_frame # Wait a frame for UI to initialize
 	%ProgressBar.max_value = DirAccess.get_directories_at(SongCatalog.SONG_DIRECTORY_PATH).size()
-	var library_file_exists = FileAccess.file_exists(SessionManager.LIBRARY_DB_PATH)
+	var library_file_exists = SessionManager.library_db_file_exists
 	if not library_file_exists:
 		%Label.text = "Initializing library file for the first time..."
 	await get_tree().process_frame
