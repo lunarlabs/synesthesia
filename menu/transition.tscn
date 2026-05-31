@@ -4,6 +4,7 @@
 [ext_resource type="Shader" uid="uid://cn3r0f32is5so" path="res://assets/shaders/hex_pulse.gdshader" id="1_51re6"]
 [ext_resource type="AudioStream" uid="uid://b4h8ap5v4lyh7" path="res://assets/songselsynch.tres" id="2_hjks8"]
 [ext_resource type="Shader" uid="uid://b6570yhqwpu5q" path="res://assets/shaders/vignette.gdshader" id="2_jb3rd"]
+[ext_resource type="AudioStream" uid="uid://btwd6ciiktoqc" path="res://assets/transition.mp3" id="2_ogdpa"]
 [ext_resource type="Texture2D" uid="uid://df5bdpqu2ggem" path="res://assets/textures/logo/logo.svg" id="3_fq6ve"]
 [ext_resource type="Texture2D" uid="uid://b8y5pk3da2vbc" path="res://assets/textures/logo/wordmark.svg" id="4_2bhp6"]
 
@@ -437,6 +438,9 @@ shader_parameter/radius = 0.6
 [node name="Transition" type="CanvasLayer" unique_id=1199933552]
 process_mode = 3
 script = ExtResource("1_2bhp6")
+
+[node name="TransitionStinger" type="AudioStreamPlayer" parent="." unique_id=1208851986]
+stream = ExtResource("2_ogdpa")
 
 [node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=1399346884]
 stream = ExtResource("2_hjks8")

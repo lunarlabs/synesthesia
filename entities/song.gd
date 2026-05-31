@@ -16,10 +16,10 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
-const START_POSITION := Vector3(-10.0, 25.0, 5.0)
+const START_POSITION := Vector3(-10.0, 25.0, 10.0)
 const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
-const GAME_POSITION := Vector3(0.0, 2.5, 2.0)
-const GAME_ROTATION := Vector3(-35.0, 0.0, 0.0)
+const GAME_POSITION := Vector3(0.0, 2.0, 2.5)
+const GAME_ROTATION := Vector3(-27.5, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
 const CHUNK_LOAD_RANGE_FORWARD = 5
 const CHUNK_UNLOAD_RANGE_BEHIND = 2
@@ -85,7 +85,7 @@ var show_phrase_highlights := true
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 @onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
 
-#signal song_prepared
+signal song_prepared
 signal song_failed(stats)
 signal song_finished(stats)
 
@@ -244,13 +244,12 @@ func _ready():
 	print("Precompiling shaders...")
 	for i in range(3):
 		await get_tree().process_frame
-
-	_song_start()
+	song_prepared.emit()
 
 func _prepare_song():
 	pass
 
-func _song_start():
+func start_song():
 	print("Starting song playback.")
 	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
 	print("Playhead starting at x=%.2f" % playhead.position.x)

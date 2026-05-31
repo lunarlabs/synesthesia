@@ -19,12 +19,12 @@ func _ready():
 	_blasted = false
 	ghost.material_override = ghost_material
 	ghost.hide()
-	capsule.material_override = capsule_material
+	change_material(capsule_material)
 	particles.material_override = ghost_material
 	capsule.visible = !suppressed
 
 func change_material(mat: BaseMaterial3D):
-	capsule.material_override = mat
+	get_node("capsule").set_surface_override_material(0, mat)
 
 func blast(emit:bool = false):
 	if _blasted:
@@ -37,6 +37,9 @@ func blast(emit:bool = false):
 	$ghost.show()
 
 func set_phrase_note(is_phrase: bool):
-	get_node("capsule").material_override = PHRASE_MATERIAL if is_phrase else capsule_material
+	if is_phrase:
+		change_material(PHRASE_MATERIAL)
+	else:
+		change_material(capsule_material)
 	if not get_node("GPUParticles3D").emitting:
 		get_node("GPUParticles3D").material_override = PHRASE_MATERIAL if is_phrase else ghost_material

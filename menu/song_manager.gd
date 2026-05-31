@@ -212,7 +212,7 @@ func _process(delta: float) -> void:
 			print("handing over to song node now")
 			if OS.has_feature("editor"):
 				var json_out = _format_json(load_result)
-				var proc_file_path = "user://preprocessor_result_%s_diff%d.json" % [song_name, difficulty]
+				var proc_file_path = "user://preprocessor_result.json"
 				var file = FileAccess.open(proc_file_path, FileAccess.WRITE)
 				if file:
 					file.store_string(json_out)
@@ -223,6 +223,10 @@ func _process(delta: float) -> void:
 			add_child.call_deferred(song_instance)
 			load_screen.color = Color(1, 1, 1, 0)
 			waiting_for_task = false
+			await song_instance.song_prepared
+			song_instance.start_song()
+			if not get_window().has_focus():
+				_toggle_pause()
 
 func _prepare_song_data(out_load_result: Dictionary) -> void:
 	song_data = load(song_file) as SongData
@@ -398,7 +402,7 @@ func _format_json(loaded_data: Dictionary) -> String:
 			"notes": [],
 			"phrases": [],
 		}
-		for i in track.track_data.note_map.size():
+		for i in track.track_data.note_times.size():
 			track_dict["notes"].append([
 				track.track_data.note_times[i],
 				track.track_data.note_map.keys()[i],
@@ -507,7 +511,6 @@ func _on_continue_pressed() -> void:
 
 func _on_restart_pressed() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
-	get_tree().paused = false
 	pause_panel.hide()
 	result_screen.hide()
 	# TODO: Add fade out transition here
@@ -518,8 +521,12 @@ func _on_restart_pressed() -> void:
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
 	add_child(song_instance)
+	await song_instance.song_prepared
+	get_tree().paused = false
 	await get_tree().process_frame
-#	song_instance.start_song()
+	song_instance.start_song()
+	if not get_window().has_focus():
+		_toggle_pause()
 
 func _on_quit_pressed() -> void:
 	Transition.start_transition_in()

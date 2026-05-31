@@ -18,6 +18,8 @@ var _vol_tween: Tween
 signal animation_completed
 signal audio_transition_completed
 
+@onready var stinger = $TransitionStinger
+
 func _ready() -> void:
 	_menu_music = $MenuMusic
 	_menu_music_stream = _menu_music.stream as AudioStreamSynchronized

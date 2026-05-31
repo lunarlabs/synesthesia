@@ -83,10 +83,10 @@ transform_format = 1
 mesh = SubResource("PlaneMesh_xv6yt")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xv6yt"]
+blend_mode = 1
 cull_mode = 2
-depth_draw_mode = 2
-no_depth_test = true
 shading_mode = 0
+albedo_color = Color(0, 1, 1, 1)
 
 [node name="Track" type="Node3D" unique_id=1756052907]
 script = ExtResource("1_q435s")
@@ -120,4 +120,5 @@ instance_shader_parameters/z_limit = 0.0
 multimesh = SubResource("MultiMesh_7l36f")
 
 [node name="PhraseLine" type="MeshInstance3D" parent="." unique_id=1215533111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
 material_override = SubResource("StandardMaterial3D_xv6yt")
