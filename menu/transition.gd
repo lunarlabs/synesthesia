@@ -14,6 +14,7 @@ var _menu_music: AudioStreamPlayer
 var _menu_music_stream: AudioStreamSynchronized
 var _current_stream_idx: int = 0
 var _vol_tween: Tween
+var _stinger_file: String = "res://assets/transition.mp3"
 
 signal animation_completed
 signal audio_transition_completed

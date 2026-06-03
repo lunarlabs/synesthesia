@@ -62,7 +62,7 @@ distance_fade_min_distance = 656.41
 material = SubResource("StandardMaterial3D_cidh0")
 
 [sub_resource type="BoxMesh" id="BoxMesh_tmkqs"]
-size = Vector3(0.1, 0.7, 16)
+size = Vector3(0.1, 0.2, 16)
 subdivide_depth = 16
 
 [sub_resource type="MultiMesh" id="MultiMesh_3q0ve"]
@@ -109,6 +109,7 @@ process_material = SubResource("ParticleProcessMaterial_dgpj8")
 draw_pass_1 = SubResource("QuadMesh_24ful")
 
 [node name="Rails" type="MultiMeshInstance3D" parent="." unique_id=1679081151]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 visible = false
 multimesh = SubResource("MultiMesh_3q0ve")
 

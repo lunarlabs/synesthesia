@@ -442,6 +442,15 @@ func _on_track_activated(note_count: int, start_measure: int):
 		else:
 			print("Autoblast: Phrase complete. Staying on track %d" % active_track)
 
+		if closest_track_marker_measure > -1:
+			print("Next playable measure in %.2f measures (currently on M%d)"\
+			 % [
+				(closest_track_marker_measure - (%Conductor.current_beat / BEATS_PER_MEASURE)), 
+				%Conductor.current_measure
+				])
+		else:
+			print("No more playable measures")
+
 
 func _on_streak_broken():
 	if %Conductor.current_measure == _last_streak_break_measure:

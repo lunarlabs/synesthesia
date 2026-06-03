@@ -1452,7 +1452,13 @@ draw_pass_1 = SubResource("QuadMesh_e81dl")
 [node name="Camera" type="Camera3D" parent="Playhead/CameraParent" unique_id=340278828]
 unique_name_in_owner = true
 transform = Transform3D(0.9396927, 0.34202012, 0, -0.21984632, 0.6040228, 0.76604444, 0.26200265, -0.7198463, 0.64278764, 0, 15, 5)
+current = true
 far = 400.0
+
+[node name="MPCamera" type="Camera3D" parent="Playhead" unique_id=745233599]
+transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 6.5, -0.75)
+v_offset = -3.165
+fov = 97.5
 
 [node name="CountIn" type="Label3D" parent="." unique_id=926558052]
 transform = Transform3D(1, 0, 0, 0, -5.2453663e-07, 1, 0, -12, -4.371139e-08, 0, 0, 0)

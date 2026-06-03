@@ -132,7 +132,7 @@ func _process_job(job: Dictionary):
 		while target_measure < job.total_measures and job.suppressed_measure_mask[target_measure]:
 			target_measure += 1
 			activation_length += 1
-		phrase_activation_lengths[m] = min(job.track_reset, (job.total_measures - (m + phrase_lengths[m])))
+		phrase_activation_lengths[m] = min(activation_length, (job.total_measures - (m + phrase_lengths[m])))
 		if target_measure >= job.total_measures:
 			phrase_next_measures[m] = job.total_measures
 		elif measure_note_counts.keys().has(target_measure):
