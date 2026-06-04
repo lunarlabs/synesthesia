@@ -46,6 +46,7 @@ func _process_job(job: Dictionary):
 	var result: SynRoadTrack.GameplayTrackData = SynRoadTrack.GameplayTrackData.new()
 	## map of beat (float) to lane (int)
 	var note_map: Dictionary[float, int] = job.note_map
+	var global_grid: Array[PackedByteArray] = job.playable_measure_grid
 
 	note_map.sort()
 	var sorted_beats: Array[float] = note_map.keys()

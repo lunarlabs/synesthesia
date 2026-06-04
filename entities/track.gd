@@ -454,7 +454,7 @@ func _get_global_next_note_idx() -> int:
 	return earliest_global_idx
 
 func activate(phrase_idx: int):
-#	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
+	print("  Track %d: Activating phrase at measure %d" % [track_index, track_data.phrase_starts[phrase_idx]])
 	last_activated_phrase_idx = phrase_idx
 	var phrase_end_measure = track_data.phrase_starts[phrase_idx] + track_data.phrase_lengths[phrase_idx] - 1
 	reset_measure = track_data.phrase_next_measures[phrase_idx]
@@ -465,6 +465,10 @@ func activate(phrase_idx: int):
 		phrase_end_measure
 	)
 	_play_pfx(reset_measure)
+	if reset_measure < song_node.total_measures:
+		print("  Track %d: Reset measure is %d" % [track_index, reset_measure])
+	else:
+		print("  Track %d: No reset measure, activating until end of song" % track_index)
 	var activation_end_measure = reset_measure if reset_measure != -1 else song_node.total_measures
 	for i in range(phrase_end_measure, activation_end_measure):
 		if measure_nodes[i]:

@@ -9,7 +9,7 @@ var difficulty: int = 96
 @export_enum("Normal", "Disabled", "Barrier 2", "Barrier 3", "Barrier 4") var checkpoint_modifier: int = 0
 @export var streak_hints: bool = true
 @export_enum("Normal", "Loose", "Strict") var timing_modifier: int = 0
-@export_enum("Normal:12", "Fast Reset 1:10", "Fast Reset 2:8") var fast_track_reset: int = 12
+@export_enum("Normal:12", "Fast Reset 1:10", "Fast Reset 2:8", "Dynamic Reset:-1") var fast_track_reset: int = 12
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
 
@@ -52,6 +52,7 @@ enum TrackReset {
 	NORMAL = 12,
 	FAST_ONE = 10,
 	FAST_TWO = 8,
+	DYNAMIC = -1,
 }
 
 const ENERGY_MODIFIER_NAMES = [
@@ -77,7 +78,8 @@ const TIMING_MODIFIER_NAMES = [
 const FAST_RESET_NAMES = {
 	12: "Track Reset",
 	10: "Fast Reset 1",
-	8: "Fast Reset 2"
+	8: "Fast Reset 2",
+	-1: "Dynamic Reset"
 }
 
 const ACCURACY_THRESHOLDS = {
@@ -125,6 +127,7 @@ var song_name: String
 var midi_hash: String
 var note_maps: Array[Dictionary]
 var track_data: Array[Dictionary]
+var _playable_measures_by_track: Array[PackedByteArray] = []
 var total_measures: int
 var length_multiplier: float
 var seconds_per_beat: float
@@ -252,6 +255,14 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		push_error("No note maps found for song %s" % song_file)
 		out_load_result["success"] = false
 		return
+	for i in note_maps.size():
+		var playable_measures = PackedByteArray()
+		playable_measures.resize(song_data.lead_in_measures + song_data.playable_measures)
+		for note in note_maps[i].keys():
+			var measure = int(note / (BEATS_PER_MEASURE))
+			if measure >= 0 and measure < playable_measures.size():
+				playable_measures[measure] = 1
+		_playable_measures_by_track.append(playable_measures)
 	seconds_per_beat = song_data.seconds_per_beat
 	if constant_velocity_mode:
 		length_multiplier = (hi_speed * STANDARD_BPM) / song_data.bpm
@@ -363,7 +374,8 @@ func _fetch_track_data() -> void:
 			"length_per_beat": length_per_beat,
 			"total_measures": total_measures,
 			"barrier_zones": barrier_zones,
-			"lead_in_measures": song_data.lead_in_measures # damnyou, bulletproof!
+			"lead_in_measures": song_data.lead_in_measures, # damnyou, bulletproof!
+			"playable_measure_grid": _playable_measures_by_track,
 		}
 		preprocessor.queue_job(job)
 
