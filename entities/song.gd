@@ -16,8 +16,8 @@ const ENERGY_BAR_TEXT: Dictionary = {
 	3: "MOD_ENERGY_SUDDENDEATH",
 	4: "MOD_ENERGY_NOFAIL",
 }
-const START_POSITION := Vector3(-10.0, 25.0, 10.0)
-const START_ROTATION := Vector3(-50.0, -30.0, -5.0)
+const START_POSITION := Vector3(-1.0, 1.5, 0.0)
+const START_ROTATION := Vector3(-5.0, 0.0, -5.0)
 const GAME_POSITION := Vector3(0.0, 2.0, 2.5)
 const GAME_ROTATION := Vector3(-27.5, 0.0, 0.0)
 const MAX_COMBO_MULTIPLIER := 4
@@ -290,16 +290,16 @@ func start_song():
 		intro_tween.tween_subtween(fade_tween)
 		intro_tween.tween_property(%Camera, "position:x", GAME_POSITION.x, \
 		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
-		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
 		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
-		(lead_in_measures - 0.5) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
 		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
-		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	else:
 		%Camera.position = GAME_POSITION
 		%Camera.rotation_degrees = GAME_ROTATION

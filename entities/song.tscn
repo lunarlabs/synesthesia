@@ -92,6 +92,9 @@ distance_fade_max_distance = 2.0
 [sub_resource type="QuadMesh" id="QuadMesh_e81dl"]
 material = SubResource("StandardMaterial3D_afjmx")
 
+[sub_resource type="BoxMesh" id="BoxMesh_tgeyx"]
+size = Vector3(1.365, 0.435, 1.05)
+
 [sub_resource type="FontVariation" id="FontVariation_scy1h"]
 base_font = ExtResource("2_0bd8t")
 variation_opentype = {
@@ -1451,13 +1454,18 @@ draw_pass_1 = SubResource("QuadMesh_e81dl")
 
 [node name="Camera" type="Camera3D" parent="Playhead/CameraParent" unique_id=340278828]
 unique_name_in_owner = true
-transform = Transform3D(0.9396927, 0.34202012, 0, -0.21984632, 0.6040228, 0.76604444, 0.26200265, -0.7198463, 0.64278764, 0, 15, 5)
+transform = Transform3D(1, 0, 0, 0, 0.8338858, 0.551937, 0, -0.551937, 0.8338858, 0, 3, 3.36)
 current = true
 far = 400.0
 
+[node name="Blaster" type="MeshInstance3D" parent="Playhead/CameraParent" unique_id=96405006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 1.5)
+visible = false
+mesh = SubResource("BoxMesh_tgeyx")
+
 [node name="MPCamera" type="Camera3D" parent="Playhead" unique_id=745233599]
-transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 6.5, -0.75)
-v_offset = -3.165
+transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 6.5, 0)
+v_offset = -3.0
 fov = 97.5
 
 [node name="CountIn" type="Label3D" parent="." unique_id=926558052]

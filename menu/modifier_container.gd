@@ -197,8 +197,8 @@ func _change_velocity_mode(constant_velocity: bool):
 	dont_set_multiplier_value = true
 	if constant_velocity:
 		speed_slider.min_value = 90.0
-		speed_slider.max_value = 240.0
-		speed_slider.step = 15.0
+		speed_slider.max_value = 200.0
+		speed_slider.step = 10.0
 		speed_slider.set_value_no_signal(120.0)
 	else:
 		speed_slider.min_value = 0.5
