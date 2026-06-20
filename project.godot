@@ -12,8 +12,8 @@ config_version=5
 
 config/name="Synesthesia Road"
 run/main_scene="uid://coucd74ci5vq3"
-config/features=PackedStringArray("4.6", "Mobile")
-config/icon="res://icon.svg"
+config/features=PackedStringArray("4.7", "Mobile")
+config/icon="uid://5earfcdpplkd"
 
 [audio]
 

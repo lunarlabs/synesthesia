@@ -289,16 +289,16 @@ func start_song():
 		var intro_tween = create_tween().set_parallel()
 		intro_tween.tween_subtween(fade_tween)
 		intro_tween.tween_property(%Camera, "position:x", GAME_POSITION.x, \
-		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
-		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
-		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
-		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	else:
 		%Camera.position = GAME_POSITION
