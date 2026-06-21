@@ -431,6 +431,7 @@ func _on_carousel_song_selected(song_folder: String, difficulty: int = -1) -> vo
 		"song_index": selected_song_index,
 		"difficulty": selected_difficulty if difficulty == -1 else difficulty,
 	}
+	SessionManager.write_modifiers()
 
 	# TODO: call transition handler here so there's no loading lag
 

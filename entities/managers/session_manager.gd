@@ -1,5 +1,6 @@
 extends Node
 
+const CONFIG_FILE_PATH = "user://synroad.cfg"
 const LIBRARY_DB_VERSION = 1
 const PLAYER_DB_VERSION = 1
 const LIBRARY_DB_PATH = "user://library.db"
@@ -12,8 +13,9 @@ var _library_db: SQLite = null
 var _player_db: SQLite = null
 var player_attached := false
 
+var _config: ConfigFile = null
 var previous_select_options: Dictionary = {}
-var modifiers: Dictionary = {}
+var _modifiers: Dictionary = {}
 
 var _library_db_file_path: String:
 	get:
@@ -25,6 +27,13 @@ var _library_db_file_path: String:
 var library_db_file_exists: bool:
 	get:
 		return FileAccess.file_exists(_library_db_file_path)
+
+var modifiers: Dictionary:
+	get:
+		if not _modifiers:
+			_modifiers = {}
+			read_modifiers()
+		return _modifiers
 
 #region Database Functions
 var library_db: SQLite:
@@ -120,6 +129,34 @@ func _update_player_db(current_version: int) -> bool:
 				
 	# Update the user_version pragma after successful migration
 	return _player_db.query("PRAGMA user_version = %d;" % PLAYER_DB_VERSION)
+#endregion
+
+#region Config Functions
+var config: ConfigFile:
+	get:
+		if not _config:
+			_config = ConfigFile.new()
+			var err = _config.load(CONFIG_FILE_PATH)
+			if err != OK:
+				print("No existing config found, starting with defaults.")
+		return _config
+
+func save_config():
+	if _config:
+		var err = _config.save(CONFIG_FILE_PATH)
+		if err != OK:
+			printerr("Failed to save config!")
+
+func write_modifiers():
+	for key in modifiers.keys():
+		config.set_value("modifiers", key, modifiers[key])
+	save_config()
+
+func read_modifiers():
+	if not config.has_section("modifiers"):
+		return
+	for key in config.get_section_keys("modifiers"):
+		_modifiers[key] = config.get_value("modifiers", key)
 #endregion
 
 #region Player Data

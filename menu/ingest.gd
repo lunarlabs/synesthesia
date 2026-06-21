@@ -12,6 +12,7 @@ func _ready() -> void:
 	await SongCatalog.scan_for_songs(!library_file_exists)
 	SongCatalog.make_menu_structure()
 	await get_tree().create_timer(1.0).timeout
+	SessionManager.read_modifiers()
 	Transition.start_transition_in()
 	await Transition.animation_completed
 	get_tree().change_scene_to_file("res://menu/song_select.tscn")
