@@ -33,7 +33,7 @@ lifetime_randomness = 0.25
 particle_flag_disable_z = true
 emission_shape_offset = Vector3(0, 0.2, 0)
 emission_shape = 3
-emission_box_extents = Vector3(7.5, 0.2, 0.02)
+emission_box_extents = Vector3(1.15, 0.2, 0.02)
 angle_min = -179.99998
 angle_max = 180.00002
 inherit_velocity_ratio = 1.0
@@ -77,7 +77,7 @@ texture_mode = 1
 curve = SubResource("Curve_2ivja")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_p3toe"]
-emission_shape_offset = Vector3(6.25, 2.25, 0)
+emission_shape_offset = Vector3(0, 2.25, 0)
 emission_shape = 3
 emission_box_extents = Vector3(7.825, 4, 0)
 spread = 0.0
@@ -114,8 +114,8 @@ shader = ExtResource("5_8w72o")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1e67b"]
 material = SubResource("ShaderMaterial_nos5s")
-size = Vector2(2.5, 2)
-center_offset = Vector3(1.25, 0, -1)
+size = Vector2(2.3, 2)
+center_offset = Vector3(0, 0, -1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1e67b"]
 render_priority = 0
@@ -127,7 +127,7 @@ shader = ExtResource("8_2ivja")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_p3toe"]
 material = SubResource("ShaderMaterial_4abvr")
-size = Vector2(16.58, 7.5)
+size = Vector2(1, 7.5)
 center_offset = Vector3(0, 2.225, 0)
 orientation = 2
 
@@ -151,7 +151,7 @@ visibility_range_fade_mode = 1
 mesh = SubResource("PrismMesh_0bd8t")
 
 [node name="Text" type="Label3D" parent="." unique_id=1941177942]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 4.125, 1.174)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.125, 1.174)
 visibility_range_end = 128.0
 visibility_range_end_margin = 64.0
 visibility_range_fade_mode = 1
@@ -170,10 +170,10 @@ autowrap_mode = 1
 width = 4000.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=1935396468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 0, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
 amount = 500
 lifetime = 1.25
-visibility_aabb = AABB(-12.9835205, -3.1711996, -3, 25.97467, 17.557516, 6)
+visibility_aabb = AABB(-13, -3.171, -3, 26, 17.558, 6)
 local_coords = true
 trail_lifetime = 0.66
 process_material = SubResource("ParticleProcessMaterial_hjeaj")
@@ -182,12 +182,11 @@ draw_pass_1 = SubResource("QuadMesh_hjeaj")
 [node name="BarrierParticles" type="GPUParticles3D" parent="." unique_id=973293312]
 emitting = false
 amount = 50
-visibility_aabb = AABB(-6.3823657, -3.6965325, -2, 24.178467, 11.906005, 4)
+visibility_aabb = AABB(-13, -3.717, -2, 26, 11.933, 4)
 process_material = SubResource("ParticleProcessMaterial_p3toe")
 draw_pass_1 = SubResource("QuadMesh_g8myr")
 
 [node name="BoundaryLine" type="MeshInstance3D" parent="." unique_id=1272142734]
-transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, 0)
 mesh = SubResource("PlaneMesh_1e67b")
 
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
@@ -195,14 +194,11 @@ mesh = SubResource("PlaneMesh_1e67b")
 [node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 1731398852) index="0" unique_id=1217249057]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
-[node name="RightGate" parent="Gate" index="1" unique_id=1542456635]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 0)
-
-[node name="GateHalo_001" parent="Gate/RightGate" index="0" unique_id=1606980335]
+[node name="GateHalo_001" parent="Gate/RightGate" parent_id_path=PackedInt32Array(215747972, 1542456635) index="0" unique_id=1606980335]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [node name="FinishPlane" type="MeshInstance3D" parent="." unique_id=1480233852]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 0, -0.06)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.06)
 visible = false
 mesh = SubResource("PlaneMesh_p3toe")
 

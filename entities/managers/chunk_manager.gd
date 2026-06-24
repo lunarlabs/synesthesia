@@ -91,6 +91,7 @@ func chunk_generation_worker(track_idx: int, chunk_idx: int):
 			cube.set_instance_shader_parameter("this_track", track_idx)
 			cube.set_instance_shader_parameter("measure_tint", track_node.lane_tint)
 			cube.set_instance_shader_parameter("phrase", i in phrase_measures)
+			cube.scale.x = 2.2/2.5
 			cube.show()
 			new_measure.position.z = _manager_node.measure_positions[i]
 			new_measure.scale.z = _z_scale

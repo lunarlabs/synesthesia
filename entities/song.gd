@@ -5,7 +5,7 @@ extends Node3D
 
 const TRACK_SCENE: PackedScene = preload("res://entities/track.tscn")
 const CHECKPOINT_SCENE: PackedScene = preload("res://entities/checkpoint.tscn")
-const TRACK_WIDTH := 2.5
+const TRACK_WIDTH := 2.3
 const MAX_ENERGY := 8
 const STANDARD_LENGTH_PER_BEAT := 4.0
 const BEATS_PER_MEASURE := 4
@@ -69,6 +69,7 @@ var _barrier_threshold: int = 0 # 0 = no barrier, 2/3/4 = streak required
 var _furthest_chunk_loaded := -1
 var _closest_chunk_recycled := -1
 var show_phrase_highlights := true
+var _road_center: float
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -133,6 +134,7 @@ func _ready():
 		%ChunkManager.chunk_generation_worker(i, 0)
 	await get_tree().process_frame
 	print("tracks added")
+	_road_center = ((tracks.size() - 1) * TRACK_WIDTH) / 2
 	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE) * 2
@@ -149,7 +151,9 @@ func _ready():
 	start_gate.name = "SongStart"
 	start_gate.fadeout_time = checkpoint_fade_time
 	start_gate.gate_location = lead_in_measures
+	start_gate.position.x = _road_center
 	start_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * lead_in_measures
+	start_gate.set_width(tracks.size(), TRACK_WIDTH)
 	if _barrier_threshold > 0:
 		# Barrier mode: show barrier appearance on start gate (streak starts at 0)
 		start_gate.set_warning_state(true)
@@ -163,7 +167,9 @@ func _ready():
 	end_gate.name = "SongEnd"
 	end_gate.fadeout_time = checkpoint_fade_time
 	end_gate.gate_location = total_measures
+	end_gate.position.x = _road_center
 	end_gate.position.z = - (BEATS_PER_MEASURE * length_per_beat) * total_measures
+	end_gate.set_width(tracks.size(), TRACK_WIDTH)
 	end_gate.get_node("FinishPlane").show()
 	end_gate.get_node("BoundaryLine").scale.z = 1.5
 	add_child(end_gate)
@@ -192,7 +198,9 @@ func _ready():
 		var percentage = float(measure * 100) / total_measures
 		checkpoint.get_node("Text").text = "%d%% Complete" % percentage
 		checkpoint.gate_location = (measure)
+		checkpoint.position.x = _road_center
 		checkpoint.position.z = manager_node.checkpoint_positions[i]
+		checkpoint.set_width(tracks.size(), TRACK_WIDTH)
 		checkpoint.get_node("BoundaryLine").visible = (manager_node.checkpoint_modifier == 0 or _barrier_threshold > 0)
 		if _barrier_threshold > 0:
 			checkpoint.is_barrier = true
@@ -251,7 +259,7 @@ func _prepare_song():
 
 func start_song():
 	print("Starting song playback.")
-	playhead.position.x = ((tracks.size() - 1) * TRACK_WIDTH) / 2
+	playhead.position.x = _road_center
 	print("Playhead starting at x=%.2f" % playhead.position.x)
 	current_track.position.x = (active_track * TRACK_WIDTH) - playhead.position.x
 	print("Current track starting at x=%.2f" % current_track.position.x)
@@ -289,17 +297,17 @@ func start_song():
 		var intro_tween = create_tween().set_parallel()
 		intro_tween.tween_subtween(fade_tween)
 		intro_tween.tween_property(%Camera, "position:x", GAME_POSITION.x, \
-		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		(lead_in_measures - 1.5) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:y", GAME_POSITION.y, \
-		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 1.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "position:z", GAME_POSITION.z, \
-		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		(lead_in_measures - 1.5) * (seconds_per_beat * BEATS_PER_MEASURE)) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		intro_tween.tween_property(%Camera, "rotation_degrees", GAME_ROTATION, \
-		(lead_in_measures - 2.) * (seconds_per_beat * BEATS_PER_MEASURE)) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		(lead_in_measures - 1.5) * (seconds_per_beat * BEATS_PER_MEASURE)) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	else:
 		%Camera.position = GAME_POSITION
 		%Camera.rotation_degrees = GAME_ROTATION

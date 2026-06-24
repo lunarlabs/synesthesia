@@ -93,8 +93,8 @@ func _enter_tree():
 		var rail_transform = Transform3D.IDENTITY
 		@warning_ignore("integer_division")
 		var z_pos = - (BEATS_PER_MEASURE * length_per_beat) * (int(i / 2) + 0.5)
-		var x_pos = 1.17 if i % 2 == 0 else -1.17
-		rail_transform.origin = Vector3(x_pos, -0.25, z_pos)
+		var x_pos = 1. if i % 2 == 0 else -1.
+		rail_transform.origin = Vector3(x_pos, -0.1, z_pos)
 		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		rail_transform.basis = rail_transform.basis.scaled(Vector3(1.0, 1.0, scale_z))
 		rails.multimesh.set_instance_transform(i, rail_transform)
