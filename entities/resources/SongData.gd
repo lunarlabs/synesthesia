@@ -211,9 +211,26 @@ func _get_song_track_locations() -> Dictionary[String, int]:
 func get_audio_stream_synchronized() -> AudioStreamSynchronized:
 	var result: AudioStreamSynchronized = AudioStreamSynchronized.new()
 	result.stream_count = tracks.size() + 1
-	result.set_sync_stream(0, load(click_track))
+	result.set_sync_stream(0, _load_audio_stream(click_track))
 	result.set_sync_stream_volume(0, -10.)
 	for i in tracks.size():
-		result.set_sync_stream(i + 1, load(tracks[i].audio_file))
+		result.set_sync_stream(i + 1, _load_audio_stream(tracks[i].audio_file))
 		result.set_sync_stream_volume(i + 1, -6.0)
 	return result
+
+func _load_audio_stream(path: String) -> AudioStream:
+	path = ResourceUID.ensure_path(path)
+	var result
+	if not FileAccess.file_exists(path):
+		push_error("Audio file not found: %s" % path)
+		return null
+	match path.get_extension():
+		"mp3":
+			result = AudioStreamMP3.load_from_file(path)
+			return result
+		"ogg":
+			result = AudioStreamOggVorbis.load_from_file(path)
+			return result
+		_:
+			push_error("Unrecognized audio file format: %s" % path)
+			return null
