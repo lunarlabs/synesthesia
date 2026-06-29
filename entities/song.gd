@@ -135,7 +135,7 @@ func _ready():
 	await get_tree().process_frame
 	print("tracks added")
 	_road_center = ((tracks.size() - 1) * TRACK_WIDTH) / 2
-	asp.stream = manager_node.song_data.get_audio_stream_synchronized()
+	asp.stream = manager_node.synced_stream
 	song_data_ok = true
 	var checkpoint_fade_time = (seconds_per_beat * BEATS_PER_MEASURE) * 2
 	# Initialize barrier threshold before gate setup

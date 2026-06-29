@@ -124,6 +124,7 @@ var waiting_for_task: bool = false
 var task = null
 var load_result: Dictionary = {}
 var song_name: String
+var synced_stream: AudioStreamSynchronized
 var midi_hash: String
 var note_maps: Array[Dictionary]
 var track_data: Array[Dictionary]
@@ -352,6 +353,8 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		OS.alert("The selected song does not have valid note data for the chosen difficulty. Please select a different difficulty or song.")
 		out_load_result["success"] = false
 		return
+	# Only load the audio files if everything worked out OK
+	synced_stream = song_data.get_audio_stream_synchronized()
 	out_load_result["success"] = true
 
 
