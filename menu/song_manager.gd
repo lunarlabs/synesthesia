@@ -172,7 +172,7 @@ func _ready() -> void:
 			await tween.finished
 		else:
 			push_error("No song file provided")
-			return
+			_on_quit_pressed()
 	get_window().focus_exited.connect(_on_lose_focus)
 	song_name = song_file.get_file().get_slice(".", 0)
 	energy_modifier = SessionManager.modifiers.get("energy_modifier", EnergyModifiers.NORMAL)
@@ -210,9 +210,9 @@ func _process(delta: float) -> void:
 			var err = WorkerThreadPool.wait_for_task_completion(task)
 			if err != OK:
 				push_error("Failed to wait for task completion")
-				return
+				_on_quit_pressed()
 			if not load_result.get("success", false):
-				return
+				_on_quit_pressed()
 			print("handing over to song node now")
 			if OS.has_feature("editor"):
 				var json_out = _format_json(load_result)
@@ -251,6 +251,12 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		}
 		out_load_result["metadata"] = metadata
 		out_load_result["difficulty"] = difficulty
+	synced_stream = song_data.get_audio_stream_synchronized()
+	if not synced_stream:
+		push_error("No audio files for song %s" % song_file)
+		OS.alert("The selected song does not have valid audio files. Please select a different song.")
+		out_load_result["success"] = false
+		return
 	note_maps = _get_note_maps()
 	if note_maps.size() == 0:
 		push_error("No note maps found for song %s" % song_file)
@@ -353,8 +359,6 @@ func _prepare_song_data(out_load_result: Dictionary) -> void:
 		OS.alert("The selected song does not have valid note data for the chosen difficulty. Please select a different difficulty or song.")
 		out_load_result["success"] = false
 		return
-	# Only load the audio files if everything worked out OK
-	synced_stream = song_data.get_audio_stream_synchronized()
 	out_load_result["success"] = true
 
 
