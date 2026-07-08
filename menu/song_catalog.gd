@@ -88,6 +88,8 @@ static var FILTER_BETWEEN_BPM = """bpm BETWEEN ? AND ?"""
 static var FILTER_BETWEEN_RATING = """difficulty_rating >= ? AND difficulty_rating < ?"""
 static var FILTER_SOURCE = """source_name = ?"""
 static var FILTER_GENRE = """genre = ?"""
+static var FILTER_CHECKPOINTS = """checkpoint_modifier = ?"""
+static var FILTER_RESET = """track_reset = ?"""
 
 static var ORDER_DEFAULT = "ORDER BY sort_key ASC"
 static var ORDER_BPM = "ORDER BY bpm ASC"
