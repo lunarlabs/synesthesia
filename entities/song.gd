@@ -60,6 +60,7 @@ var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
+var _cached_non_empty_tracks_this_measure: Array[bool]
 var closest_track_marker_measure: int = -1 # The closest track marker measure not less than the current measure
 var _targets: Array
 var _checkpoint_nodes: Array[Node3D]
@@ -331,13 +332,14 @@ func _process(delta: float):
 		RenderingServer.global_shader_parameter_set("beat", %Conductor.current_beat)
 
 		var new_active_track = active_track
+		# TODO: wrapi(active_track + dir, 0, trs.size()) for classic jump behavior
 		if !mn.autoblast and input_enabled:
 			if Input.is_action_just_pressed("track_next"):
-				new_active_track = (active_track + 1) % trs.size()
+				new_active_track = _jump_track(1)
 				_switch_active_track(new_active_track)
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 			elif Input.is_action_just_pressed("track_prev"):
-				new_active_track = (active_track - 1 + trs.size()) % trs.size()
+				new_active_track = _jump_track(-1)
 				_switch_active_track(new_active_track)
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 
@@ -352,6 +354,31 @@ func _process(delta: float):
 				# last opportunity passed, penalize.
 				_on_streak_broken()
 
+func _jump_track(direction: int) -> int:
+	var normalized_dir = sign(direction)
+	var num_tracks = tracks.size()
+	assert(normalized_dir != 0, "Direction needs to be non-zero to jump tracks.")
+	if _playable_tracks_this_measure():
+
+		# Check every OTHER track up to the total size minus 1
+		for i in range(1, num_tracks):
+			# Calculate the offset from the current track, then wrap it safely
+			var offset = i * normalized_dir
+			var check_index = wrapi(active_track + offset, 0, num_tracks)
+
+			if _cached_non_empty_tracks_this_measure[check_index]:
+				return check_index
+
+	elif closest_track_marker_measure != -1:
+		for i in range(1, num_tracks):
+			# Calculate the offset from the current track, then wrap it safely
+			var offset = i * normalized_dir
+			var check_index = wrapi(active_track + offset, 0, num_tracks)
+
+			if _track_marker_measures[check_index] == closest_track_marker_measure:
+				return check_index
+	#TODO: sfx indicating can't jump
+	return active_track
 
 func _unhandled_input(event: InputEvent) -> void:
 	if manager_node.autoblast or not input_enabled:
@@ -458,6 +485,7 @@ func _on_track_activated(note_count: int, start_measure: int):
 				])
 		else:
 			print("No more playable measures")
+	_update_playable_cache()
 
 
 func _on_streak_broken():
@@ -636,6 +664,13 @@ func _update_closest_track_marker_cache() -> void:
 			
 		track.marker.visible = should_be_visible
 
+func _update_playable_cache():
+	_cached_non_empty_tracks_this_measure.clear()
+	for i in range(tracks.size()):
+		_cached_non_empty_tracks_this_measure.append(
+			tracks[i].current_measure_is_unactivated()
+			or tracks[i].measure_is_unactivated(%Conductor.current_measure + 1))
+
 func _select_initial_track_for_autoblast() -> int:
 	var target_track: int = -1
 	var candidate_tracks: Array[int] = []
@@ -810,6 +845,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 					%ChunkManager.enqueue_recycle(ci)
 				_closest_chunk_recycled = target_behind
 		_update_closest_track_marker_cache()
+		_update_playable_cache()
 		if _next_checkpoint < manager_node.checkpoint_measures.size():
 			var checkpoint_measure = manager_node.checkpoint_measures[_next_checkpoint]
 			if measure == checkpoint_measure:
@@ -923,3 +959,6 @@ func _show_barrier_message(message_key: String) -> void:
 	# Auto-hide after a delay
 	var timer = get_tree().create_timer(2.0)
 	timer.timeout.connect(%BarrierWarningContainer.hide)
+
+func _playable_tracks_this_measure() -> bool:
+	return _cached_non_empty_tracks_this_measure.count(true) > 0

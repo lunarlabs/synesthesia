@@ -530,8 +530,11 @@ func restore_barrier_activation(phrase_idx: int) -> void:
 #					note_nodes[j].blast(true)
 	_advance_phrase()
 
+func measure_is_unactivated(measure: int) -> bool:
+	return measure >= reset_measure and measure in track_data.phrase_starts
+
 func current_measure_is_unactivated() -> bool:
-	return conductor.current_measure >= reset_measure and conductor.current_measure in track_data.phrase_starts
+	return measure_is_unactivated(conductor.current_measure)
 
 func _misblast(beat_position: float, lane_index: int):
 	miss_sound.play()
