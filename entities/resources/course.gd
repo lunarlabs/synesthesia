@@ -1,0 +1,2 @@
+class_name SynRoadCourse
+extends Resource
