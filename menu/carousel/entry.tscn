@@ -85,7 +85,6 @@ metadata/_edit_vertical_guides_ = [90.0, 15.0, 95.0]
 metadata/_edit_horizontal_guides_ = [7.0, 78.0]
 
 [node name="Song" type="Control" parent="." unique_id=819393028]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -101,6 +100,7 @@ offset_bottom = 85.0
 texture = ExtResource("2_sx17s")
 
 [node name="PlayMarker" type="TextureRect" parent="Song" unique_id=112757303]
+modulate = Color(0.12, 0.12, 0.12, 1)
 layout_mode = 0
 offset_right = 400.0
 offset_bottom = 85.0
@@ -145,6 +145,7 @@ text = "Difficulty"
 label_settings = SubResource("LabelSettings_sx17s")
 
 [node name="Submenu" type="Control" parent="." unique_id=1524135444]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

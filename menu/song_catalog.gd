@@ -6,6 +6,15 @@ var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
 var additions: Array = []
 
+enum ClearStatus {
+	NOT_PLAYED,
+	FAILED,
+	CLEARED_LOOSE,
+	CLEARED,
+	CLEARED_TIGHT,
+	PERFECT,
+	}
+
 static var CATALOG_JSON_PATH = "user://song_catalog.json"
 static var DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
 static var SONG_DIRECTORY_PATH = "user://song/"
