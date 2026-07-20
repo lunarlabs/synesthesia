@@ -8,6 +8,15 @@
 [sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
 font_size = 24
 
+[sub_resource type="FontVariation" id="FontVariation_dn0fs"]
+base_font = ExtResource("2_eskt4")
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 85,
+2003265652: 350
+}
+
 [sub_resource type="FontVariation" id="FontVariation_bsqdo"]
 base_font = ExtResource("2_eskt4")
 variation_opentype = {
@@ -1077,6 +1086,7 @@ visible_characters_behavior = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_dn0fs")
 text = "Artist"
 horizontal_alignment = 1
 autowrap_mode = 3
