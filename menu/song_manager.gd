@@ -536,6 +536,8 @@ func _on_restart_pressed() -> void:
 	if song_instance and is_instance_valid(song_instance):
 		song_instance.queue_free()
 		await song_instance.tree_exited
+	for i in range(1, synced_stream.stream_count):
+		synced_stream.set_sync_stream_volume(i, -6.0)
 	song_instance = SONG_SCENE.instantiate() as SynRoadSong
 	song_instance.song_failed.connect(_on_song_failed)
 	song_instance.song_finished.connect(_on_song_finished)
