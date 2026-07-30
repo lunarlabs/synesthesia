@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bncrnwiyh8pt5"]
+
+[sub_resource type="FontVariation" id="FontVariation_voan6"]
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 125,
+2003265652: 600
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_x4xwi"]
+font = SubResource("FontVariation_voan6")
+font_size = 48
+
+[node name="GameOptions" type="Control" unique_id=960256031]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OptionPanel" type="PanelContainer" parent="." unique_id=2018700768]
+propagate_maximum_size = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = -32.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="VBoxContainer" parent="OptionPanel" unique_id=978138323]
+propagate_maximum_size = false
+layout_mode = 2
+theme_type_variation = &"OpaquePanelContainer"
+
+[node name="Title" type="Label" parent="OptionPanel/Control" unique_id=158228817]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "MENU_TITLE_GAME_OPTIONS"
+label_settings = SubResource("LabelSettings_x4xwi")

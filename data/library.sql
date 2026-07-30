@@ -1,12 +1,36 @@
 BEGIN TRANSACTION;
 
-PRAGMA user_version = 1;
+PRAGMA user_version = 2;
 
 DROP TABLE IF EXISTS "sources";
 CREATE TABLE "sources" (
     "source_id"    INTEGER PRIMARY KEY,
     "name"         TEXT NOT NULL UNIQUE COLLATE NOCASE
 );
+
+-- ha ha ha, stealing from my own code!
+DROP TABLE IF EXISTS "song_paks";
+CREATE TABLE "song_paks" (
+    "pak_id"            INTEGER PRIMARY KEY,
+    "pak_filename"      TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    "pak_name"          TEXT NOT NULL,
+    "pak_version"       INTEGER NOT NULL,
+    "pak_art"           BLOB,
+    "pak_art_width"     INTEGER CHECK("cover_art_width" BETWEEN 1 AND 16777216),
+    "pak_art_height"    INTEGER CHECK("cover_art_height" BETWEEN 1 AND 16777216),
+    "pak_art_fmt"       INTEGER CHECK("cover_art_fmt" BETWEEN 0 AND 46),
+    "sort_key"          TEXT GENERATED ALWAYS AS (
+        CASE
+            WHEN LOWER(title) LIKE 'the %' THEN SUBSTR(title, 5)
+            WHEN LOWER(title) LIKE 'an %'  THEN SUBSTR(title, 4)
+            WHEN LOWER(title) LIKE 'a %'   THEN SUBSTR(title, 3)
+            ELSE title
+        END || COALESCE(' ' || NULLIF(TRIM(sub_title), ''), '')
+    ) STORED,
+    CHECK (("cover_art_height" IS NULL) = ("cover_art" IS NULL)
+    AND ("cover_art_width" IS NULL) = ("cover_art" IS NULL)
+    AND ("cover_art_fmt" IS NULL) = ("cover_art" IS NULL))
+)
 
 DROP TABLE IF EXISTS "difficulty_levels";
 CREATE TABLE "difficulty_levels" (
@@ -24,6 +48,7 @@ CREATE TABLE "songs" (
     "genre"             TEXT NOT NULL DEFAULT 'Unknown Genre',
     "bpm"               REAL NOT NULL DEFAULT 120 CHECK("bpm" BETWEEN 30 AND 300),
     "source"            INTEGER,
+    "song_pak"          INTEGER,
     "desc"              TEXT,
     "cover_art"         BLOB,
     "cover_art_width"   INTEGER CHECK("cover_art_width" BETWEEN 1 AND 16777216),
@@ -56,7 +81,8 @@ CREATE TABLE "songs" (
     AND ("cover_art_width" IS NULL) = ("cover_art" IS NULL)
     AND ("cover_art_fmt" IS NULL) = ("cover_art" IS NULL)),
     PRIMARY KEY("folder_id"),
-    FOREIGN KEY("source") REFERENCES "sources"("source_id") ON DELETE SET NULL
+    FOREIGN KEY("source") REFERENCES "sources"("source_id") ON DELETE SET NULL,
+    FOREIGN KEY("song_pak") REFERENCES "song_paks"("pak_id") ON DELETE SET NULL
 );
 
 DROP TABLE IF EXISTS "difficulties";
