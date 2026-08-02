@@ -45,7 +45,7 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 @export_file("*.wav", "*.mp3", "*.ogg") var preview_audio = ""
 
-@export_file("*.wav", "*.mp3", "*.ogg") var selection_audio = "res://assets/transition.mp3"
+@export_file("*.wav", "*.mp3", "*.ogg") var selection_audio = ""
 
 @export_category("Gameplay")
 
@@ -149,6 +149,11 @@ var seconds_per_beat: float:
 var total_measures: int:
 	get:
 		return lead_in_measures + playable_measures
+
+static func get_file_paths(data: SongData) -> PackedStringArray:
+	var result: PackedStringArray
+	result.append(ProjectSettings.globalize_path(data.resource_path))
+	return result
 
 ## Returns a dictionary mapping timestamps to note values for a specific track and difficulty.
 ##
