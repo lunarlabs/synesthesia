@@ -8,7 +8,6 @@ CREATE TABLE "sources" (
     "name"         TEXT NOT NULL UNIQUE COLLATE NOCASE
 );
 
--- ha ha ha, stealing from my own code!
 DROP TABLE IF EXISTS "song_paks";
 CREATE TABLE "song_paks" (
     "pak_id"            INTEGER PRIMARY KEY,
@@ -16,21 +15,21 @@ CREATE TABLE "song_paks" (
     "pak_name"          TEXT NOT NULL,
     "pak_version"       INTEGER NOT NULL,
     "pak_art"           BLOB,
-    "pak_art_width"     INTEGER CHECK("cover_art_width" BETWEEN 1 AND 16777216),
-    "pak_art_height"    INTEGER CHECK("cover_art_height" BETWEEN 1 AND 16777216),
-    "pak_art_fmt"       INTEGER CHECK("cover_art_fmt" BETWEEN 0 AND 46),
+    "pak_art_width"     INTEGER CHECK("pak_art_width" BETWEEN 1 AND 16777216),
+    "pak_art_height"    INTEGER CHECK("pak_art_height" BETWEEN 1 AND 16777216),
+    "pak_art_fmt"       INTEGER CHECK("pak_art_fmt" BETWEEN 0 AND 46),
     "sort_key"          TEXT GENERATED ALWAYS AS (
         CASE
-            WHEN LOWER(title) LIKE 'the %' THEN SUBSTR(title, 5)
-            WHEN LOWER(title) LIKE 'an %'  THEN SUBSTR(title, 4)
-            WHEN LOWER(title) LIKE 'a %'   THEN SUBSTR(title, 3)
-            ELSE title
-        END || COALESCE(' ' || NULLIF(TRIM(sub_title), ''), '')
+            WHEN LOWER(pak_name) LIKE 'the %' THEN SUBSTR(pak_name, 5)
+            WHEN LOWER(pak_name) LIKE 'an %'  THEN SUBSTR(pak_name, 4)
+            WHEN LOWER(pak_name) LIKE 'a %'   THEN SUBSTR(pak_name, 3)
+            ELSE pak_name
+        END
     ) STORED,
-    CHECK (("cover_art_height" IS NULL) = ("cover_art" IS NULL)
-    AND ("cover_art_width" IS NULL) = ("cover_art" IS NULL)
-    AND ("cover_art_fmt" IS NULL) = ("cover_art" IS NULL))
-)
+    CHECK (("pak_art_height" IS NULL) = ("pak_art" IS NULL)
+    AND ("pak_art_width" IS NULL) = ("pak_art" IS NULL)
+    AND ("pak_art_fmt" IS NULL) = ("pak_art" IS NULL))
+);
 
 DROP TABLE IF EXISTS "difficulty_levels";
 CREATE TABLE "difficulty_levels" (

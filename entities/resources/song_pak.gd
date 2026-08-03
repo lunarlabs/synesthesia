@@ -5,14 +5,28 @@ extends Resource
 
 static var _err = OK
 
-@export var pak_name: String
+@export var pak_name: String = "New SongPak"
 @export var pak_image: Texture2D
-@export_file_path("*.tres") var pak_songs: PackedStringArray
+@export var pak_songs: Array[SongData]
 
-static func export_pak(pak: SynRoadSongPak, path: String) -> bool:
-    push_error("export_pak: Not implemented yet")
-    _err = ERR_UNAVAILABLE
-    return false
+func export_pak(path: String):
+    var writer = ZIPPacker.new()
+    var err = writer.open(path)
+    if err != OK:
+        return err
+    writer.start_file("name.txt")
+    writer.write_file(pak_name.to_utf8_buffer())
+    writer.close_file()
+    var image = pak_image.get_image()
+    if image:
+        var byte_buffer: PackedByteArray = image.save_png_to_buffer()
+        writer.start_file("banner.png")
+        writer.write_file(byte_buffer)
+        writer.close_file()
+    for song: SongData in pak_songs:
+        var song_dir = song.resource_path.get_file().get_basename()
+        var song_paths = song.get_file_paths()
+    return OK
 
 static func import_pak(path: String) -> SynRoadSongPak:
     push_error("import_pak: Not implemented yet")

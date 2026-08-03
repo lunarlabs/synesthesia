@@ -150,9 +150,29 @@ var total_measures: int:
 	get:
 		return lead_in_measures + playable_measures
 
-static func get_file_paths(data: SongData) -> PackedStringArray:
+func get_file_paths() -> PackedStringArray:
 	var result: PackedStringArray
-	result.append(ProjectSettings.globalize_path(data.resource_path))
+	if resource_path.is_empty():
+		push_error("Tried to get file path of unsaved resource.")
+		return []
+	var song_name = resource_path.get_file()
+	result.append(ProjectSettings.globalize_path(resource_path))
+	if not FileAccess.file_exists(midi_file):
+		push_error(song_name + ": Required midi file missing")
+		return []
+	result.append(ProjectSettings.globalize_path(midi_file))
+	if not FileAccess.file_exists(click_track):
+		push_error(resource_path + ": Required audio file missing")
+		return []
+	result.append(ProjectSettings.globalize_path(click_track))
+	for optional_file: String in [preview_audio, selection_audio]:
+		if not optional_file.is_empty() and FileAccess.file_exists(optional_file):
+			result.append(ProjectSettings.globalize_path(optional_file))
+	for track: SongTrackData in tracks:
+		if not FileAccess.file_exists(track.audio_file):
+			push_error(resource_path + ": Required track audio file missing")
+			return []
+		result.append(ProjectSettings.globalize_path(track.audio_file))
 	return result
 
 ## Returns a dictionary mapping timestamps to note values for a specific track and difficulty.

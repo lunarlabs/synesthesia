@@ -1,7 +1,7 @@
 extends Node
 
 const CONFIG_FILE_PATH = "user://synroad.cfg"
-const LIBRARY_DB_VERSION = 1
+const LIBRARY_DB_VERSION = 2
 const PLAYER_DB_VERSION = 1
 const LIBRARY_DB_PATH = "user://library.db"
 const LIBRARY_RES_DB_PATH = "user://library_res.db"
@@ -19,10 +19,7 @@ var _modifiers: Dictionary = {}
 
 var _library_db_file_path: String:
 	get:
-		if OS.has_feature("res_song_catalog"):
-			return LIBRARY_RES_DB_PATH
-		else:
-			return LIBRARY_DB_PATH
+		return LIBRARY_DB_PATH
 
 var library_db_file_exists: bool:
 	get:

@@ -18,7 +18,6 @@ enum ClearStatus {
 static var CATALOG_JSON_PATH = "user://song_catalog.json"
 static var DIFFICULTY_DETAILS_JSON_PATH = "user://song_difficulty_details.json"
 static var SONG_DIRECTORY_PATH = "user://song/"
-static var SONG_DIRECTORY_PATH_RES = "res://song/"
 static var DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 static var DIFFICULTY_NAMES = {
 	96: "Beginner",
@@ -133,8 +132,6 @@ class DetailedDifficultyInfo:
 
 func scan_for_songs(rescan := false):
 	var dirs_to_scan = [SONG_DIRECTORY_PATH]
-	if OS.has_feature("res_song_catalog"):
-		dirs_to_scan.append(SONG_DIRECTORY_PATH_RES)
 	for dir_path in dirs_to_scan:
 		print("Scanning song directory: %s" % dir_path)
 		var dir = DirAccess.open(dir_path)
@@ -164,7 +161,8 @@ func scan_for_songs(rescan := false):
 		while folder_name != "":
 			if dir.current_is_dir() and not folder_name.begins_with("."):
 				total_folders += 1
-				var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+				# FIXME: same damn hardcoded folder error
+				var file_path = "user://song/%s/%s.tres" % [folder_name, folder_name]
 				var file_exists = FileAccess.file_exists(file_path)
 				var resource_hash = null
 				if file_exists:
@@ -258,7 +256,8 @@ func process_song(scan_info: Dictionary):
 	}
 
 	if file_exists:
-		var file_path = "res://song/%s/%s.tres" % [folder_name, folder_name]
+		# FIXME: Hardcoded file path! Bad!
+		var file_path = "user://song/%s/%s.tres" % [folder_name, folder_name]
 		song_data = ResourceLoader.load(file_path) as SongData
 		upsert_dict.merge(_extract_songdata_meta(song_data))
 		db.insert_row(song_insert_view, upsert_dict) # if the row exists, this will update it
@@ -576,7 +575,8 @@ func _difficulty_info_from_json(dict: Dictionary) -> DetailedDifficultyInfo:
 #endregion
 
 func get_resource_path(folder_id: String) -> String:
-	return "res://song/%s/%s.tres" % [folder_id, folder_id]
+	# FIXME: Hardcoded directory
+	return "user://song/%s/%s.tres" % [folder_id, folder_id]
 
 func get_difficulty_rating(folder_id: String, difficulty_offset: int) -> float:
 	var db = SessionManager.library_db
@@ -620,8 +620,21 @@ func get_song_preview(folder_id: String) -> AudioStream:
 	var preview_filename = result[0]["preview_filename"]
 	if preview_filename == null:
 		return null
-	var resource = load("res://song/%s/%s" % [folder_id, preview_filename])
-	return resource
+	# FIXME: Hard coded directory
+	var path = "user://song/%s/%s" % [folder_id, preview_filename]
+	if not FileAccess.file_exists(path):
+		push_error("Audio file not found: %s" % path)
+		return null
+	match path.get_extension():
+		"mp3":
+			result = AudioStreamMP3.load_from_file(path)
+			return result
+		"ogg":
+			result = AudioStreamOggVorbis.load_from_file(path)
+			return result
+		_:
+			push_error("Unrecognized audio file format: %s" % path)
+			return null
 
 func get_difficulties(folder_id: String) -> Array:
 	var db = SessionManager.library_db
