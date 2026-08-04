@@ -164,7 +164,7 @@ func _ready() -> void:
 			else:
 				title_label.text = "%s\n%s" % [catalog_entry["title"], catalog_entry["sub_title"]]
 			artist_label.text = catalog_entry["artist"]
-			song_file = SongCatalog.get_resource_path(catalog_entry.folder_id)
+			song_file = SongCatalog.get_song_file_path(catalog_entry.folder_id)
 			midi_hash = catalog_entry.midi_hash
 			result_screen.populate_from_catalog_entry(catalog_entry, difficulty)
 			var tween = create_tween()
