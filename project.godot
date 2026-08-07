@@ -28,6 +28,13 @@ SessionManager="*res://entities/managers/session_manager.gd"
 VizManager="*uid://dq61i85kle6gq"
 Transition="*uid://20prs1tmvmbh"
 
+[debug]
+
+gdscript/warnings/directory_rules={
+"res://addons": 0,
+"res://addons/synesthesia_road_editor": 1
+}
+
 [display]
 
 window/size/viewport_width=1280
@@ -41,7 +48,7 @@ movie_writer/movie_file="D:/streamarchive/synroad/synroadtest.avi"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/godot_midi/plugin.cfg", "res://addons/moggsong_to_synroad/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/godot_midi/plugin.cfg", "res://addons/moggsong_to_synroad/plugin.cfg", "res://addons/song_metadata_editor/plugin.cfg")
 
 [gui]
 

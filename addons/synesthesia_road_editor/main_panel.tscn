@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://uquc2xmey3dk"]
+
+[node name="MainPanel" type="TabContainer" unique_id=1176819056]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Songs" type="HSplitContainer" parent="." unique_id=1385217628]
+layout_mode = 2
+split_offsets = PackedInt32Array(280)
+split_offset = 280
+metadata/_tab_index = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Songs" unique_id=1788181644]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Songs/VBoxContainer2" unique_id=2142080887]
+layout_mode = 2
+
+[node name="TextEdit" type="TextEdit" parent="Songs/VBoxContainer2/HBoxContainer" unique_id=1253971444]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Filter Songs"
+
+[node name="Button" type="Button" parent="Songs/VBoxContainer2/HBoxContainer" unique_id=774689054]
+layout_mode = 2
+text = "Rescan"
+
+[node name="ItemList" type="ItemList" parent="Songs/VBoxContainer2" unique_id=449103023]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Songs" unique_id=597477737]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Songs/VBoxContainer" unique_id=767037025]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Songs/VBoxContainer/HBoxContainer" unique_id=551947183]
+layout_mode = 2
+text = "Import from .moggsong"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Songs/VBoxContainer" unique_id=1138577425]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Songs/VBoxContainer/ScrollContainer" unique_id=1024481948]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=646329103]
+layout_mode = 2
+text = "Metadata"
+horizontal_alignment = 1
+
+[node name="SongMetadata" type="GridContainer" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1519953129]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=2022926971]
+layout_mode = 2
+text = "Title"
+horizontal_alignment = 2
+
+[node name="TitleField" type="TextEdit" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=673133488]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=2049070065]
+layout_mode = 2
+text = "Subtitle"
+horizontal_alignment = 2
+
+[node name="SubtitleField" type="TextEdit" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=1859237851]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label3" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=1398614973]
+layout_mode = 2
+text = "Artist"
+horizontal_alignment = 2
+
+[node name="ArtistField" type="TextEdit" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=1443645163]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=1645737236]
+layout_mode = 2
+text = "Genre"
+horizontal_alignment = 2
+
+[node name="GenreField" type="TextEdit" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=1837856252]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label5" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=861705679]
+layout_mode = 2
+text = "Source"
+horizontal_alignment = 2
+
+[node name="SourceField" type="TextEdit" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=935745020]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label6" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=870279453]
+layout_mode = 2
+text = "Cover Art"
+horizontal_alignment = 2
+
+[node name="CoverArtContainer" type="HBoxContainer" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata" unique_id=656294577]
+layout_mode = 2
+
+[node name="CoverArt" type="TextureRect" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata/CoverArtContainer" unique_id=915248597]
+visible = false
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+
+[node name="DefaultPlaceholder" type="Label" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata/CoverArtContainer" unique_id=2100893544]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+text = "(default)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata/CoverArtContainer" unique_id=421103399]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Browse..."
+
+[node name="Button2" type="Button" parent="Songs/VBoxContainer/ScrollContainer/VBoxContainer/SongMetadata/CoverArtContainer" unique_id=719875143]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Use Default"
