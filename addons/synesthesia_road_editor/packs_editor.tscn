@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cxrxwm4hcb7xt"]
+
+[ext_resource type="Script" uid="uid://bw34xr1du26jn" path="res://addons/synesthesia_road_editor/packs_editor.gd" id="1_bn2te"]
+
+[node name="Packs" type="HSplitContainer" unique_id=499041847]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(280)
+split_offset = 280
+script = ExtResource("1_bn2te")
+metadata/_tab_index = 1

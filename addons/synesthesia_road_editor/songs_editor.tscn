@@ -1,0 +1,403 @@
+[gd_scene format=3 uid="uid://lchj1kvwjly4"]
+
+[ext_resource type="Script" uid="uid://cbbqadgxjyng6" path="res://addons/synesthesia_road_editor/songs_editor.gd" id="1_cd5aj"]
+
+[node name="SongsPanel" type="HSplitContainer" unique_id=1802316100]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(280)
+split_offset = 280
+script = ExtResource("1_cd5aj")
+metadata/_tab_index = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="." unique_id=675009755]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer2" unique_id=817492269]
+layout_mode = 2
+
+[node name="SongFilterField" type="TextEdit" parent="VBoxContainer2/HBoxContainer" unique_id=354855979]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Filter Songs"
+
+[node name="RescanButton" type="Button" parent="VBoxContainer2/HBoxContainer" unique_id=76526173]
+layout_mode = 2
+text = "Rescan"
+
+[node name="SongList" type="ItemList" parent="VBoxContainer2" unique_id=1191970052]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=608317953]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=254278346]
+layout_mode = 2
+
+[node name="NewSongButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=767030618]
+layout_mode = 2
+text = "New Song..."
+
+[node name="ImportMoggsongButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1155903570]
+layout_mode = 2
+text = "Import from .moggsong"
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2063191433]
+layout_mode = 2
+disabled = true
+text = "Save"
+
+[node name="RightSide" type="VBoxContainer" parent="VBoxContainer" unique_id=857163038]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DataScrollContainer" type="ScrollContainer" parent="VBoxContainer/RightSide" unique_id=101519599]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SongEditorContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer" unique_id=481043118]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MetadataLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=896438568]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Metadata"
+
+[node name="SongMetadata" type="GridContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1762525668]
+layout_mode = 2
+columns = 2
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=221259157]
+layout_mode = 2
+text = "Title"
+horizontal_alignment = 2
+
+[node name="TitleField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1343950786]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1911918516]
+layout_mode = 2
+text = "Subtitle"
+horizontal_alignment = 2
+
+[node name="SubtitleField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=2121996338]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArtistLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1349306796]
+layout_mode = 2
+text = "Artist"
+horizontal_alignment = 2
+
+[node name="ArtistField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1000735712]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GenreLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=4180847]
+layout_mode = 2
+text = "Genre"
+horizontal_alignment = 2
+
+[node name="GenreField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1624413880]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SourceLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=1697690047]
+layout_mode = 2
+text = "Source"
+horizontal_alignment = 2
+
+[node name="SourceField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=287703119]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DescriptionLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=912076700]
+layout_mode = 2
+text = "Description"
+horizontal_alignment = 2
+
+[node name="DescriptionField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=160616167]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+wrap_mode = 1
+
+[node name="CoverArtLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=329609557]
+layout_mode = 2
+text = "Cover Art"
+horizontal_alignment = 2
+
+[node name="CoverArtContainer" type="HBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata" unique_id=2577085]
+layout_mode = 2
+
+[node name="CoverArt" type="TextureRect" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer" unique_id=279459711]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+
+[node name="DefaultPlaceholder" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer" unique_id=148073772]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+text = "(default)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CoverArtBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer" unique_id=1610964101]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Browse..."
+
+[node name="CoverArtResetButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer" unique_id=882078723]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+text = "Use Default"
+
+[node name="FilesLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1068528946]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Files"
+
+[node name="FilesGrid" type="GridContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=646868069]
+layout_mode = 2
+columns = 4
+
+[node name="MidiFileTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=633109299]
+layout_mode = 2
+text = "MIDI File"
+horizontal_alignment = 2
+
+[node name="MidiFileField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1962724582]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MidiFileBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=681956362]
+layout_mode = 2
+text = "..."
+
+[node name="MidiFileSpacer" type="Control" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1223296901]
+layout_mode = 2
+
+[node name="ClickTrackTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=448802854]
+layout_mode = 2
+text = "Click Track/BG Audio File"
+horizontal_alignment = 2
+
+[node name="ClickTrackField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=2022979445]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ClickTrackBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1515903236]
+layout_mode = 2
+text = "..."
+
+[node name="ClickTrackSpacer" type="Control" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=861470111]
+layout_mode = 2
+
+[node name="PreviewAudioTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=2061940564]
+layout_mode = 2
+text = "Preview Audio File"
+horizontal_alignment = 2
+
+[node name="PreviewAudioField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=2112355550]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "None"
+
+[node name="PreviewAudioBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1065942488]
+layout_mode = 2
+text = "..."
+
+[node name="PreviewAudioClearButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=2108740903]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "X"
+
+[node name="DecideAudioTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1221924642]
+layout_mode = 2
+text = "Decision Audio File"
+horizontal_alignment = 2
+
+[node name="DecideAudioField" type="TextEdit" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=187833164]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Use Default"
+
+[node name="DecideAudioBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1476628307]
+layout_mode = 2
+text = "..."
+
+[node name="DecideAudioClearButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=678370506]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "X"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1714392057]
+layout_mode = 2
+
+[node name="TracksTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1611125967]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLarge"
+text = "Tracks"
+
+[node name="RescanMidiButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=16586390]
+layout_mode = 2
+text = "Rescan MIDI Tracks"
+
+[node name="AddTrackButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1888094818]
+layout_mode = 2
+text = "Add"
+
+[node name="Button" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1238629678]
+layout_mode = 2
+text = "Extract from .mogg"
+
+[node name="TracksContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1523004890]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NoTracksLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/TracksContainer" unique_id=2067320368]
+unique_name_in_owner = true
+layout_mode = 2
+text = "(No tracks)"
+horizontal_alignment = 1
+
+[node name="GameplayTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1979235560]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Gameplay"
+
+[node name="GameplayContainer" type="HBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1573473374]
+layout_mode = 2
+
+[node name="GameplayGrid" type="GridContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer" unique_id=35012132]
+layout_mode = 2
+columns = 2
+
+[node name="BpmOverrideCheck" type="CheckBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=148685051]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BPM Override"
+alignment = 2
+
+[node name="BpmSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=747474978]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+min_value = 60.0
+max_value = 300.0
+value = 120.0
+rounded = true
+editable = false
+suffix = "BPM"
+
+[node name="LeadInTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=757704336]
+layout_mode = 2
+text = "Lead-in Measures"
+horizontal_alignment = 2
+
+[node name="LeadInSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=1064341670]
+unique_name_in_owner = true
+layout_mode = 2
+value = 1.0
+rounded = true
+
+[node name="PlayableTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=655936338]
+layout_mode = 2
+text = "Playable Measures"
+horizontal_alignment = 2
+
+[node name="PlayableSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid" unique_id=1275758460]
+unique_name_in_owner = true
+layout_mode = 2
+value = 1.0
+rounded = true
+
+[node name="CheckpointContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer" unique_id=1899969468]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Header" type="HBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer" unique_id=548953921]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=1070521945]
+layout_mode = 2
+text = "Checkpoints"
+
+[node name="CheckPointCountSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=367449235]
+unique_name_in_owner = true
+layout_mode = 2
+value = 3.0
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/RightSide/DataScrollContainer" unique_id=1312438725]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/CenterContainer" unique_id=651185147]
+layout_mode = 2
+text = "No song selected"
+
+[node name="ProblemsLabel" type="RichTextLabel" parent="VBoxContainer/RightSide" unique_id=1462251816]
+unique_name_in_owner = true
+layout_mode = 2
+bbcode_enabled = true
+text = "[ul]
+No problems detected.
+[/ul]"
+fit_content = true
+
+[node name="NewSongPopup" type="ConfirmationDialog" parent="." unique_id=689381457]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "New Song"
+position = Vector2i(0, 24)
+size = Vector2i(244, 122)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NewSongPopup" unique_id=950317334]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = 9.0
+offset_right = -9.0
+offset_bottom = -51.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="NewSongPopup/VBoxContainer" unique_id=3019516]
+layout_mode = 2
+text = "Enter new song folder name:"
+
+[node name="NewSongFolderNameField" type="TextEdit" parent="NewSongPopup/VBoxContainer" unique_id=1172173529]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 29)
+layout_mode = 2

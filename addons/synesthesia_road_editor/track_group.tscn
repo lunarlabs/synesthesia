@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://db52c7tufatr1"]
+
+[ext_resource type="Script" uid="uid://d3sryny0oh2p4" path="res://addons/synesthesia_road_editor/track_group.gd" id="1_rpnjn"]
+
+[node name="TrackGroup" type="HBoxContainer" unique_id=1573245628]
+script = ExtResource("1_rpnjn")
+
+[node name="MoveUpButton" type="Button" parent="." unique_id=1979895948]
+layout_mode = 2
+disabled = true
+text = "↑"
+
+[node name="MoveDownButton" type="Button" parent="." unique_id=636375186]
+layout_mode = 2
+disabled = true
+text = "↓"
+
+[node name="MidiTrackList" type="OptionButton" parent="." unique_id=1226939397]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="InstrumentList" type="OptionButton" parent="." unique_id=2046729242]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 0
+item_count = 6
+popup/item_0/text = "Drums"
+popup/item_0/id = 0
+popup/item_1/text = "Bass"
+popup/item_1/id = 1
+popup/item_2/text = "Guitar"
+popup/item_2/id = 2
+popup/item_3/text = "Synth"
+popup/item_3/id = 3
+popup/item_4/text = "Vocals"
+popup/item_4/id = 4
+popup/item_5/text = "FX"
+popup/item_5/id = 5
+
+[node name="TrackAudioFileField" type="TextEdit" parent="." unique_id=600160024]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrackAudioFileBrowseButton" type="Button" parent="." unique_id=65248359]
+layout_mode = 2
+text = "..."
+
+[node name="Volume" type="SpinBox" parent="." unique_id=1258502261]
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+value = -6.0
+editable = false
+suffix = "dB"
+
+[node name="RemoveButton" type="Button" parent="." unique_id=1319765801]
+layout_mode = 2
+text = "X"

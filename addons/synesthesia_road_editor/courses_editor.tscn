@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b65ssycjvt5va"]
+
+[ext_resource type="Script" uid="uid://bifdyq6nuoop3" path="res://addons/synesthesia_road_editor/courses_editor.gd" id="1_yvpgv"]
+
+[node name="Courses" type="HSplitContainer" unique_id=1207522328]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(280)
+split_offset = 280
+script = ExtResource("1_yvpgv")
+metadata/_tab_index = 2

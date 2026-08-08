@@ -69,6 +69,8 @@ gradient = SubResource("Gradient_vojec")
 fill_from = Vector2(1, 0.8119658)
 fill_to = Vector2(1, 0.2863248)
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_3xd07"]
+
 [sub_resource type="FontVariation" id="FontVariation_i0f0l"]
 base_font = ExtResource("3_mbci5")
 variation_opentype = {
@@ -178,6 +180,30 @@ tracks/4/keys = {
 "update": 0,
 "values": [1.0, 0.0]
 }
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("%PackArtTexture:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("%PackArtTexture:offset_transform_rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
 [sub_resource type="Animation" id="Animation_pjj6u"]
 resource_name = "select_item"
@@ -241,6 +267,30 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("%PackArtTexture:modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("%PackArtTexture:offset_transform_rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [1.5707964, 0.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hjgwb"]
@@ -780,7 +830,7 @@ anchor_bottom = 0.5
 offset_left = -90.0
 offset_top = -165.0
 offset_right = -10.0
-offset_bottom = 165.0
+offset_bottom = 185.0
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
@@ -851,6 +901,7 @@ theme_override_constants/separation = 30
 
 [node name="CoverArt" type="TextureRect" parent="TopBox" unique_id=728567514]
 unique_name_in_owner = true
+visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 texture = ExtResource("5_hjgwb")
@@ -898,8 +949,24 @@ material = SubResource("CanvasItemMaterial_mbci5")
 layout_mode = 2
 texture = SubResource("GradientTexture2D_hjgwb")
 
+[node name="PackArtTexture" type="TextureRect" parent="TopBox/SongInfo/Control" unique_id=1904686546]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_transform_enabled = true
+offset_transform_pivot_ratio = Vector2(1, 1)
+texture = SubResource("PlaceholderTexture2D_3xd07")
+expand_mode = 3
+
 [node name="ArtistLabel" type="Label" parent="TopBox/SongInfo" unique_id=2118599333]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "Artist Name"
 label_settings = SubResource("LabelSettings_hjgwb")
@@ -929,6 +996,7 @@ size_flags_horizontal = 8
 
 [node name="TempoLabel" type="Label" parent="TopBox/SongInfo/HBoxContainer" unique_id=500289050]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 text = "??? BPM"
@@ -1397,8 +1465,8 @@ offset_bottom = 16.0
 layout_mode = 0
 offset_left = 32.0
 offset_top = 24.0
-offset_right = 942.0
-offset_bottom = 96.0
+offset_right = 958.0
+offset_bottom = 104.0
 text = "MENU_TITLE_SONG_SELECT"
 label_settings = SubResource("LabelSettings_tlsan")
 
