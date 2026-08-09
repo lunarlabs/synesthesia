@@ -50,9 +50,16 @@ layout_mode = 2
 text = "Import from .moggsong"
 
 [node name="SaveButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2063191433]
+unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Save"
+
+[node name="RevertButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1482599662]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Revert"
 
 [node name="RightSide" type="VBoxContainer" parent="VBoxContainer" unique_id=857163038]
 layout_mode = 2
@@ -190,6 +197,7 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+editable = false
 
 [node name="MidiFileBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=681956362]
 layout_mode = 2
@@ -207,6 +215,7 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+editable = false
 
 [node name="ClickTrackBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1515903236]
 layout_mode = 2
@@ -225,6 +234,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "None"
+editable = false
 
 [node name="PreviewAudioBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1065942488]
 layout_mode = 2
@@ -246,6 +256,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Use Default"
+editable = false
 
 [node name="DecideAudioBrowseButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid" unique_id=1476628307]
 layout_mode = 2
@@ -274,7 +285,7 @@ text = "Rescan MIDI Tracks"
 layout_mode = 2
 text = "Add"
 
-[node name="Button" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1238629678]
+[node name="ExtractAudioButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1238629678]
 layout_mode = 2
 text = "Extract from .mogg"
 
@@ -347,14 +358,16 @@ size_flags_horizontal = 8
 [node name="Header" type="HBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer" unique_id=548953921]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=1070521945]
+[node name="CheckpointsTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=1070521945]
 layout_mode = 2
 text = "Checkpoints"
 
-[node name="CheckPointCountSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=367449235]
+[node name="CheckpointCountSpin" type="SpinBox" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header" unique_id=367449235]
 unique_name_in_owner = true
 layout_mode = 2
+max_value = 50.0
 value = 3.0
+rounded = true
 
 [node name="NoSongSelectedContainer" type="CenterContainer" parent="VBoxContainer/RightSide/DataScrollContainer" unique_id=1312438725]
 unique_name_in_owner = true
@@ -370,10 +383,6 @@ text = "No song selected"
 [node name="ProblemsLabel" type="RichTextLabel" parent="VBoxContainer/RightSide" unique_id=1462251816]
 unique_name_in_owner = true
 layout_mode = 2
-bbcode_enabled = true
-text = "[ul]
-No problems detected.
-[/ul]"
 fit_content = true
 
 [node name="NewSongPopup" type="ConfirmationDialog" parent="." unique_id=689381457]
@@ -402,3 +411,33 @@ text = "Enter new song folder name:"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 29)
 layout_mode = 2
+
+[connection signal="text_changed" from="VBoxContainer2/HBoxContainer/SongFilterField" to="." method="_on_song_filter_field_text_changed"]
+[connection signal="pressed" from="VBoxContainer2/HBoxContainer/RescanButton" to="." method="_on_rescan_button_pressed"]
+[connection signal="item_selected" from="VBoxContainer2/SongList" to="." method="_on_song_list_item_selected"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/NewSongButton" to="." method="_on_new_song_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ImportMoggsongButton" to="." method="_on_import_moggsong_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/RevertButton" to="." method="_on_revert_button_pressed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/TitleField" to="." method="_on_title_field_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/SubtitleField" to="." method="_on_subtitle_field_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/ArtistField" to="." method="_on_artist_field_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/GenreField" to="." method="_on_genre_field_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/SourceField" to="." method="_on_source_field_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/DescriptionField" to="." method="_on_description_field_text_changed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer/CoverArtBrowseButton" to="." method="_on_cover_art_browse_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/SongMetadata/CoverArtContainer/CoverArtResetButton" to="." method="_on_cover_art_reset_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/MidiFileBrowseButton" to="." method="_on_midi_file_browse_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/ClickTrackBrowseButton" to="." method="_on_click_track_browse_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/PreviewAudioBrowseButton" to="." method="_on_preview_audio_browse_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/PreviewAudioClearButton" to="." method="_on_preview_audio_clear_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/DecideAudioBrowseButton" to="." method="_on_decide_audio_browse_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/FilesGrid/DecideAudioClearButton" to="." method="_on_decide_audio_clear_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer/RescanMidiButton" to="." method="_on_rescan_midi_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer/AddTrackButton" to="." method="_on_add_track_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer/ExtractAudioButton" to="." method="_on_extract_audio_button_pressed"]
+[connection signal="toggled" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid/BpmOverrideCheck" to="." method="_on_bpm_override_check_toggled"]
+[connection signal="changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid/BpmSpin" to="." method="_on_bpm_spin_changed"]
+[connection signal="changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid/LeadInSpin" to="." method="_on_lead_in_spin_changed"]
+[connection signal="changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/GameplayGrid/PlayableSpin" to="." method="_on_playable_spin_changed"]
+[connection signal="changed" from="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/GameplayContainer/CheckpointContainer/Header/CheckpointCountSpin" to="." method="_on_checkpoint_count_spin_changed"]
