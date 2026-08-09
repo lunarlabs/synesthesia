@@ -10,6 +10,8 @@ class_name SongData
 const MICROSECONDS_PER_MINUTE = 60_000_000.0
 const MIDI_META_TEMPO_EVENT = 0x51
 
+const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
+
 ##Path to the MIDI file for this song
 @export_file("*.mid") var midi_file
 
@@ -186,21 +188,40 @@ func get_file_paths() -> PackedStringArray:
 func get_note_map_from_track(track: int, difficulty_offset: int) -> Dictionary[float, int]:
 	var time_start = Time.get_ticks_usec()
 	var note_map: Dictionary[float, int] = {}
-	var valid_note_positions: Array[int] = [difficulty_offset, difficulty_offset + 2, difficulty_offset + 4]
 	var tick := 0
 	for i in _midi_data.tracks[track].events.size():
 		var event = _midi_data.tracks[track].events[i]
 		tick += event.delta
 		if event.subtype == MIDI_MESSAGE_NOTE_ON and event.data > 0:
-			if valid_note_positions.has(event.note):
+			var note_offset: int = event.note - difficulty_offset
+			if note_offset == 0 or note_offset == 2 or note_offset == 4:
 				var beat_position: float = float(tick) / float(ticks_per_beat)
-				note_map[beat_position] = valid_note_positions.find(event.note)
+				@warning_ignore("integer_division")
+				var lane_idx = note_offset / 2
+				note_map[beat_position] = lane_idx
 	note_map.sort()
 	if note_map.size() == 0:
 		push_warning("No valid notes found in track %d with difficulty offset %d." % [track, difficulty_offset])
 	@warning_ignore("integer_division")
 	print("Loaded note map %d in %d ms" % [track, (Time.get_ticks_usec() - time_start) / 1000])
 	return note_map
+
+func has_difficulty(difficulty_offset: int) -> bool:
+	for track in tracks:
+		var mdt = _midi_data.tracks[song_track_locations[track.midi_track_name]]
+		for event in mdt.events:
+			if event.subtype == MIDI_MESSAGE_NOTE_ON and event.data > 0:
+				var note_offset: int = event.note - difficulty_offset
+				if note_offset == 0 or note_offset == 2 or note_offset == 4:
+					return true
+	return false
+
+func get_difficulties() -> Array[int]:
+	var result: Array[int] = []
+	for i in DIFFICULTY_LEVELS:
+		if has_difficulty(i):
+			result.append(i)
+	return result
 
 func _load_midi_data() -> void:
 	_midi_mutex.lock()

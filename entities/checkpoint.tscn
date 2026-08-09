@@ -48,6 +48,7 @@ scale_min = 0.19999999
 color_ramp = SubResource("GradientTexture1D_hjeaj")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6wqo1"]
+render_priority = -2
 transparency = 1
 shading_mode = 0
 specular_mode = 2
@@ -88,6 +89,7 @@ color = Color(1.8247963, 0.93389755, 0.93389755, 1)
 alpha_curve = SubResource("CurveTexture_4abvr")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_byq8c"]
+render_priority = -2
 transparency = 1
 blend_mode = 1
 shading_mode = 0
@@ -122,7 +124,7 @@ render_priority = 0
 shader = ExtResource("6_nos5s")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4abvr"]
-render_priority = 0
+render_priority = -1
 shader = ExtResource("8_2ivja")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_p3toe"]
@@ -157,9 +159,8 @@ visibility_range_end_margin = 64.0
 visibility_range_fade_mode = 1
 pixel_size = 0.004
 double_sided = false
-alpha_antialiasing_mode = 1
-render_priority = 1
-outline_render_priority = 0
+alpha_antialiasing_mode = 2
+alpha_antialiasing_edge = 0.47
 modulate = Color(0.98039216, 0.69411767, 0, 1)
 text = "00% Completed"
 font = SubResource("FontVariation_6wqo1")

@@ -6,8 +6,10 @@ extends Resource
 static var _err = OK
 
 @export var pak_name: String = "New SongPak"
-@export var pak_image: Texture2D
+@export var pak_banner_image: Texture2D
+@export var pak_default_cover: Texture2D
 @export var pak_songs: Array[SongData]
+@export var pak_courses: Array[SynRoadCourse]
 
 func export_pak(path: String):
     var writer = ZIPPacker.new()
@@ -17,9 +19,9 @@ func export_pak(path: String):
     writer.start_file("name.txt")
     writer.write_file(pak_name.to_utf8_buffer())
     writer.close_file()
-    var image = pak_image.get_image()
-    if image:
-        var byte_buffer: PackedByteArray = image.save_png_to_buffer()
+    var banner_image = pak_banner_image.get_image()
+    if banner_image:
+        var byte_buffer: PackedByteArray = banner_image.save_png_to_buffer()
         writer.start_file("banner.png")
         writer.write_file(byte_buffer)
         writer.close_file()

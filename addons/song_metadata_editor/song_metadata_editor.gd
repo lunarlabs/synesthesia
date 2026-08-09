@@ -5,7 +5,7 @@ extends EditorPlugin
 ## file under res://song/ and lets you edit metadata, tracks, and checkpoints
 ## without ever navigating the filesystem.
 
-const SONG_DIRECTORY := "res://song/"
+const SONG_DIRECTORY := "user://song/"
 const INSTRUMENT_OPTIONS: Array[String] = ["Drums", "Bass", "Guitar", "Synth", "Vocals", "FX"]
 
 var dock: Control
