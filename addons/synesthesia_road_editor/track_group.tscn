@@ -44,6 +44,7 @@ popup/item_5/id = 5
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+editable = false
 
 [node name="TrackAudioFileBrowseButton" type="Button" parent="." unique_id=65248359]
 layout_mode = 2
@@ -55,9 +56,22 @@ layout_mode = 2
 min_value = -80.0
 max_value = 24.0
 value = -6.0
-editable = false
 suffix = "dB"
 
 [node name="RemoveButton" type="Button" parent="." unique_id=1319765801]
 layout_mode = 2
 text = "X"
+
+[node name="AudioFileDialog" type="EditorFileDialog" parent="." unique_id=147682197]
+unique_name_in_owner = true
+title = "Open a File"
+file_mode = 0
+access = 1
+filters = PackedStringArray("*.mp3,*.ogg;Audio Files;audio/mpeg,audio/ogg")
+
+[connection signal="item_selected" from="MidiTrackList" to="." method="_on_midi_track_list_item_selected"]
+[connection signal="item_selected" from="InstrumentList" to="." method="_on_instrument_list_item_selected"]
+[connection signal="pressed" from="TrackAudioFileBrowseButton" to="." method="_on_track_audio_file_browse_button_pressed"]
+[connection signal="value_changed" from="VolumeSpin" to="." method="_on_volume_spin_value_changed"]
+[connection signal="pressed" from="RemoveButton" to="." method="_on_remove_button_pressed"]
+[connection signal="file_selected" from="AudioFileDialog" to="." method="_on_audio_file_dialog_file_selected"]

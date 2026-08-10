@@ -341,7 +341,7 @@ static func _read_moggsong_file(path: String) -> Dictionary:
 
 	var file = FileAccess.open(path, FileAccess.READ)
 	if not file:
-		var error: Error = file.get_open_error()
+		var error: Error = FileAccess.get_open_error()
 		result["error_message"] = "Failed to open moggsong file: %s" % str(error)
 		return result
 

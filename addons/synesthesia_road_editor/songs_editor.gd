@@ -8,6 +8,7 @@ var songs: Dictionary = {}
 var current_folder: String = ""
 var current_song: SongData = null
 var dirty: bool = false
+var undo_redo := EditorInterface.get_editor_undo_redo()
 
 var checkpoint_spins: Array[SpinBox] = []
 
