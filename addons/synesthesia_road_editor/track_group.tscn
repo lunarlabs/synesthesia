@@ -6,11 +6,13 @@
 script = ExtResource("1_rpnjn")
 
 [node name="MoveUpButton" type="Button" parent="." unique_id=1979895948]
+visible = false
 layout_mode = 2
 disabled = true
 text = "↑"
 
 [node name="MoveDownButton" type="Button" parent="." unique_id=636375186]
+visible = false
 layout_mode = 2
 disabled = true
 text = "↓"
@@ -47,7 +49,8 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "..."
 
-[node name="Volume" type="SpinBox" parent="." unique_id=1258502261]
+[node name="VolumeSpin" type="SpinBox" parent="." unique_id=1258502261]
+unique_name_in_owner = true
 layout_mode = 2
 min_value = -80.0
 max_value = 24.0

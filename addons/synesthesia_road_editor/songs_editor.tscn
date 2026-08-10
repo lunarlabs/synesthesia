@@ -289,15 +289,15 @@ text = "Add"
 layout_mode = 2
 text = "Extract from .mogg"
 
-[node name="TracksContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1523004890]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="NoTracksLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/TracksContainer" unique_id=2067320368]
+[node name="NoTracksLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=2067320368]
 unique_name_in_owner = true
 layout_mode = 2
 text = "(No tracks)"
 horizontal_alignment = 1
+
+[node name="TracksContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1523004890]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="GameplayTitle" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1979235560]
 layout_mode = 2
