@@ -415,3 +415,9 @@ func _on_midi_file_dialog_file_selected(path: String) -> void:
 
 func _on_mogg_song_file_dialog_file_selected(path: String) -> void:
 	pass # Replace with function body.
+
+
+func _on_album_art_file_dialog_file_selected(path: String) -> void:
+	pass # Replace with function body.
+
+#endregion

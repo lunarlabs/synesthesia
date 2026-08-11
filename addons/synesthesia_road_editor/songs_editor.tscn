@@ -68,7 +68,7 @@ size_flags_vertical = 3
 [node name="DataScrollContainer" type="ScrollContainer" parent="VBoxContainer/RightSide" unique_id=101519599]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_vertical = 139
+scroll_vertical = 100
 horizontal_scroll_mode = 0
 
 [node name="SongEditorContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer" unique_id=481043118]
@@ -437,6 +437,14 @@ file_mode = 0
 access = 1
 filters = PackedStringArray("*.moggsong;MoggSong Files;text/plain")
 
+[node name="AlbumArtFileDialog" type="EditorFileDialog" parent="." unique_id=153881965]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Open a File"
+file_mode = 0
+access = 1
+filters = PackedStringArray("*.png;Portable Network Graphics;image/png")
+
 [node name="SwitchConfirmDialog" type="ConfirmationDialog" parent="." unique_id=781727651]
 unique_name_in_owner = true
 ok_button_text = "Save"
@@ -475,6 +483,7 @@ dialog_text = "You have unsaved changes. Do you want to save before switching so
 [connection signal="file_selected" from="AudioFileDialog" to="." method="_on_audio_file_dialog_file_selected"]
 [connection signal="file_selected" from="MidiFileDialog" to="." method="_on_midi_file_dialog_file_selected"]
 [connection signal="file_selected" from="MoggSongFileDialog" to="." method="_on_mogg_song_file_dialog_file_selected"]
+[connection signal="file_selected" from="AlbumArtFileDialog" to="." method="_on_album_art_file_dialog_file_selected"]
 [connection signal="canceled" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_canceled"]
 [connection signal="confirmed" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_confirmed"]
 [connection signal="custom_action" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_custom_action"]
