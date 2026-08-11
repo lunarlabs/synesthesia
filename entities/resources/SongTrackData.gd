@@ -12,4 +12,4 @@ class_name SongTrackData
 ## The audio file of the track
 @export_file("*.wav", "*.ogg", "*.mp3") var audio_file: String = ""
 
-@export_range(-24, 6, 0.1, "suffix:dB") var inactive_volume: float = -4.0
+@export_range(-80, 24, 0.1, "suffix:dB") var inactive_volume: float = -4.0
