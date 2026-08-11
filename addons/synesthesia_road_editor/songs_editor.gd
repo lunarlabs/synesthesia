@@ -2,15 +2,28 @@
 
 extends HSplitContainer
 
+enum AudioFileType {
+	CLICK_TRACK,
+	PREVIEW_AUDIO,
+	DECIDE_AUDIO
+}
+
 const SONGS_PATH: String = "user://songs"
 
 var songs: Dictionary = {}
 var current_folder: String = ""
 var current_song: SongData = null
+var current_moggsong_path: String = ""
 var dirty: bool = false
 var undo_redo := EditorInterface.get_editor_undo_redo()
+var audio_file_dialog_dest: AudioFileType = AudioFileType.CLICK_TRACK
 
 var checkpoint_spins: Array[SpinBox] = []
+
+func _ready() -> void:
+	_refresh_song_list()
+	_rebuild_song_list_ui()
+	%SwitchConfirmDialog.add_button("Discard", true, "discard")
 
 func _refresh_song_list() -> void:
 	var dir = DirAccess.open(SONGS_PATH)
@@ -100,6 +113,33 @@ func _update_editor_fields() -> void:
 	%PreviewAudioClearButton.disabled = current_song.preview_audio.is_empty()
 	%DecideAudioField.text = current_song.selection_audio
 	%DecideAudioClearButton.disabled = current_song.selection_audio.is_empty()
+	%BpmOverrideCheck.button_pressed = current_song.bpm_fix
+	%BpmSpin.value = current_song.fixed_bpm
+	%LeadInSpin.value = current_song.lead_in_measures
+	%PlayableSpin.value = current_song.playable_measures
+	%CheckpointCountSpin.value = current_song.checkpoints.size()
+	_load_checkpoint_values()
+
+func _resize_track_groups(count: int):
+	%NoTracksLabel.visible = (count == 0)
+	var delta = count - %TracksContainer.get_child_count()
+	if delta > 0:
+		for i in range(delta):
+			var new_group = preload("res://addons/synesthesia_road_editor/track_group.tscn").instantiate()
+			new_group.idx = %TracksContainer.get_child_count()
+			%TracksContainer.add_child(new_group)
+	elif delta < 0:
+		for i in range(abs(delta)):
+			var rem_group = %TracksContainer.get_child(%TracksContainer.get_child_count() - 1)
+			%TracksContainer.remove_child(rem_group)
+			rem_group.queue_free()
+
+func _load_track_groups():
+	_resize_track_groups(current_song.tracks.size())
+	for i in range(current_song.tracks.size()):
+		var track_data = current_song.tracks[i]
+		var track_group = %TracksContainer.get_child(i)
+		track_group.set_track_data(track_data)
 
 func _resize_checkpoint_spins(count: int):
 	var delta = count - checkpoint_spins.size() 
@@ -120,7 +160,11 @@ func _load_checkpoint_values():
 	for i in current_song.checkpoints.size():
 		checkpoint_spins[i].value = current_song.checkpoints[i]
 	
-	
+func _rescan_midi_track_names():
+	var new_track_names = current_song.track_names
+	for i in %TracksContainer.get_child_count():
+		var track_group = %TracksContainer.get_child(i)
+		track_group.update_midi_track_names(new_track_names)
 
 func _set_dirty(value: bool) -> void:
 	dirty = value
@@ -167,7 +211,7 @@ func _on_new_song_button_pressed() -> void:
 
 
 func _on_import_moggsong_button_pressed() -> void:
-	pass # Replace with function body.
+	%MoggSongFileDialog.popup_centered()
 
 
 func _on_save_button_pressed() -> void:
@@ -179,27 +223,63 @@ func _on_revert_button_pressed() -> void:
 
 
 func _on_title_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_title = current_song.title
+	undo_redo.create_action("Change Song Title")
+	undo_redo.add_do_property(%TitleField, "text", %TitleField.text)
+	undo_redo.add_do_property(current_song, "title", %TitleField.text)
+	undo_redo.add_undo_property(%TitleField, "text", old_title)
+	undo_redo.add_undo_property(current_song, "title", old_title)
+	undo_redo.commit_action()
 
 
 func _on_subtitle_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_subtitle = current_song.subtitle
+	undo_redo.create_action("Change Subtitle")
+	undo_redo.add_do_property(%SubtitleField, "text", %SubtitleField.text)
+	undo_redo.add_do_property(current_song, "subtitle", %SubtitleField.text)
+	undo_redo.add_undo_property(%SubtitleField, "text", old_subtitle)
+	undo_redo.add_undo_property(current_song, "subtitle", old_subtitle)
+	undo_redo.commit_action()
 
 
 func _on_artist_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_artist = current_song.artist
+	undo_redo.create_action("Change Artist")
+	undo_redo.add_do_property(%ArtistField, "text", %ArtistField.text)
+	undo_redo.add_do_property(current_song, "artist", %ArtistField.text)
+	undo_redo.add_undo_property(%ArtistField, "text", old_artist)
+	undo_redo.add_undo_property(current_song, "artist", old_artist)
+	undo_redo.commit_action()
 
 
 func _on_genre_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_genre = current_song.genre
+	undo_redo.create_action("Change Genre")
+	undo_redo.add_do_property(%GenreField, "text", %GenreField.text)
+	undo_redo.add_do_property(current_song, "genre", %GenreField.text)
+	undo_redo.add_undo_property(%GenreField, "text", old_genre)
+	undo_redo.add_undo_property(current_song, "genre", old_genre)
+	undo_redo.commit_action()
 
 
 func _on_source_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_source = current_song.source
+	undo_redo.create_action("Change Source")
+	undo_redo.add_do_property(%SourceField, "text", %SourceField.text)
+	undo_redo.add_do_property(current_song, "source", %SourceField.text)
+	undo_redo.add_undo_property(%SourceField, "text", old_source)
+	undo_redo.add_undo_property(current_song, "source", old_source)
+	undo_redo.commit_action()
 
 
 func _on_description_field_text_changed() -> void:
-	pass # Replace with function body.
+	var old_description = current_song.description
+	undo_redo.create_action("Change Description")
+	undo_redo.add_do_property(%DescriptionField, "text", %DescriptionField.text)
+	undo_redo.add_do_property(current_song, "description", %DescriptionField.text)
+	undo_redo.add_undo_property(%DescriptionField, "text", old_description)
+	undo_redo.add_undo_property(current_song, "description", old_description)
+	undo_redo.commit_action()
 
 
 func _on_cover_art_browse_button_pressed() -> void:
@@ -211,19 +291,22 @@ func _on_cover_art_reset_button_pressed() -> void:
 
 
 func _on_midi_file_browse_button_pressed() -> void:
-	pass # Replace with function body.
+	%MidiFileDialog.popup_centered()
 
 
 func _on_click_track_browse_button_pressed() -> void:
-	pass # Replace with function body.
+	audio_file_dialog_dest = AudioFileType.CLICK_TRACK
+	%AudioFileDialog.popup_centered()
 
 
 func _on_preview_audio_browse_button_pressed() -> void:
-	pass # Replace with function body.
+	audio_file_dialog_dest = AudioFileType.PREVIEW_AUDIO
+	%AudioFileDialog.popup_centered()
 
 
 func _on_decide_audio_browse_button_pressed() -> void:
-	pass # Replace with function body.
+	audio_file_dialog_dest = AudioFileType.DECIDE_AUDIO
+	%AudioFileDialog.popup_centered()
 
 
 func _on_preview_audio_clear_button_pressed() -> void:
@@ -235,7 +318,10 @@ func _on_decide_audio_clear_button_pressed() -> void:
 
 
 func _on_rescan_midi_button_pressed() -> void:
-	pass # Replace with function body.
+	# This is for if the MIDI file path is the same but the data changed
+	# (i.e. the user replaced the file with a new version). We need to reload the MIDI data and update the track names in the editor.
+	current_song._load_midi_data()
+	_rescan_midi_track_names()
 
 
 func _on_add_track_button_pressed() -> void:
@@ -247,22 +333,85 @@ func _on_extract_audio_button_pressed() -> void:
 
 
 func _on_bpm_override_check_toggled(toggled_on: bool) -> void:
-	pass # Replace with function body.
+	var old_bpm_fix = current_song.bpm_fix
+	undo_redo.create_action("Toggle BPM Override")
+	undo_redo.add_do_property(current_song, "bpm_fix", toggled_on)
+	undo_redo.add_do_property(%BpmSpin, "editable", toggled_on)
+	undo_redo.add_undo_property(current_song, "bpm_fix", old_bpm_fix)
+	undo_redo.add_undo_property(%BpmSpin, "editable", old_bpm_fix)
+	undo_redo.commit_action()
 
 
 func _on_bpm_spin_changed() -> void:
-	pass # Replace with function body.
+	var old_bpm = current_song.fixed_bpm
+	undo_redo.create_action("Change BPM")
+	undo_redo.add_do_method(%BpmSpin, "set_value_no_signal", %BpmSpin.value)
+	undo_redo.add_do_property(current_song, "fixed_bpm", %BpmSpin.value)
+	undo_redo.add_undo_method(%BpmSpin, "set_value_no_signal", old_bpm)
+	undo_redo.add_undo_property(current_song, "fixed_bpm", old_bpm)
+	undo_redo.commit_action()
 
 
 func _on_lead_in_spin_changed() -> void:
-	pass # Replace with function body.
+	var old_lead_in = current_song.lead_in_measures
+	undo_redo.create_action("Change Lead-In Measures")
+	undo_redo.add_do_method(%LeadInSpin, "set_value_no_signal", %LeadInSpin.value)
+	undo_redo.add_do_property(current_song, "lead_in_measures", %LeadInSpin.value)
+	undo_redo.add_undo_method(%LeadInSpin, "set_value_no_signal", old_lead_in)
+	undo_redo.add_undo_property(current_song, "lead_in_measures", old_lead_in)
+	undo_redo.commit_action()
 
 
 func _on_playable_spin_changed() -> void:
-	pass # Replace with function body.
+	var old_playable = current_song.playable_measures
+	undo_redo.create_action("Change Playable Measures")
+	undo_redo.add_do_method(%PlayableSpin, "set_value_no_signal", %PlayableSpin.value)
+	undo_redo.add_do_property(current_song, "playable_measures", %PlayableSpin.value)
+	undo_redo.add_undo_method(%PlayableSpin, "set_value_no_signal", old_playable)
+	undo_redo.add_undo_property(current_song, "playable_measures", old_playable)
+	undo_redo.commit_action()
 
 
 func _on_checkpoint_count_spin_changed() -> void:
+	var old_checkpoints = current_song.checkpoints.duplicate()
+
+	var new_checkpoint_count = int(%CheckpointCountSpin.value)
+	var new_checkpoints = current_song.checkpoints.duplicate()
+	new_checkpoints.resize(new_checkpoint_count)
+
+	undo_redo.create_action("Change Checkpoint Count")
+	undo_redo.add_do_method(%CheckpointCountSpin, "set_value_no_signal", new_checkpoint_count)
+	undo_redo.add_do_property(current_song, "checkpoints", new_checkpoints)
+	undo_redo.add_do_method(self, "_load_checkpoint_values")
+	undo_redo.add_undo_method(%CheckpointCountSpin, "set_value_no_signal", old_checkpoints.size())
+	undo_redo.add_undo_property(current_song, "checkpoints", old_checkpoints)
+	undo_redo.add_undo_method(self, "_load_checkpoint_values")
+	undo_redo.commit_action()
+
+
+func _on_audio_file_dialog_file_selected(path: String) -> void:
 	pass # Replace with function body.
 
-#endregion
+
+func _on_switch_confirm_dialog_confirmed() -> void:
+	pass # Replace with function body.
+
+
+func _on_switch_confirm_dialog_canceled() -> void:
+	pass # Replace with function body.
+
+
+func _on_switch_confirm_dialog_custom_action(action: StringName) -> void:
+	pass # Replace with function body.
+
+
+func _on_new_song_popup_confirmed() -> void:
+	pass # Replace with function body.
+
+
+func _on_midi_file_dialog_file_selected(path: String) -> void:
+	pass # Replace with function body.
+
+
+func _on_mogg_song_file_dialog_file_selected(path: String) -> void:
+	pass # Replace with function body.
