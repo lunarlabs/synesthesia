@@ -12,30 +12,65 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 
+var _midi_data: MidiResource
+
 ##Path to the MIDI file for this song
-@export_file("*.mid") var midi_file
+@export_file("*.mid") var midi_file:
+	set(value):
+		if  midi_file != value:
+			midi_file = value
+			_midi_data = null
+			emit_changed()
 
 @export_category("Song Info")
 
 ##Short title of the song
-@export var title: String = "Unknown Track"
+@export var title: String = "Unknown Track":
+	set(value):
+		if  title != value:
+			title = value.strip_edges()
+			emit_changed()
 
 ## Subtitle of the song
-@export var sub_title: String = ""
+@export var sub_title: String = "":
+	set(value):
+		if  sub_title != value:
+			sub_title = value.strip_edges()
+			emit_changed()
 
 ## Name of the artist or composer
-@export var artist: String = "Unknown Artist"
+@export var artist: String = "Unknown Artist":
+	set(value):
+		if  artist != value:
+			artist = value.strip_edges()
+			emit_changed()
 
 ##  Musical genre classification
-@export var genre: String = "Unknown Genre"
+@export var genre: String = "Unknown Genre":
+	set(value):
+		if  genre != value:
+			genre = value.strip_edges()
+			emit_changed()
 
 ## The game the song is from
-@export var source: String = ""
+@export var source: String = "":
+	set(value):
+		if  source != value:
+			source = value.strip_edges()
+			emit_changed()
 
-@export var cover_art: Texture2D
+@export var cover_art: Texture2D:
+	set(value):
+		if  cover_art != value:
+			cover_art = value.strip_edges
+			emit_changed()
 
 ## Description or background information about the song
-@export_multiline var description: String
+@export_multiline var description: String:
+	set(value):
+		if  description != value:
+			description = value
+			emit_changed()
 
 @export_category("Tracks and Audio")
 
@@ -43,30 +78,62 @@ const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medi
 @export var tracks: Array[SongTrackData]
 
 ## Path to the audio file for the song's main track
-@export_file("*.wav", "*.mp3", "*.ogg") var click_track = ""
+@export_file("*.wav", "*.mp3", "*.ogg") var click_track = "":
+	set(value):
+		if  click_track != value:
+			click_track = value
+			emit_changed()
 
-@export_file("*.wav", "*.mp3", "*.ogg") var preview_audio = ""
+@export_file("*.wav", "*.mp3", "*.ogg") var preview_audio = "":
+	set(value):
+		if  preview_audio != value:
+			preview_audio = value
+			emit_changed()
 
-@export_file("*.wav", "*.mp3", "*.ogg") var selection_audio = ""
+@export_file("*.wav", "*.mp3", "*.ogg") var selection_audio = "":
+	set(value):
+		if  selection_audio != value:
+			selection_audio = value
+			emit_changed()
 
 @export_category("Gameplay")
 
-@export_range(0.5, 2.0, 0.1) var scale_fudge_factor: float = 1.0
+@export_range(0.5, 2.0, 0.1) var scale_fudge_factor: float = 1.0:
+	set(value):
+		if  scale_fudge_factor != value:
+			scale_fudge_factor = value
+			emit_changed()
 
 ## Number of measures to lead in before gameplay starts
-@export_range(0, 500, 1) var lead_in_measures: int = 4
+@export_range(0, 500, 1) var lead_in_measures: int = 4:
+	set(value):
+		if  lead_in_measures != value:
+			lead_in_measures = value
+			emit_changed()
 
 ## Number of playable measures in the song
-@export_range(0, 500, 1) var playable_measures: int = 100
+@export_range(0, 500, 1) var playable_measures: int = 100:
+	set(value):
+		if  playable_measures != value:
+			playable_measures = value
+			emit_changed()
 
 ## Array of measure indices where checkpoints occur
 @export var checkpoints: Array[int]
 
 ## Whether to use a fixed BPM value instead of reading from the MIDI file
-@export var bpm_fix: bool = false
+@export var bpm_fix: bool = false:
+	set(value):
+		if  bpm_fix != value:
+			bpm_fix = value
+			emit_changed()
 
 ## Fixed BPM value to use if bpm_fix is true
-@export var fixed_bpm: float = 120.0
+@export var fixed_bpm: float = 120.0:
+	set(value):
+		if  fixed_bpm != value:
+			fixed_bpm = value
+			emit_changed()
 
 var _bpm = NAN
 var _err = Error.ERR_INVALID_DATA
@@ -74,7 +141,7 @@ var _midi_mutex: Mutex = Mutex.new()
 
 var long_title: String:
 	get:
-		return "%s %s" % [title, sub_title]
+		return "%s %s" % [title, sub_title] if not sub_title.is_empty() else title
 
 var midi_error: Error:
 	get:
@@ -82,7 +149,6 @@ var midi_error: Error:
 			_load_midi_data()
 		return _err
 
-var _midi_data: MidiResource
 var ticks_per_beat: int:
 	get:
 		if !_midi_data:

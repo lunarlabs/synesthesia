@@ -17,6 +17,7 @@ var current_moggsong_path: String = ""
 var dirty: bool = false
 var undo_redo := EditorInterface.get_editor_undo_redo()
 var audio_file_dialog_dest: AudioFileType = AudioFileType.CLICK_TRACK
+var _next_folder: String = ""
 
 var checkpoint_spins: Array[SpinBox] = []
 
@@ -171,6 +172,10 @@ func _set_dirty(value: bool) -> void:
 	%SaveButton.disabled = not dirty
 	%RevertButton.disabled = not dirty
 
+func song_data_path(folder: String) -> String:
+	return SONGS_PATH.path_join(folder).path_join("%s.tres" % folder)
+
+
 #region Signal Handling
 func _on_song_filter_field_text_changed() -> void:
 	_rebuild_song_list_ui(%SongFilter.text)
@@ -182,32 +187,17 @@ func _on_rescan_button_pressed() -> void:
 
 func _on_song_list_item_selected(index: int) -> void:
 	var folder = %SongList.get_item_metadata(index)
-	var _save_and_switch = func():
-		_save_current_song()
-		_load_song(folder)
-		_update_editor_fields()
-	var _discard_and_switch = func():
-		_load_song(folder)
-		_update_editor_fields()
-	var _cancel_switch = func():
-		%SongList.select(songs[current_folder].list_index)
 	if folder != current_folder:
 		if dirty:
-			var confirm = ConfirmationDialog.new()
-			confirm.dialog_text = "You have unsaved changes. Do you want to save before switching songs?"
-			confirm.ok_button_text = "Save"
-			confirm.add_button("Discard", true, "discard")
-			confirm.connect("confirmed", _save_and_switch)
-			confirm.connect("canceled", _cancel_switch)
-			confirm.connect("custom_action", _discard_and_switch)
-			confirm.popup_centered()
+			_next_folder = folder
+			%SwitchConfirmDialog.popup_centered()
 		else:
 			_load_song(folder)
 			_update_editor_fields()
 
 
 func _on_new_song_button_pressed() -> void:
-	pass # Replace with function body.
+	%NewSongPopup.popup_centered()
 
 
 func _on_import_moggsong_button_pressed() -> void:
@@ -215,7 +205,9 @@ func _on_import_moggsong_button_pressed() -> void:
 
 
 func _on_save_button_pressed() -> void:
-	pass # Replace with function body.
+	var path = song_data_path(current_folder)
+	ResourceSaver.save(current_song, path)
+	_set_dirty(false)
 
 
 func _on_revert_button_pressed() -> void:
@@ -225,65 +217,77 @@ func _on_revert_button_pressed() -> void:
 func _on_title_field_text_changed() -> void:
 	var old_title = current_song.title
 	undo_redo.create_action("Change Song Title")
-	undo_redo.add_do_property(%TitleField, "text", %TitleField.text)
 	undo_redo.add_do_property(current_song, "title", %TitleField.text)
-	undo_redo.add_undo_property(%TitleField, "text", old_title)
+	undo_redo.add_do_property(%TitleField, "text", %TitleField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "title", old_title)
+	undo_redo.add_undo_property(%TitleField, "text", old_title)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_subtitle_field_text_changed() -> void:
 	var old_subtitle = current_song.subtitle
 	undo_redo.create_action("Change Subtitle")
-	undo_redo.add_do_property(%SubtitleField, "text", %SubtitleField.text)
 	undo_redo.add_do_property(current_song, "subtitle", %SubtitleField.text)
-	undo_redo.add_undo_property(%SubtitleField, "text", old_subtitle)
+	undo_redo.add_do_property(%SubtitleField, "text", %SubtitleField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "subtitle", old_subtitle)
+	undo_redo.add_undo_property(%SubtitleField, "text", old_subtitle)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_artist_field_text_changed() -> void:
 	var old_artist = current_song.artist
 	undo_redo.create_action("Change Artist")
-	undo_redo.add_do_property(%ArtistField, "text", %ArtistField.text)
 	undo_redo.add_do_property(current_song, "artist", %ArtistField.text)
-	undo_redo.add_undo_property(%ArtistField, "text", old_artist)
+	undo_redo.add_do_property(%ArtistField, "text", %ArtistField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "artist", old_artist)
+	undo_redo.add_undo_property(%ArtistField, "text", old_artist)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_genre_field_text_changed() -> void:
 	var old_genre = current_song.genre
 	undo_redo.create_action("Change Genre")
-	undo_redo.add_do_property(%GenreField, "text", %GenreField.text)
 	undo_redo.add_do_property(current_song, "genre", %GenreField.text)
-	undo_redo.add_undo_property(%GenreField, "text", old_genre)
+	undo_redo.add_do_property(%GenreField, "text", %GenreField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "genre", old_genre)
+	undo_redo.add_undo_property(%GenreField, "text", old_genre)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_source_field_text_changed() -> void:
 	var old_source = current_song.source
 	undo_redo.create_action("Change Source")
-	undo_redo.add_do_property(%SourceField, "text", %SourceField.text)
 	undo_redo.add_do_property(current_song, "source", %SourceField.text)
-	undo_redo.add_undo_property(%SourceField, "text", old_source)
+	undo_redo.add_do_property(%SourceField, "text", %SourceField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "source", old_source)
+	undo_redo.add_undo_property(%SourceField, "text", old_source)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_description_field_text_changed() -> void:
 	var old_description = current_song.description
 	undo_redo.create_action("Change Description")
-	undo_redo.add_do_property(%DescriptionField, "text", %DescriptionField.text)
 	undo_redo.add_do_property(current_song, "description", %DescriptionField.text)
-	undo_redo.add_undo_property(%DescriptionField, "text", old_description)
+	undo_redo.add_do_property(%DescriptionField, "text", %DescriptionField.text)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "description", old_description)
+	undo_redo.add_undo_property(%DescriptionField, "text", old_description)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
 func _on_cover_art_browse_button_pressed() -> void:
-	pass # Replace with function body.
+	%AlbumArtFileDialog.popup_centered()
 
 
 func _on_cover_art_reset_button_pressed() -> void:
@@ -337,6 +341,7 @@ func _on_bpm_override_check_toggled(toggled_on: bool) -> void:
 	undo_redo.create_action("Toggle BPM Override")
 	undo_redo.add_do_property(current_song, "bpm_fix", toggled_on)
 	undo_redo.add_do_property(%BpmSpin, "editable", toggled_on)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "bpm_fix", old_bpm_fix)
 	undo_redo.add_undo_property(%BpmSpin, "editable", old_bpm_fix)
 	undo_redo.commit_action()
@@ -345,30 +350,32 @@ func _on_bpm_override_check_toggled(toggled_on: bool) -> void:
 func _on_bpm_spin_changed() -> void:
 	var old_bpm = current_song.fixed_bpm
 	undo_redo.create_action("Change BPM")
-	undo_redo.add_do_method(%BpmSpin, "set_value_no_signal", %BpmSpin.value)
 	undo_redo.add_do_property(current_song, "fixed_bpm", %BpmSpin.value)
-	undo_redo.add_undo_method(%BpmSpin, "set_value_no_signal", old_bpm)
+	undo_redo.add_do_method(%BpmSpin, "set_value_no_signal", %BpmSpin.value)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "fixed_bpm", old_bpm)
+	undo_redo.add_undo_method(%BpmSpin, "set_value_no_signal", old_bpm)
 	undo_redo.commit_action()
 
 
 func _on_lead_in_spin_changed() -> void:
 	var old_lead_in = current_song.lead_in_measures
 	undo_redo.create_action("Change Lead-In Measures")
-	undo_redo.add_do_method(%LeadInSpin, "set_value_no_signal", %LeadInSpin.value)
 	undo_redo.add_do_property(current_song, "lead_in_measures", %LeadInSpin.value)
-	undo_redo.add_undo_method(%LeadInSpin, "set_value_no_signal", old_lead_in)
+	undo_redo.add_do_method(%LeadInSpin, "set_value_no_signal", %LeadInSpin.value)
 	undo_redo.add_undo_property(current_song, "lead_in_measures", old_lead_in)
+	undo_redo.add_undo_method(%LeadInSpin, "set_value_no_signal", old_lead_in)
 	undo_redo.commit_action()
 
 
 func _on_playable_spin_changed() -> void:
 	var old_playable = current_song.playable_measures
 	undo_redo.create_action("Change Playable Measures")
-	undo_redo.add_do_method(%PlayableSpin, "set_value_no_signal", %PlayableSpin.value)
 	undo_redo.add_do_property(current_song, "playable_measures", %PlayableSpin.value)
-	undo_redo.add_undo_method(%PlayableSpin, "set_value_no_signal", old_playable)
+	undo_redo.add_do_method(%PlayableSpin, "set_value_no_signal", %PlayableSpin.value)
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "playable_measures", old_playable)
+	undo_redo.add_undo_method(%PlayableSpin, "set_value_no_signal", old_playable)
 	undo_redo.commit_action()
 
 
@@ -380,11 +387,12 @@ func _on_checkpoint_count_spin_changed() -> void:
 	new_checkpoints.resize(new_checkpoint_count)
 
 	undo_redo.create_action("Change Checkpoint Count")
-	undo_redo.add_do_method(%CheckpointCountSpin, "set_value_no_signal", new_checkpoint_count)
 	undo_redo.add_do_property(current_song, "checkpoints", new_checkpoints)
+	undo_redo.add_do_method(%CheckpointCountSpin, "set_value_no_signal", new_checkpoint_count)
 	undo_redo.add_do_method(self, "_load_checkpoint_values")
-	undo_redo.add_undo_method(%CheckpointCountSpin, "set_value_no_signal", old_checkpoints.size())
+	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "checkpoints", old_checkpoints)
+	undo_redo.add_undo_method(%CheckpointCountSpin, "set_value_no_signal", old_checkpoints.size())
 	undo_redo.add_undo_method(self, "_load_checkpoint_values")
 	undo_redo.commit_action()
 
@@ -398,11 +406,16 @@ func _on_switch_confirm_dialog_confirmed() -> void:
 
 
 func _on_switch_confirm_dialog_canceled() -> void:
-	pass # Replace with function body.
+	%SongList.select(songs[current_folder].list_index)
+	_next_folder = ""
 
 
 func _on_switch_confirm_dialog_custom_action(action: StringName) -> void:
-	pass # Replace with function body.
+	if action == "discard":
+		var next_idx = songs[_next_folder].list_index
+		_load_song(%SongList.get_item_metadata(next_idx))
+		_update_editor_fields()
+		_next_folder = ""
 
 
 func _on_new_song_popup_confirmed() -> void:
