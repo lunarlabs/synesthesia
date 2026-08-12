@@ -62,7 +62,7 @@ var _midi_data: MidiResource
 @export var cover_art: Texture2D:
 	set(value):
 		if  cover_art != value:
-			cover_art = value.strip_edges
+			cover_art = value
 			emit_changed()
 
 ## Description or background information about the song
