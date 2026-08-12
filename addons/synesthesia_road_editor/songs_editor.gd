@@ -64,8 +64,10 @@ func _load_song(folder: String) -> void:
 	if not song_res is SongData:
 		push_error("Resource at %s is not a SongData resource." % song_path)
 		return
-	current_song.changed.disconnect(_on_current_song_changed)
-	undo_redo.clear_history(undo_redo.get_object_history_id(current_song))
+	if current_song:
+		if current_song.changed.is_connected(_on_current_song_changed):
+			current_song.changed.disconnect(_on_current_song_changed)
+		undo_redo.clear_history(undo_redo.get_object_history_id(current_song))
 	current_song = song_res
 	current_folder = folder
 	current_song.changed.connect(_on_current_song_changed)
@@ -170,12 +172,12 @@ func _resize_checkpoint_spins(count: int):
 
 func _load_checkpoint_values():
 	_resize_checkpoint_spins(current_song.checkpoints.size())
-	for i in current_song.checkpoints.size():
+	for i in range(current_song.checkpoints.size()):
 		checkpoint_spins[i].value = current_song.checkpoints[i]
 	
 func _rescan_midi_track_names():
 	var new_track_names = current_song.track_names
-	for i in %TracksContainer.get_child_count():
+	for i in range(%TracksContainer.get_child_count()):
 		var track_group = %TracksContainer.get_child(i)
 		track_group.update_midi_track_names(new_track_names)
 
@@ -351,11 +353,37 @@ func _on_decide_audio_browse_button_pressed() -> void:
 
 
 func _on_preview_audio_clear_button_pressed() -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to clear preview audio.")
+		return
+	var old_preview = current_song.preview_audio
+	undo_redo.create_action("Clear Preview Audio")
+	undo_redo.add_do_property(current_song, "preview_audio", "")
+	undo_redo.add_do_property(%PreviewAudioField, "text", "")
+	undo_redo.add_do_property(%PreviewAudioClearButton, "disabled", true)
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "preview_audio", old_preview)
+	undo_redo.add_undo_property(%PreviewAudioField, "text", old_preview)
+	undo_redo.add_undo_property(%PreviewAudioClearButton, "disabled", old_preview.is_empty())
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 func _on_decide_audio_clear_button_pressed() -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to clear selection audio.")
+		return
+	var old_sel = current_song.selection_audio
+	undo_redo.create_action("Clear Selection Audio")
+	undo_redo.add_do_property(current_song, "selection_audio", "")
+	undo_redo.add_do_property(%DecideAudioField, "text", "")
+	undo_redo.add_do_property(%DecideAudioClearButton, "disabled", true)
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "selection_audio", old_sel)
+	undo_redo.add_undo_property(%DecideAudioField, "text", old_sel)
+	undo_redo.add_undo_property(%DecideAudioClearButton, "disabled", old_sel.is_empty())
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 func _on_rescan_midi_button_pressed() -> void:
@@ -458,11 +486,54 @@ func _on_checkpoint_count_spin_changed() -> void:
 
 
 func _on_audio_file_dialog_file_selected(path: String) -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to set audio file.")
+		return
+	match audio_file_dialog_dest:
+		AudioFileType.CLICK_TRACK:
+			var old_click = current_song.click_track
+			undo_redo.create_action("Set Click Track")
+			undo_redo.add_do_property(current_song, "click_track", path)
+			undo_redo.add_do_property(%ClickTrackField, "text", path)
+			undo_redo.add_do_method(self, "_set_dirty", true)
+			undo_redo.add_undo_property(current_song, "click_track", old_click)
+			undo_redo.add_undo_property(%ClickTrackField, "text", old_click)
+			undo_redo.add_undo_method(self, "_set_dirty", dirty)
+			undo_redo.commit_action()
+		AudioFileType.PREVIEW_AUDIO:
+			var old_preview = current_song.preview_audio
+			undo_redo.create_action("Set Preview Audio")
+			undo_redo.add_do_property(current_song, "preview_audio", path)
+			undo_redo.add_do_property(%PreviewAudioField, "text", path)
+			undo_redo.add_do_property(%PreviewAudioClearButton, "disabled", false)
+			undo_redo.add_do_method(self, "_set_dirty", true)
+			undo_redo.add_undo_property(current_song, "preview_audio", old_preview)
+			undo_redo.add_undo_property(%PreviewAudioField, "text", old_preview)
+			undo_redo.add_undo_property(%PreviewAudioClearButton, "disabled", old_preview.is_empty())
+			undo_redo.add_undo_method(self, "_set_dirty", dirty)
+			undo_redo.commit_action()
+		AudioFileType.DECIDE_AUDIO:
+			var old_sel = current_song.selection_audio
+			undo_redo.create_action("Set Selection Audio")
+			undo_redo.add_do_property(current_song, "selection_audio", path)
+			undo_redo.add_do_property(%DecideAudioField, "text", path)
+			undo_redo.add_do_property(%DecideAudioClearButton, "disabled", false)
+			undo_redo.add_do_method(self, "_set_dirty", true)
+			undo_redo.add_undo_property(current_song, "selection_audio", old_sel)
+			undo_redo.add_undo_property(%DecideAudioField, "text", old_sel)
+			undo_redo.add_undo_property(%DecideAudioClearButton, "disabled", old_sel.is_empty())
+			undo_redo.add_undo_method(self, "_set_dirty", dirty)
+			undo_redo.commit_action()
+		_:
+			push_warning("Unknown audio file destination selected")
 
 
 func _on_switch_confirm_dialog_confirmed() -> void:
 	ResourceSaver.save(current_song)
+	var next_idx = songs[_next_folder].list_index
+	_load_song(%SongList.get_item_metadata(next_idx))
+	_update_editor_fields()
+	_next_folder = ""
 
 
 func _on_switch_confirm_dialog_canceled() -> void:
@@ -479,24 +550,113 @@ func _on_switch_confirm_dialog_custom_action(action: StringName) -> void:
 
 
 func _on_new_song_popup_confirmed() -> void:
-	pass # Replace with function body.
+	# Minimal new-song creation: create a uniquely named folder and empty SongData resource.
+	var base_name = "new_song"
+	var name = base_name
+	var idx = 1
+	while songs.has(name) or FileAccess.file_exists(_get_song_data_path(name)):
+		name = "%s_%d" % [base_name, idx]
+		idx += 1
+	var dir = DirAccess.open(SONGS_PATH)
+	if not dir:
+		# try to create the base songs directory
+		var created = DirAccess.make_dir_recursive_absolute(SONGS_PATH)
+		if created != OK:
+			push_error("Failed to create songs directory: %s" % SONGS_PATH)
+			return
+	else:
+		if dir.change_dir(name) == OK:
+			# folder already exists
+			dir.change_dir("..")
+		else:
+			dir.make_dir(name)
+
+	var new_song = SongData.new()
+	new_song.title = name
+	new_song.artist = ""
+	var save_path = _get_song_data_path(name)
+	var err = ResourceSaver.save(new_song, save_path)
+	if err != OK:
+		push_error("Failed to save new song resource to %s (err=%d)" % [save_path, err])
+		return
+	songs[name] = {"folder": name, "path": save_path}
+	_rebuild_song_list_ui(%SongFilter.text if %SongFilter else "")
+	_load_song(name)
+	_update_editor_fields()
+	_set_dirty(false)
 
 
 func _on_extract_confirm_dialog_confirmed() -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to extract audio from.")
+		return
+	# Extraction behaviour not implemented here; notify the user.
+	push_warning("Audio extraction workflow is not implemented in the editor script.")
 
 
 func _on_midi_file_dialog_file_selected(path: String) -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to assign MIDI file.")
+		return
+	var old_midi = current_song.midi_file
+	undo_redo.create_action("Set MIDI File")
+	undo_redo.add_do_property(current_song, "midi_file", path)
+	undo_redo.add_do_property(%MidiFileField, "text", path)
+	undo_redo.add_do_method(current_song, "_load_midi_data")
+	undo_redo.add_do_method(self, "_rescan_midi_track_names")
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "midi_file", old_midi)
+	undo_redo.add_undo_property(%MidiFileField, "text", old_midi)
+	undo_redo.add_undo_method(current_song, "_load_midi_data")
+	undo_redo.add_undo_method(self, "_rescan_midi_track_names")
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 func _on_mogg_song_file_dialog_file_selected(path: String) -> void:
 	var old_song_data = current_song.duplicate_deep()
 	var new_song_data = MoggsongParser.create_songdata_from_moggsong(path)
+	# If the parser returned a SongData, apply it via undo/redo so it can be reverted.
+	if new_song_data and new_song_data is SongData:
+		undo_redo.create_action("Import Moggsong")
+		undo_redo.add_do_property(self, "current_song", new_song_data)
+		undo_redo.add_do_method(self, "_set_dirty", true)
+		undo_redo.add_undo_property(self, "current_song", old_song_data)
+		undo_redo.add_undo_method(self, "_set_dirty", dirty)
+		undo_redo.commit_action()
+		# Refresh UI to reflect new song data
+		_update_editor_fields()
 
 
 func _on_album_art_file_dialog_file_selected(path: String) -> void:
-	pass # Replace with function body.
+	if not current_song:
+		push_error("No song loaded to set cover art.")
+		return
+	var old_tex = current_song.cover_art
+	# Try to load as a Resource first (imported texture), else load image file and create texture
+	var new_tex = ResourceLoader.load(path)
+	if not new_tex:
+		var img = Image.new()
+		var err = img.load(path)
+		if err != OK:
+			push_error("Failed to load image from %s" % path)
+			return
+		new_tex = ImageTexture.create_from_image(img)
+
+	undo_redo.create_action("Set Cover Art")
+	undo_redo.add_do_property(current_song, "cover_art", new_tex)
+	undo_redo.add_do_property(%CoverArt, "texture", new_tex)
+	undo_redo.add_do_property(%CoverArt, "visible", true)
+	undo_redo.add_do_property(%DefaultPlaceholder, "visible", false)
+	undo_redo.add_do_property(%CoverArtResetButton, "disabled", false)
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "cover_art", old_tex)
+	undo_redo.add_undo_property(%CoverArt, "texture", old_tex)
+	undo_redo.add_undo_property(%CoverArt, "visible", old_tex != null)
+	undo_redo.add_undo_property(%DefaultPlaceholder, "visible", old_tex == null)
+	undo_redo.add_undo_property(%CoverArtResetButton, "disabled", old_tex == null)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 #endregion
