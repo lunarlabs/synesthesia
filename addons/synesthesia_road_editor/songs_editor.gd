@@ -66,6 +66,7 @@ func _load_song(folder: String) -> void:
 		return
 	current_song = song_res
 	current_folder = folder
+	current_song.changed.connect(_on_current_song_changed)
 	_set_dirty(false)
 
 func _save_current_song() -> void:
@@ -175,6 +176,8 @@ func _set_dirty(value: bool) -> void:
 func song_data_path(folder: String) -> String:
 	return SONGS_PATH.path_join(folder).path_join("%s.tres" % folder)
 
+func _on_current_song_changed():
+	pass
 
 #region Signal Handling
 func _on_song_filter_field_text_changed() -> void:
@@ -211,7 +214,14 @@ func _on_save_button_pressed() -> void:
 
 
 func _on_revert_button_pressed() -> void:
-	pass # Replace with function body.
+	var old_data = current_song.duplicate_deep()
+	var new_data = ResourceLoader.load(current_song.resource_path)
+	undo_redo.create_action("Revert Song Data", UndoRedo.MERGE_DISABLE, current_song)
+	undo_redo.add_do_property(self, "current_song", new_data)
+	undo_redo.add_do_method(self, "_set_dirty", false)
+	undo_redo.add_undo_property(self, "current_song", old_data)
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 func _on_title_field_text_changed() -> void:
@@ -329,11 +339,21 @@ func _on_rescan_midi_button_pressed() -> void:
 
 
 func _on_add_track_button_pressed() -> void:
-	pass # Replace with function body.
+	var old_array = current_song.tracks.duplicate()
+	var new_array = current_song.tracks.duplicate()
+	new_array.append(SongTrackData.new())
+	undo_redo.create_action("Add Track")
+	undo_redo.add_do_property(current_song, "tracks", new_array)
+	undo_redo.add_do_method(self, "_resize_track_groups")
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "tracks", old_array)
+	undo_redo.add_undo_method(self, "_resize_track_groups")
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 
 func _on_extract_audio_button_pressed() -> void:
-	pass # Replace with function body.
+	%ExtractConfirmDialog.popup_centered()
 
 
 func _on_bpm_override_check_toggled(toggled_on: bool) -> void:
@@ -344,6 +364,7 @@ func _on_bpm_override_check_toggled(toggled_on: bool) -> void:
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "bpm_fix", old_bpm_fix)
 	undo_redo.add_undo_property(%BpmSpin, "editable", old_bpm_fix)
+	undo_redo.add_undo_property(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
 
@@ -422,6 +443,10 @@ func _on_new_song_popup_confirmed() -> void:
 	pass # Replace with function body.
 
 
+func _on_extract_confirm_dialog_confirmed() -> void:
+	pass # Replace with function body.
+
+
 func _on_midi_file_dialog_file_selected(path: String) -> void:
 	pass # Replace with function body.
 
@@ -432,5 +457,6 @@ func _on_mogg_song_file_dialog_file_selected(path: String) -> void:
 
 func _on_album_art_file_dialog_file_selected(path: String) -> void:
 	pass # Replace with function body.
+
 
 #endregion

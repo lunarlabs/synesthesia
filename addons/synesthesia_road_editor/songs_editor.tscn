@@ -391,16 +391,16 @@ unique_name_in_owner = true
 oversampling_override = 1.0
 title = "New Song"
 position = Vector2i(0, 24)
-size = Vector2i(244, 122)
+size = Vector2i(262, 122)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NewSongPopup" unique_id=950317334]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 9.0
-offset_top = 9.0
-offset_right = -9.0
-offset_bottom = -51.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -53.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -447,8 +447,18 @@ filters = PackedStringArray("*.png;Portable Network Graphics;image/png")
 
 [node name="SwitchConfirmDialog" type="ConfirmationDialog" parent="." unique_id=781727651]
 unique_name_in_owner = true
+oversampling_override = 1.0
+size = Vector2i(639, 100)
 ok_button_text = "Save"
 dialog_text = "You have unsaved changes. Do you want to save before switching songs?"
+
+[node name="ExtractConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1359724399]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Extract Audio Files?"
+size = Vector2i(522, 100)
+ok_button_text = "Extract"
+dialog_text = "This process will take a few minutes and cannot be undone."
 
 [connection signal="text_changed" from="VBoxContainer2/HBoxContainer/SongFilterField" to="." method="_on_song_filter_field_text_changed"]
 [connection signal="pressed" from="VBoxContainer2/HBoxContainer/RescanButton" to="." method="_on_rescan_button_pressed"]
@@ -487,3 +497,4 @@ dialog_text = "You have unsaved changes. Do you want to save before switching so
 [connection signal="canceled" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_canceled"]
 [connection signal="confirmed" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_confirmed"]
 [connection signal="custom_action" from="SwitchConfirmDialog" to="." method="_on_switch_confirm_dialog_custom_action"]
+[connection signal="confirmed" from="ExtractConfirmDialog" to="." method="_on_extract_confirm_dialog_confirmed"]
