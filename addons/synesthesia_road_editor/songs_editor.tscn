@@ -46,7 +46,9 @@ layout_mode = 2
 text = "New Song..."
 
 [node name="ImportMoggsongButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1155903570]
+unique_name_in_owner = true
 layout_mode = 2
+disabled = true
 text = "Import from .moggsong"
 
 [node name="SaveButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=2063191433]
@@ -68,7 +70,6 @@ size_flags_vertical = 3
 [node name="DataScrollContainer" type="ScrollContainer" parent="VBoxContainer/RightSide" unique_id=101519599]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_vertical = 100
 horizontal_scroll_mode = 0
 
 [node name="SongEditorContainer" type="VBoxContainer" parent="VBoxContainer/RightSide/DataScrollContainer" unique_id=481043118]
@@ -178,6 +179,7 @@ text = "Browse..."
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
+disabled = true
 text = "Use Default"
 
 [node name="FilesLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=1068528946]
@@ -287,7 +289,9 @@ layout_mode = 2
 text = "Add"
 
 [node name="ExtractAudioButton" type="Button" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer/HBoxContainer" unique_id=1238629678]
+unique_name_in_owner = true
 layout_mode = 2
+disabled = true
 text = "Extract from .mogg"
 
 [node name="NoTracksLabel" type="Label" parent="VBoxContainer/RightSide/DataScrollContainer/SongEditorContainer" unique_id=2067320368]

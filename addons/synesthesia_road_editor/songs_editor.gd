@@ -8,7 +8,7 @@ enum AudioFileType {
 	DECIDE_AUDIO
 }
 
-const SONGS_PATH: String = "user://songs"
+const SONGS_PATH: String = "user://song"
 
 var songs: Dictionary = {}
 var current_folder: String = ""
@@ -33,7 +33,7 @@ func _refresh_song_list() -> void:
 		return
 	var folders = dir.get_directories()
 	for folder in folders:
-		var song_file_path = SONGS_PATH.path_join(folder).path_join("%s.tres" % folder)
+		var song_file_path = _get_song_data_path(folder)
 		if FileAccess.file_exists(song_file_path) and not songs.has(folder):
 			songs[folder] = {"folder": folder,
 				"path": song_file_path,}
@@ -64,9 +64,18 @@ func _load_song(folder: String) -> void:
 	if not song_res is SongData:
 		push_error("Resource at %s is not a SongData resource." % song_path)
 		return
+	current_song.changed.disconnect(_on_current_song_changed)
+	undo_redo.clear_history(undo_redo.get_object_history_id(current_song))
 	current_song = song_res
 	current_folder = folder
 	current_song.changed.connect(_on_current_song_changed)
+	current_moggsong_path = _get_moggsong_path(folder) if FileAccess.file_exists(_get_moggsong_path(folder)) else ""
+	for fd: EditorFileDialog in [%AudioFileDialog, %AlbumArtFileDialog, %MidiFileDialog, %MoggSongFileDialog]:
+		fd.root_subfolder = _get_song_folder_path(folder)
+		fd.current_dir = _get_song_folder_path(folder)
+	var rich_name = "%s - %s" % [current_song.artist, current_song.long_title]
+	songs[folder]["rich_name"] = rich_name
+	%SongList.set_item_text(songs[folder].list_index, rich_name)
 	_set_dirty(false)
 
 func _save_current_song() -> void:
@@ -121,6 +130,7 @@ func _update_editor_fields() -> void:
 	%PlayableSpin.value = current_song.playable_measures
 	%CheckpointCountSpin.value = current_song.checkpoints.size()
 	_load_checkpoint_values()
+	_load_track_groups()
 
 func _resize_track_groups(count: int):
 	%NoTracksLabel.visible = (count == 0)
@@ -129,6 +139,7 @@ func _resize_track_groups(count: int):
 		for i in range(delta):
 			var new_group = preload("res://addons/synesthesia_road_editor/track_group.tscn").instantiate()
 			new_group.idx = %TracksContainer.get_child_count()
+			new_group.remove_requested.connect(_on_track_group_remove_requested)
 			%TracksContainer.add_child(new_group)
 	elif delta < 0:
 		for i in range(abs(delta)):
@@ -173,8 +184,14 @@ func _set_dirty(value: bool) -> void:
 	%SaveButton.disabled = not dirty
 	%RevertButton.disabled = not dirty
 
-func song_data_path(folder: String) -> String:
-	return SONGS_PATH.path_join(folder).path_join("%s.tres" % folder)
+func _get_song_folder_path(folder: String) -> String:
+	return SONGS_PATH.path_join(folder)
+
+func _get_song_data_path(folder: String) -> String:
+	return _get_song_folder_path(folder).path_join("%s.tres" % folder)
+
+func _get_moggsong_path(folder: String) -> String:
+	return _get_song_folder_path(folder).path_join("%s.moggsong" % folder)
 
 func _on_current_song_changed():
 	pass
@@ -186,7 +203,6 @@ func _on_song_filter_field_text_changed() -> void:
 func _on_rescan_button_pressed() -> void:
 	_refresh_song_list()
 	_rebuild_song_list_ui(%SongFilter.text)
-
 
 func _on_song_list_item_selected(index: int) -> void:
 	var folder = %SongList.get_item_metadata(index)
@@ -208,7 +224,7 @@ func _on_import_moggsong_button_pressed() -> void:
 
 
 func _on_save_button_pressed() -> void:
-	var path = song_data_path(current_folder)
+	var path = _get_song_data_path(current_folder)
 	ResourceSaver.save(current_song, path)
 	_set_dirty(false)
 
@@ -301,7 +317,18 @@ func _on_cover_art_browse_button_pressed() -> void:
 
 
 func _on_cover_art_reset_button_pressed() -> void:
-	pass # Replace with function body.
+	var old_texture = current_song.cover_art
+	undo_redo.create_action("Clear Cover Art")
+	undo_redo.add_do_property(current_song, "cover_art", null)
+	undo_redo.add_do_property(%CoverArt, "visible", false)
+	undo_redo.add_do_property(%DefaultPlaceholder, "visible", true)
+	undo_redo.add_do_property(%CoverArtResetButton, "disabled", true)
+	undo_redo.add_undo_property(current_song, "cover_art", old_texture)
+	undo_redo.add_undo_property(%CoverArt, "visible", true)
+	undo_redo.add_undo_property(%DefaultPlaceholder, "visible", false)
+	undo_redo.add_undo_property(%CoverArtResetButton, "disabled", false)
+	undo_redo.commit_action()
+
 
 
 func _on_midi_file_browse_button_pressed() -> void:
@@ -351,6 +378,18 @@ func _on_add_track_button_pressed() -> void:
 	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
+func _on_track_group_remove_requested(idx: int):
+	var old_array = current_song.tracks.duplicate()
+	var new_array = current_song.tracks.duplicate()
+	new_array.remove_at(idx)
+	undo_redo.create_action("Remove Track")
+	undo_redo.add_do_property(current_song, "tracks", new_array)
+	undo_redo.add_do_method(self, "_load_track_groups")
+	undo_redo.add_do_method(self, "_set_dirty", true)
+	undo_redo.add_undo_property(current_song, "tracks", old_array)
+	undo_redo.add_undo_method(self, "_load_track_groups")
+	undo_redo.add_undo_method(self, "_set_dirty", dirty)
+	undo_redo.commit_action()
 
 func _on_extract_audio_button_pressed() -> void:
 	%ExtractConfirmDialog.popup_centered()
@@ -423,7 +462,7 @@ func _on_audio_file_dialog_file_selected(path: String) -> void:
 
 
 func _on_switch_confirm_dialog_confirmed() -> void:
-	pass # Replace with function body.
+	ResourceSaver.save(current_song)
 
 
 func _on_switch_confirm_dialog_canceled() -> void:
@@ -452,7 +491,8 @@ func _on_midi_file_dialog_file_selected(path: String) -> void:
 
 
 func _on_mogg_song_file_dialog_file_selected(path: String) -> void:
-	pass # Replace with function body.
+	var old_song_data = current_song.duplicate_deep()
+	var new_song_data = MoggsongParser.create_songdata_from_moggsong(path)
 
 
 func _on_album_art_file_dialog_file_selected(path: String) -> void:
