@@ -10,13 +10,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 current_tab = 0
 
 [node name="Songs" parent="." unique_id=1802316100 instance=ExtResource("1_0wufn")]
 layout_mode = 2
 
 [node name="Packs" parent="." unique_id=499041847 instance=ExtResource("2_u4g4l")]
+visible = false
 layout_mode = 2
 
 [node name="Courses" parent="." unique_id=1207522328 instance=ExtResource("3_hyad6")]
+visible = false
 layout_mode = 2

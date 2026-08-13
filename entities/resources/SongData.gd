@@ -13,6 +13,7 @@ const MIDI_META_TEMPO_EVENT = 0x51
 const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 
 var _midi_data: MidiResource
+var _cached_midi_track_names: Array[String] = []
 
 ##Path to the MIDI file for this song
 @export_file("*.mid") var midi_file:
@@ -167,16 +168,18 @@ var track_names: Array[String]:
 	get:
 		if !_midi_data:
 			_load_midi_data()
-		var names: Array[String] = []
-		for i in _midi_data.tracks.size():
-			for event in _midi_data.tracks[i].events:
-				if event["type"] == "meta" and event["subtype"] == 3:
-					names.append(event["data"])
-					break
-		if names.size() == 0:
+		if _cached_midi_track_names.size() == 0:
+			var names: Array[String] = []
+			for i in _midi_data.tracks.size():
+				for event in _midi_data.tracks[i].events:
+					if event["type"] == "meta" and event["subtype"] == 3:
+						names.append(event["data"])
+						break
+			_cached_midi_track_names = names
+		if _cached_midi_track_names.size() == 0:
 			push_warning("No track names found in MIDI data.")
 			printerr("No track names found in MIDI data!")
-		return names
+		return _cached_midi_track_names
 
 ## A dictionary mapping song track names to their storage locations.
 ## 

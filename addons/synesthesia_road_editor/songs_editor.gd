@@ -41,7 +41,7 @@ func _refresh_song_list() -> void:
 func _rebuild_song_list_ui(filter: String = "") -> void:
 	%SongList.clear()
 	var keys: Array = songs.keys()
-	keys.sort_custom(func(a, b): return a.to_lower().naturalnocasecmp_to(b.to_lower()) > 0)
+	keys.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
 	for entry in keys:
 		if filter == "" or entry.to_lower().findn(filter.to_lower()) != -1:
 			var item = %SongList.add_item(songs[entry].get("rich_name", entry))
@@ -72,6 +72,7 @@ func _load_song(folder: String) -> void:
 	current_folder = folder
 	current_song.changed.connect(_on_current_song_changed)
 	current_moggsong_path = _get_moggsong_path(folder) if FileAccess.file_exists(_get_moggsong_path(folder)) else ""
+	%ImportMoggsongButton.disabled = current_moggsong_path.is_empty()
 	for fd: EditorFileDialog in [%AudioFileDialog, %AlbumArtFileDialog, %MidiFileDialog, %MoggSongFileDialog]:
 		fd.root_subfolder = _get_song_folder_path(folder)
 		fd.current_dir = _get_song_folder_path(folder)
@@ -91,13 +92,8 @@ func _save_current_song() -> void:
 		return
 	_set_dirty(false)
 
-func _revert_current_song() -> void:
-	if not current_song or current_folder == "":
-		push_error("No song is currently loaded to revert.")
-		return
-	_load_song(current_folder)
-
 func _update_editor_fields() -> void:
+	print("Updating editor fields for current song.")
 	if not current_song:
 		push_error("No song is currently loaded to update editor fields.")
 		%SongEditorContainer.visible = false
@@ -126,13 +122,15 @@ func _update_editor_fields() -> void:
 	%PreviewAudioClearButton.disabled = current_song.preview_audio.is_empty()
 	%DecideAudioField.text = current_song.selection_audio
 	%DecideAudioClearButton.disabled = current_song.selection_audio.is_empty()
-	%BpmOverrideCheck.button_pressed = current_song.bpm_fix
+	%BpmOverrideCheck.set_pressed_no_signal(current_song.bpm_fix)
 	%BpmSpin.value = current_song.fixed_bpm
 	%LeadInSpin.value = current_song.lead_in_measures
 	%PlayableSpin.value = current_song.playable_measures
 	%CheckpointCountSpin.value = current_song.checkpoints.size()
 	_load_checkpoint_values()
+	_rescan_midi_track_names()
 	_load_track_groups()
+	_list_problems()
 
 func _resize_track_groups(count: int):
 	%NoTracksLabel.visible = (count == 0)
@@ -142,6 +140,7 @@ func _resize_track_groups(count: int):
 			var new_group = preload("res://addons/synesthesia_road_editor/track_group.tscn").instantiate()
 			new_group.idx = %TracksContainer.get_child_count()
 			new_group.remove_requested.connect(_on_track_group_remove_requested)
+			new_group.track_data_changed.connect(_on_current_song_changed)
 			%TracksContainer.add_child(new_group)
 	elif delta < 0:
 		for i in range(abs(delta)):
@@ -154,6 +153,8 @@ func _load_track_groups():
 	for i in range(current_song.tracks.size()):
 		var track_data = current_song.tracks[i]
 		var track_group = %TracksContainer.get_child(i)
+		track_group.get_node("%AudioFileDialog").root_subfolder = _get_song_folder_path(current_folder)
+		track_group.update_midi_track_names(current_song.track_names)
 		track_group.set_track_data(track_data)
 
 func _resize_checkpoint_spins(count: int):
@@ -177,6 +178,7 @@ func _load_checkpoint_values():
 	
 func _rescan_midi_track_names():
 	var new_track_names = current_song.track_names
+	print(new_track_names)
 	for i in range(%TracksContainer.get_child_count()):
 		var track_group = %TracksContainer.get_child(i)
 		track_group.update_midi_track_names(new_track_names)
@@ -196,15 +198,75 @@ func _get_moggsong_path(folder: String) -> String:
 	return _get_song_folder_path(folder).path_join("%s.moggsong" % folder)
 
 func _on_current_song_changed():
-	pass
+	print("Current song data has changed. Marking as dirty.")
+	_list_problems()
+
+func _list_problems():
+	var is_playable := true
+	if not current_song:
+		%ProblemsLabel.hide()
+		return
+	%ProblemsLabel.clear()
+	%ProblemsLabel.push_list(0, RichTextLabel.LIST_DOTS, true)
+	if current_song.midi_file.is_empty():
+		is_playable = false
+		%ProblemsLabel.push_color(Color.RED)
+		%ProblemsLabel.add_text("MIDI file path is empty. This song is unplayable.\n")
+		%ProblemsLabel.pop()
+	if current_song.click_track.is_empty():
+		is_playable = false
+		%ProblemsLabel.push_color(Color.RED)
+		%ProblemsLabel.add_text("Click track path is empty. This song is unplayable.\n")
+		%ProblemsLabel.pop()
+	for i in current_song.tracks.size():
+		var track = current_song.tracks[i]
+		var display_i = i + 1
+		if not track.midi_track_name in current_song.track_names:
+			is_playable = false
+			%ProblemsLabel.push_color(Color.RED)
+			%ProblemsLabel.add_text("Track %d: MIDI track name not in MIDI file. This song is unplayable.\n" % display_i)
+			%ProblemsLabel.pop()
+		if track.audio_file.is_empty():
+			is_playable = false
+			%ProblemsLabel.push_color(Color.RED)
+			%ProblemsLabel.add_text("Track %d: Audio file path is empty. This song is unplayable.\n" % display_i)
+			%ProblemsLabel.pop()
+	if current_song.long_title == "Unknown Track":
+		%ProblemsLabel.push_color(Color.YELLOW)
+		%ProblemsLabel.add_text("Title is not set.\n")
+		%ProblemsLabel.pop()
+	if current_song.artist == "Unknown Artist":
+		%ProblemsLabel.push_color(Color.YELLOW)
+		%ProblemsLabel.add_text("Artist is not set.\n")
+		%ProblemsLabel.pop()
+	if current_song.genre == "Unknown Genre":
+		%ProblemsLabel.push_color(Color.YELLOW)
+		%ProblemsLabel.add_text("Genre is not set.\n")
+		%ProblemsLabel.pop()
+	if current_song.source.is_empty():
+		%ProblemsLabel.push_color(Color.YELLOW)
+		%ProblemsLabel.add_text("No source given.\n")
+		%ProblemsLabel.pop()
+	if current_song.preview_audio.is_empty():
+		%ProblemsLabel.push_color(Color.YELLOW)
+		%ProblemsLabel.add_text("Prevue audio file not set. Preview will not play in Song Select screen.\n")
+		%ProblemsLabel.pop()
+	if current_song.selection_audio.is_empty():
+		%ProblemsLabel.add_text("Selection sting will be the game default.\n")
+	if not current_song.cover_art:
+		%ProblemsLabel.add_text("Cover art will be its pack's default.\n")
+	if is_playable:
+		%ProblemsLabel.add_text("This song is playable.")
+	%ProblemsLabel.pop_all()
+	%ProblemsLabel.show()
 
 #region Signal Handling
 func _on_song_filter_field_text_changed() -> void:
-	_rebuild_song_list_ui(%SongFilter.text)
+	_rebuild_song_list_ui(%SongFilterField.text)
 
 func _on_rescan_button_pressed() -> void:
 	_refresh_song_list()
-	_rebuild_song_list_ui(%SongFilter.text)
+	_rebuild_song_list_ui(%SongFilterField.text)
 
 func _on_song_list_item_selected(index: int) -> void:
 	var folder = %SongList.get_item_metadata(index)
@@ -236,8 +298,10 @@ func _on_revert_button_pressed() -> void:
 	var new_data = ResourceLoader.load(current_song.resource_path)
 	undo_redo.create_action("Revert Song Data", UndoRedo.MERGE_DISABLE, current_song)
 	undo_redo.add_do_property(self, "current_song", new_data)
+	undo_redo.add_do_method(self, "_update_editor_fields")
 	undo_redo.add_do_method(self, "_set_dirty", false)
 	undo_redo.add_undo_property(self, "current_song", old_data)
+	undo_redo.add_undo_method(self, "_update_editor_fields")
 	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
@@ -399,10 +463,10 @@ func _on_add_track_button_pressed() -> void:
 	new_array.append(SongTrackData.new())
 	undo_redo.create_action("Add Track")
 	undo_redo.add_do_property(current_song, "tracks", new_array)
-	undo_redo.add_do_method(self, "_resize_track_groups")
+	undo_redo.add_do_method(self, "_resize_track_groups", new_array.size())
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "tracks", old_array)
-	undo_redo.add_undo_method(self, "_resize_track_groups")
+	undo_redo.add_undo_method(self, "_resize_track_groups", old_array.size())
 	undo_redo.add_undo_method(self, "_set_dirty", dirty)
 	undo_redo.commit_action()
 
@@ -547,6 +611,7 @@ func _on_switch_confirm_dialog_custom_action(action: StringName) -> void:
 		_load_song(%SongList.get_item_metadata(next_idx))
 		_update_editor_fields()
 		_next_folder = ""
+		%Switch_confirm_dialog.hide()
 
 
 func _on_new_song_popup_confirmed() -> void:
@@ -580,7 +645,7 @@ func _on_new_song_popup_confirmed() -> void:
 		push_error("Failed to save new song resource to %s (err=%d)" % [save_path, err])
 		return
 	songs[name] = {"folder": name, "path": save_path}
-	_rebuild_song_list_ui(%SongFilter.text if %SongFilter else "")
+	_rebuild_song_list_ui(%SongFilterField.text if %SongFilterField else "")
 	_load_song(name)
 	_update_editor_fields()
 	_set_dirty(false)
