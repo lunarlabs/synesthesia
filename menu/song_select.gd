@@ -75,6 +75,7 @@ var subscreen_buttons: Array = []
 var bpm_tween: Tween
 var prev_bpm: float
 var vol_tween: Tween
+var title_tween: Tween
 
 var default_cover_art = preload("res://assets/textures/generic_song.svg")
 
@@ -335,6 +336,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			_update_previous_bests()
 			selected_difficulty = held_difficulty
 			_update_difficulty_panels(reference[&"difficulties"])
+			if title_tween:
+				title_tween.kill()
 			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_play_song_preview()
@@ -365,6 +368,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%PrevBestContainer.show()
 			_update_previous_bests()
 			_update_difficulty_panels({reference[&"difficulty_offset"]: reference[&"difficulty_rating"]})
+			if title_tween:
+				title_tween.kill()
 			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_play_song_preview()
@@ -381,6 +386,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%GenreLabel.text = "Category Select"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			if title_tween:
+				title_tween.kill()
 			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_stop_song_preview()
@@ -397,6 +404,8 @@ func _on_carousel_selection_changed(reference: Dictionary) -> void:
 			%TitleLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			%GenreLabel.text = "Folder"
 			%GenreLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			if title_tween:
+				title_tween.kill()
 			%SongSelectAnimation.play("select_item")
 			if play_preview_on_select:
 				_stop_song_preview()
@@ -586,3 +595,21 @@ func _on_modifier_container_setting_changed() -> void:
 	else:
 		autoblast_label.add_theme_color_override("font_color", Color.WEB_GRAY)
 		autoblast_label.text = &"Off"
+
+
+func _on_song_select_animation_animation_finished(anim_name: StringName) -> void:
+	if anim_name == "select_item":
+		if %TitleLabel.size.x > %TitleLabel.get_parent().size.x:
+			title_tween = create_tween()
+			title_tween.tween_interval(3.)
+			title_tween.tween_property(%TitleLabel,
+				"offset_left",
+				-%TitleLabel.size.x,
+				10.0).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+			title_tween.tween_interval(0.1)
+			title_tween.tween_callback(func(): %TitleLabel.offset_left = 0.0)
+			title_tween.tween_property(%TitleLabel,
+				"anchor_bottom",
+				1.0,
+				0.5).from(0.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+			title_tween.set_loops()
