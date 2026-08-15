@@ -25,6 +25,12 @@ func export_pak(path: String):
         writer.start_file("banner.png")
         writer.write_file(byte_buffer)
         writer.close_file()
+    var default_cover = pak_default_cover.get_image()
+    if default_cover:
+        var byte_buffer: PackedByteArray = default_cover.save_png_to_buffer()
+        writer.start_file("cover.png")
+        writer.write_file(byte_buffer)
+        writer.close_file()
     for song: SongData in pak_songs:
         var song_dir = song.resource_path.get_file().get_basename()
         var song_paths = song.get_file_paths()

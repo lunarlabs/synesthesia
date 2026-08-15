@@ -14,7 +14,7 @@ WITH aggregated AS (
         MAX(pr."max_streak") AS best_streak,
         s."difficulty_rating"
     FROM player_records pr
-    LEFT JOIN library.v_full_library s
+    LEFT JOIN "library"."v_full_library" s
       ON pr.midi_hash = s.midi_hash
      AND pr.difficulty = s.difficulty_offset
     GROUP BY pr.midi_hash, pr.difficulty

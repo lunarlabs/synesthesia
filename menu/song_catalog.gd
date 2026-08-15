@@ -4,7 +4,6 @@ var _song_catalog: Array = []
 var song_indices: Dictionary[String, int] = {}
 var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
-var _lamp_values: Dictionary = {}
 var additions: Array = []
 
 enum ClearStatus {

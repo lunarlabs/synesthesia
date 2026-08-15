@@ -93,6 +93,8 @@ var timing_modifier_index: int = 0
 var reset_modifier_index: int = 0
 var hi_speed_index: int = 0 # Default to 1.0x
 
+var lamp_dict: Dictionary
+
 signal difficulty_changed(difficulty: int)
 
 
@@ -110,6 +112,7 @@ func _ready():
 	else:
 		print("Song catalog generated with %d songs." % SongCatalog.song_catalog.size())
 	_connect_signals()
+	lamp_dict = SessionManager.get_lamps()
 	# Because carousel's _current_difficulty mirrors selected_difficulty here, we can just let
 	# it handle the difficulty state. Nifty!
 	$Carousel.restore_state_from_session()
@@ -601,7 +604,7 @@ func _on_song_select_animation_animation_finished(anim_name: StringName) -> void
 	if anim_name == "select_item":
 		if %TitleLabel.size.x > %TitleLabel.get_parent().size.x:
 			title_tween = create_tween()
-			title_tween.tween_interval(3.)
+			title_tween.tween_interval(2.)
 			title_tween.tween_property(%TitleLabel,
 				"offset_left",
 				-%TitleLabel.size.x,

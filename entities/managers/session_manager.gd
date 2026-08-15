@@ -8,10 +8,13 @@ const LIBRARY_RES_DB_PATH = "user://library_res.db"
 const PLAYER_DB_PATH = "user://player.db"
 const LIBRARY_DDL_PATH = "res://data/library.sql"
 const PLAYER_DDL_PATH = "res://data/player.sql"
+const BEST_SCORE_QUERY_PATH = "res://data/bestscores.sql"
+const FREQ_SCORE_QUERY_PATH = "res://data/freqscore.sql"
+const LAMP_QUERY_PATH = "res://data/lamps.sql"
 
 var _library_db: SQLite = null
 var _player_db: SQLite = null
-var player_attached := false
+var _library_attached := false
 
 var _config: ConfigFile = null
 var previous_select_options: Dictionary = {}
@@ -126,6 +129,18 @@ func _update_player_db(current_version: int) -> bool:
 				
 	# Update the user_version pragma after successful migration
 	return _player_db.query("PRAGMA user_version = %d;" % PLAYER_DB_VERSION)
+
+func _attach_library_db():
+	var global_library_path: String = ProjectSettings.globalize_path(LIBRARY_DB_PATH)
+
+	var attach_query: String = "ATTACH DATABASE '%s' AS library;" % global_library_path
+	player_db.query(attach_query)
+	_library_attached = true
+
+func _detach_library_db():
+	player_db.query("DETACH DATABASE library;")
+	_library_attached = false
+
 #endregion
 
 #region Config Functions
@@ -360,5 +375,24 @@ func get_song_best_record(midi_hash: String, difficulty: int) -> SongResult:
 			result.clear_state = SongResult.ClearState.PERFECT_RUN
 		_:
 			result.clear_state = SongResult.ClearState.NOT_PLAYED
+	return result
+
+func get_lamps() -> Dictionary:
+	var result = {}
+	if not _library_attached:
+		_attach_library_db()
+	var query = FileAccess.get_file_as_string(LAMP_QUERY_PATH)
+	var success = player_db.query(query)
+	if not success:
+		printerr(player_db.error_message)
+		return {}
+	for row in player_db.query_result:
+		var folder_id = row["folder_id"]
+		var diff_offset = row["difficulty_offset"]
+		var status = row["max_status"]
+		if not result.has(row["folder_id"]):
+			result[folder_id] = {}
+		result[folder_id][diff_offset] = status
+	_detach_library_db()
 	return result
 #endregion
