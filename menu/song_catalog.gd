@@ -4,6 +4,7 @@ var _song_catalog: Array = []
 var song_indices: Dictionary[String, int] = {}
 var _difficulty_catalog: Array = []
 var _menu_structure: Array = []
+var _lamp_values: Dictionary = {}
 var additions: Array = []
 
 enum ClearStatus {
@@ -755,7 +756,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_SOURCE, ORDER_DEFAULT], [source.name])
+		success = db.query_with_bindings("%s WHERE files_ok = 1 AND %s %s;" % [QUERY_BASE, FILTER_SOURCE, ORDER_DEFAULT], [source.name])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
@@ -797,7 +798,7 @@ func make_menu_structure():
 				&"open": false,
 				&"children": []
 			}
-			success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_GENRE, ORDER_DEFAULT], [genre_name])
+			success = db.query_with_bindings("%s WHERE files_ok = 1 AND %s %s;" % [QUERY_BASE, FILTER_GENRE, ORDER_DEFAULT], [genre_name])
 			var genre_results = db.query_result
 			if not genre_results.is_empty() and success:
 				for j in genre_results.size():
@@ -833,7 +834,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_BASE, FILTER_BETWEEN_BPM, ORDER_BPM], [bucket.min, bucket.max])
+		success = db.query_with_bindings("%s WHERE files_ok = 1 AND %s %s;" % [QUERY_BASE, FILTER_BETWEEN_BPM, ORDER_BPM], [bucket.min, bucket.max])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:
@@ -870,7 +871,7 @@ func make_menu_structure():
 			&"open": false,
 			&"children": []
 		}
-		success = db.query_with_bindings("%s WHERE %s %s;" % [QUERY_DIFFICULTY, FILTER_BETWEEN_RATING, ORDER_DIFF_RATING], [i, i + 1])
+		success = db.query_with_bindings("%s WHERE files_ok = 1 AND %s %s;" % [QUERY_DIFFICULTY, FILTER_BETWEEN_RATING, ORDER_DIFF_RATING], [i, i + 1])
 		result = db.query_result
 		result_is_empty = result.size() == 0
 		if result_is_empty or not success:

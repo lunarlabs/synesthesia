@@ -132,7 +132,7 @@ func _ready():
 		%HiSpeedOption.text = tr("MOD_HISPEED")
 	else:
 		%HiSpeedOption.text = tr("MOD_HISPEED") + " " + HI_SPEED_MULTS_STR[HI_SPEED_MULTS_VAL[hi_speed_index]]
-	Transition.play_menu_track(Transition.MenuTracks.SONG_SELECT, 1.0)
+	Transition.play_menu_track(Transition.MenuTracks.SONG_SELECT, 0.25)
 	await Transition.audio_transition_completed
 	Transition.start_transition_out()
 	$MenuAnimations.play("LoadIn")

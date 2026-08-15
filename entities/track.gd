@@ -3,12 +3,12 @@ extends Node3D
 
 #TODO: fix the color assignments, don't make them fullbright (keep ps4/CroCru or use ps2 theme??)
 static var INSTRUMENTS = [
-	["Drums", Color(0.8, 0, 1), "uid://bx04vawou1p2o", "uid://w401c706l7dq"],
+	["Drums", Color(0.8, 0.1, 1), "uid://bx04vawou1p2o", "uid://w401c706l7dq"],
 	["Bass", Color(0.129, 0.25, 1), "uid://dmfgawpqalfv3", "uid://b7mxrnn681i7t"],
-	["Guitar", Color(1, 0, 0), "uid://bihm6tbkft235", "uid://5qhhjlqiksto"],
-	["Synth", Color(1, .8, 0), "uid://d01i5nlpc34dy", "uid://dtebx5wg367bw"],
-	["Vocals", Color(0, 1, 0.2), "uid://bdeui16xuol6", "uid://5vj1puwyti0d"],
-	["FX", Color(0, .9, 1), "uid://dym0vwrypvoco", "uid://bpjy82igjyw2q"],
+	["Guitar", Color(1, 0.1, 0.1), "uid://bihm6tbkft235", "uid://5qhhjlqiksto"],
+	["Synth", Color(1, .8, .1), "uid://d01i5nlpc34dy", "uid://dtebx5wg367bw"],
+	["Vocals", Color(0.1, 1, 0.2), "uid://bdeui16xuol6", "uid://5vj1puwyti0d"],
+	["FX", Color(0.1, .9, 1), "uid://dym0vwrypvoco", "uid://bpjy82igjyw2q"],
 ]
 const MISBLAST_SCENE: PackedScene = preload("res://entities/misblast.tscn")
 const BLASTING_VOLUME = -3.0
@@ -93,7 +93,7 @@ func _enter_tree():
 		var rail_transform = Transform3D.IDENTITY
 		@warning_ignore("integer_division")
 		var z_pos = - (BEATS_PER_MEASURE * length_per_beat) * (int(i / 2) + 0.5)
-		var x_pos = 1. if i % 2 == 0 else -1.
+		var x_pos = 1.1 if i % 2 == 0 else -1.1
 		rail_transform.origin = Vector3(x_pos, -0.25, z_pos)
 		var scale_z = length_per_beat / STANDARD_LENGTH_PER_BEAT
 		rail_transform.basis = rail_transform.basis.scaled(Vector3(1.0, 1.0, scale_z))

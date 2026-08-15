@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d0ooj6aih13in"]
 
-[ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/trackshader.res" id="1_lkcd8"]
+[ext_resource type="Shader" uid="uid://cydggyd4nrbkv" path="res://assets/shaders/trackshader.res" id="1_lkcd8"]
 [ext_resource type="PackedScene" uid="uid://b5rou2au557hc" path="res://entities/trackgeom.tscn" id="3_aeq1i"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lkcd8"]

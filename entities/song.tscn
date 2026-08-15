@@ -1464,6 +1464,7 @@ visible = false
 mesh = SubResource("BoxMesh_tgeyx")
 
 [node name="MPCamera" type="Camera3D" parent="Playhead" unique_id=745233599]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 6.5, 0)
 v_offset = -3.0
 fov = 97.5
@@ -1703,14 +1704,14 @@ anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -477.43994
 offset_top = 36.0
-offset_right = -439.43982
-offset_bottom = 96.00004
+offset_right = -423.43994
+offset_bottom = 104.0
 grow_horizontal = 0
 pivot_offset_ratio = Vector2(0.5, 0.5)
 text = "x0"
 label_settings = SubResource("LabelSettings_q2dmg")
 horizontal_alignment = 1
-vertical_alignment = 2
+vertical_alignment = 1
 
 [node name="ScoreTitle" type="Label" parent="HUD/ScoreBar" unique_id=2051510449]
 self_modulate = Color(1, 1, 1, 0)
