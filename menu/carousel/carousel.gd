@@ -4,6 +4,7 @@ var _root_menu_structure: Array = []
 var _current_menu_structure: Array = []
 var _back_stack: Array = []
 var _displayed_menu_structure: Array = []
+var _lamp_status: Dictionary = {}
 
 var _current_item_index: int = 0
 var _current_open_folder: int = -1
@@ -37,6 +38,7 @@ signal song_selected(song_folder: String, difficulty: int)
 func fetch_menu_structure(force := false):
 	if force:
 		SongCatalog.make_menu_structure()
+	_lamp_status = SessionManager.get_lamps()
 	_root_menu_structure = SongCatalog.menu_structure
 	_current_menu_structure = _root_menu_structure
 	_back_stack = []
