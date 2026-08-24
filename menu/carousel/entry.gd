@@ -22,7 +22,7 @@ const LAMP_COLORS = [
 	Color(0.1, 0.1, 0.1, 1.0), #Not Played
 	Color(0.6, 0.1, 0.0, 1.0), #Failed
 	Color(0.0, 0.8, 0.2, 1.0), #Cleared
-	Color(0.8 ,0.9, 1.0, 1.0), #Perfect
+	Color.GOLD, #Perfect
 ]
 const SONG_ENTRY_BG_COLOR = Color(0.75, 0.75, 0.75, 0.8)
 const FOLDER_ENTRY_BG_COLOR = Color(0.149, 0.444, 0.592, 1.0)
@@ -66,7 +66,7 @@ func update_difficulty(difficulty_offset: int, item: Dictionary):
 			rating = 0
 	difficulty_value_label.text = "%.1f" % rating
 	difficulty_value_label.modulate = DIFFICULTY_COLORS[difficulty_offset]
-	difficulty_bg.modulate = DIFFICULTY_COLORS[difficulty_offset]
+#	difficulty_bg.modulate = DIFFICULTY_COLORS[difficulty_offset]
 	match lamps.get(difficulty_offset, 0):
 		2:
 			play_marker.modulate = LAMP_COLORS[1]

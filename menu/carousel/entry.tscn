@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://c4gkjkci7oq2x" path="res://assets/textures/carouselplaymarker.svg" id="3_341lh"]
 [ext_resource type="LabelSettings" uid="uid://byf65v26sdt0p" path="res://menu/carousel/subtitle.tres" id="3_fu0w3"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j3pel"]
+
 [sub_resource type="FontVariation" id="FontVariation_f5151"]
 base_font = ExtResource("1_jqa2a")
 variation_opentype = {
@@ -20,8 +22,8 @@ variation_opentype = {
 [sub_resource type="LabelSettings" id="LabelSettings_55ab4"]
 font = SubResource("FontVariation_f5151")
 font_size = 45
-font_color = Color(0, 0, 0, 1)
-outline_size = 7
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.67058825)
 
 [sub_resource type="FontVariation" id="FontVariation_55ab4"]
 base_font = ExtResource("1_jqa2a")
@@ -100,7 +102,7 @@ offset_bottom = 85.0
 texture = ExtResource("2_sx17s")
 
 [node name="PlayMarker" type="TextureRect" parent="Song" unique_id=112757303]
-modulate = Color(0.12, 0.12, 0.12, 1)
+material = SubResource("ShaderMaterial_j3pel")
 layout_mode = 0
 offset_right = 400.0
 offset_bottom = 85.0
