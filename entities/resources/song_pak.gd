@@ -3,13 +3,21 @@
 class_name SynRoadSongPak
 extends Resource
 
+const TEMP_SONG_DATA_PATH = "res://temp_song_data.tres"
+
 static var _err = OK
 
 @export var pak_name: String = "New SongPak"
-@export var pak_banner_image: Texture2D
-@export var pak_default_cover: Texture2D
+@export var pak_banner_image: String = ""
+@export var pak_default_cover: String = ""
 @export var pak_songs: Array[SongData]
 @export var pak_courses: Array[SynRoadCourse]
+
+var manifest: Dictionary = {
+    "name": pak_name,
+    "songs": [],
+    "courses": [],
+}
 
 func export_pak(path: String):
     var writer = ZIPPacker.new()
@@ -19,21 +27,24 @@ func export_pak(path: String):
     writer.start_file("name.txt")
     writer.write_file(pak_name.to_utf8_buffer())
     writer.close_file()
-    var banner_image = pak_banner_image.get_image()
-    if banner_image:
-        var byte_buffer: PackedByteArray = banner_image.save_png_to_buffer()
+    if FileAccess.file_exists(pak_banner_image):
+        manifest["banner"] = "banner.png"
         writer.start_file("banner.png")
-        writer.write_file(byte_buffer)
+        var banner_file = FileAccess.open(pak_banner_image, FileAccess.READ)
+        var banner_bytes = banner_file.get_buffer(banner_file.get_length())
+        writer.write_file(banner_bytes)
         writer.close_file()
-    var default_cover = pak_default_cover.get_image()
-    if default_cover:
-        var byte_buffer: PackedByteArray = default_cover.save_png_to_buffer()
+    if FileAccess.file_exists(pak_default_cover):
+        manifest["default_cover"] = "cover.png"
         writer.start_file("cover.png")
-        writer.write_file(byte_buffer)
+        var cover_file = FileAccess.open(pak_default_cover, FileAccess.READ)
+        var cover_bytes = cover_file.get_buffer(cover_file.get_length())
+        writer.write_file(cover_bytes)
         writer.close_file()
     for song: SongData in pak_songs:
         var song_dir = song.resource_path.get_file().get_basename()
         var song_paths = song.get_file_paths()
+        manifest["songs"].append(song_dir)
     return OK
 
 static func import_pak(path: String) -> SynRoadSongPak:

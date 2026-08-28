@@ -329,7 +329,7 @@ func _extract_songdata_meta(song_data: SongData) -> Dictionary:
 		"preview_filename": song_data.preview_audio.get_file(),
 		}
 	if song_data.cover_art:
-		var cover_art_img = song_data.cover_art.get_image()
+		var cover_art_img = song_data.get_cover_art_image()
 		result["cover_art"] = cover_art_img.get_data()
 		result["cover_art_width"] = cover_art_img.get_width()
 		result["cover_art_height"] = cover_art_img.get_height()

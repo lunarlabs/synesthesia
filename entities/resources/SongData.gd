@@ -60,7 +60,7 @@ var _cached_midi_track_names: Array[String] = []
 			source = value.strip_edges()
 			emit_changed()
 
-@export var cover_art: Texture2D:
+@export var cover_art: String = "":
 	set(value):
 		if  cover_art != value:
 			cover_art = value
@@ -349,3 +349,17 @@ func _load_audio_stream(path: String) -> AudioStream:
 		_:
 			push_error("Unrecognized audio file format: %s" % path)
 			return null
+
+func get_cover_art_image() -> Image:
+	if cover_art.is_empty():
+		return null
+	var path = ResourceUID.ensure_path(cover_art)
+	if not FileAccess.file_exists(path):
+		push_error("Cover art file not found: %s" % path)
+		return null
+	var image = Image.new()
+	var err = image.load(path)
+	if err != OK:
+		push_error("Failed to load cover art image: %s" % path)
+		return null
+	return image
