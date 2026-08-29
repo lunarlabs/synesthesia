@@ -21,7 +21,7 @@ var current_item: Dictionary:
 const ITEM_SPACING_PX := 6
 const COL_OFFSET_PX := 20
 const ENTRY_SCENE: PackedScene = preload("res://menu/carousel/entry.tscn")
-const SCROLL_ANIM_DURATION := 0.25
+const SCROLL_ANIM_DURATION := 0.15
 
 var _scroll_tween: Tween
 var _entry_height: float
@@ -109,8 +109,6 @@ func navigate_back() -> bool:
 #endregion
 
 func update_carousel(emit := true, animate_direction: int = 0):
-	if _scroll_tween and _scroll_tween.is_valid():
-		_scroll_tween.kill()
 	for i in range(entries.get_child_count()):
 		var entry = entries.get_child(i)
 		var item_index = posmod(_current_item_index + entry.carousel_index, _displayed_menu_structure.size())
@@ -122,6 +120,8 @@ func update_carousel(emit := true, animate_direction: int = 0):
 		emit_currently_selected()
 
 func _animate_scroll(direction: int) -> void:
+	if _scroll_tween and _scroll_tween.is_valid():
+		_scroll_tween.kill()
 	_scroll_tween = create_tween().set_parallel(true)
 	_scroll_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	var offset_y := _entry_height * direction # positive = items come from below
