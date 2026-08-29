@@ -221,29 +221,36 @@ var total_measures: int:
 	get:
 		return lead_in_measures + playable_measures
 
-func get_file_paths() -> PackedStringArray:
-	var result: PackedStringArray
+func get_file_paths() -> Dictionary:
+	var result: Dictionary = {}
 	if resource_path.is_empty():
 		push_error("Tried to get file path of unsaved resource.")
-		return []
+		return {}
 	var song_name = resource_path.get_file()
-	result.append(ProjectSettings.globalize_path(resource_path))
+	result["song"] = (ProjectSettings.globalize_path(resource_path))
 	if not FileAccess.file_exists(midi_file):
 		push_error(song_name + ": Required midi file missing")
-		return []
-	result.append(ProjectSettings.globalize_path(midi_file))
+		return {}
+	result["midi"] = ProjectSettings.globalize_path(midi_file)
 	if not FileAccess.file_exists(click_track):
-		push_error(resource_path + ": Required audio file missing")
-		return []
-	result.append(ProjectSettings.globalize_path(click_track))
-	for optional_file: String in [preview_audio, selection_audio]:
-		if not optional_file.is_empty() and FileAccess.file_exists(optional_file):
-			result.append(ProjectSettings.globalize_path(optional_file))
+		push_error(song_name + ": Required audio file missing")
+		return {}
+	result["click_track"] = ProjectSettings.globalize_path(click_track)
+	var optional_files = {
+		"preview_audio": preview_audio,
+		"selection_audio": selection_audio,
+		"cover_art": cover_art,
+	}
+	for key: String in optional_files:
+		var path = optional_files[key]
+		if not path.is_empty() and FileAccess.file_exists(path):
+			result[key] = ProjectSettings.globalize_path(path)
+	result["tracks"] = []
 	for track: SongTrackData in tracks:
 		if not FileAccess.file_exists(track.audio_file):
-			push_error(resource_path + ": Required track audio file missing")
-			return []
-		result.append(ProjectSettings.globalize_path(track.audio_file))
+			push_error(song_name + ": Required track audio file missing")
+			return {}
+		result["tracks"].append(ProjectSettings.globalize_path(track.audio_file))
 	return result
 
 ## Returns a dictionary mapping timestamps to note values for a specific track and difficulty.
