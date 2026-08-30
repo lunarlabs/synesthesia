@@ -12,7 +12,6 @@ checkpoint_modifier = 1
 [node name="LoadScreen" parent="." unique_id=1381759080 instance=ExtResource("2_tr38k")]
 process_mode = 3
 visible = false
-mouse_filter = 2
 
 [node name="PausePanel" type="PanelContainer" parent="." unique_id=245645394]
 process_mode = 3

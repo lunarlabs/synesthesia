@@ -487,8 +487,10 @@ func _populate_from_songdata(sd: SongData) -> void:
 	_desc_edit.editable = true
 
 	# Cover art
-	if sd.cover_art:
-		_cover_art_rect.texture = sd.cover_art
+	if sd.cover_art and FileAccess.file_exists(sd.cover_art):
+		var img := Image.load_from_file(sd.cover_art)
+		var tex := ImageTexture.create_from_image(img)
+		_cover_art_rect.texture = tex
 	else:
 		_cover_art_rect.texture = null
 	_cover_art_browse_btn.disabled = false
@@ -715,7 +717,9 @@ func _do_save() -> void:
 
 	# Cover art
 	if _cover_art_rect.texture:
-		sd.cover_art = _cover_art_rect.texture
+		var img := Image.load_from_file(sd.cover_art)
+		var tex := ImageTexture.create_from_image(img)
+		_cover_art_rect.texture = tex
 
 	# MIDI
 	sd.midi_file = _midi_file_edit.text if _midi_file_edit.text != "" else null
