@@ -60,7 +60,7 @@ var _cached_midi_track_names: Array[String] = []
 			source = value.strip_edges()
 			emit_changed()
 
-@export var cover_art: String = "":
+@export_file("*.png", "*.jpg", "*.jpeg") var cover_art: String = "":
 	set(value):
 		if  cover_art != value:
 			cover_art = value

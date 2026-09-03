@@ -3,4 +3,4 @@ extends HSplitContainer
 const PAKS_DIR := "user://packs/"
 
 
-var songs: Array[String] = []
+var songs_in_paks: Dictionary[String, String] = {}
