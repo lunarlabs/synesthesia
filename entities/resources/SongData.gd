@@ -370,3 +370,87 @@ func get_cover_art_image() -> Image:
 		push_error("Failed to load cover art image: %s" % path)
 		return null
 	return image
+
+func make_zip(path: String) -> Error:
+	var res_copy: SongData = duplicate_deep()
+	var temp_dir_path := OS.get_temp_dir() + "sr-song-temp.tscn"
+
+	var writer := ZIPPacker.new()
+	var err = writer.open(path)
+	if err != OK:
+		return err
+
+	var midi_filename = midi_file.get_file()
+	writer.start_file(midi_filename)
+	var mf = FileAccess.open(midi_file, FileAccess.READ)
+	var midi_bytes = mf.get_buffer(mf.get_length())
+	writer.write_file(midi_bytes)
+	writer.close_file()
+	res_copy.midi_file = midi_filename
+
+	var click_track_filename = click_track.get_file()
+	writer.start_file(click_track_filename)
+	var click_track_file = FileAccess.open(click_track, FileAccess.READ)
+	var click_track_bytes = click_track_file.get_buffer(click_track_file.get_length())
+	writer.write_file(click_track_bytes)
+	writer.close_file()
+	res_copy.click_track = click_track_filename
+
+	if FileAccess.file_exists(preview_audio):
+		var preview_filename = preview_audio.get_file()
+		writer.start_file(preview_filename)
+		var preview_audio_file = FileAccess.open(preview_audio, FileAccess.READ)
+		var preview_audio_bytes = preview_audio_file.get_buffer(preview_audio_file.get_length())
+		writer.write_file(preview_audio_bytes)
+		writer.close_file()
+		res_copy.preview_audio = preview_filename
+	else:
+		res_copy.preview_audio = ""
+
+	if FileAccess.file_exists(selection_audio):
+		var selection_filename = selection_audio.get_file()
+		writer.start_file(selection_filename)
+		var selection_audio_file = FileAccess.open(selection_audio, FileAccess.READ)
+		var selection_audio_bytes = selection_audio_file.get_buffer(selection_audio_file.get_length())
+		writer.write_file(selection_audio_bytes)
+		writer.close_file()
+		res_copy.selection_audio = selection_filename
+	else:
+		res_copy.selection_audio = ""
+
+	if FileAccess.file_exists(cover_art):
+		var cover_filename = cover_art.get_file()
+		writer.start_file(cover_art)
+		var cover_art_file = FileAccess.open(cover_art, FileAccess.READ)
+		var cover_art_bytes = cover_art_file.get_buffer(cover_art_file.get_length())
+		writer.write_file(cover_art_bytes)
+		writer.close_file()
+		res_copy.cover_art = cover_filename
+	else:
+		res_copy.cover_art = ""
+
+	for i in range(tracks.size()):
+		var track: SongTrackData = res_copy.tracks[i]
+		var track_audio_filename = track.audio_file.get_file()
+		writer.start_file(track_audio_filename)
+		var track_audio_file = FileAccess.open(track.audio_file, FileAccess.READ)
+		var track_audio_bytes = track_audio_file.get_buffer(track_audio_file.get_length())
+		writer.write_file(track_audio_bytes)
+		writer.close_file()
+		track.audio_file = track_audio_filename
+
+	ResourceSaver.save(res_copy, temp_dir_path)
+	var song_res_filename = resource_path.get_file()
+	writer.start_file(song_res_filename)
+	var song_res_file = FileAccess.open(temp_dir_path, FileAccess.READ)
+	var song_res_bytes = song_res_file.get_buffer(song_res_file.get_length())
+	writer.write_file(song_res_bytes)
+	writer.close_file()
+
+	DirAccess.remove_absolute(temp_dir_path)
+
+	err = writer.close()
+	return err
+
+static func import_zip(path: String) -> SongData:
+	return null

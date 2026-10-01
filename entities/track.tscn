@@ -44,6 +44,7 @@ angle_min = -89.99999
 angle_max = 90.000015
 direction = Vector3(0, 1, 0)
 spread = 30.0
+initial_velocity_min = 1.0
 initial_velocity_max = 5.0
 angular_velocity_min = -128.41002
 angular_velocity_max = 128.40999
