@@ -372,8 +372,16 @@ func get_cover_art_image() -> Image:
 	return image
 
 func make_zip(path: String) -> Error:
+	ResourceSaver.save(self)
 	var res_copy: SongData = duplicate_deep()
-	var temp_dir_path := OS.get_temp_dir() + "sr-song-temp.tscn"
+	var temp_dir_path := OS.get_temp_dir().path_join("sr-song-temp.tres")
+
+	if not FileAccess.file_exists(midi_file):
+		push_error("Required midi file missing")
+		return ERR_FILE_NOT_FOUND
+	if not FileAccess.file_exists(click_track):
+		push_error("Required audio file missing")
+		return ERR_FILE_NOT_FOUND
 
 	var writer := ZIPPacker.new()
 	var err = writer.open(path)
@@ -381,76 +389,268 @@ func make_zip(path: String) -> Error:
 		return err
 
 	var midi_filename = midi_file.get_file()
-	writer.start_file(midi_filename)
+	err = writer.start_file(midi_filename)
+	if err != OK:
+		writer.close()
+		return err
 	var mf = FileAccess.open(midi_file, FileAccess.READ)
+	if not mf:
+		err = FileAccess.get_open_error()
+		writer.close_file()
+		writer.close()
+		return err
 	var midi_bytes = mf.get_buffer(mf.get_length())
-	writer.write_file(midi_bytes)
-	writer.close_file()
+	if mf.get_error() != OK:
+		writer.close_file()
+		writer.close()
+		mf.close()
+		return mf.get_error()
+	mf.close()
+	err = writer.write_file(midi_bytes)
+	if err != OK:
+		writer.close_file()
+		writer.close()
+		return err
+	err = writer.close_file()
+	if err != OK:
+		writer.close()
+		return err
 	res_copy.midi_file = midi_filename
 
 	var click_track_filename = click_track.get_file()
-	writer.start_file(click_track_filename)
+	err = writer.start_file(click_track_filename)
+	if err != OK:
+		writer.close()
+		return err
 	var click_track_file = FileAccess.open(click_track, FileAccess.READ)
+	if not click_track_file:
+		err = FileAccess.get_open_error()
+		writer.close_file()
+		writer.close()
+		return err
 	var click_track_bytes = click_track_file.get_buffer(click_track_file.get_length())
-	writer.write_file(click_track_bytes)
-	writer.close_file()
+	if click_track_file.get_error() != OK:
+		writer.close_file()
+		writer.close()
+		click_track_file.close()
+		return click_track_file.get_error()
+	click_track_file.close()
+	err = writer.write_file(click_track_bytes)
+	if err != OK:
+		writer.close_file()
+		writer.close()
+		return err
+	err = writer.close_file()
+	if err != OK:
+		writer.close()
+		return err
 	res_copy.click_track = click_track_filename
 
 	if FileAccess.file_exists(preview_audio):
 		var preview_filename = preview_audio.get_file()
-		writer.start_file(preview_filename)
+		err = writer.start_file(preview_filename)
+		if err != OK:
+			writer.close()
+			return err
 		var preview_audio_file = FileAccess.open(preview_audio, FileAccess.READ)
+		if not preview_audio_file:
+			err = FileAccess.get_open_error()
+			writer.close_file()
+			writer.close()
+			return err
 		var preview_audio_bytes = preview_audio_file.get_buffer(preview_audio_file.get_length())
-		writer.write_file(preview_audio_bytes)
-		writer.close_file()
+		if preview_audio_file.get_error() != OK:
+			writer.close_file()
+			writer.close()
+			preview_audio_file.close()
+			return preview_audio_file.get_error()
+		preview_audio_file.close()
+		err = writer.write_file(preview_audio_bytes)
+		if err != OK:
+			writer.close_file()
+			writer.close()
+			return err
+		err = writer.close_file()
+		if err != OK:
+			writer.close()
+			return err
 		res_copy.preview_audio = preview_filename
 	else:
 		res_copy.preview_audio = ""
 
 	if FileAccess.file_exists(selection_audio):
 		var selection_filename = selection_audio.get_file()
-		writer.start_file(selection_filename)
+		err = writer.start_file(selection_filename)
+		if err != OK:
+			writer.close()
+			return err
 		var selection_audio_file = FileAccess.open(selection_audio, FileAccess.READ)
+		if not selection_audio_file:
+			err = FileAccess.get_open_error()
+			writer.close_file()
+			writer.close()
+			return err
 		var selection_audio_bytes = selection_audio_file.get_buffer(selection_audio_file.get_length())
-		writer.write_file(selection_audio_bytes)
-		writer.close_file()
+		if selection_audio_file.get_error() != OK:
+			writer.close_file()
+			writer.close()
+			selection_audio_file.close()
+			return selection_audio_file.get_error()
+		selection_audio_file.close()
+		err = writer.write_file(selection_audio_bytes)
+		if err != OK:
+			writer.close_file()
+			writer.close()
+			return err
+		err = writer.close_file()
+		if err != OK:
+			writer.close()
+			return err
 		res_copy.selection_audio = selection_filename
 	else:
 		res_copy.selection_audio = ""
 
 	if FileAccess.file_exists(cover_art):
 		var cover_filename = cover_art.get_file()
-		writer.start_file(cover_art)
+		err = writer.start_file(cover_filename)
+		if err != OK:
+			writer.close()
+			return err
 		var cover_art_file = FileAccess.open(cover_art, FileAccess.READ)
+		if not cover_art_file:
+			err = FileAccess.get_open_error()
+			writer.close_file()
+			writer.close()
+			return err
 		var cover_art_bytes = cover_art_file.get_buffer(cover_art_file.get_length())
-		writer.write_file(cover_art_bytes)
-		writer.close_file()
+		if cover_art_file.get_error() != OK:
+			writer.close_file()
+			writer.close()
+			cover_art_file.close()
+			return cover_art_file.get_error()
+		cover_art_file.close()
+		err = writer.write_file(cover_art_bytes)
+		if err != OK:
+			writer.close_file()
+			writer.close()
+			return err
+		err = writer.close_file()
+		if err != OK:
+			writer.close()
+			return err
 		res_copy.cover_art = cover_filename
 	else:
 		res_copy.cover_art = ""
 
 	for i in range(tracks.size()):
 		var track: SongTrackData = res_copy.tracks[i]
+		if not FileAccess.file_exists(track.audio_file):
+			push_error("Required track audio file missing: %s" % track.audio_file)
+			writer.close()
+			return ERR_FILE_NOT_FOUND
 		var track_audio_filename = track.audio_file.get_file()
-		writer.start_file(track_audio_filename)
+		err = writer.start_file(track_audio_filename)
+		if err != OK:
+			writer.close()
+			return err
 		var track_audio_file = FileAccess.open(track.audio_file, FileAccess.READ)
+		if not track_audio_file:
+			err = FileAccess.get_open_error()
+			writer.close_file()
+			writer.close()
+			return err
 		var track_audio_bytes = track_audio_file.get_buffer(track_audio_file.get_length())
-		writer.write_file(track_audio_bytes)
-		writer.close_file()
+		if track_audio_file.get_error() != OK:
+			writer.close_file()
+			writer.close()
+			track_audio_file.close()
+			return track_audio_file.get_error()
+		track_audio_file.close()
+		err = writer.write_file(track_audio_bytes)
+		if err != OK:
+			writer.close_file()
+			writer.close()
+			return err
+		err = writer.close_file()
+		if err != OK:
+			writer.close()
+			return err
 		track.audio_file = track_audio_filename
 
-	ResourceSaver.save(res_copy, temp_dir_path)
+	err = ResourceSaver.save(res_copy, temp_dir_path)
+	if err != OK:
+		writer.close()
+		return err
 	var song_res_filename = resource_path.get_file()
-	writer.start_file(song_res_filename)
+	err = writer.start_file(song_res_filename)
+	if err != OK:
+		writer.close()
+		DirAccess.remove_absolute(temp_dir_path)
+		return err
 	var song_res_file = FileAccess.open(temp_dir_path, FileAccess.READ)
+	if not song_res_file:
+		writer.close()
+		DirAccess.remove_absolute(temp_dir_path)
+		return FileAccess.get_open_error()
 	var song_res_bytes = song_res_file.get_buffer(song_res_file.get_length())
-	writer.write_file(song_res_bytes)
-	writer.close_file()
+	if song_res_file.get_error() != OK:
+		writer.close_file()
+		writer.close()
+		song_res_file.close()
+		DirAccess.remove_absolute(temp_dir_path)
+		return song_res_file.get_error()
+	song_res_file.close()
+	err = writer.write_file(song_res_bytes)
+	if err != OK:
+		writer.close_file()
+		writer.close()
+		DirAccess.remove_absolute(temp_dir_path)
+		return err
+	err = writer.close_file()
+	if err != OK:
+		writer.close()
+		DirAccess.remove_absolute(temp_dir_path)
+		return err
 
 	DirAccess.remove_absolute(temp_dir_path)
 
 	err = writer.close()
 	return err
 
-static func import_zip(path: String) -> SongData:
-	return null
+static func import_zip(path: String) -> Error:
+	const song_directory = "user://songs/"
+	var song_name = path.get_file().get_basename()
+	var folder_path = song_directory.path_join(song_name)
+
+	var reader = ZIPReader.new()
+	var err = reader.open(path)
+	if err != OK:
+		return err
+
+	if DirAccess.dir_exists_absolute(folder_path):
+		push_error("Song folder already exists: %s" % folder_path)
+		return ERR_ALREADY_EXISTS
+	DirAccess.make_dir_recursive_absolute(folder_path)
+	var dir = DirAccess.open(folder_path)
+	if DirAccess.get_open_error() != OK:
+		push_error("Failed to open song folder: %s" % folder_path)
+		return DirAccess.get_open_error()
+	
+	var files = reader.get_files()
+	for file_path in files:
+		if file_path.ends_with("/"):
+			dir.make_dir_recursive(file_path)
+			continue
+		
+		dir.make_dir_recursive(dir.get_current_dir().path_join(file_path).get_base_dir())
+		var file = FileAccess.open(dir.get_current_dir().path_join(file_path), FileAccess.WRITE)
+		if not file:
+			push_error("Failed to create file: %s" % dir.get_current_dir().path_join(file_path))
+			reader.close()
+			return FileAccess.get_open_error()
+		var buffer = reader.read_file(file_path)
+		file.store_buffer(buffer)
+		file.close()
+	
+	err = reader.close()
+	return err
