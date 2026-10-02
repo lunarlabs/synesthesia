@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://q4h65rpug2ae" path="res://addons/kenney_particle_pack/star_01.png" id="3_2ivja"]
 [ext_resource type="Texture2D" uid="uid://bonpfjdyaxk1v" path="res://addons/kenney_particle_pack/rotated/trace_07_rotated.png" id="4_1e67b"]
 [ext_resource type="Shader" uid="uid://bt0wv8w2tjngg" path="res://assets/shaders/checkpointline.tres" id="5_8w72o"]
-[ext_resource type="PackedScene" uid="uid://dmwb2wxd5gn4v" path="res://assets/mesh/checkpoint.blend" id="5_nos5s"]
+[ext_resource type="PackedScene" uid="uid://d7wwuyqqxday" path="res://assets/mesh/checkpoint.glb" id="5_nos5s"]
 [ext_resource type="Shader" uid="uid://ha5bdas7rcte" path="res://assets/shaders/halo_shader.tres" id="6_nos5s"]
 [ext_resource type="Shader" uid="uid://cv8op8vy5wp4u" path="res://assets/shaders/finishplane.tres" id="8_2ivja"]
 
@@ -192,10 +192,10 @@ mesh = SubResource("PlaneMesh_1e67b")
 
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
-[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 941155593) index="0" unique_id=23098908]
+[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 360548216) index="0" unique_id=1410171738]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
-[node name="GateHalo_001" parent="Gate/RightGate" parent_id_path=PackedInt32Array(215747972, 229744792) index="0" unique_id=224203035]
+[node name="GateHalo_001" parent="Gate/RightGate" parent_id_path=PackedInt32Array(215747972, 1377240436) index="0" unique_id=2051234001]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [node name="FinishPlane" type="MeshInstance3D" parent="." unique_id=1480233852]

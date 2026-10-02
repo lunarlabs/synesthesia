@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b5rou2au557hc"]
 
-[ext_resource type="PackedScene" uid="uid://b3f3ytkxxv0lr" path="res://assets/trackgeom.blend" id="1_oblog"]
+[ext_resource type="PackedScene" uid="uid://2xu1xmsax17t" path="res://assets/mesh/trackgeom.glb" id="1_oblog"]
 [ext_resource type="Shader" uid="uid://dvvrpixtrx6n4" path="res://entities/trackshader.gdshader" id="2_plo11"]
 [ext_resource type="Texture2D" uid="uid://dhxi8wpabpu4y" path="res://assets/textures/trackalbedo.png" id="3_qblm2"]
 [ext_resource type="Shader" uid="uid://bue2h033anbms" path="res://entities/trackgeom.gdshader" id="3_y256c"]
@@ -30,8 +30,9 @@ shader_parameter/curve_frg_6 = SubResource("CurveTexture_meoiv")
 
 [node name="trackgeom" unique_id=281112438 instance=ExtResource("1_oblog")]
 
-[node name="Cube" parent="." index="0" unique_id=1860648946]
+[node name="Cube" parent="." index="0" unique_id=179274400]
 unique_name_in_owner = true
+visible = false
 visibility_range_end = 200.0
 visibility_range_end_margin = 8.0
 visibility_range_fade_mode = 1
