@@ -902,7 +902,7 @@ anchor_bottom = 0.5
 offset_left = -90.0
 offset_top = -165.0
 offset_right = -10.0
-offset_bottom = 165.0
+offset_bottom = 185.0
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
@@ -913,7 +913,7 @@ layout_mode = 2
 layout_mode = 2
 tooltip_text = "Gameplay Modifiers"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MODS"
+text = "MENU_SONGSEL_MOD"
 icon = ExtResource("5_wm27l")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -923,7 +923,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Game Settings"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "SYS"
+text = "MENU_SONGSEL_OPTIONS"
 icon = ExtResource("6_jldp2")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -933,7 +933,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Song Audit"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "SONGS"
+text = "MENU_SONGSEL_CATALOG"
 icon = ExtResource("7_h6xa0")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -943,7 +943,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Equalizer/Effects"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "EQ/FX"
+text = "MENU_SONGSEL_EQ_FX"
 icon = ExtResource("8_qhtwy")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -953,7 +953,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Player Statistics"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "STATS"
+text = "MENU_SONGSEL_PLAYER_STATS"
 icon = ExtResource("9_byi8g")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -1210,13 +1210,13 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="ModifierContainer/GridContainer" unique_id=2013413453]
 layout_mode = 2
-text = "Game Modifiers"
+text = "MENU_MODIFIERS_TITLE"
 horizontal_alignment = 1
 uppercase = true
 
 [node name="EnergyBarTitle" type="Label" parent="ModifierContainer/GridContainer" unique_id=1086967898]
 layout_mode = 2
-text = "Energy Bar"
+text = "MOD_ENERGY_GROUP"
 
 [node name="EnergyBarOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=448698383]
 layout_mode = 2
@@ -1234,20 +1234,20 @@ focus_next = NodePath("../TrackResetOptions")
 focus_previous = NodePath("../CloseButton")
 selected = 0
 item_count = 5
-popup/item_0/text = "Normal"
+popup/item_0/text = "MOD_ENERGY_NORMAL"
 popup/item_0/id = 0
-popup/item_1/text = "Constant Drain"
+popup/item_1/text = "MOD_ENERGY_DRAIN"
 popup/item_1/id = 1
-popup/item_2/text = "No Recovery"
+popup/item_2/text = "MOD_ENERGY_NORECOVER"
 popup/item_2/id = 2
-popup/item_3/text = "Sudden Death"
+popup/item_3/text = "MOD_ENERGY_SUDDENDEATH"
 popup/item_3/id = 3
-popup/item_4/text = "Practice (No Fail)"
+popup/item_4/text = "MOD_ENERGY_NOFAIL"
 popup/item_4/id = 4
 
 [node name="TrackResetTitle" type="Label" parent="ModifierContainer/GridContainer" unique_id=492627195]
 layout_mode = 2
-text = "Track Reset"
+text = "MOD_RESET_GROUP"
 
 [node name="TrackResetOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=1369181277]
 layout_mode = 2
@@ -1260,16 +1260,16 @@ focus_next = NodePath("../TimingOptions")
 focus_previous = NodePath("../EnergyBarOptions")
 selected = 0
 item_count = 3
-popup/item_0/text = "Normal"
+popup/item_0/text = "MOD_RESET_NORMAL"
 popup/item_0/id = 0
-popup/item_1/text = "Fast Reset 1"
+popup/item_1/text = "MOD_RESET_FAST1"
 popup/item_1/id = 1
-popup/item_2/text = "Fast Reset 2"
+popup/item_2/text = "MOD_RESET_FAST2"
 popup/item_2/id = 2
 
 [node name="TimingTitle" type="Label" parent="ModifierContainer/GridContainer" unique_id=742783542]
 layout_mode = 2
-text = "Timing Window"
+text = "MOD_TIMING_GROUP"
 
 [node name="TimingOptions" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=1037482499]
 layout_mode = 2
@@ -1282,11 +1282,11 @@ focus_next = NodePath("../CheckpointsButton")
 focus_previous = NodePath(".")
 selected = 1
 item_count = 3
-popup/item_0/text = "Loose"
+popup/item_0/text = "MOD_TIMING_LOOSE"
 popup/item_0/id = 0
-popup/item_1/text = "Normal"
+popup/item_1/text = "MOD_TIMING_NORMAL"
 popup/item_1/id = 1
-popup/item_2/text = "Strict"
+popup/item_2/text = "MOD_TIMING_STRICT"
 popup/item_2/id = 2
 
 [node name="Seperator" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=1721255299]
@@ -1302,7 +1302,7 @@ focus_neighbor_bottom = NodePath("../HighlightsButton")
 focus_next = NodePath("../HighlightsButton")
 focus_previous = NodePath("../TimingOptions")
 button_pressed = true
-text = "Checkpoints "
+text = "MOD_CHECKPOINTS_TOGGLE"
 
 [node name="HighlightsButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=738055518]
 layout_mode = 2
@@ -1314,14 +1314,14 @@ focus_neighbor_bottom = NodePath("../SpeedOption")
 focus_next = NodePath("../SpeedOption")
 focus_previous = NodePath("../CheckpointsButton")
 button_pressed = true
-text = "Highlight Phrase Starts"
+text = "MOD_HIGHLIGHTS_TOGGLE"
 
 [node name="Seperator2" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=1731785847]
 layout_mode = 2
 
 [node name="SpeedTitle" type="Label" parent="ModifierContainer/GridContainer" unique_id=594920054]
 layout_mode = 2
-text = "Speed Options"
+text = "MOD_SPEED_OPTIONS"
 
 [node name="SpeedOption" type="OptionButton" parent="ModifierContainer/GridContainer" unique_id=434068311]
 layout_mode = 2
@@ -1334,9 +1334,9 @@ focus_next = NodePath("../SpeedSlider")
 focus_previous = NodePath("../HighlightsButton")
 selected = 0
 item_count = 2
-popup/item_0/text = "Speed Multiplier"
+popup/item_0/text = "MOD_SPEED_MULTIPLIER"
 popup/item_0/id = 0
-popup/item_1/text = "Constant Speed"
+popup/item_1/text = "MOD_CONSTANT_SPEED"
 popup/item_1/id = 1
 
 [node name="SpeedLabel" type="Label" parent="ModifierContainer/GridContainer" unique_id=558009537]
@@ -1367,7 +1367,7 @@ focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../CloseButton")
 focus_next = NodePath("../CloseButton")
 focus_previous = NodePath("../SpeedSlider")
-text = "Autoblast"
+text = "MOD_AUTOBLAST"
 
 [node name="Seperator4" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=578384054]
 layout_mode = 2
@@ -1382,7 +1382,7 @@ focus_next = NodePath("../EnergyBarOptions")
 focus_previous = NodePath("../AutoblastButton")
 shortcut_context = NodePath("../..")
 shortcut = SubResource("Shortcut_tlsan")
-text = "Close"
+text = "MENU_CLOSE"
 
 [node name="SongSelectAnimation" type="AnimationPlayer" parent="." unique_id=1628454593]
 unique_name_in_owner = true

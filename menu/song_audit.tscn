@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cq2j1hoe3pbb1"]
+
+[node name="SongAudit" type="Control" unique_id=2052430131]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuBar" type="MenuBar" parent="." unique_id=372603309]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="CatalogMenu" type="PopupMenu" parent="MenuBar" unique_id=2094147408]
+title = "Catalog"

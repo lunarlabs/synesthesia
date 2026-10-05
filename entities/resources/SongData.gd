@@ -618,7 +618,7 @@ func make_zip(path: String) -> Error:
 	return err
 
 static func import_zip(path: String) -> Error:
-	const song_directory = "user://songs/"
+	const song_directory = "user://song/"
 	var song_name = path.get_file().get_basename()
 	var folder_path = song_directory.path_join(song_name)
 
