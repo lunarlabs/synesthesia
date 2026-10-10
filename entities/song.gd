@@ -71,6 +71,7 @@ var _furthest_chunk_loaded := -1
 var _closest_chunk_recycled := -1
 var show_phrase_highlights := true
 var _road_center: float
+var _jump_assist: bool
 @onready var asp = $SongPlayer
 @onready var lbl_debug_info = $DebugInfo
 @onready var playhead = $Playhead
@@ -113,6 +114,7 @@ func _ready():
 	%Conductor.setup(asp, bpm)
 	seconds_per_beat = manager_node.song_data.seconds_per_beat
 	length_per_beat = STANDARD_LENGTH_PER_BEAT * length_multiplier
+	_jump_assist = manager_node.jump_assist
 	_playhead_speed = - (length_per_beat / seconds_per_beat)
 	_targets = [%TargetLeft, %TargetCenter, %TargetRight]
 	_track_marker_measures.resize(6) # Initialize cache for 6 instrument tracks
@@ -323,7 +325,6 @@ func _process(delta: float):
 			return
 
 		var mn = manager_node
-		var trs = tracks
 
 		# Smooth playhead movement to absorb conductor timing corrections
 		var target_z = %Conductor.current_beat * -length_per_beat
@@ -335,11 +336,11 @@ func _process(delta: float):
 		# TODO: wrapi(active_track + dir, 0, trs.size()) for classic jump behavior
 		if !mn.autoblast and input_enabled:
 			if Input.is_action_just_pressed("track_next"):
-				new_active_track = _jump_track(1)
+				new_active_track = _jump_track(1) if _jump_assist else wrapi(active_track + 1, 0, tracks.size())
 				_switch_active_track(new_active_track)
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 			elif Input.is_action_just_pressed("track_prev"):
-				new_active_track = _jump_track(-1)
+				new_active_track = _jump_track(-1) if _jump_assist else wrapi(active_track - 1, 0, tracks.size())
 				_switch_active_track(new_active_track)
 				RenderingServer.global_shader_parameter_set("current_track", active_track)
 

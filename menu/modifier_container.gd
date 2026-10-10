@@ -213,3 +213,8 @@ func _update_velocity_label():
 		speed_label.text = "%d BPM" % speed_slider.value
 	else:
 		speed_label.text = "%sx" % speed_slider.value
+
+
+func _on_jump_assist_button_toggled(toggled_on: bool) -> void:
+	SessionManager.modifiers["jump_assist"] = toggled_on
+	setting_changed.emit()

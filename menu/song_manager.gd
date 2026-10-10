@@ -12,6 +12,7 @@ var difficulty: int = 96
 @export_enum("Normal:12", "Fast Reset 1:10", "Fast Reset 2:8", "Dynamic Reset:-1") var fast_track_reset: int = 12
 @export var autoblast: bool = false
 @export_range(0.5, 3.0, 0.25) var hi_speed: float = 1.0
+@export var jump_assist: bool = true
 
 var constant_velocity_mode = false
 var can_pause := false
@@ -183,6 +184,7 @@ func _ready() -> void:
 	constant_velocity_mode = SessionManager.modifiers.get("constant_velocity_mode", false)
 	hi_speed = SessionManager.modifiers.get("length_multiplier", 1.0)
 	autoblast = SessionManager.modifiers.get("autoblast", false)
+	jump_assist = SessionManager.modifiers.get("jump_assist", true)
 
 	var prepare_func = Callable(self , "_prepare_song_data").bind(load_result)
 	task = WorkerThreadPool.add_task(prepare_func)

@@ -902,7 +902,7 @@ anchor_bottom = 0.5
 offset_left = -90.0
 offset_top = -165.0
 offset_right = -10.0
-offset_bottom = 185.0
+offset_bottom = 165.0
 grow_vertical = 2
 
 [node name="SubScreenButtons" type="VBoxContainer" parent="SubScreenContainer" unique_id=20057792]
@@ -913,7 +913,7 @@ layout_mode = 2
 layout_mode = 2
 tooltip_text = "Gameplay Modifiers"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MENU_SONGSEL_MOD"
+text = "MODS"
 icon = ExtResource("5_wm27l")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -923,7 +923,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Game Settings"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MENU_SONGSEL_OPTIONS"
+text = "SYS"
 icon = ExtResource("6_jldp2")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -933,7 +933,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Song Audit"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MENU_SONGSEL_CATALOG"
+text = "SONGS"
 icon = ExtResource("7_h6xa0")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -943,7 +943,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Equalizer/Effects"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MENU_SONGSEL_EQ_FX"
+text = "EQ/FX"
 icon = ExtResource("8_qhtwy")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -953,7 +953,7 @@ expand_icon = true
 layout_mode = 2
 tooltip_text = "Player Statistics"
 theme_override_fonts/font = SubResource("FontVariation_pjj6u")
-text = "MENU_SONGSEL_PLAYER_STATS"
+text = "STATS"
 icon = ExtResource("9_byi8g")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -1304,6 +1304,9 @@ focus_previous = NodePath("../TimingOptions")
 button_pressed = true
 text = "MOD_CHECKPOINTS_TOGGLE"
 
+[node name="Seperator5" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=1138684482]
+layout_mode = 2
+
 [node name="HighlightsButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=738055518]
 layout_mode = 2
 tooltip_text = "If enabled, highlights phrases that continue the streak."
@@ -1315,6 +1318,18 @@ focus_next = NodePath("../SpeedOption")
 focus_previous = NodePath("../CheckpointsButton")
 button_pressed = true
 text = "MOD_HIGHLIGHTS_TOGGLE"
+
+[node name="JumpAssistButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=29315667]
+layout_mode = 2
+tooltip_text = "If enabled, highlights phrases that continue the streak."
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../CheckpointsButton")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../SpeedOption")
+focus_next = NodePath("../SpeedOption")
+focus_previous = NodePath("../CheckpointsButton")
+button_pressed = true
+text = "MOD_JUMP_ASSIST_TOGGLE"
 
 [node name="Seperator2" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=1731785847]
 layout_mode = 2
@@ -1367,7 +1382,8 @@ focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../CloseButton")
 focus_next = NodePath("../CloseButton")
 focus_previous = NodePath("../SpeedSlider")
-text = "MOD_AUTOBLAST"
+theme_override_colors/button_checked_color = Color(1, 0, 0, 1)
+text = "MOD_AUTOBLAST_TOGGLE"
 
 [node name="Seperator4" type="HSeparator" parent="ModifierContainer/GridContainer" unique_id=578384054]
 layout_mode = 2
@@ -1559,6 +1575,7 @@ libraries/ = SubResource("AnimationLibrary_qoeqo")
 [connection signal="item_selected" from="ModifierContainer/GridContainer/TimingOptions" to="ModifierContainer" method="_on_timing_options_item_selected"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/CheckpointsButton" to="ModifierContainer" method="_on_checkpoints_button_toggled"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/HighlightsButton" to="ModifierContainer" method="_on_highlights_button_toggled"]
+[connection signal="toggled" from="ModifierContainer/GridContainer/JumpAssistButton" to="ModifierContainer" method="_on_jump_assist_button_toggled"]
 [connection signal="item_selected" from="ModifierContainer/GridContainer/SpeedOption" to="ModifierContainer" method="_on_speed_option_item_selected"]
 [connection signal="value_changed" from="ModifierContainer/GridContainer/SpeedSlider" to="ModifierContainer" method="_on_speed_slider_value_changed"]
 [connection signal="toggled" from="ModifierContainer/GridContainer/AutoblastButton" to="ModifierContainer" method="_on_autoblast_button_toggled"]
