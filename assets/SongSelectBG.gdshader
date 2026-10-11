@@ -93,12 +93,12 @@ float opRing(vec3 p, float y_offset, float rot_dir, bool is_top) {
     vec2 d_xz = local_pos - obj_pos;
     
     // 6. Handle Vertical Offset
-    float y_pos = is_top ? y_offset : y_offset - (h * 3.0);
+    float y_pos = is_top ? y_offset : y_offset - (h * 4.0);
     
     // Construct the query point relative to the capsule center
     vec3 q = vec3(d_xz.x, p.y - y_pos, d_xz.y);
     
-    return sdVerticalCapsule(q, h * 3., 0.1);
+    return sdVerticalCapsule(q, h * 4., 0.1);
 }
 
 // --- Rotation Matrices ---

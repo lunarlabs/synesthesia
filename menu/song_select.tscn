@@ -1321,7 +1321,7 @@ text = "MOD_HIGHLIGHTS_TOGGLE"
 
 [node name="JumpAssistButton" type="CheckButton" parent="ModifierContainer/GridContainer" unique_id=29315667]
 layout_mode = 2
-tooltip_text = "If enabled, highlights phrases that continue the streak."
+tooltip_text = "If enabled, changing tracks jumps over empty and active tracks."
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../CheckpointsButton")
 focus_neighbor_right = NodePath(".")

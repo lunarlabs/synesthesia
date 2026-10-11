@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://c63m7nndko8cn" path="res://assets/textures/generic_song.svg" id="1_eskt4"]
 [ext_resource type="FontFile" uid="uid://c64x4gnaw1q22" path="res://assets/fonts/Science_Gothic/ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf" id="2_eskt4"]
 [ext_resource type="PackedScene" uid="uid://51eeo5x4q33x" path="res://menu/result_box.tscn" id="3_eskt4"]
+[ext_resource type="Texture2D" uid="uid://bm11ewe0g0gis" path="res://addons/kenney_particle_pack/circle_03.png" id="4_xsivx"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_xsivx"]
 font_size = 24
@@ -28,13 +29,6 @@ variation_opentype = {
 opentype_features = {
 1953396077: 1
 }
-
-[sub_resource type="LabelSettings" id="LabelSettings_dn0fs"]
-resource_local_to_scene = true
-font = SubResource("FontVariation_bsqdo")
-font_size = 72
-outline_size = 6
-outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="FontVariation" id="FontVariation_cnqnt"]
 base_font = ExtResource("2_eskt4")
@@ -544,10 +538,10 @@ tracks/40/path = NodePath("RightSide/RankPanel/RankLabel:modulate")
 tracks/40/interp = 1
 tracks/40/loop_wrap = true
 tracks/40/keys = {
-"times": PackedFloat32Array(1.2, 1.3666667),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(1.2, 1.3666667, 1.4),
+"transitions": PackedFloat32Array(1, 2, 0.5),
 "update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1)]
 }
 tracks/41/type = "value"
 tracks/41/imported = false
@@ -560,6 +554,30 @@ tracks/41/keys = {
 "transitions": PackedFloat32Array(1, 1, 0.5, 1),
 "update": 0,
 "values": [Vector2(1, 10), Vector2(1, 1), Vector2(1.5, 1.5), Vector2(1, 1)]
+}
+tracks/42/type = "value"
+tracks/42/imported = false
+tracks/42/enabled = true
+tracks/42/path = NodePath("RightSide/RankPanel/RankRipple:modulate")
+tracks/42/interp = 1
+tracks/42/loop_wrap = true
+tracks/42/keys = {
+"times": PackedFloat32Array(1, 1.4, 1.7),
+"transitions": PackedFloat32Array(0, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/43/type = "value"
+tracks/43/imported = false
+tracks/43/enabled = true
+tracks/43/path = NodePath("RightSide/RankPanel/RankRipple:offset_transform_scale")
+tracks/43/interp = 1
+tracks/43/loop_wrap = true
+tracks/43/keys = {
+"times": PackedFloat32Array(1.4000001, 1.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(10, 10)]
 }
 
 [sub_resource type="Animation" id="Animation_xsivx"]
@@ -1068,6 +1086,30 @@ tracks/41/keys = {
 "update": 0,
 "values": [Vector2(1, 1)]
 }
+tracks/42/type = "value"
+tracks/42/imported = false
+tracks/42/enabled = true
+tracks/42/path = NodePath("RightSide/RankPanel/RankRipple:modulate")
+tracks/42/interp = 1
+tracks/42/loop_wrap = true
+tracks/42/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/43/type = "value"
+tracks/43/imported = false
+tracks/43/enabled = true
+tracks/43/path = NodePath("RightSide/RankPanel/RankRipple:offset_transform_scale")
+tracks/43/interp = 1
+tracks/43/loop_wrap = true
+tracks/43/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xsivx"]
 _data = {
@@ -1169,9 +1211,19 @@ z_index = 1
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 offset_transform_enabled = true
+theme_override_fonts/font = SubResource("FontVariation_bsqdo")
+theme_override_font_sizes/font_size = 72
 text = "???"
-label_settings = SubResource("LabelSettings_dn0fs")
 horizontal_alignment = 1
+
+[node name="RankRipple" type="TextureRect" parent="RightSide/RankPanel" unique_id=89649422]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+offset_transform_enabled = true
+texture = ExtResource("4_xsivx")
+expand_mode = 3
+stretch_mode = 5
 
 [node name="ClearPanel" type="PanelContainer" parent="RightSide" unique_id=564247159]
 modulate = Color(1, 1, 1, 0)

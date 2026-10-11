@@ -12,6 +12,7 @@ signal setting_changed
 @onready var speed_slider = $GridContainer/SpeedSlider
 @onready var speed_label = $GridContainer/SpeedLabel
 @onready var autoblast_button = $GridContainer/AutoblastButton
+@onready var jump_assist_button = $GridContainer/JumpAssistButton
 
 var previous_checkpoint_choice: bool
 var dont_set_multiplier_value: bool = false
@@ -27,6 +28,7 @@ func _ready() -> void:
 	var constant_velocity_mode = SessionManager.modifiers.get("constant_velocity_mode", false)
 	var length_multiplier = SessionManager.modifiers.get("length_multiplier", 1.0)
 	var autoblast = SessionManager.modifiers.get("autoblast", false)
+	var jump_assist = SessionManager.modifiers.get("jump_assist", false)
 
 	# Now, we essentially do the reverse of the modifier setting in the event functions
 	match energy_modifier:
@@ -96,6 +98,7 @@ func _ready() -> void:
 	_update_velocity_label()
 	
 	autoblast_button.button_pressed = autoblast
+	jump_assist_button.button_pressed = jump_assist
 	setting_changed.emit() # make the menu screen update
 
 func _on_energy_bar_options_item_selected(index: int) -> void:
