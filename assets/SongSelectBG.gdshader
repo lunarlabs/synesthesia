@@ -251,6 +251,12 @@ vec3 hsl_to_rgb(float h, float s, float l) {
     return rgb + m;
 }
 
+float star_field(vec2 uv) {
+    vec2 grid = floor((uv + 1.0) * 700.0);
+    float n = fract(sin(dot(grid, vec2(127.1, 311.7))) * 43758.5453123);
+    return step(0.996, n);
+}
+
 void fragment() {
     // 1. Aspect Ratio Correction
     // SCREEN_PIXEL_SIZE is vec2(1.0/width, 1.0/height)
@@ -260,11 +266,14 @@ void fragment() {
     // Fix aspect ratio so X is wider than Y on landscape screens
     uv.x *= SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
 
-    int object_id;
+    // Subtle camera drift keeps the scene feeling alive without becoming chaotic.
+    vec3 ro = camera_location + vec3(
+        sin(TIME * 0.25) * 0.35,
+        cos(TIME * 0.18) * 0.15,
+        0.0
+    );
 
-    // 2. Camera Setup
-    // Ray Origin (Camera Position)
-    vec3 ro = camera_location;
+    int object_id;
 
     // Ray Direction
     // The UV becomes the XY direction, Z is forward (1.0)
@@ -273,15 +282,20 @@ void fragment() {
     // 3. Perform Raymarching
     float d = ray_march(ro, rd, object_id);
 
-    vec3 bg_color = hsl_to_rgb(0.58, 0.4, 0.08);
+    vec3 bg_color = mix(vec3(0.02, 0.03, 0.08), vec3(0.08, 0.10, 0.22), 0.5 + 0.5 * uv.y);
+    float haze = exp(-length(uv) * 2.5);
+    bg_color += vec3(0.10, 0.18, 0.42) * haze * 0.55;
+//    bg_color += vec3(0.7, 0.8, 1.0) * star_field(uv) * 0.22;
     
     vec3 col = bg_color;
 	if(d < MAX_DIST) {
         // We hit something
         vec3 p = ro + rd * d;
+        vec3 n = get_normal(p);
         vec2 lighting = get_light(p, -rd); // Pass view direction for specular
         float diffuse = lighting.x;
         float base_spec = lighting.y;
+        float rim = pow(1.0 - max(dot(n, -rd), 0.0), 2.5);
         
         // Material properties
         float hue = 0.55;
@@ -294,33 +308,35 @@ void fragment() {
         if (object_id == 1 || object_id == 2) {
             // Parallelograms (Outer rings / walls)
             hue = mix(0.65, 0.60, (p.y + 5.0) / 10.0);
-            sat = mix(0.4, 0.6, diffuse);
-            lightness = mix(0.1, 0.25, diffuse);
+            sat = mix(0.45, 0.8, diffuse + rim * 0.35);
+            lightness = mix(0.10, 0.35, diffuse + rim * 0.5);
             shininess = 32.0;
-            spec_intensity = 0.4;
-            specular_color = hsl_to_rgb(0.60, 0.8, 0.8);
+            spec_intensity = 0.85;
+            specular_color = hsl_to_rgb(0.60, 0.9, 0.9);
         } else if (object_id == 3) {
             // Octahedron (Center piece)
             hue = mix(0.65, 0.70, (p.y + 3.0) / 6.0); 
-            sat = mix(0.6, 0.9, diffuse);
-            lightness = mix(0.2, 0.6, diffuse);
-            shininess = 128.0;
-            spec_intensity = 1.0;
-            specular_color = hsl_to_rgb(0.90, 0.9, 0.9);
+            sat = mix(0.7, 1.0, diffuse + rim * 0.3);
+            lightness = mix(0.20, 0.72, diffuse + rim * 0.8);
+            shininess = 160.0;
+            spec_intensity = 1.6;
+            specular_color = hsl_to_rgb(0.90, 0.9, 0.95);
         } else if (object_id == 4 || object_id == 5) {
             // Visualizer Rings (Audio reactive pills)
-            hue = mix(0.50, 0.55, (p.y + 5.0) / 10.0);
-            sat = mix(0.5, 0.8, diffuse);
-            lightness = mix(0.2, 0.5, diffuse);
-            shininess = 64.0;
-            spec_intensity = 0.9;
-            specular_color = hsl_to_rgb(0.52, 0.8, 0.9);
+            float pulse = 0.65 + 0.35 * sin(TIME * 3.5 + p.x * 1.4 + p.y * 0.7);
+            hue = mix(0.50, 0.58, (p.y + 5.0) / 10.0);
+            sat = mix(0.6, 1.0, diffuse + rim * 0.4 + pulse * 0.2);
+            lightness = mix(0.18, 0.62, diffuse + rim * 0.6 + pulse * 0.2);
+            shininess = 90.0;
+            spec_intensity = 1.2;
+            specular_color = hsl_to_rgb(0.54, 0.9, 0.95);
         }
         
         float specular = pow(base_spec, shininess);
         
         vec3 surface_color = hsl_to_rgb(hue, sat, lightness);
         surface_color += specular_color * specular * spec_intensity;
+        surface_color += specular_color * rim * (0.8 + diffuse);
         
         // Depth fog: Mix surface color with background based on distance
         float fog_factor = smoothstep(0.0, MAX_DIST * 0.7, d);
