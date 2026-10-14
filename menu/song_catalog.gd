@@ -40,9 +40,11 @@ static var QUANT_FACTOR_SIXTEENTH = 1.3
 static var QUANT_FACTOR_THIRTY_SECOND = 1.5
 static var BASE_SPEED_WEIGHT = 1.0
 static var JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
+static var JACK_SMOOTHING_WINDOW = 0.1 # seconds across which the jack weight transitions
 static var PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
 static var PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
 static var PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
+static var MEAN_MAX_BLEND_LAMBDA = 0.25 # Blend factor for mean vs max difficulty for final track calculation
 
 var catalog_loading_scene: PackedScene = preload("res://menu/CatalogLoading.tscn")
 
@@ -128,6 +130,7 @@ class DetailedDifficultyInfo:
 	var measure_note_counts: Array[PackedInt32Array]
 	var phrase_raw_difficulties: Array[PackedFloat32Array]
 	var track_avg_raw_difficulties: PackedFloat32Array
+	var track_max_phrase_difficulties: PackedFloat32Array
 	var avg_raw_difficulty: float
 
 static func get_song_folder_path(folder_id: String) -> String:
@@ -363,6 +366,7 @@ func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> D
 	ddi.measure_note_counts.resize(track_count)
 	ddi.phrase_raw_difficulties.resize(track_count)
 	ddi.track_avg_raw_difficulties.resize(track_count)
+	ddi.track_max_phrase_difficulties.resize(track_count)
 	for i in range(track_count):
 		var note_map = track_maps[i]
 		ddi.track_note_counts[i] = note_map.size()
@@ -378,6 +382,7 @@ func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> D
 		var phrase_difficulties: PackedFloat32Array = PackedFloat32Array()
 		phrase_difficulties.resize(song_data.total_measures)
 		var track_raw_difficulty := 0.0
+		var track_max_phrase_difficulty := 0.0
 		var phrase_map = _build_phrase_map_single_pass(note_map.keys())
 		for start_measure in phrase_map.keys():
 			if start_measure >= phrase_difficulties.size():
@@ -390,10 +395,13 @@ func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> D
 				song_data.seconds_per_beat)
 			phrase_difficulties[start_measure] = raw_difficulty
 			track_raw_difficulty += raw_difficulty
+			track_max_phrase_difficulty = max(track_max_phrase_difficulty, raw_difficulty)
 		ddi.phrase_raw_difficulties[i] = phrase_difficulties
+		ddi.track_max_phrase_difficulties[i] = track_max_phrase_difficulty
 		ddi.track_avg_raw_difficulties[i] = track_raw_difficulty / float(max(phrase_map.size(), 1))
 	# Average across all tracks
 	var total_avg := 0.0
+	var max_measure_difficulty := 0.0
 	var active_measures := 0
 	for m in range(song_data.total_measures):
 		var active_tracks := 0
@@ -404,9 +412,13 @@ func _calculate_detailed_difficulty(track_maps: Array, song_data: SongData) -> D
 				active_tracks += 1
 				measure_sum += v
 		if active_tracks > 0:
-			total_avg += measure_sum / float(active_tracks)
+			var measure_difficulty = measure_sum / float(active_tracks)
+			total_avg += measure_difficulty
+			max_measure_difficulty = max(max_measure_difficulty, measure_difficulty)
 			active_measures += 1
-	ddi.avg_raw_difficulty = total_avg / float(max(active_measures, 1))
+	var mean_measure_difficulty = total_avg / float(max(active_measures, 1))
+	ddi.avg_raw_difficulty = mean_measure_difficulty + MEAN_MAX_BLEND_LAMBDA * (
+		max_measure_difficulty - mean_measure_difficulty)
 	return ddi
 
 func _calculate_phrase_difficulty(
@@ -493,10 +505,15 @@ func _get_pattern_weight(
 	var lane_change = abs(curr_lane - prev_lane)
 	match lane_change:
 		0:
-			if time_interval < JACK_SPEED_THRESHOLD:
+			var transition_start = JACK_SPEED_THRESHOLD - JACK_SMOOTHING_WINDOW / 2.0
+			var transition_end = JACK_SPEED_THRESHOLD + JACK_SMOOTHING_WINDOW / 2.0
+			if time_interval <= transition_start:
 				return PATTERN_WEIGHT_JACK
-			else:
+			if time_interval >= transition_end:
 				return PATTERN_WEIGHT_EASY
+			var progress = (transition_end - time_interval) / JACK_SMOOTHING_WINDOW
+			progress = progress * progress * (3.0 - 2.0 * progress)
+			return lerpf(PATTERN_WEIGHT_EASY, PATTERN_WEIGHT_JACK, progress)
 		1:
 			return 1.0 # Neutral weight for single lane changes
 		2:
