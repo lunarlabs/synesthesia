@@ -60,13 +60,19 @@ func play_menu_track(track: int, fade_time: float = 0.0):
 				_vol_tween.kill()
 			_vol_tween = create_tween()
 			for i in _menu_music_stream.stream_count:
-				var vol = PLAYING_VOLUME_DB if i == track else MUTED_VOLUME_DB
-				_vol_tween.tween_method(
-					func(x): _menu_music_stream.set_sync_stream_volume(i, x),
-					_menu_music_stream.get_sync_stream_volume(i),
-					vol,
+				var target_linear = 1.0 if i == track else 0.0
+				var current_db := _menu_music_stream.get_sync_stream_volume(i)
+				var current_linear := db_to_linear(current_db)
+				_vol_tween.parallel().tween_method(
+					(func(val: float, idx: int): 
+						_menu_music_stream.set_sync_stream_volume(
+							idx, linear_to_db(val)
+						)
+						).bind(i),
+					current_linear,
+					target_linear,
 					fade_time
-				).parallel()
+				).set_trans(Tween.TRANS_LINEAR)
 		_vol_tween.tween_callback(_on_audio_transition_completed)
 		_current_stream_idx = track
 	else:

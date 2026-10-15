@@ -1563,6 +1563,7 @@ libraries/ = SubResource("AnimationLibrary_qoeqo")
 
 [connection signal="difficulty_changed" from="." to="Carousel" method="_on_song_select_difficulty_changed"]
 [connection signal="pressed" from="SubScreenContainer/SubScreenButtons/ModifierButton" to="." method="_on_modifier_button_pressed"]
+[connection signal="pressed" from="SubScreenContainer/SubScreenButtons/SongsButton" to="." method="_on_songs_button_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/EnergyOption" to="." method="_on_energy_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/CheckpointOption" to="." method="_on_checkpoint_option_pressed"]
 [connection signal="pressed" from="LeftSide/HBoxContainer/Modifiers/ModifiersGrid/TimingOption" to="." method="_on_timing_option_pressed"]

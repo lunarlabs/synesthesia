@@ -1,0 +1,143 @@
+[gd_resource type="VisualShader" format=3 uid="uid://bbngs65sbe1ug"]
+
+[sub_resource type="VisualShaderNodeRemap" id="VisualShaderNodeRemap_r41i0"]
+default_input_values = [1, 0.0, 2, 1.0, 3, -1.0, 4, 1.0]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_heyn7"]
+default_input_values = [0, 0.0, 1, 1.0]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_yymwg"]
+parameter_name = "beat"
+qualifier = 1
+
+[sub_resource type="Curve" id="Curve_3sw4s"]
+bake_resolution = 200
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.0390625, 0), 0.0, 0.0, 0, 0, Vector2(0.08333333, 0.9084967), 0.0, 0.0, 0, 0, Vector2(0.12239583, 0.15032679), 0.0, 0.0, 0, 0, Vector2(0.15624999, 0.7908496), 0.0, 0.0, 0, 0, Vector2(0.19270833, 0.496732), 0.0, 0.0, 0, 0, Vector2(0.22, 0.5), 0.0, 0.0, 0, 0, Vector2(0.25, 1), 0.0, 0.0, 0, 0, Vector2(0.3, 0.5), 0.0, 0.0, 0, 0, Vector2(0.47, 0.5), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(0.55, 0.5), 0.0, 0.0, 0, 0, Vector2(0.72, 0.5), 0.0, 0.0, 0, 0, Vector2(0.75, 1), 0.0, 0.0, 0, 0, Vector2(0.8, 0.5), 0.0, 0.0, 0, 0, Vector2(0.97, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 17
+
+[sub_resource type="CurveTexture" id="CurveTexture_e4885"]
+texture_mode = 1
+curve = SubResource("Curve_3sw4s")
+
+[sub_resource type="VisualShaderNodeCurveTexture" id="VisualShaderNodeCurveTexture_cpnr8"]
+output_port_for_preview = 0
+texture = SubResource("CurveTexture_e4885")
+
+[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_r41i0"]
+function = 17
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_yymwg"]
+default_input_values = [0, 0.0, 1, 4.0]
+operator = 3
+
+[sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_r41i0"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_r41i0"]
+input_name = "vertex"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_heyn7"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_yymwg"]
+input_name = "normal"
+
+[sub_resource type="VisualShaderNodeExpression" id="VisualShaderNodeExpression_cpnr8"]
+size = Vector2(440, 340)
+expression = "output0 = fbm(p);"
+
+[sub_resource type="VisualShaderNodeGlobalExpression" id="VisualShaderNodeGlobalExpression_my2lh"]
+size = Vector2(680, 440)
+expression = "float hash(vec2 p) {
+  return fract(sin(dot(p * 17.17, vec2(14.91, 67.31))) * 4791.9511);
+}
+
+float noise(vec2 x) {
+  vec2 p = floor(x);
+  vec2 f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  vec2 a = vec2(1.0, 0.0);
+  return mix(mix(hash(p + a.yy), hash(p + a.xy), f.x),
+         mix(hash(p + a.yx), hash(p + a.xx), f.x), f.y);
+}
+
+float fbm(vec2 x) {
+  float height = 0.0;
+  float amplitude = 0.5;
+  float frequency = 3.0;
+  for (int i = 0; i < 6; i++){
+    height += noise(x * frequency) * amplitude;
+    amplitude *= 0.5;
+    frequency *= 2.0;
+  }
+  return height;
+}"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_62wky"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_62wky"]
+input_name = "vertex_id"
+
+[resource]
+flags/unshaded = true
+flags/wireframe = true
+nodes/vertex/2/node = SubResource("VisualShaderNodeInput_r41i0")
+nodes/vertex/2/position = Vector2(-400, 200)
+nodes/vertex/3/node = SubResource("VisualShaderNodeVectorOp_heyn7")
+nodes/vertex/3/position = Vector2(40, 240)
+nodes/vertex/4/node = SubResource("VisualShaderNodeInput_yymwg")
+nodes/vertex/4/position = Vector2(-640, 340)
+nodes/vertex/5/node = SubResource("VisualShaderNodeExpression_cpnr8")
+nodes/vertex/5/position = Vector2(-1760, 140)
+nodes/vertex/5/size = Vector2(440, 340)
+nodes/vertex/5/input_ports = "0,3,p;"
+nodes/vertex/5/output_ports = "0,0,output0;"
+nodes/vertex/5/expression = "output0 = fbm(p);"
+nodes/vertex/6/node = SubResource("VisualShaderNodeGlobalExpression_my2lh")
+nodes/vertex/6/position = Vector2(-500, -340)
+nodes/vertex/6/size = Vector2(680, 440)
+nodes/vertex/6/input_ports = ""
+nodes/vertex/6/output_ports = ""
+nodes/vertex/6/expression = "float hash(vec2 p) {
+  return fract(sin(dot(p * 17.17, vec2(14.91, 67.31))) * 4791.9511);
+}
+
+float noise(vec2 x) {
+  vec2 p = floor(x);
+  vec2 f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  vec2 a = vec2(1.0, 0.0);
+  return mix(mix(hash(p + a.yy), hash(p + a.xy), f.x),
+         mix(hash(p + a.yx), hash(p + a.xx), f.x), f.y);
+}
+
+float fbm(vec2 x) {
+  float height = 0.0;
+  float amplitude = 0.5;
+  float frequency = 3.0;
+  for (int i = 0; i < 6; i++){
+    height += noise(x * frequency) * amplitude;
+    amplitude *= 0.5;
+    frequency *= 2.0;
+  }
+  return height;
+}"
+nodes/vertex/7/node = SubResource("VisualShaderNodeVectorOp_62wky")
+nodes/vertex/7/position = Vector2(-220, 360)
+nodes/vertex/9/node = SubResource("VisualShaderNodeInput_62wky")
+nodes/vertex/9/position = Vector2(-1720, 60)
+nodes/vertex/10/node = SubResource("VisualShaderNodeRemap_r41i0")
+nodes/vertex/10/position = Vector2(-540, 640)
+nodes/vertex/11/node = SubResource("VisualShaderNodeFloatOp_heyn7")
+nodes/vertex/11/position = Vector2(-680, 480)
+nodes/vertex/12/node = SubResource("VisualShaderNodeFloatParameter_yymwg")
+nodes/vertex/12/position = Vector2(-1880, 600)
+nodes/vertex/13/node = SubResource("VisualShaderNodeCurveTexture_cpnr8")
+nodes/vertex/13/position = Vector2(-1120, 640)
+nodes/vertex/14/node = SubResource("VisualShaderNodeFloatFunc_r41i0")
+nodes/vertex/14/position = Vector2(-1371.6206, 696.68994)
+nodes/vertex/15/node = SubResource("VisualShaderNodeFloatOp_yymwg")
+nodes/vertex/15/position = Vector2(-1560, 700)
+nodes/vertex/16/node = SubResource("VisualShaderNodeClamp_r41i0")
+nodes/vertex/16/position = Vector2(-960, 200)
+nodes/vertex/connections = PackedInt32Array(2, 0, 3, 0, 3, 0, 0, 0, 4, 0, 7, 0, 9, 0, 5, 0, 14, 0, 13, 0, 12, 0, 15, 0, 15, 0, 14, 0, 5, 0, 16, 0, 16, 0, 11, 0, 7, 0, 3, 1, 13, 0, 10, 0, 10, 0, 11, 1, 11, 0, 7, 1)

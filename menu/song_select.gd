@@ -617,6 +617,7 @@ func _on_song_select_animation_animation_finished(anim_name: StringName) -> void
 				0.5).from(0.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 			title_tween.set_loops()
 
-
-func _on_jump_assist_button_toggled(toggled_on: bool) -> void:
-	pass # Replace with function body.
+func _on_songs_button_pressed() -> void:
+	Transition.start_transition_in()
+	await Transition.animation_completed
+	get_tree().change_scene_to_file("res://menu/song_audit.tscn")

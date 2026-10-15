@@ -89,7 +89,7 @@ CREATE TABLE "difficulties" (
     "song_folder"       TEXT NOT NULL,
     "difficulty_offset" INTEGER NOT NULL,
     -- currently the highest rating is 10.7 but future songs may have higher ratings
-    "difficulty_rating" REAL NOT NULL CHECK ("difficulty_rating" BETWEEN 0 AND 20),
+    "difficulty_rating" REAL NOT NULL CHECK ("difficulty_rating" BETWEEN 0 AND 99),
     "details_json"      TEXT, -- Stores the DetailedDifficultyInfo serializer as JSON
     PRIMARY KEY("song_folder","difficulty_offset"),
     FOREIGN KEY("difficulty_offset") REFERENCES "difficulty_levels"("offset"),
@@ -157,7 +157,7 @@ SELECT
     s."cover_art_height",
     s."cover_art_width",
     d."difficulty_offset",
-    ROUND(d."difficulty_rating", 1) AS "difficulty_rating",
+    ROUND(d."difficulty_rating") AS "difficulty_rating",
     d."difficulty_rating" AS "real_rating",
     d."details_json",
     dl."name" AS "difficulty_name",
