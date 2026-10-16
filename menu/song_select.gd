@@ -618,6 +618,7 @@ func _on_song_select_animation_animation_finished(anim_name: StringName) -> void
 			title_tween.set_loops()
 
 func _on_songs_button_pressed() -> void:
+	_stop_song_preview()
 	Transition.start_transition_in()
 	await Transition.animation_completed
 	get_tree().change_scene_to_file("res://menu/song_audit.tscn")

@@ -268,8 +268,8 @@ void fragment() {
 
     // Subtle camera drift keeps the scene feeling alive without becoming chaotic.
     vec3 ro = camera_location + vec3(
-        sin(TIME * 0.25) * 0.35,
-        cos(TIME * 0.18) * 0.15,
+        sin(TIME * 0.25) * 0.3,
+        cos(TIME * 0.18) * 0.5,
         0.0
     );
 
