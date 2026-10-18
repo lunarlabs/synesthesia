@@ -373,8 +373,8 @@ func get_cover_art_image() -> Image:
 
 func make_zip(path: String) -> Error:
 	ResourceSaver.save(self)
-	var res_copy: SongData = duplicate_deep()
-	var temp_dir_path := OS.get_temp_dir().path_join("sr-song-temp.tres")
+	#var res_copy: SongData = duplicate_deep()
+	#var temp_dir_path := OS.get_temp_dir().path_join("sr-song-temp.tres")
 
 	if not FileAccess.file_exists(midi_file):
 		push_error("Required midi file missing")
@@ -382,6 +382,26 @@ func make_zip(path: String) -> Error:
 	if not FileAccess.file_exists(click_track):
 		push_error("Required audio file missing")
 		return ERR_FILE_NOT_FOUND
+
+	# it'll be much easier to work on this with external tools if we use
+	# something standard like JSON instead of .tres files
+	var json_dict: Dictionary = {
+		&"title": title,
+		&"sub_title": sub_title,
+		&"artist": artist,
+		&"genre": genre,
+		&"source": source,
+		&"description": description,
+		&"scale_fudge_factor": scale_fudge_factor,
+		&"lead_in_measures": lead_in_measures,
+		&"playable_measures": playable_measures,
+		&"checkpoints": checkpoints,
+		&"bpm_fix": bpm_fix,
+		&"fixed_bpm": fixed_bpm,
+		&"midi_filename": midi_file.get_file(),
+		&"click_track": click_track.get_file(),
+		&"tracks": [],
+	}
 
 	var writer := ZIPPacker.new()
 	var err = writer.open(path)
@@ -415,7 +435,7 @@ func make_zip(path: String) -> Error:
 	if err != OK:
 		writer.close()
 		return err
-	res_copy.midi_file = midi_filename
+	#res_copy.midi_file = midi_filename
 
 	var click_track_filename = click_track.get_file()
 	err = writer.start_file(click_track_filename)
@@ -444,10 +464,11 @@ func make_zip(path: String) -> Error:
 	if err != OK:
 		writer.close()
 		return err
-	res_copy.click_track = click_track_filename
+	#res_copy.click_track = click_track_filename
 
 	if FileAccess.file_exists(preview_audio):
 		var preview_filename = preview_audio.get_file()
+		json_dict[&"preview_filename"] = preview_filename
 		err = writer.start_file(preview_filename)
 		if err != OK:
 			writer.close()
@@ -474,12 +495,13 @@ func make_zip(path: String) -> Error:
 		if err != OK:
 			writer.close()
 			return err
-		res_copy.preview_audio = preview_filename
-	else:
-		res_copy.preview_audio = ""
+		#res_copy.preview_audio = preview_filename
+	#else:
+		#res_copy.preview_audio = ""
 
 	if FileAccess.file_exists(selection_audio):
 		var selection_filename = selection_audio.get_file()
+		json_dict[&"selection_filename"] = selection_filename
 		err = writer.start_file(selection_filename)
 		if err != OK:
 			writer.close()
@@ -506,12 +528,13 @@ func make_zip(path: String) -> Error:
 		if err != OK:
 			writer.close()
 			return err
-		res_copy.selection_audio = selection_filename
-	else:
-		res_copy.selection_audio = ""
+		#res_copy.selection_audio = selection_filename
+	#else:
+		#res_copy.selection_audio = ""
 
 	if FileAccess.file_exists(cover_art):
 		var cover_filename = cover_art.get_file()
+		json_dict[&"cover_filename"] = cover_filename
 		err = writer.start_file(cover_filename)
 		if err != OK:
 			writer.close()
@@ -538,17 +561,24 @@ func make_zip(path: String) -> Error:
 		if err != OK:
 			writer.close()
 			return err
-		res_copy.cover_art = cover_filename
-	else:
-		res_copy.cover_art = ""
+		#res_copy.cover_art = cover_filename
+	#else:
+		#res_copy.cover_art = ""
 
 	for i in range(tracks.size()):
-		var track: SongTrackData = res_copy.tracks[i]
+		var track: SongTrackData = tracks[i]
+		var track_dict: Dictionary = {
+			&"midi_track_name": track.midi_track_name,
+			&"instrument": SongCatalog.INSTRUMENT_NAMES[track.instrument],
+			&"inactive_db": track.inactive_volume,
+		}
 		if not FileAccess.file_exists(track.audio_file):
 			push_error("Required track audio file missing: %s" % track.audio_file)
 			writer.close()
 			return ERR_FILE_NOT_FOUND
 		var track_audio_filename = track.audio_file.get_file()
+		track_dict[&"audio_file"] = track_audio_filename
+		json_dict[&"tracks"].append(track_dict)
 		err = writer.start_file(track_audio_filename)
 		if err != OK:
 			writer.close()
@@ -575,44 +605,29 @@ func make_zip(path: String) -> Error:
 		if err != OK:
 			writer.close()
 			return err
-		track.audio_file = track_audio_filename
+		#track.audio_file = track_audio_filename
 
-	err = ResourceSaver.save(res_copy, temp_dir_path)
-	if err != OK:
-		writer.close()
-		return err
-	var song_res_filename = resource_path.get_file()
+	# err = ResourceSaver.save(res_copy, temp_dir_path)
+	# if err != OK:
+	# 	writer.close()
+	# 	return err
+	var song_res_filename = resource_path.get_file().get_basename() + ".json"
+	var json_string = JSON.stringify(json_dict)
 	err = writer.start_file(song_res_filename)
 	if err != OK:
 		writer.close()
-		DirAccess.remove_absolute(temp_dir_path)
 		return err
-	var song_res_file = FileAccess.open(temp_dir_path, FileAccess.READ)
-	if not song_res_file:
-		writer.close()
-		DirAccess.remove_absolute(temp_dir_path)
-		return FileAccess.get_open_error()
-	var song_res_bytes = song_res_file.get_buffer(song_res_file.get_length())
-	if song_res_file.get_error() != OK:
-		writer.close_file()
-		writer.close()
-		song_res_file.close()
-		DirAccess.remove_absolute(temp_dir_path)
-		return song_res_file.get_error()
-	song_res_file.close()
-	err = writer.write_file(song_res_bytes)
+	err = writer.write_file(json_string.to_utf8_buffer())
 	if err != OK:
 		writer.close_file()
 		writer.close()
-		DirAccess.remove_absolute(temp_dir_path)
 		return err
 	err = writer.close_file()
 	if err != OK:
 		writer.close()
-		DirAccess.remove_absolute(temp_dir_path)
 		return err
 
-	DirAccess.remove_absolute(temp_dir_path)
+	# DirAccess.remove_absolute(temp_dir_path)
 
 	err = writer.close()
 	return err
@@ -621,6 +636,7 @@ static func import_zip(path: String) -> Error:
 	const song_directory = "user://song/"
 	var song_name = path.get_file().get_basename()
 	var folder_path = song_directory.path_join(song_name)
+	var song: SongData = null
 
 	var reader = ZIPReader.new()
 	var err = reader.open(path)
@@ -640,6 +656,69 @@ static func import_zip(path: String) -> Error:
 	for file_path in files:
 		if file_path.ends_with("/"):
 			dir.make_dir_recursive(file_path)
+			continue
+
+		if file_path.get_extension().to_lower() == "json":
+			if song:
+				push_warning("A manifest was already read, skipping.")
+				continue
+			elif file_path.get_file().get_basename() != song_name:
+				push_warning("Manifest file name doesn't match zip file name (zip renamed?)")
+			var json_string := reader.read_file(file_path).get_string_from_utf8()
+			var parsed = JSON.parse_string(json_string)
+			if typeof(parsed) != TYPE_DICTIONARY:
+				push_error("Invalid manifest!")
+				err = reader.close()
+				if err == OK:
+					return ERR_PARSE_ERROR
+				break
+			var data = parsed as Dictionary
+			song = SongData.new()
+
+			song.title = data.get("title", "Unknown Song")
+			song.sub_title = data.get("sub_title", "")
+			song.artist = data.get("artist", "Unknown Artist")
+			song.genre = data.get("genre", "Unknown Genre")
+			song.source = data.get("source", "Unknown Source")
+			song.description = data.get("description", "")
+			song.scale_fudge_factor = data.get("scale_fudge_factor", 1.0)
+			song.lead_in_measures = int(data.get("lead_in_measures", 4))
+			song.playable_measures = int(data.get("playable_measures", 100))
+			song.bpm_fix = data.get("bpm_fix", false)
+			song.fixed_bpm = data.get("fixed_bpm", 120.0)
+
+			song.midi_file = folder_path.path_join(data["midi_filename"])
+			song.click_track = folder_path.path_join(data["click_track"])
+
+			if data.has("cover_filename"):
+				song.cover_art = folder_path.path_join(data["cover_filename"])
+			if data.has("preview_filename"):
+				song.preview_audio = folder_path.path_join(data["preview_filename"])
+			if data.has("selection_filename"):
+				song.selection_audio = folder_path.path_join(data["selection_filename"])
+			
+			song.checkpoints.clear()
+			for checkpoint in data.get("checkpoints", []):
+				song.checkpoints.append(int(checkpoint))
+			
+			song.tracks.clear()
+			for track_data: Dictionary in data.get("tracks", []):
+				var track := SongTrackData.new()
+				track.midi_track_name = track_data["midi_track_name"]
+				track.audio_file = folder_path.path_join(track_data["audio_file"])
+				track.inactive_volume = track_data["inactive_db"]
+
+				var instrument_index := SongCatalog.INSTRUMENT_NAMES.find(track_data["instrument"])
+				if instrument_index == -1:
+					err = reader.close()
+					if err == OK:
+						return ERR_INVALID_DATA
+					break
+				track.instrument = instrument_index
+
+				song.tracks.append(track)
+			var resource_save_path = folder_path.path_join(song_name + ".tres")
+			err = ResourceSaver.save(song, resource_save_path)
 			continue
 		
 		dir.make_dir_recursive(dir.get_current_dir().path_join(file_path).get_base_dir())
