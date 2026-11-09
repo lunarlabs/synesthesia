@@ -188,6 +188,10 @@ func _set_dirty(value: bool) -> void:
 	%SaveButton.disabled = not dirty
 	%RevertButton.disabled = not dirty
 
+func _set_text_edit_text_if_different(text_edit: TextEdit, value: String) -> void:
+	if text_edit.text != value:
+		text_edit.text = value
+
 func _get_song_folder_path(folder: String) -> String:
 	return SONGS_PATH.path_join(folder)
 
@@ -310,7 +314,7 @@ func _on_title_field_text_changed() -> void:
 	var old_title = current_song.title
 	undo_redo.create_action("Change Song Title")
 	undo_redo.add_do_property(current_song, "title", %TitleField.text)
-	undo_redo.add_do_property(%TitleField, "text", %TitleField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %TitleField, %TitleField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "title", old_title)
 	undo_redo.add_undo_property(%TitleField, "text", old_title)
@@ -322,7 +326,7 @@ func _on_subtitle_field_text_changed() -> void:
 	var old_subtitle = current_song.subtitle
 	undo_redo.create_action("Change Subtitle")
 	undo_redo.add_do_property(current_song, "subtitle", %SubtitleField.text)
-	undo_redo.add_do_property(%SubtitleField, "text", %SubtitleField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %SubtitleField, %SubtitleField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "subtitle", old_subtitle)
 	undo_redo.add_undo_property(%SubtitleField, "text", old_subtitle)
@@ -334,7 +338,7 @@ func _on_artist_field_text_changed() -> void:
 	var old_artist = current_song.artist
 	undo_redo.create_action("Change Artist")
 	undo_redo.add_do_property(current_song, "artist", %ArtistField.text)
-	undo_redo.add_do_property(%ArtistField, "text", %ArtistField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %ArtistField, %ArtistField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "artist", old_artist)
 	undo_redo.add_undo_property(%ArtistField, "text", old_artist)
@@ -346,7 +350,7 @@ func _on_genre_field_text_changed() -> void:
 	var old_genre = current_song.genre
 	undo_redo.create_action("Change Genre")
 	undo_redo.add_do_property(current_song, "genre", %GenreField.text)
-	undo_redo.add_do_property(%GenreField, "text", %GenreField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %GenreField, %GenreField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "genre", old_genre)
 	undo_redo.add_undo_property(%GenreField, "text", old_genre)
@@ -358,7 +362,7 @@ func _on_source_field_text_changed() -> void:
 	var old_source = current_song.source
 	undo_redo.create_action("Change Source")
 	undo_redo.add_do_property(current_song, "source", %SourceField.text)
-	undo_redo.add_do_property(%SourceField, "text", %SourceField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %SourceField, %SourceField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "source", old_source)
 	undo_redo.add_undo_property(%SourceField, "text", old_source)
@@ -370,7 +374,7 @@ func _on_description_field_text_changed() -> void:
 	var old_description = current_song.description
 	undo_redo.create_action("Change Description")
 	undo_redo.add_do_property(current_song, "description", %DescriptionField.text)
-	undo_redo.add_do_property(%DescriptionField, "text", %DescriptionField.text)
+	undo_redo.add_do_method(self, "_set_text_edit_text_if_different", %DescriptionField, %DescriptionField.text)
 	undo_redo.add_do_method(self, "_set_dirty", true)
 	undo_redo.add_undo_property(current_song, "description", old_description)
 	undo_redo.add_undo_property(%DescriptionField, "text", old_description)

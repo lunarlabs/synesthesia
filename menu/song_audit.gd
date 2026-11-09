@@ -22,7 +22,8 @@ func _on_catalog_menu_id_pressed(id: int) -> void:
 			if id == 1:
 				SessionManager.close_library_db()
 				DirAccess.remove_absolute(SessionManager.LIBRARY_DB_PATH)
-			await SongCatalog.scan_for_songs(SessionManager.library_db_file_exists)
+			await SongCatalog.scan_for_songs(not SessionManager.library_db_file_exists)
+			SessionManager.previous_select_options.clear()
 			SongCatalog.make_menu_structure()
 		3:
 			Transition.start_transition_in()

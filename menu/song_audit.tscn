@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cq2j1hoe3pbb1"]
 
-[ext_resource type="Script" uid="uid://h812gttvaqd4" path="res://menu/song_audit.gd" id="1_wnduy"]
+[ext_resource type="Script" uid="uid://wlspwp1axahj" path="res://menu/song_audit.gd" id="1_wnduy"]
 
 [node name="SongAudit" type="Control" unique_id=2052430131]
 layout_mode = 3
@@ -30,5 +30,13 @@ item_2/id = 2
 item_2/separator = true
 item_3/text = "Return to Song Select"
 item_3/id = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=481857569]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.2
+anchor_right = 0.9
+anchor_bottom = 0.9
 
 [connection signal="id_pressed" from="MenuBar/CatalogMenu" to="." method="_on_catalog_menu_id_pressed"]

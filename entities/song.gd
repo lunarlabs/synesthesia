@@ -230,6 +230,8 @@ func _ready():
 		%EnergyTitle.hide()
 		%EnergyMod.show()
 		%EnergyMod.text = "HUD_AUTOBLAST_ON"
+		%TimingStats.hide()
+		%FastSlowLabel.hide()
 	else:
 		match manager_node.energy_modifier:
 			1:

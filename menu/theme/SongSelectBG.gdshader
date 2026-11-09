@@ -75,7 +75,7 @@ float opRing(vec3 p, float r, float a, float y_offset, float rot_dir, bool is_to
     // Fast periodic index wrap for texture fetch
     int j = int(mod(mod(id, 64.0) + 64.0, 16.0));
     float h = texelFetch(viz, ivec2(j, 0), 0).x;
-    float h4 = h * 4.0;
+    float h4 = h * 3.0;
     
     // Reconstruct query offset directly
     vec2 d_xz = vec2(sin(local_a) * r, cos(local_a) * r - 11.0);

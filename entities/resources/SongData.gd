@@ -12,6 +12,15 @@ const MIDI_META_TEMPO_EVENT = 0x51
 
 const DIFFICULTY_LEVELS = [96, 102, 108, 114] # MIDI note offsets for Easy, Medium, Hard, Expert
 
+const INSTRUMENT_NAMES = [
+	"drums",
+	"bass",
+	"guitar",
+	"synth",
+	"vocals",
+	"fx",
+]
+
 var _midi_data: MidiResource
 var _cached_midi_track_names: Array[String] = []
 
@@ -569,7 +578,7 @@ func make_zip(path: String) -> Error:
 		var track: SongTrackData = tracks[i]
 		var track_dict: Dictionary = {
 			&"midi_track_name": track.midi_track_name,
-			&"instrument": SongCatalog.INSTRUMENT_NAMES[track.instrument],
+			&"instrument": INSTRUMENT_NAMES[track.instrument],
 			&"inactive_db": track.inactive_volume,
 		}
 		if not FileAccess.file_exists(track.audio_file):
