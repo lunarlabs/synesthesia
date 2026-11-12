@@ -14,8 +14,8 @@ void fragment() {
     // 2. Emission Logic
     // Condensing the node math: UV.y minus beat, then fract, then texture lookup
     float scroll_val = fract(UV.y - beat);
-    float curve_val = texture(curve_frg_6, vec2(scroll_val, 0.0)).r;
-    
+    // float curve_val = texture(curve_frg_6, vec2(scroll_val, 0.0)).r;
+    float curve_val = smoothstep(0.48, 0.5, abs(scroll_val - 0.5));
     // Mixing black with the tint color based on the curve is mathematically 
     // identical to just multiplying them, which is much cheaper.
     EMISSION = measure_tint.rgb * curve_val;

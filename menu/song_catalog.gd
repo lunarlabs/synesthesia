@@ -41,8 +41,8 @@ static var QUANT_FACTOR_THIRTY_SECOND = 1.5
 static var BASE_SPEED_WEIGHT = 1.0
 static var JACK_SPEED_THRESHOLD = 0.2 # seconds between notes to consider "jacking"
 static var JACK_SMOOTHING_WINDOW = 0.1 # seconds across which the jack weight transitions
-static var PATTERN_WEIGHT_JACK = 2.5 # Penalty for fast repeated notes
-static var PATTERN_WEIGHT_JUMP = 1.5 # Penalty for Lane 0 -> Lane 2
+static var PATTERN_WEIGHT_JACK = 1.75 # Penalty for fast repeated notes
+static var PATTERN_WEIGHT_JUMP = 1.25 # Penalty for Lane 0 -> Lane 2
 static var PATTERN_WEIGHT_EASY = 0.8 # Bonus for slow repeated notes
 static var MEAN_MAX_BLEND_LAMBDA = 0.25 # Blend factor for mean vs max difficulty for final track calculation
 
