@@ -816,6 +816,7 @@ func _on_conductor_new_measure(measure: Variant) -> void:
 		tween.tween_property(%Camera, "position:y", 3.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(%MPCamera, "position:y", 3.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(%MPCamera, "fov", 75.0, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(%MPCamera, "v_offset", 0., 2.).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		var stop_duration = seconds_per_beat * BEATS_PER_MEASURE * 2
 		# To match initial velocity (play speed) with a Quad EaseOut, Distance must be V0 * T / 2
 		# V0 = length/sec. T = 2 * measures_sec.

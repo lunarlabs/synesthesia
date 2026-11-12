@@ -2049,7 +2049,6 @@ offset_right = 777.0
 offset_bottom = 16.0
 
 [node name="FinishTower" parent="." unique_id=32694067 instance=ExtResource("16_qk6wt")]
-visible = false
 
 [connection signal="song_finished" from="." to="FinishTower" method="_on_song_song_finished"]
 [connection signal="timeout" from="HUD/FastSlowLabel/FastSlowTimer" to="." method="_hide_fast_slow_label"]
