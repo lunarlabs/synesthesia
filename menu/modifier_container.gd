@@ -191,6 +191,7 @@ func _input(event: InputEvent) -> void:
 	if visible and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if not get_global_rect().has_point(get_global_mouse_position()):
 			_on_close_button_pressed()
+			get_viewport().set_input_as_handled()
 
 func _on_close_button_pressed() -> void:
 	hide()

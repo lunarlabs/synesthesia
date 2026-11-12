@@ -18,6 +18,10 @@ CREATE TABLE "song_paks" (
     "pak_art_width"     INTEGER CHECK("pak_art_width" BETWEEN 1 AND 16777216),
     "pak_art_height"    INTEGER CHECK("pak_art_height" BETWEEN 1 AND 16777216),
     "pak_art_fmt"       INTEGER CHECK("pak_art_fmt" BETWEEN 0 AND 46),
+    "default_cover_art"           BLOB,
+    "default_cover_art_width"     INTEGER CHECK("default_cover_art_width" BETWEEN 1 AND 16777216),
+    "default_cover_art_height"    INTEGER CHECK("default_cover_art_height" BETWEEN 1 AND 16777216),
+    "default_cover_art_fmt"       INTEGER CHECK("default_cover_art_fmt" BETWEEN 0 AND 46),
     "sort_key"          TEXT GENERATED ALWAYS AS (
         CASE
             WHEN LOWER(pak_name) LIKE 'the %' THEN SUBSTR(pak_name, 5)
@@ -28,7 +32,10 @@ CREATE TABLE "song_paks" (
     ) STORED,
     CHECK (("pak_art_height" IS NULL) = ("pak_art" IS NULL)
     AND ("pak_art_width" IS NULL) = ("pak_art" IS NULL)
-    AND ("pak_art_fmt" IS NULL) = ("pak_art" IS NULL))
+    AND ("pak_art_fmt" IS NULL) = ("pak_art" IS NULL)),
+    CHECK (("default_cover_art_height" IS NULL) = ("default_cover_art" IS NULL)
+    AND ("default_cover_art_width" IS NULL) = ("default_cover_art" IS NULL)
+    AND ("default_cover_art_fmt" IS NULL) = ("default_cover_art" IS NULL))
 );
 
 DROP TABLE IF EXISTS "difficulty_levels";
@@ -110,6 +117,8 @@ CREATE INDEX "idx_difficulties_rating" ON "difficulties" ("difficulty_rating");
 CREATE INDEX "idx_songs_bpm" ON "songs" ("bpm");
 CREATE INDEX "idx_difficulties_song" ON "difficulties" ("song_folder");
 CREATE INDEX "idx_songs_source" ON "songs" ("source");
+CREATE INDEX "idx_paks" ON "song_paks" ("sort_key");
+
 
 DROP VIEW IF EXISTS "v_song_select";
 CREATE VIEW "v_song_select" AS
@@ -127,13 +136,16 @@ SELECT
     s."resource_hash",
     s."midi_hash",
     s."preview_filename",
-    s."cover_art",
-    s."cover_art_fmt",
-    s."cover_art_height",
-    s."cover_art_width"
+    coalesce(s."cover_art", p."default_cover_art") AS "cover_art",
+    coalesce(s."cover_art_fmt", p."default_cover_art_fmt") AS "cover_art_fmt",
+    coalesce(s."cover_art_height", p."default_cover_art_height") AS "cover_art_height",
+    coalesce(s."cover_art_width", p."default_cover_art_width") AS "cover_art_width",
+    coalesce(p."pak_name", "No Pack") as "pak_name",
+    p."sort_key" AS "pak_sort"
 FROM "songs" s
 LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
 LEFT JOIN "sources" src ON s."source" = src."source_id"
+LEFT JOIN "song_paks" p ON s."song_pak" = p."pak_id"
 GROUP BY s."folder_id";
 
 DROP VIEW IF EXISTS "v_full_library";
@@ -152,20 +164,23 @@ SELECT
     s."resource_hash",
     s."midi_hash",
     s."preview_filename",
-    s."cover_art",
-    s."cover_art_fmt",
-    s."cover_art_height",
-    s."cover_art_width",
+    coalesce(s."cover_art", p."default_cover_art") AS "cover_art",
+    coalesce(s."cover_art_fmt", p."default_cover_art_fmt") AS "cover_art_fmt",
+    coalesce(s."cover_art_height", p."default_cover_art_height") AS "cover_art_height",
+    coalesce(s."cover_art_width", p."default_cover_art_width") AS "cover_art_width",
     d."difficulty_offset",
     ROUND(d."difficulty_rating", 1) AS "difficulty_rating",
     d."difficulty_rating" AS "real_rating",
     d."details_json",
     dl."name" AS "difficulty_name",
-    src."name" AS "source_name"
+    src."name" AS "source_name",
+    coalesce(p."pak_name", "No Pack") as "pak_name",
+    p."sort_key" AS "pak_sort"
 FROM "songs" s
 LEFT JOIN "difficulties" d ON s."folder_id" = d."song_folder"
 LEFT JOIN "difficulty_levels" dl ON d."difficulty_offset" = dl."offset"
-LEFT JOIN "sources" src ON s."source" = src."source_id";
+LEFT JOIN "sources" src ON s."source" = src."source_id"
+LEFT JOIN "song_paks" p ON s."song_pak" = p."pak_id";
 
 DROP VIEW IF EXISTS "v_song_upsert";
 CREATE VIEW "v_song_upsert" AS

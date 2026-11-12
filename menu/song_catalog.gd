@@ -100,10 +100,12 @@ static var FILTER_SOURCE = """source_name = ?"""
 static var FILTER_GENRE = """genre = ?"""
 static var FILTER_CHECKPOINTS = """checkpoint_modifier = ?"""
 static var FILTER_RESET = """track_reset = ?"""
+static var FILTER_PAK = """pak_name = ?"""
 
 static var ORDER_DEFAULT = "ORDER BY sort_key ASC"
 static var ORDER_BPM = "ORDER BY bpm ASC"
 static var ORDER_DIFF_RATING = "ORDER BY difficulty_rating ASC"
+static var ORDER_PAK = "ORDER BY pak_sort ASC"
 
 #const MENU_ITEM_TYPES = ["submenu", "category", "song_single_difficulty", "song_all_difficulties"]
 static var BPM_BUCKET_SIZE = 20

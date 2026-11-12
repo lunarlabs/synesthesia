@@ -2,6 +2,23 @@
 
 [ext_resource type="Script" uid="uid://wlspwp1axahj" path="res://menu/song_audit.gd" id="1_wnduy"]
 
+[sub_resource type="FontVariation" id="FontVariation_voan6"]
+variation_opentype = {
+1129599571: 0,
+1936486004: -10,
+2003072104: 125,
+2003265652: 600
+}
+opentype_features = {
+1936548720: 1
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_wnduy"]
+font = SubResource("FontVariation_voan6")
+font_size = 48
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_3xd07"]
+
 [node name="SongAudit" type="Control" unique_id=2052430131]
 layout_mode = 3
 anchors_preset = 15
@@ -11,32 +28,92 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_wnduy")
 
-[node name="MenuBar" type="MenuBar" parent="." unique_id=372603309]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1593868091]
 
-[node name="CatalogMenu" type="PopupMenu" parent="MenuBar" unique_id=2094147408]
-oversampling_override = 1.0
-title = "Catalog"
-size = Vector2i(240, 105)
-item_count = 4
-item_0/text = "Scan For New Songs"
-item_0/id = 0
-item_1/text = "Rebuild Song Database"
-item_1/id = 1
-item_2/id = 2
-item_2/separator = true
-item_3/text = "Return to Song Select"
-item_3/id = 3
+[node name="Title" type="Label" parent="CanvasLayer" unique_id=855312601]
+offset_left = 32.0
+offset_top = 24.0
+offset_right = 958.0
+offset_bottom = 104.0
+text = "MENU_TITLE_SONG_AUDIT"
+label_settings = SubResource("LabelSettings_wnduy")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=481857569]
-layout_mode = 1
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer" unique_id=481857569]
 anchors_preset = -1
 anchor_left = 0.1
 anchor_top = 0.2
 anchor_right = 0.9
 anchor_bottom = 0.9
 
-[connection signal="id_pressed" from="MenuBar/CatalogMenu" to="." method="_on_catalog_menu_id_pressed"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer" unique_id=810611782]
+layout_mode = 2
+
+[node name="MenuBar" type="MenuBar" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=372603309]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CatalogMenu" type="PopupMenu" parent="CanvasLayer/PanelContainer/VBoxContainer/MenuBar" unique_id=2094147408]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Catalog"
+size = Vector2i(240, 105)
+item_count = 2
+item_0/text = "Scan For New Songs"
+item_0/id = 0
+item_1/text = "Rebuild Song Database"
+item_1/id = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=47946273]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftSide" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=982081575]
+layout_mode = 2
+
+[node name="SongTree" type="Tree" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/LeftSide" unique_id=1913687223]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+
+[node name="BackButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/LeftSide" unique_id=1563344178]
+layout_mode = 2
+text = "Return to Song Select"
+
+[node name="RightSide" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer" unique_id=767761726]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/RightSide" unique_id=431212694]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/RightSide/HBoxContainer" unique_id=782265072]
+layout_mode = 2
+disabled = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3xd07")
+text = "DIFF_96"
+
+[node name="Button2" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/RightSide/HBoxContainer" unique_id=1110205308]
+layout_mode = 2
+disabled = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3xd07")
+text = "DIFF_102"
+
+[node name="Button3" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/RightSide/HBoxContainer" unique_id=398534517]
+layout_mode = 2
+disabled = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3xd07")
+text = "DIFF_108"
+
+[node name="Button4" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/RightSide/HBoxContainer" unique_id=1999861907]
+layout_mode = 2
+disabled = true
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3xd07")
+text = "DIFF_114"
+
+[connection signal="id_pressed" from="CanvasLayer/PanelContainer/VBoxContainer/MenuBar/CatalogMenu" to="." method="_on_catalog_menu_id_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HBoxContainer/LeftSide/BackButton" to="." method="_on_back_button_pressed"]
