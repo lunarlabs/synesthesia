@@ -58,6 +58,11 @@ func select_item(item: Dictionary):
 		&"submenu":
 			navigate_into_submenu(item)
 		&"category":
+			if item[&"open"]:
+				item[&"open"] = false
+				_update_displayed_menu_structure()
+				update_carousel(false)
+				return
 			switch_category(item)
 		&"song_all_difficulties":
 			song_selected.emit(item[&"folder_id"], -1)

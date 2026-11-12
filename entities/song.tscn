@@ -132,6 +132,26 @@ font_size = 56
 outline_size = 10
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="FontVariation" id="FontVariation_tgeyx"]
+base_font = ExtResource("2_0bd8t")
+variation_opentype = {
+1129599571: 0,
+1936486004: 0,
+2003072104: 125,
+2003265652: 300
+}
+opentype_features = {
+1684959085: 0,
+1718772067: 0,
+1953396077: 0
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_xubvx"]
+font = SubResource("FontVariation_tgeyx")
+font_size = 35
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="FontVariation" id="FontVariation_0yoam"]
 base_font = ExtResource("2_0bd8t")
 variation_opentype = {
@@ -1395,7 +1415,6 @@ script = ExtResource("1_jv32a")
 energy_gradient = SubResource("Gradient_36g15")
 
 [node name="SongPlayer" type="AudioStreamPlayer" parent="." unique_id=1984526006 groups=["AudioPlayers", "LoopingAudio"]]
-volume_db = -6.0
 bus = &"Song"
 
 [node name="DebugInfo" type="Label" parent="." unique_id=1195024175]
@@ -1537,7 +1556,7 @@ pivot_offset = Vector2(256, 256)
 texture = ExtResource("3_0mt4k")
 
 [node name="PhraseValue" type="Control" parent="HUD" unique_id=2012156817]
-custom_minimum_size = Vector2(170, 100)
+custom_minimum_size = Vector2(170, 150)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -1545,27 +1564,24 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 210.0
-offset_top = -100.0
+offset_top = -90.0
 offset_right = 380.0
+offset_bottom = 60.000122
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PhraseValueLabel" type="Label" parent="HUD/PhraseValue" unique_id=620704031]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(170, 0)
+custom_minimum_size = Vector2(170, 100)
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 0.5
 offset_left = -85.0
-offset_top = -50.0
 offset_right = 85.0
-offset_bottom = 49.0
+offset_bottom = 99.0
 grow_horizontal = 2
-grow_vertical = 2
 pivot_offset_ratio = Vector2(0.5, 0.5)
 size_flags_horizontal = 8
 text = "0"
@@ -1573,18 +1589,40 @@ label_settings = SubResource("LabelSettings_scy1h")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="PhraseValueTotal" type="Label" parent="HUD/PhraseValue" unique_id=127883655]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(170, 50)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -85.0
+offset_top = -83.0
+offset_right = 85.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset_ratio = Vector2(0.5, 0.5)
+size_flags_horizontal = 8
+text = "0"
+label_settings = SubResource("LabelSettings_xubvx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="PhraseValueAnims" type="Control" parent="HUD/PhraseValue" unique_id=313056461]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
 grow_horizontal = 2
-grow_vertical = 2
 
 [node name="PvlAni1" parent="HUD/PhraseValue/PhraseValueAnims" unique_id=894985603 instance=ExtResource("7_gwrde")]
 visible = false
 layout_mode = 1
+offset_top = 0.0
+offset_bottom = 100.0
 
 [node name="PvlAni2" parent="HUD/PhraseValue/PhraseValueAnims" unique_id=200128491 instance=ExtResource("7_gwrde")]
 visible = false
@@ -1739,6 +1777,7 @@ theme_override_fonts/font = SubResource("FontVariation_0yoam")
 text = "STREAK"
 
 [node name="TimingStats" type="PanelContainer" parent="HUD/ScoreBar" unique_id=1973754546]
+unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1

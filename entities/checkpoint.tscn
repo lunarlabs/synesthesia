@@ -192,10 +192,10 @@ mesh = SubResource("PlaneMesh_1e67b")
 
 [node name="Gate" parent="." unique_id=215747972 instance=ExtResource("5_nos5s")]
 
-[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 360548216) index="0" unique_id=1410171738]
+[node name="GateHalo" parent="Gate/LeftGate" parent_id_path=PackedInt32Array(215747972, 2059326478) index="0" unique_id=1379896786]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
-[node name="GateHalo_001" parent="Gate/RightGate" parent_id_path=PackedInt32Array(215747972, 1377240436) index="0" unique_id=2051234001]
+[node name="GateHalo_001" parent="Gate/RightGate" parent_id_path=PackedInt32Array(215747972, 1630252098) index="0" unique_id=1365923722]
 surface_material_override/0 = SubResource("ShaderMaterial_1e67b")
 
 [node name="FinishPlane" type="MeshInstance3D" parent="." unique_id=1480233852]

@@ -58,6 +58,7 @@ var _early_note_hits: int = 0
 var _late_note_hits: int = 0
 var _avg_hit_offset: float = 0.0
 var _notes_hit_count: int = 0
+var _current_phrase_notes_hit: int = 0
 var _cached_active_track_node: SynRoadTrack # Cache active track reference
 var _track_marker_measures: PackedInt32Array # Cache of marker measures for each track, updated by track._move_marker()
 var _cached_non_empty_tracks_this_measure: Array[bool]
@@ -84,6 +85,7 @@ var _jump_assist: bool
 @onready var lbl_score = %ScoreLabel
 @onready var lbl_streak = %StreakLabel
 @onready var lbl_phrase_value = %PhraseValueLabel
+@onready var lbl_phrase_val_total = %PhraseValueTotal
 @onready var lbl_auto_blast = $HUD/AutoblastLabel
 @onready var lbl_fast_slow = $HUD/FastSlowLabel
 @onready var fast_slow_timer = $HUD/FastSlowLabel/FastSlowTimer
@@ -228,6 +230,8 @@ func _ready():
 		%EnergyTitle.hide()
 		%EnergyMod.show()
 		%EnergyMod.text = "HUD_AUTOBLAST_ON"
+		%TimingStats.hide()
+		%FastSlowLabel.hide()
 	else:
 		match manager_node.energy_modifier:
 			1:
@@ -423,8 +427,10 @@ func debug_info() -> String:
 func _on_started_phrase(phrase_score_value: int, start_measure: int, measure_count: int):
 	_phrase_started_this_measure = true
 	streak += 1
+	lbl_phrase_value.text = "%d" % (min(streak, MAX_COMBO_MULTIPLIER))
 	lbl_streak.text = "x%d" % min(streak, MAX_COMBO_MULTIPLIER)
-	lbl_phrase_value.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
+	lbl_phrase_val_total.text = "%d" % (phrase_score_value * min(streak, MAX_COMBO_MULTIPLIER))
+	lbl_phrase_val_total.show()
 	lbl_phrase_value.show()
 	# Tell inactive tracks to position their markers after this phrase
 	var next_phrase_measure = start_measure + measure_count
@@ -441,7 +447,9 @@ func _on_track_activated(note_count: int, start_measure: int):
 	if streak > max_streak:
 		max_streak = streak
 	_phrases_completed += 1
+	_current_phrase_notes_hit = 0
 	lbl_phrase_value.hide()
+	lbl_phrase_val_total.hide()
 	pv_anims[pv_pointer].phrase_passed(value)
 	pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	%HUDAnimations.play("phrase_completed")
@@ -495,10 +503,12 @@ func _on_streak_broken():
 	_last_streak_break_measure = %Conductor.current_measure
 	var had_streak = streak > 0
 	_miss_count += 1
+	_current_phrase_notes_hit = 0
 	if lbl_phrase_value.visible:
 		pv_anims[pv_pointer].phrase_failed(lbl_phrase_value.text)
 		pv_pointer = (pv_pointer + 1) % pv_anims.size()
 	lbl_phrase_value.hide()
+	lbl_phrase_val_total.hide()
 	match manager_node.energy_modifier:
 		0, 2:
 			energy_change(-1)
@@ -714,9 +724,11 @@ func _hide_fast_slow_label():
 	lbl_fast_slow.text = ""
 
 func _on_note_hit(offset: float):
+	_current_phrase_notes_hit += 1
 	if _note_hit_tween:
 		_note_hit_tween.kill()
 	_note_hit_tween = create_tween()
+	lbl_phrase_value.text = "%d" % (_current_phrase_notes_hit * min(streak, MAX_COMBO_MULTIPLIER))
 	lbl_phrase_value.scale = Vector2(1.25, 1.25)
 	_note_hit_tween.tween_property(lbl_phrase_value, "scale", Vector2(1.0, 1.0), 0.1)
 	_max_hit_offset = max(_max_hit_offset, offset)
@@ -725,7 +737,7 @@ func _on_note_hit(offset: float):
 	_notes_hit_count += 1
 	%NotesHitLabel.text = str(_notes_hit_count)
 	%EarlyHitLabel.text = str(_early_note_hits)
-	%AvgHitLabel.text = "%d ms" % (_avg_hit_offset * -1000)
+	%AvgHitLabel.text = "%+d ms" % (_avg_hit_offset * -1000)
 	%LateHitLabel.text = str(_late_note_hits)
 	if abs(offset) > 0.015:
 		lbl_fast_slow.show()

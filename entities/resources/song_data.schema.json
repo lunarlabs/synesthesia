@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synesthesia Road Song Data",
+  "description": "JSON metadata file generated inside a SongData ZIP archive.",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "sub_title": {
+      "type": "string"
+    },
+    "artist": {
+      "type": "string"
+    },
+    "genre": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "scale_fudge_factor": {
+      "type": "number"
+    },
+    "lead_in_measures": {
+      "type": "integer"
+    },
+    "playable_measures": {
+      "type": "integer"
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "bpm_fix": {
+      "type": "boolean"
+    },
+    "fixed_bpm": {
+      "type": "number"
+    },
+    "midi_filename": {
+      "type": "string"
+    },
+    "click_track": {
+      "type": "string"
+    },
+    "preview_filename": {
+      "type": "string"
+    },
+    "selection_filename": {
+      "type": "string"
+    },
+    "cover_filename": {
+      "type": "string"
+    },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "midi_track_name": {
+            "type": "string"
+          },
+          "instrument": {
+            "type": "string",
+            "enum": [
+              "drums",
+              "bass",
+              "guitar",
+              "synth",
+              "vocals",
+              "fx"
+            ]
+          },
+          "inactive_db": {
+            "type": "number"
+          },
+          "audio_file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "midi_track_name",
+          "instrument",
+          "inactive_db",
+          "audio_file"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "title",
+    "sub_title",
+    "artist",
+    "genre",
+    "source",
+    "description",
+    "scale_fudge_factor",
+    "lead_in_measures",
+    "playable_measures",
+    "checkpoints",
+    "bpm_fix",
+    "fixed_bpm",
+    "midi_filename",
+    "click_track",
+    "tracks"
+  ],
+  "additionalProperties": false
+}
